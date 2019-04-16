@@ -1,0 +1,23 @@
+dependencies:
+- name: traefik
+  version: "~1.52.2"
+  # repository: https://meshbincam.pega.com/artifactory/helm-traefik
+  repository: https://kubernetes-charts.storage.googleapis.com
+  condition: traefik.enabled
+- name: cassandra
+  version: "0.9.4"
+  # repository: https://meshbincam.pega.com/artifactory/helm-cassandra
+  repository: https://kubernetes-charts-incubator.storage.googleapis.com/
+  condition: cassandra.enabled
+- name: elasticsearch
+  version: "1.15.1"
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: elasticsearch.enabled
+- name: fluentd-elasticsearch
+  version: "1.5.0"
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: fluentd-elasticsearch.enabled
+- name: kibana
+  version: "1.1.0"
+  repository: https://kubernetes-charts.storage.googleapis.com/
+  condition: kibana.enabled

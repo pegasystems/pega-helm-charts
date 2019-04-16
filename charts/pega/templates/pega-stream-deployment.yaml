@@ -1,0 +1,21 @@
+{{- define "pega.stream.volume" -}}
+- name: pega-stream
+  mountPath: "/opt/pega"
+{{- end -}}
+{{- define "pega.stream.extraData" -}}
+volumeClaimTemplates:
+- metadata:
+    name: {{ template "pegaStreamName" . }}
+    creationTimestamp:
+  spec:
+    accessModes:
+    - ReadWriteOnce
+  {{- if eq .Values.provider "eks" }}
+    storageClassName: {{ template "pegaStorageClassEBS" }}
+  {{- end }}
+    resources:
+      requests:
+        storage: 5Gi
+serviceName: {{ template "pegaStreamName" . }}
+{{- end -}}
+{{ template "pega.deployment" dict "root" $ "node" .Values.stream "name" (include "pegaStreamName" .) "kind" "StatefulSet" "apiVersion" "apps/v1beta2" "nodeType" "Stream" "initContainers" (list "waitForPegaSearch") "extraVolume" "pega.stream.volume" "extraSpecData" "pega.stream.extraData" }}

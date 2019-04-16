@@ -1,0 +1,216 @@
+# Enter your Kubernetes provider. Replace "YOUR_KUBERNETES_PROVIDER" with one of the following values:
+#   k8s - for a deployment using open-source Kubernetes
+#   openshift - for a deployment using Red Hat Openshift
+#   eks - for a deployment using Amazon EKS
+provider: "YOUR_KUBERNETES_PROVIDER"
+
+# Configure Traefik for load balancing:
+#   If enabled: true, Traefik is deployed automatically.
+#   If enabled: false, Traefik is not deployed and load balancing must be configured manually.
+#   Pega recommends enabling Traefik on providers other than Openshift.
+#   On Openshift, Traefik is ignored and Pega uses Openshift's built-in load balancer.
+traefik:
+  enabled: true
+  # Set any additional Traefik parameters. These values will be used by Traefik's helm chart.
+  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
+  serviceType: NodePort
+  rbac:
+    enabled: true
+  service:
+    nodePorts:
+      # NodePorts for traefik service.
+      http: 30080
+      https: 30443
+
+# Configure EFK stack for logging:
+#   For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
+#   Pega recommends deploying EFK only on k8s
+#   On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
+#   On EKS, see https://eksworkshop.com/logging/
+elasticsearch:
+   # If elasticsearch.enabled is set to true, elasticsearch is deployed automatically. 
+   enabled: true
+   # Set this variable to create the service with given prefix.
+   # elasticsearch service would be <YOUR_ELASTICSEARCH_NAME>-client.
+   # If this parameter is changed, please update the values for for kibana [elasticsearch.url] and fluentd-elasticsearch [host].
+   # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
+   # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
+   fullnameOverride: "YOUR_ELASTICSEARCH_NAME"
+
+kibana:
+  # If kibana.enabled is set to true, kibana is deployed automatically. 
+  enabled: true
+  # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
+  files:
+    kibana.yml:
+      elasticsearch.url: http://<YOUR_ELASTICSEARCH_NAME>-client:9200
+  service:
+    externalPort: 80
+  ingress:
+    # If enabled is set to "true", an ingress is created to access kibana.
+    enabled: true
+    # Enter the domain name to access kibana via a load balancer.
+    hosts:
+      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
+
+fluentd-elasticsearch:
+  # If fluentd-elasticsearch.enabled is set to true, fluentd-elasticsearch is deployed automatically. 
+  enabled: true
+  # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+  elasticsearch:
+    host: '<YOUR_ELASTICSEARCH_NAME>-client'
+    buffer_chunk_limit: 250M
+    buffer_queue_limit: 30
+
+# Docker image information for the Pega docker image, containing the application server.
+# To use this feature you MUST host the image using a private registry.
+# See https://kubernetes.io/docs/concepts/containers/images/#using-a-private-registry
+# Note: the imagePullPolicy is always for all images in this deployment, so pre-pulling images will not work.
+docker:
+  image: "YOUR_PEGA_IMAGE:TAG"
+  registry:
+    url: "YOUR_DOCKER_REGISTRY"
+    # Provide your Docker registry username and password to access the docker image. These credentials will be
+    # used for both the Pega Platform image and the Elasticsearch image.
+    username: "YOUR_DOCKER_REGISTRY_USERNAME"
+    password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+
+# JDBC information to connect to the Pega database.
+# Pega must be installed to this database before deploying on Kubernetes.
+#
+# Examples for jdbc url and driver class:
+# For Oracle:
+#   url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
+#   driverClass: oracle.jdbc.OracleDriver
+# For Microsoft SQL Server:
+#   url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
+#   driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+# For IBM DB2 for LUW:
+#   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+#   driverClass: com.ibm.db2.jcc.DB2Driver
+# For IBM DB2 for z/OS:
+#   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME
+#   driverClass: com.ibm.db2.jcc.DB2Driver
+# For PostgreSQL:
+#   url: jdbc:postgresql://YOUR_DB_HOST:5432/YOUR_DB_NAME
+#   driverClass: org.postgresql.Driver
+jdbc:
+  url: "YOUR_JDBC_URL"
+  driverClass: "YOUR_JDBC_DRIVER_CLASS"
+  # Set the uri to download the database driver for your database.
+  driverUri: "YOUR_JDBC_DRIVER_URI"
+  # Set your database username and password. These values will be obfuscated and stored in a secrets file.
+  username: "YOUR_JDBC_USERNAME"
+  password: "YOUR_JDBC_PASSWORD"
+  # Set the rules and data schemas for your database. Additional schemas can be defined within Pega.
+  rulesSchema: "YOUR_RULES_SCHEMA"
+  dataSchema: "YOUR_DATA_SCHEMA"
+
+# Pega web deployment settings.
+web:
+  # Enter the domain name to access web nodes via a load balancer.
+  #  e.g. web.mypega.example.com
+  domain: "YOUR_WEB_NODE_DOMAIN"
+  # Enter the number of web nodes for Kubernetes to deploy (minimum 1).
+  replicas: 1
+  # Enter the CPU limit for each web node (recommended 2).
+  cpuLimit: 2
+  # Enter the memory limit for each web node (recommended 8Gi).
+  memLimit: "8Gi"
+  # Enter any additional java options.
+  javaOpts: ""
+  # Initial heap size for the jvm.
+  initialHeap: "2048m"
+  # Maximum heap size for the jvm.
+  maxHeap: "7168m"
+  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
+  # The file paths are relative to this project's root directory.
+  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
+  prconfigPath: "config/prconfig.xml"
+  prlog4j2Path: "config/prlog4j2.xml"
+  # Set your Pega diagnostic credentials.
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
+# Pega stream deployment settings.
+stream:
+  # Enter the domain name to access stream nodes via a load balancer.
+  #  e.g. stream.mypega.example.com
+  domain: "YOUR_STREAM_NODE_DOMAIN"
+  # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
+  replicas: 1
+  # Enter the CPU limit for each stream node (recommended 2).
+  cpuLimit: 2
+  # Enter the memory limit for each stream node (recommended 8Gi).
+  memLimit: "8Gi"
+  # Enter any additional java options
+  javaOpts: ""
+  # Initial heap size for the jvm
+  initialHeap: "2048m"
+  # Maximum heap size for the jvm
+  maxHeap: "7168m"
+  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
+  # The file paths are relative to this project's root directory.
+  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
+  prconfigPath: "config/prconfig.xml"
+  prlog4j2Path: "config/prlog4j2.xml"
+
+# Pega batch deployment settings.
+batch:
+  # Enter the number of batch nodes for Kubernetes to deploy (minimum 1).
+  replicas: 1
+  # Enter the CPU limit for each batch node (recommended 2).
+  cpuLimit: 2
+  # Enter the memory limit for each batch node (recommended 8Gi).
+  memLimit: "8Gi"
+  # Enter any additional java options.
+  javaOpts: ""
+  # Initial heap size for the jvm.
+  initialHeap: "2048m"
+  # Maximum heap size for the jvm.
+  maxHeap: "7168m"
+  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
+  # The file paths are relative to this project's root directory.
+  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
+  prconfigPath: "config/prconfig.xml"
+  prlog4j2Path: "config/prlog4j2.xml"
+
+# Cassandra automatic deployment settings.
+cassandra:
+  # Set cassandra.enabled to true to automatically deploy the Cassandra sub-chart.
+  # Set to false if dds.externalNodes is set, or if you do not need Cassandra in your Pega environment.
+  enabled: true
+  # Set any additional Cassandra parameters. These values will be used by Cassandra's helm chart.
+  # See https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml
+  persistence:
+    enabled: true
+
+# DDS (external Cassandra) connection settings.
+# These settings should only be modified if you are using a custom Cassandra deployment.
+dds:
+  # Enter an external node to use a custom external Cassandra deployment. If cassandra.enabled is set to true, leave dds.externalNodes blank.
+  # If using an external node, cassandra.enabled should be set to false.
+  # If dds.externalNodes is set and cassandra.enabled is set to true, Pega will connect to Cassandra using dds.externalNodes.
+  externalNodes: ""
+  # The port, username, and password should only be modified if supplying a custom external Cassandra node.
+  port: "9042"
+  username: "dnode_ext"
+  password: "dnode_ext"
+
+# Elasticsearch deployment settings.
+# Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
+# These search nodes will be deployed regardless of the Elasticsearch configuration above.
+search:
+  # Enter the number of search nodes for Kubernetes to deploy (minimum 1).
+  replicas: 1
+  # If externalURL is set, no search nodes will be deployed automatically, and Pega will use this search node url.
+  externalURL: ""
+  # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
+  # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
+  image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
+  # Enter the CPU limit for each search node (recommended 1).
+  cpuLimit: 1
+  # Enter the volume size limit for each search node (recommended 5Gi).
+  volumeSize: "5Gi"

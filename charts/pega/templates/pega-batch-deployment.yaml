@@ -1,0 +1,1 @@
+{{ template "pega.deployment" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" "Background" "initContainers" (list "waitForPegaSearch" "waitForCassandra") }}

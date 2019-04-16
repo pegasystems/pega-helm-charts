@@ -1,0 +1,1 @@
+{{ template "pega.config" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) }}
