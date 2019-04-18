@@ -28,17 +28,17 @@ traefik:
 #   On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
 #   On EKS, see https://eksworkshop.com/logging/
 elasticsearch:
-   # If elasticsearch.enabled is set to true, elasticsearch is deployed automatically. 
-   enabled: true
-   # Set this variable to create the service with given prefix.
-   # elasticsearch service would be <YOUR_ELASTICSEARCH_NAME>-client.
-   # If this parameter is changed, please update the values for for kibana [elasticsearch.url] and fluentd-elasticsearch [host].
-   # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
-   # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
-   fullnameOverride: "YOUR_ELASTICSEARCH_NAME"
+  # If elasticsearch.enabled is set to true, elasticsearch is deployed automatically.
+  enabled: true
+  # Set this variable to create the service with given prefix.
+  # elasticsearch service would be <YOUR_ELASTICSEARCH_NAME>-client.
+  # If this parameter is changed, please update the values for for kibana [elasticsearch.url] and fluentd-elasticsearch [host].
+  # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
+  fullnameOverride: "YOUR_ELASTICSEARCH_NAME"
 
 kibana:
-  # If kibana.enabled is set to true, kibana is deployed automatically. 
+  # If kibana.enabled is set to true, kibana is deployed automatically.
   enabled: true
   # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
   # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
@@ -55,7 +55,7 @@ kibana:
       - "YOUR_WEB.KIBANA.EXAMPLE.COM"
 
 fluentd-elasticsearch:
-  # If fluentd-elasticsearch.enabled is set to true, fluentd-elasticsearch is deployed automatically. 
+  # If fluentd-elasticsearch.enabled is set to true, fluentd-elasticsearch is deployed automatically.
   enabled: true
   # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
   # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
