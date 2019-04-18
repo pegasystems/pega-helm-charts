@@ -8,12 +8,12 @@ env:
     - YAMLLINT_VERSION=1.15.0
 
 install:
-  # Installing Helm
+  # Install Helm
   - wget -q ${HELM_URL}/${HELM_TGZ}
   - tar xzfv ${HELM_TGZ}
   - PATH=`pwd`/linux-amd64/:$PATH
   - helm init --client-only
-  # Installig pip deps
+  # Install pip deps
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 
 script:
