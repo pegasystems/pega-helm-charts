@@ -13,4 +13,3 @@ data:
   prlog4j2.xml: |-
 {{ .root.Files.Get .node.prlog4j2Path | indent 6 }}
 {{- end }}
-

@@ -3,9 +3,16 @@ language: python
 
 env:
   global:
+    - HELM_URL=https://storage.googleapis.com/kubernetes-helm
+    - HELM_TGZ=helm-v2.4.1-linux-amd64.tar.gz
     - YAMLLINT_VERSION=1.15.0
 
 install:
+  # Installing Helm
+  - wget -q ${HELM_URL}/${HELM_TGZ}
+  - tar xzfv ${HELM_TGZ}
+  - PATH=`pwd`/linux-amd64/:$PATH
+  - helm init --client-only
   # Installig pip deps
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 
@@ -14,3 +21,9 @@ script:
   - yamllint -c .yamllint.yml -s .travis.yml .yamllint.yml
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
+  # Run Helm lint
+  - >
+     helm lint ${REPO_DIR}/kubenow/$dir
+     if [ $? != 0 ]; then
+      travis_terminate 1
+     fi
