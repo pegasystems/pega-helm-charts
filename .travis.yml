@@ -1,0 +1,16 @@
+---
+language: python
+
+env:
+  global:
+    - YAMLLINT_VERSION=1.15.0
+
+install:
+  # Installig pip deps
+  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
+
+script:
+  # Check YAML styling
+  - yamllint -c .yamllint.yml -s .travis.yml .yamllint.yml
+  - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
+  - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
