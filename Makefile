@@ -1,7 +1,7 @@
-
-examples:
+dependencies:
 	helm dependency update ./charts/pega/
 
+examples: dependencies
 	mkdir -p ./examples/kubernetes
 	helm template ./charts/pega/ --output-dir ./examples/kubernetes --values ./charts/pega/values.yaml --namespace example --set provider=k8s --set actions.execute=deploy
 	mv ./examples/kubernetes/pega/templates/* ./examples/kubernetes
@@ -18,4 +18,5 @@ examples:
 	rm -rf ./examples/aws-eks/pega
 
 clean:
-	rm -rfv examples/
+	rm -rf examples/
+	rm -rf charts/pega/charts/*

@@ -21,5 +21,7 @@ script:
   - yamllint -c .yamllint.yml -s .travis.yml .yamllint.yml
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
+  # Now load the helm dependencies
+  - make dependencies
   # Run Helm lint
   - helm lint ./charts/pega
