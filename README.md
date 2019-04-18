@@ -21,6 +21,6 @@ Server: &version.Version{SemVer:"v2.12.2", GitCommit:"7d2b0c73d734f6586ed222a567
 
 Start by performing a clone (or download) of the latest Charts.
 
-`` git clone https://github.com/pegasystems/pega-k8s-deploy.git ``
+`` git clone https://github.com/pegasystems/pega-helm-charts.git ``
 
 Navigate to the project directory and open the values.yaml file.  This is the configuration file that tells Helm what and how to deploy.  For additional documentation covering the different deployment options, see the Pega Community article on [Deploying the Pega Platform by using Kubnernetes](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes).
