@@ -23,7 +23,7 @@ script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
   # Run Helm lint
   - >
-     helm lint ${REPO_DIR}/kubenow/$dir
+     helm lint ./charts/pega
      if [ $? != 0 ]; then
       travis_terminate 1
      fi
