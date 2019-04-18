@@ -1,0 +1,29 @@
+# Config map used for common configuration between Pega nodes
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "pegaEnvironmentConfig" }}
+  namespace: {{ .Release.Namespace }}
+data:
+  # JDBC URL of the DB where Pega is installed
+  JDBC_URL: {{ .Values.jdbc.url }}
+  # Class name of the DB's JDBC driver
+  JDBC_CLASS: {{ .Values.jdbc.driverClass }}
+  # URI that the JDBC driver can be downloaded from
+  JDBC_DRIVER_URI: {{ .Values.jdbc.driverUri }}
+  # Rules schema of the Pega installation
+  RULES_SCHEMA: {{ .Values.jdbc.rulesSchema }}
+  # Data schema of the Pega installation
+  DATA_SCHEMA: {{ .Values.jdbc.dataSchema }}
+  # URL to connect to Elastic Search
+  PEGA_SEARCH_URL: {{ include "properPegaSearchURL" . }}
+  # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
+  CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
+  # Comma separated list of cassandra hosts
+  CASSANDRA_NODES: {{ include "cassandraNodes" . }}
+  # Port to connect to cassandra with
+  CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  # Username for Cassandra DB
+  CASSANDRA_USERNAME: {{ .Values.dds.username }}
+  # Password for Cassandra DB
+  CASSANDRA_PASSWORD: {{ .Values.dds.password }}
