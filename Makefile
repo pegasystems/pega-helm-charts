@@ -10,16 +10,17 @@ dependencies:
 examples: dependencies
 	mkdir -p ./build/kubernetes
 	helm template ./charts/pega/ --output-dir ./build/kubernetes --values ./charts/pega/values.yaml --namespace example --set provider=k8s --set actions.execute=deploy
-	tar -zcf ./pega-kubernetes-example.tar.gz ./build/kubernetes/pega/templates/*
+	tar -C ./build/kubernetes/pega/templates -cvzf ./pega-kubernetes-example.tar.gz .
 
 	mkdir -p ./build/openshift
 	helm template ./charts/pega/ --output-dir ./build/openshift --values ./charts/pega/values.yaml --namespace example --set provider=openshift --set actions.execute=deploy
-	tar -zcf ./pega-openshift-example.tar.gz ./build/openshift/pega/templates/*
+	tar -C ./build/openshift/pega/templates -cvzf ./pega-openshift-example.tar.gz .
 
 	mkdir -p ./build/aws-eks
 	helm template ./charts/pega/ --output-dir ./build/aws-eks --values ./charts/pega/values.yaml --namespace example --set provider=eks --set actions.execute=deploy
-	tar -zcf ./pega-eks-example.tar.gz ./build/aws-eks/pega/templates/*
+	tar -C ./build/aws-eks/pega/templates -cvzf ./pega-eks-example.tar.gz .
 
 clean:
-	rm -rf build/
-	rm -rf charts/pega/charts/*
+	rm -rf ./build
+	rm -rf ./charts/pega/charts/*
+	rm -rf ./*.tar.gz
