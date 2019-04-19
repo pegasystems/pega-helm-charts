@@ -25,7 +25,21 @@ script:
 deploy:
   provider: releases
   api_key:
-    secure: GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9KdgyEawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnzaXJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXhCO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1Hml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39RFcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT/wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGWJeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74gAG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9a/rvc6hM6quXSmlAwA0U=
+    secure: >
+      GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
+      EawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnza
+      XJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXh
+      CO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1H
+      ml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39R
+      FcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql
+      0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT
+      /wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGW
+      JeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O
+      6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8
+      ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74g
+      AG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt
+      3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
+      a/rvc6hM6quXSmlAwA0U=
   file:
     - file1.txt
   skip_cleanup: true
