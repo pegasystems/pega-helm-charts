@@ -11,6 +11,7 @@ examples: dependencies
 	mkdir -p ./examples/kubernetes
 	helm template ./charts/pega/ --output-dir ./examples/kubernetes --values ./charts/pega/values.yaml --namespace example --set provider=k8s --set actions.execute=deploy
 	mv ./examples/kubernetes/pega/templates/* ./examples/kubernetes
+	tar -zcf ./examples-kubernetes.tar.gz ./examples/kubernetes
 	rm -rf ./examples/kubernetes/pega
 
 	mkdir -p ./examples/openshift

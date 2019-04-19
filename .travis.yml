@@ -22,7 +22,7 @@ script:
   - make dependencies
   # Run Helm lint
   - helm lint ./charts/pega
-  - touch ./file1.txt
+  - make examples
 deploy:
   provider: releases
   api_key:
@@ -42,7 +42,7 @@ deploy:
       3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
       a/rvc6hM6quXSmlAwA0U=
   file:
-    - file1.txt
+    - examples-kubernetes.tar.gz
   skip_cleanup: true
   on:
     repo: pegasystems/pega-helm-charts
