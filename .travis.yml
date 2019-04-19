@@ -42,7 +42,9 @@ deploy:
       3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
       a/rvc6hM6quXSmlAwA0U=
   file:
-    - examples-kubernetes.tar.gz
+    - pega-kubernetes-example.tar.gz
+    - pega-openshift-example.tar.gz
+    - pega-eks-example.tar.gz
   skip_cleanup: true
   on:
     repo: pegasystems/pega-helm-charts
