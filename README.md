@@ -2,6 +2,7 @@
 
 This project provides Helm charts and basic examples for deploying Pega on Kubernetes. This project **does not include** the required database installation image which you [may obtain from the Pega Community](https://community.pega.com/knowledgebase/products/platform/deploy).
 
+[![Build Status](https://travis-ci.org/pegasystems/pega-helm-charts.svg?branch=master)](https://travis-ci.org/pegasystems/pega-helm-charts)
 
 
 ## Getting Started
