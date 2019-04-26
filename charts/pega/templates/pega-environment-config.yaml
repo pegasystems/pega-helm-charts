@@ -15,6 +15,8 @@ data:
   RULES_SCHEMA: {{ .Values.jdbc.rulesSchema }}
   # Data schema of the Pega installation
   DATA_SCHEMA: {{ .Values.jdbc.dataSchema }}
+  # CustomerData schema of the Pega installation
+  CUSTOMERDATA_SCHEMA: {{ .Values.jdbc.customerDataSchema }}
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ include "properPegaSearchURL" . }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
@@ -23,7 +25,3 @@ data:
   CASSANDRA_NODES: {{ include "cassandraNodes" . }}
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
-  # Username for Cassandra DB
-  CASSANDRA_USERNAME: {{ .Values.dds.username }}
-  # Password for Cassandra DB
-  CASSANDRA_PASSWORD: {{ .Values.dds.password }}

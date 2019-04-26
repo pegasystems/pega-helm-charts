@@ -29,7 +29,7 @@ spec:
       - name: {{ template "pegaVolumeCredentials" }}
         secret:
           # This name will be referred in the volume mounts kind.
-          secretName: {{ template "pegaDatabaseSecret" }}
+          secretName: {{ template "pegaCredentialsSecret" }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
       initContainers:

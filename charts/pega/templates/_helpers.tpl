@@ -1,8 +1,7 @@
 {{- define "pegaEnvironmentConfig" }}pega-environment-config{{- end }}
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
-{{- define "pegaStorageClassEBS" }}pega-ebs-storage-class{{- end }}
-{{- define "pegaDatabaseSecret" }}pega-database-secret{{- end }}
+{{- define "pegaCredentialsSecret" }}pega-credentials-secret{{- end }}
 {{- define "pegaRegistrySecret" }}pega-registry-secret{{- end }}
 {{- define "pegaWebName" -}}pega-web{{- end -}}
 {{- define "pegaBatchName" -}}pega-batch{{- end -}}
@@ -118,16 +117,6 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
     configMapKeyRef:
       name: {{ template "pegaEnvironmentConfig" }}
       key: CASSANDRA_PORT
-- name: CASSANDRA_USERNAME
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CASSANDRA_USERNAME
-- name: CASSANDRA_PASSWORD
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CASSANDRA_PASSWORD
 - name: PEGA_SEARCH_URL
   valueFrom:
     configMapKeyRef:
@@ -158,6 +147,11 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
     configMapKeyRef:
       name: {{ template "pegaEnvironmentConfig" }}
       key: DATA_SCHEMA
+- name: CUSTOMERDATA_SCHEMA
+  valueFrom:
+    configMapKeyRef:
+      name: {{ template "pegaEnvironmentConfig" }}
+      key: CUSTOMERDATA_SCHEMA
 - name: DL-NAME
   value: EMPTY
 {{- end }}

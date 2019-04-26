@@ -27,6 +27,14 @@ spec:
         fsGroup: 1000
       {{ end }}
       initContainers:
+      {{ if eq .Values.provider "openshift" }}
+      - name: set-dir-owner
+        image: busybox:1.27.2
+        command: ['sh', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data']
+        volumeMounts:
+        - name: esstorage
+          mountPath: /usr/share/elasticsearch/data
+      {{ end }}
       - name: set-max-map-count
         image: busybox:1.27.2
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
