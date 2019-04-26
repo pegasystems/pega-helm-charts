@@ -1,3 +1,4 @@
+---
 # Enter your Kubernetes provider. Replace "YOUR_KUBERNETES_PROVIDER" with one of the following values:
 #   k8s - for a deployment using open-source Kubernetes
 #   openshift - for a deployment using Red Hat Openshift
@@ -106,14 +107,14 @@ web:
     minReplicas: 1
     # Enter the maximum number of replicas that HPA can scale-up
     maxReplicas: 5
-    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request. 
-    # Default value is set at 70% of web pod cpu limit. Pega web pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c. 
+    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request.
+    # Default value is set at 70% of web pod cpu limit. Pega web pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c.
     # HPA will scale up if pega web pods average cpu utilization reaches 1.4c
     targetAverageCPUUtilization: 700
     # Enter the threshold value for average memory utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of web pod memory limit. Pega web pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi. 
+    # Default value is set at 70% of web pod memory limit. Pega web pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi.
     # HPA will scale up if pega web pods average memory utilization reaches 5.6Gi
-    targetAverageMemoryUtilization: 280  
+    targetAverageMemoryUtilization: 280
 
 # Pega stream deployment settings.
 stream:
@@ -163,12 +164,12 @@ batch:
     minReplicas: 1
     # Enter the maximum number of replicas that HPA can scale-up
     maxReplicas: 3
-    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request. 
-    # Default value is set at 70% of batch pod cpu limit. Pega batch pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c. 
+    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request.
+    # Default value is set at 70% of batch pod cpu limit. Pega batch pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c.
     # HPA will scale up if pega batch pods average cpu utilization reaches 1.4c
     targetAverageCPUUtilization: 700
     # Enter the threshold value for average memory utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of batch pod memory limit. Pega batch pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi. 
+    # Default value is set at 70% of batch pod memory limit. Pega batch pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi.
     # HPA will scale up if pega batch pods average memory utilization reaches 5.6Gi
     targetAverageMemoryUtilization: 280
 
@@ -260,15 +261,26 @@ fluentd-elasticsearch:
     buffer_queue_limit: 30
 
 metrics-server:
-  # Set this to true to install metrics-server. Follow below guidelines specific to each provider,
-  # open-source Kubernetes, Openshift & EKS - mandatory to set this to true if web.hpa.enabled or batch.hpa.enabled is true
-  # GKE or AKS - set this to false since metrics-server is installed in the cluster by default.
+  # Set this to true to install metrics-server. Follow below guidelines specific
+  #  to each provider, open-source Kubernetes, Openshift & EKS - mandatory to
+  #  set this to true if web.hpa.enabled or batch.hpa.enabled is true GKE or
+  #  AKS - set this to false since metrics-server is installed in the cluster
+  #  by default.
   enabled: true
-  # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
+  # Set any additional metrics-server parameters. These values will be used by
+  #  metrics-server's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
   args:
-  - --logtostderr
-  # The order in which to consider different Kubelet node address types when connecting to Kubelet. Uncomment below arguemnt if host names are not resolvable from metrics server pod. This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-  #- --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-  # Uncomment below arguemnt to skip verifying Kubelet CA certificates. Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates. This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.  
-  #- --kubelet-insecure-tls
+    - --logtostderr
+    # The order in which to consider different Kubelet node address types when
+    #  connecting to Kubelet. Uncomment below arguemnt if host names are not
+    #  resolvable from metrics server pod. This setting is not required for
+    #  public cloud providers & openshift enterprise. It may be required for
+    #  open-source Kubernetes.
+    # - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+    # Uncomment below arguemnt to skip verifying Kubelet CA certificates.
+    #  Not recommended for production usage, but can be useful in test clusters
+    #  with self-signed Kubelet serving certificates. This setting is not
+    #  required for public cloud providers & openshift enterprise. It may be
+    #  required for open-source Kubernetes.
+    # - --kubelet-insecure-tls
