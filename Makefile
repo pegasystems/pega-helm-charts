@@ -1,9 +1,5 @@
 dependencies:
-	helm repo add traefik https://kubernetes-charts.storage.googleapis.com
-	helm repo add cassandra https://kubernetes-charts-incubator.storage.googleapis.com/
-	helm repo add elasticsearch https://kubernetes-charts.storage.googleapis.com/
-	helm repo add fluentd-elasticsearch https://kubernetes-charts.storage.googleapis.com/
-	helm repo add kibana https://kubernetes-charts.storage.googleapis.com/
+	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 	helm repo list
 	helm dependency update ./charts/pega/
 
