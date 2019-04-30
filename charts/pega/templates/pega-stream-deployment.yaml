@@ -10,9 +10,6 @@ volumeClaimTemplates:
   spec:
     accessModes:
     - ReadWriteOnce
-  {{- if eq .Values.provider "eks" }}
-    storageClassName: {{ template "pegaStorageClassEBS" }}
-  {{- end }}
     resources:
       requests:
         storage: 5Gi

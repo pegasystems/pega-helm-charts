@@ -43,7 +43,10 @@ deploy:
   file:
     - pega-kubernetes-example.tar.gz
     - pega-openshift-example.tar.gz
-    - pega-eks-example.tar.gz
+    - pega-azure-aks-example.tar.gz
+    - pega-aws-eks-example.tar.gz
+    - pega-google-gke-example.tar.gz
+    - pega-pivotal-pks-example.tar.gz
   skip_cleanup: true
   on:
     repo: pegasystems/pega-helm-charts
