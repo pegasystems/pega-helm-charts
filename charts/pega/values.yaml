@@ -182,6 +182,15 @@ cassandra:
   # See https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml
   persistence:
     enabled: true
+  ## Minimum memory for development is 4GB and 2 CPU cores
+  ## Minimum memory for production is 8GB and 4 CPU cores
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: 2
+    limits:
+      memory: "8Gi"
+      cpu: 4
 
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
@@ -208,6 +217,8 @@ search:
   image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
   # Enter the CPU limit for each search node (recommended 1).
   cpuLimit: 1
+  # Enter the Memory limit for each search node (recommended 4Gi).
+  memLimit: "4Gi"
   # Enter the volume size limit for each search node (recommended 5Gi).
   volumeSize: "5Gi"
 
