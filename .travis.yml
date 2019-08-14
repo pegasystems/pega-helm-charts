@@ -12,8 +12,9 @@ install:
   - helm init --client-only
   # Install pip deps
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
-before_deploy:
-  - ./before_deploy.sh
+script:
+  - helm lint ./charts/pega
+  - helm package ./charts/pega/
 deploy:
   provider: bintray
   user: karthikgollapudi
