@@ -1,53 +1,9 @@
----
-language: python
-env:
-  global:
-    - HELM_URL=https://storage.googleapis.com/kubernetes-helm
-    - HELM_TGZ=helm-v2.11.0-linux-amd64.tar.gz
-    - YAMLLINT_VERSION=1.15.0
-install:
-  # Install Helm
-  - wget -q ${HELM_URL}/${HELM_TGZ}
-  - tar xzfv ${HELM_TGZ}
-  - PATH=`pwd`/linux-amd64/:$PATH
-  - helm init --client-only
-  # Install pip deps
-  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
-script:
-  # Check YAML styling
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
-  # Now load the helm dependencies
-  - make dependencies
-  # Run Helm lint
-  - helm lint ./charts/pega
-  - make examples
+before_deploy:
+  - ./before_deploy.sh
 deploy:
-  provider: releases
-  api_key:
-    secure: >
-      GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
-      EawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnza
-      XJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXh
-      CO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1H
-      ml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39R
-      FcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql
-      0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT
-      /wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGW
-      JeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O
-      6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8
-      ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74g
-      AG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt
-      3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
-      a/rvc6hM6quXSmlAwA0U=
-  file:
-    - pega-kubernetes-example.tar.gz
-    - pega-openshift-example.tar.gz
-    - pega-azure-aks-example.tar.gz
-    - pega-aws-eks-example.tar.gz
-    - pega-google-gke-example.tar.gz
-    - pega-pivotal-pks-example.tar.gz
+  provider: bintray
+  user: karthikgollapudi
+  key:
+    secure: oxmyUBvGLQeu2CMLQMYaJaHKnItJwUp3sHGje5i6XeQJHVhbyhye+GQV3byozxyfN7Twl5R/5YB+tAJGZsNUVVbl/ZFV7uqSoDYvRFadiq1FgN1fU1f3SXCMrlpJbBY2p3D61qzxBton29TGK7wlsH242wZoR5MOyZMxefi7IyQX/bIKbadHx3dfinBULtZKtU+FYI3r81vHZ/XFXZa/aXUZCZhSiL/tHgvioyvDRpzd5npJdTmnsFjHhg7WBwuuCtp7bSb+D8aOjQIFcg7Npi9RH58swXRnf2FJ1lFCKGFAG9HJ5NIwTIX623LN6Lt7PMb2oOhJcbcf1cdvEJ0kw0vCoJ7BNTuU3qJ73ctr9lo9akwaAnAkqekBvhCmEdFXcqEpxEY1lr3yC4MWfgmS68GcymFZQNK5K6IJW+aMgQcCBYmKZKT+0y1wMms4TRiya/cjVgx8V9vg2I2d8Iw6/MjWAvSbUCqfn1q0XD90GJhqbu4jVjun8AyqoSrSWeA1m4U31/j5Yc4sEMVLJSlVO5SyLz3TF94EViIumdBFwO5PRYqW5+6GOZBgrzaHSEECqUTE3DaWmnufz9ymaqvAE7jZMwtH9F0fkHTcy7UbzROoS4gsd2FV1YSK6I671ePqWHR5yNxlgvDsLfsm+XuXqY/AYdbCWd+xQFLD4XrfShM=
   skip_cleanup: true
-  on:
-    repo: pegasystems/pega-helm-charts
-    tags: true
+  on: master

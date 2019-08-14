@@ -1,0 +1,19 @@
+{
+    "package": {
+        "name": "pega-helm-charts",
+        "repo": "pega-helm-charts",
+        "subject": "karthikgollapudi",
+        "vcs_url": "https://github.com/scrumteamwhitewalkers/pega-helm-charts-1",
+        "licenses": ["Apache License 2.0"]
+    },
+
+    "version": {
+        "name": "1.0.0"
+    },
+
+    "files":
+        [
+        {"includePattern": "[a-z]*.tgz", "uploadPattern": ""}
+        ],
+    "publish": true
+}
