@@ -13,8 +13,10 @@ install:
   # Install pip deps
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 script:
-  - helm lint ./charts/pega
   - cd ./charts/pega
+  - helm repo list
+  - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+  - helm repo list
   - helm dep update
   - helm package .
 deploy:
