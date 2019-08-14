@@ -21,7 +21,8 @@ script:
   - helm package ./charts/pega/
   - ls -l
 deploy:
-  provider: bintray
+  provider: bintray  ,
+  file: descriptor.json
   user: karthikgollapudi
   key:
     secure: oxmyUBvGLQeu2CMLQMYaJaHKnItJwUp3sHGje5i6XeQJHVhbyhye+GQV3byozxyfN7Twl5R/5YB+tAJGZsNUVVbl/ZFV7uqSoDYvRFadiq1FgN1fU1f3SXCMrlpJbBY2p3D61qzxBton29TGK7wlsH242wZoR5MOyZMxefi7IyQX/bIKbadHx3dfinBULtZKtU+FYI3r81vHZ/XFXZa/aXUZCZhSiL/tHgvioyvDRpzd5npJdTmnsFjHhg7WBwuuCtp7bSb+D8aOjQIFcg7Npi9RH58swXRnf2FJ1lFCKGFAG9HJ5NIwTIX623LN6Lt7PMb2oOhJcbcf1cdvEJ0kw0vCoJ7BNTuU3qJ73ctr9lo9akwaAnAkqekBvhCmEdFXcqEpxEY1lr3yC4MWfgmS68GcymFZQNK5K6IJW+aMgQcCBYmKZKT+0y1wMms4TRiya/cjVgx8V9vg2I2d8Iw6/MjWAvSbUCqfn1q0XD90GJhqbu4jVjun8AyqoSrSWeA1m4U31/j5Yc4sEMVLJSlVO5SyLz3TF94EViIumdBFwO5PRYqW5+6GOZBgrzaHSEECqUTE3DaWmnufz9ymaqvAE7jZMwtH9F0fkHTcy7UbzROoS4gsd2FV1YSK6I671ePqWHR5yNxlgvDsLfsm+XuXqY/AYdbCWd+xQFLD4XrfShM=
