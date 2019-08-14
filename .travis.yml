@@ -14,7 +14,9 @@ install:
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 script:
   - helm lint ./charts/pega
-  - helm package ./charts/pega/
+  - cd ./charts/pega
+  - helm dep update
+  - helm package .
 deploy:
   provider: bintray
   user: karthikgollapudi
