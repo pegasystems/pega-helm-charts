@@ -1,3 +1,17 @@
+language: python
+env:
+  global:
+    - HELM_URL=https://storage.googleapis.com/kubernetes-helm
+    - HELM_TGZ=helm-v2.11.0-linux-amd64.tar.gz
+    - YAMLLINT_VERSION=1.15.0
+install:
+  # Install Helm
+  - wget -q ${HELM_URL}/${HELM_TGZ}
+  - tar xzfv ${HELM_TGZ}
+  - PATH=`pwd`/linux-amd64/:$PATH
+  - helm init --client-only
+  # Install pip deps
+  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 before_deploy:
   - ./before_deploy.sh
 deploy:
