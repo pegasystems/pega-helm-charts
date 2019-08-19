@@ -10,8 +10,6 @@ install:
   - tar xzfv ${HELM_TGZ}
   - PATH=`pwd`/linux-amd64/:$PATH
   - helm init --client-only
-  # Install pip deps
-  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
 script:
   - helm repo list
   - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
