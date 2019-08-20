@@ -11,13 +11,10 @@ install:
   - PATH=`pwd`/linux-amd64/:$PATH
   - helm init --client-only
 script:
-  - helm repo list
-  - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-  - helm repo list
-  - ls -l
+  - curl -o index.yaml https://stwhitewalkers.bintray.com/pega-helm-charts/index.yaml
   - helm dep update ./charts/pega/
   - helm package ./charts/pega/
-  - ls -l
+  - helm repo index --merge index.yaml --url https://dl.bintray.com/pegasystems/pega-helm-charts/ .
 deploy:
   provider: bintray
   file: descriptor.json
