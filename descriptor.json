@@ -15,7 +15,7 @@
         [
         {"includePattern": "pega-1.0.0.tgz", "uploadPattern": "pega-1.0.0.tgz", 
             "matrixParams": {
-                "overwrite" : true
+                "override" : 1
             }
         },
         {"includePattern": "index.yaml", "uploadPattern": "index.yaml"}
