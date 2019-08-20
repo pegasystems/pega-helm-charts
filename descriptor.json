@@ -13,8 +13,8 @@
 
     "files":
         [
-        {"includePattern": "pega-1.0.0.tgz", "uploadPattern": "$1"},
-        {"includePattern": "index.yaml", "uploadPattern": "$1"}
+        {"includePattern": "pega-1.0.0.tgz", "uploadPattern": "pega-1.0.0.tgz"},
+        {"includePattern": "index.yaml", "uploadPattern": "index.yaml"}
         ],
     "publish": true
 }
