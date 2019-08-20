@@ -12,6 +12,7 @@ install:
   - helm init --client-only
 script:
   - curl -o index.yaml https://stwhitewalkers.bintray.com/pega-helm-charts/index.yaml
+  - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
   - helm dep update ./charts/pega/
   - helm package ./charts/pega/
   - helm repo index --merge index.yaml --url https://dl.bintray.com/pegasystems/pega-helm-charts/ .
