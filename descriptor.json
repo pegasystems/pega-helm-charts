@@ -13,7 +13,7 @@
 
     "files":
         [
-        {"includePattern": "(pega-1.0.0.tgz)", "uploadPattern": "$1", 
+        {"includePattern": "(*.tgz)", "uploadPattern": "$1", 
             "matrixParams": {
                 "override" : 1
             }
