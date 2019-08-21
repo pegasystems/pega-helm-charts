@@ -25,3 +25,9 @@ Start by performing a clone (or download) of the latest Charts.
 `` git clone https://github.com/pegasystems/pega-helm-charts.git ``
 
 Navigate to the project directory and open the values.yaml file.  This is the configuration file that tells Helm what and how to deploy.  For additional documentation covering the different deployment options, see the Pega Community article on [Deploying the Pega Platform by using Kubnernetes](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes).
+
+## Dependencies
+
+The Pega chart depends on other charts supplied by third parties.  These are called out in the [requirements yaml file](charts/pega/requirements.yaml).  Individual dependencies may or may not be deployed based on the configuration of your values.yaml file.  When you first setup your helm chart, you will need to update your dependencies to pull down these additional charts from their repositories.  For convenience, the required commands are part of the [Makefile](Makefile) and can run with the ```make dependencies``` command.
+
+For more information about Helm dependencies, see the [Helm documentation](https://helm.sh/docs/helm/#helm-dependency).
