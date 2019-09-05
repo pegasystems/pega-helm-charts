@@ -1,3 +1,4 @@
+---
 # Configure Traefik for load balancing:
 #   If enabled: true, Traefik is deployed automatically.
 #   If enabled: false, Traefik is not deployed and load balancing must be configured manually.
@@ -108,11 +109,11 @@ metrics-server:
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
   args:
     - --logtostderr
-  # The order in which to consider different Kubelet node address types when connecting to Kubelet.
-  # Uncomment below arguemnt if host names are not resolvable from metrics server pod.
-  # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-  # - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-  # Uncomment below arguemnt to skip verifying Kubelet CA certificates.
-  # Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
-  # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-  # - --kubelet-insecure-tls
+# The order in which to consider different Kubelet node address types when connecting to Kubelet.
+# Uncomment below arguemnt if host names are not resolvable from metrics server pod.
+# This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
+# - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+# Uncomment below arguemnt to skip verifying Kubelet CA certificates.
+# Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
+# This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
+# - --kubelet-insecure-tls

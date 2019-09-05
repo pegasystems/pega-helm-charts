@@ -1,3 +1,4 @@
+---
 global:
   # Enter your Kubernetes provider. Replace "YOUR_KUBERNETES_PROVIDER" with one of the following values:
   #   k8s - for a deployment using open-source Kubernetes
@@ -201,50 +202,49 @@ global:
         resources:
           requests:
             storage: 5Gi
-
-  # The following customization options are available for web, stream and batch tiers.
-  # - ports
-  # - init containers
-  # - volumes
-  # - volume mounts
-  # - environmental variable
-  # - prconfig.xml content
-  # - context.xml content
-  #
-  #custom:
-  #  initContainers:
-  #    - name: 'custom-wait-for-database'
-  #      image: 'xxbedy/postgres-pljava:latest'
-  #      command: [
-  #        'sh',
-  #        '-c',
-  #        'until pg_isready -h $host -p $port -U $user; do echo Waiting for database to become live...; sleep 10; done;'
-  #      ]
-  #  ports:
-  #    - name: 'custom-jmx-port'
-  #      containerPort: 9001
-  #  volumes:
-  #   - name: 'custom-ssh-secret'
-  #      secret: [
-  #        secretName: 'custom-ssh-secret'
-  #        defaultMode: 448
-  #      ]
-  #  volumeMounts:
-  #    - name: 'custom-ssh-secret'
-  #      mountPath: '/root/.ssh'
-  #  env:
-  #    - name: 'NODE_SETTINGS'
-  #      value: 'PEGA-RULESENGINE/IMPORT/ALLOWONLYBRANCHEDINSTANCES=true'
-  #  prconfig: |-
-  #    <?xml version="1.0" encoding="UTF-8"?>
-  #    <pegarules>
-  #        <!-- customize -->
-  #    </pegarules>
-  #  context: |-
-  #    <?xml version='1.0' encoding='utf-8'?>
-  #    <Context>
-  #      <!-- customize -->
-  #    </Context>
+# The following customization options are available for web, stream and batch tiers.
+# - ports
+# - init containers
+# - volumes
+# - volume mounts
+# - environmental variable
+# - prconfig.xml content
+# - context.xml content
+#
+#     custom:
+#       initContainers:
+#         - name: 'custom-wait-for-database'
+#           image: 'xxbedy/postgres-pljava:latest'
+#           command: [
+#             'sh',
+#             '-c',
+#             'until pg_isready -h $host -p $port -U $user; do echo Waiting for database to become live...; sleep 10; done;'
+#            ]
+#       ports:
+#         - name: 'custom-jmx-port'
+#           containerPort: 9001
+#       volumes:
+#         - name: 'custom-ssh-secret'
+#           secret: [
+#             secretName: 'custom-ssh-secret'
+#             defaultMode: 448
+#           ]
+#       volumeMounts:
+#         - name: 'custom-ssh-secret'
+#           mountPath: '/root/.ssh'
+#       env:
+#         - name: 'NODE_SETTINGS'
+#           value: 'PEGA-RULESENGINE/IMPORT/ALLOWONLYBRANCHEDINSTANCES=true'
+#       prconfig: |-
+#         <?xml version="1.0" encoding="UTF-8"?>
+#         <pegarules>
+#             <!-- customize -->
+#         </pegarules>
+#       context: |-
+#         <?xml version='1.0' encoding='utf-8'?>
+#         <Context>
+#            <!-- customize -->
+#         </Context>
 
 # Docker image information for the Pega docker image, containing the application server.
 # To use this feature you MUST host the image using a private registry.
@@ -293,11 +293,11 @@ pegasearch:
   # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
   image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
 
-#Pega Installer settings
+# Pega Installer settings
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   adminPassword: "ADMIN_PASSWORD"
-# Upgrade specific properties
+  # Upgrade specific properties
   upgrade:
     # Type of upgrade
     # Valid values are 'in-place' , 'out-of-place'
