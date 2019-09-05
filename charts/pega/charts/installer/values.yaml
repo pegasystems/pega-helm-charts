@@ -1,0 +1,58 @@
+image: "YOUR_IMAGE_NAME"
+# Creates a new System and replaces this with default system.Default is pega
+systemName: "pega"
+# Creates the system with this production level.Default is 2
+productionLevel: 2
+# Whether this is a Multitenant System ('true' if yes, 'false' if no)
+multitenantSystem: "false"
+# UDF generation will be skipped if this property is set to true
+bypassUdfGeneration: "false"
+# Temporary password for administrator@pega.com that is used to install Pega Platform
+adminPassword: ""
+# Run the Static Assembler ('true' to run, 'false' to not run)
+assembler:
+# Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
+bypassTruncateUpdatescache: "false"
+# JDBC custom connection properties
+jdbcCustomConnection: ""
+# Distribution kit URL
+distributionKitURL: ""
+# A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
+# This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence. 
+# Only distriubtion kit zip file is expected inside the volume.
+distributionKitVolumeClaimName: ""
+threads:
+  # Maximum Idle Thread.Default is 5
+  maxIdle: 5
+  # Maximum Wait Thread.Default is -1
+  maxWait: -1
+  # Maximum Active Thread.Default is 10
+  maxActive: 10
+zos:
+  # Z/OS SITE-SPECIFIC PROPERTIES FILE
+  zosProperties: "/opt/pega/config/DB2SiteDependent.properties"
+  # Specify the workload manager to load UDFs into db2zos
+  db2zosUdfWlm: ""
+# Upgrade specific properties
+upgrade:
+  # Type of upgrade
+  # Valid values are 'in-place' , 'out-of-place'
+  upgradeType: ""
+  # Specify target rules schema for migration and upgrade
+  targetRulesSchema: ""
+  # The commit count to use when loading database tables
+  dbLoadCommitRate: 100
+  # Update existing application will be run if this property is set to true
+  updateExistingApplications: "false"
+  # Runs the Update Applications Schema utility to update the cloned Rule, Data, Work and Work History tables with the schema changes in the latest base tables if this property is set to true
+  updateApplicationsSchema: "false"
+  # Generate and execute an SQL script to clean old rulesets and their rules from the system if this property is set to true
+  runRulesetCleanup: "false"
+  # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
+  rebuildIndexes: "false"
+  # Configure only for aks/pks
+  # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
+  # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
+  kube-apiserver:
+    serviceHost: "API_SERVICE_ADDRESS"
+    httpsServicePort: "SERVICE_PORT_HTTPS"

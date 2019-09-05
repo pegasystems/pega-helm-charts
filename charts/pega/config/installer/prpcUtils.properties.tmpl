@@ -1,0 +1,86 @@
+# Properties file for use with PRPC Utilities. Update this file 
+# before using prpcUtils.bat/sh script.
+# For more information, see the Pega Platform help.
+
+################### COMMON PROPERTIES - DB CONNECTION (REQUIRED) ##################
+###################################################################################
+#   Set the database connection properties.
+#   For databases that use multiple JDBC driver files (such as DB2), specify
+#   semicolon separated values for 'pega.jdbc.driver.jar'
+#
+#   pega.jdbc.driver.jar	-- path to jdbc jar
+#
+#   pega.jdbc.driver.class 	-- jdbc class.  Valid values are:
+#
+#   Oracle              oracle.jdbc.OracleDriver
+#   IBM DB/2            com.ibm.db2.jcc.DB2Driver
+#   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
+#   PostgreSQL          org.postgresql.Driver
+#
+#   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
+#
+#   pega.jdbc.url		Valid values are:
+#
+#   Oracle              jdbc:oracle:thin:@//localhost:1521/dbName
+#   IBM DB/2 z / OS 	jdbc:db2://localhost:50000/dbName
+#   IBM DB/2            jdbc:db2://localhost:50000/dbName:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+#   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
+#   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
+#
+#   pega.jdbc.username 	db username
+#   pega.jdbc.password  db password
+#
+
+# CONNECTION INFORMATION
+pega.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
+pega.jdbc.driver.class={{ .Env.JDBC_CLASS }}
+pega.database.type={{ .Env.DB_TYPE }}
+pega.jdbc.url={{ .Env.JDBC_URL }}
+pega.jdbc.username={{ .Env.DB_USERNAME }}
+pega.jdbc.password={{ .Env.DB_PASSWORD }}
+
+# CUSTOM CONNECTION PROPERTIES
+# Uncomment this property and add a list of ; delimited connections properties
+# The list must end with ;
+# For example: jdbc.custom.connection.properties=user=usr;password=pwd;
+jdbc.custom.connection.properties={{ .Env.JDBC_CUSTOM_CONNECTION }}
+
+# RULES SCHEMA NAME
+# The default is the value specified for the user name
+rules.schema.name={{ .Env.RULES_SCHEMA }}
+
+# DATA SCHEMA NAME
+# The default is the value specified for the rules schema name
+data.schema.name={{ .Env.DATA_SCHEMA }}
+
+# CUSTOMER DATA SCHEMA NAME
+# The default is the value specified for the data schema name
+customerdata.schema.name={{ .Env.CUSTOMERDATA_SCHEMA }}
+
+# USER TEMP DIRECTORY
+# Will use default if not set to valid directory
+user.temp.dir=/opt/pega/temp
+
+############################### SETTINGS FOR CHANGING DYNAMIC SYSTEM SETTINGS ########
+######################################################################################
+# PATH TO JSON FILE (REQUIRED)
+# Comma-delimited list of absolute path(s) to the json files. The list must end with a semicolon.
+# If the path is a folder, then all the json files in that directory will be considered recursively.
+# For example: C://file1.json,C://dir1//file2.json,C://dir2;
+# Sample json format
+#{  
+#   "dass":[  
+#      {  
+#         "pySetting":"true",
+#         "pyPurpose":"indexing/fileMonitoring",
+#         "pyOwner":"Pega-RULES"
+#      },
+#      {  
+#         "pySetting":"Hourly",
+#         "pyPurpose":"indexing/frequency",
+#         "pyOwner":"Pega-RULES"
+#      }
+#   ]
+#}
+dass.filepath=/opt/pega/kit/scripts/upgrade_dass_settings.json
+pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}

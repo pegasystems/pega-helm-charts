@@ -3,13 +3,42 @@
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 {{- define "pegaCredentialsSecret" }}pega-credentials-secret{{- end }}
 {{- define "pegaRegistrySecret" }}pega-registry-secret{{- end }}
-{{- define "pegaWebName" -}}pega-web{{- end -}}
-{{- define "pegaBatchName" -}}pega-batch{{- end -}}
-{{- define "pegaStreamName" -}}pega-stream{{- end -}}
-{{- define "searchName" -}}pega-search{{- end -}}
+{{- define "deployConfig" -}}deploy-config{{- end -}}
 
 {{- define "imagePullSecret" }}
-{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.docker.registry.url (printf "%s:%s" .Values.docker.registry.username .Values.docker.registry.password | b64enc) | b64enc }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
+
+{{- define "performOnlyDeployment" }}
+  {{- if (eq .Values.global.actions.execute "deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performDeployment" }}
+  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performInstallAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performUpgradeAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
 {{- end }}
 
 # list of either external or internal cassandra nodes
@@ -47,19 +76,11 @@
   {{- end -}}
 {{- end }}
 
-{{- define "properPegaSearchURL" }}
-  {{- if .Values.search.externalURL -}}
-    {{ .Values.search.externalURL }}
-  {{- else -}}
-    http://{{ template "searchName" . }}
-  {{- end -}}
-{{- end }}
-
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch
-  image: busybox:1.27.2
+  image: busybox:1.31.0
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
-  command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "properPegaSearchURL" . }}); do echo Waiting for search to become live...; sleep 10; done;']
+  command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ .Values.pegasearch.externalURL }}); do echo Waiting for search to become live...; sleep 10; done;']
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -100,61 +121,6 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 - name: MAX_HEAP
   value: "{{ .node.maxHeap }}"
 {{- end -}}
-
-{{- define "commonEnvironmentVariables" -}}
-- name: CASSANDRA_CLUSTER
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CASSANDRA_CLUSTER
-- name: CASSANDRA_NODES
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CASSANDRA_NODES
-- name: CASSANDRA_PORT
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CASSANDRA_PORT
-- name: PEGA_SEARCH_URL
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: PEGA_SEARCH_URL
-- name: JDBC_URL
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: JDBC_URL
-- name: JDBC_CLASS
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: JDBC_CLASS
-- name: JDBC_DRIVER_URI
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: JDBC_DRIVER_URI
-- name: RULES_SCHEMA
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: RULES_SCHEMA
-- name: DATA_SCHEMA
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: DATA_SCHEMA
-- name: CUSTOMERDATA_SCHEMA
-  valueFrom:
-    configMapKeyRef:
-      name: {{ template "pegaEnvironmentConfig" }}
-      key: CUSTOMERDATA_SCHEMA
-- name: DL-NAME
-  value: EMPTY
-{{- end }}
 
 {{- define "pega.health.probes" -}}
 # LivenessProbe: indicates whether the container is live, i.e. running.
@@ -203,4 +169,13 @@ readinessProbe:
   # Giving up in case of liveness probe means restarting the Pod. In case of readiness probe the
   # Pod will be marked Unready. Defaults to 3. Minimum value is 1.
   failureThreshold: 3
+{{- end }}
+
+# Evaluate background node types based on cassandra enabled or not(internally or externally)
+{{- define "evaluateBackgroundNodeTypes" }}
+  {{- if  eq (include "cassandraEnabled" .) "true" -}}
+    BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX,ADM,RTDG  
+  {{- else -}}
+    Background
+  {{- end -}}
 {{- end }}

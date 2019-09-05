@@ -1,27 +1,33 @@
 # Config map used for common configuration between Pega nodes
+{{ if (eq (include "performDeployment" .) "true") }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
   name: {{ template "pegaEnvironmentConfig" }}
   namespace: {{ .Release.Namespace }}
 data:
+  # Database Type for installation
+  DB_TYPE: {{ .Values.global.jdbc.dbType }}
   # JDBC URL of the DB where Pega is installed
-  JDBC_URL: {{ .Values.jdbc.url }}
+  JDBC_URL: {{ .Values.global.jdbc.url }}
   # Class name of the DB's JDBC driver
-  JDBC_CLASS: {{ .Values.jdbc.driverClass }}
+  JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
   # URI that the JDBC driver can be downloaded from
-  JDBC_DRIVER_URI: {{ .Values.jdbc.driverUri }}
+  JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
+  # The connection properties that will be sent to our JDBC driver when establishing new connections
+  JDBC_CONNECTION_PROPERTIES: {{ .Values.global.jdbc.connectionProperties }}
   # Rules schema of the Pega installation
-  RULES_SCHEMA: {{ .Values.jdbc.rulesSchema }}
+  RULES_SCHEMA: {{ .Values.global.jdbc.rulesSchema }}
   # Data schema of the Pega installation
-  DATA_SCHEMA: {{ .Values.jdbc.dataSchema }}
+  DATA_SCHEMA: {{ .Values.global.jdbc.dataSchema }}
   # CustomerData schema of the Pega installation
-  CUSTOMERDATA_SCHEMA: {{ .Values.jdbc.customerDataSchema }}
+  CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
   # URL to connect to Elastic Search
-  PEGA_SEARCH_URL: {{ include "properPegaSearchURL" . }}
+  PEGA_SEARCH_URL: {{ .Values.pegasearch.externalURL }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
   # Comma separated list of cassandra hosts
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
-  CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  CASSANDRA_PORT: "{{ .Values.dds.port }}"  
+{{ end }}

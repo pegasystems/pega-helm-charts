@@ -1,177 +1,254 @@
----
-# Enter your Kubernetes provider. Replace "YOUR_KUBERNETES_PROVIDER" with one of the following values:
-#   k8s - for a deployment using open-source Kubernetes
-#   openshift - for a deployment using Red Hat Openshift
-#   eks - for a deployment using Amazon EKS
-#   gke - for a deployment using Google Kubernetes Engine
-#   pks - for a deployment using Pivotal Container Service
-#   aks - for a deployment using Azure Kubernetes Service
-provider: "YOUR_KUBERNETES_PROVIDER"
+global:
+  # Enter your Kubernetes provider. Replace "YOUR_KUBERNETES_PROVIDER" with one of the following values:
+  #   k8s - for a deployment using open-source Kubernetes
+  #   openshift - for a deployment using Red Hat Openshift
+  #   eks - for a deployment using Amazon EKS
+  #   gke - for a deployment using Google Kubernetes Engine
+  #   pks - for a deployment using Pivotal Container Service
+  #   aks - for a deployment using Azure Kubernetes Service
+  provider: "YOUR_KUBERNETES_PROVIDER"
 
-# Configure Traefik for load balancing:
-#   If enabled: true, Traefik is deployed automatically.
-#   If enabled: false, Traefik is not deployed and load balancing must be configured manually.
-#   Pega recommends enabling Traefik on providers other than Openshift.
-#   On Openshift, Traefik is ignored and Pega uses Openshift's built-in load balancer.
-traefik:
-  enabled: true
-  # Set any additional Traefik parameters. These values will be used by Traefik's helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
-  # Set traefik.serviceType to "LoadBalancer" on gke, aks, and pks
-  serviceType: NodePort
-  # If enabled is set to "true", ssl will be enabled for traefik
-  ssl:
-    enabled: false
-  rbac:
-    enabled: true
-  service:
-    nodePorts:
-      # NodePorts for traefik service.
-      http: 30080
-      https: 30443
+  actions:
+    # valid values are install, deploy, install-deploy
+    # install - install the pega platform database.
+    # deploy - deploy the full pega cluster
+    # install-deploy - installation followed by full pega cluster deployment
+    # upgrade - upgrades the pega platform to the build version.
+    # upgrade-deploy - upgrades the pega platform and deploys the pega cluster on the upgraded database.
+    execute: "deploy"
+  
+  # JDBC information to connect to the Pega database.
+  # Pega must be installed to this database before deploying on Kubernetes.
+  #
+  # Examples for jdbc url and driver class:
+  # For Oracle:
+  #   url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
+  #   driverClass: oracle.jdbc.OracleDriver
+  # For Microsoft SQL Server:
+  #   url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
+  #   driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+  # For IBM DB2 for LUW:
+  #   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+  #   driverClass: com.ibm.db2.jcc.DB2Driver
+  # For IBM DB2 for z/OS:
+  #   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME
+  #   driverClass: com.ibm.db2.jcc.DB2Driver
+  # For PostgreSQL:
+  #   url: jdbc:postgresql://YOUR_DB_HOST:5432/YOUR_DB_NAME
+  #   driverClass: org.postgresql.Driver
+  # NOTE: These jdbc values provided are also considered for the upgrade source database details when upgrade/upgrade-deploy action is used.
+  jdbc:
+    url: "YOUR_JDBC_URL"
+    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    # Set the database type only for action = install/install-deploy/upgrade/upgrade-deploy. Valid values are: mssql, oracledate, udb, db2zos, postgres
+    dbType: "YOUR_DATABASE_TYPE"
+    # Set the uri to download the database driver for your database.
+    driverUri: "YOUR_JDBC_DRIVER_URI"
+    # Set your database username and password. These values will be obfuscated and stored in a secrets file.
+    username: "YOUR_JDBC_USERNAME"
+    password: "YOUR_JDBC_PASSWORD"
+    # Set your connection properties that will be sent to our JDBC driver when establishing new connections,Format of the string must be [propertyName=property;]
+    connectionProperties: ""
+    # Set the rules and data schemas for your database. Additional schemas can be defined within Pega.
+    rulesSchema: "YOUR_RULES_SCHEMA"
+    dataSchema: "YOUR_DATA_SCHEMA"
+    # If configured, set the customerdata schema for your database. Defaults to value of dataSchema if not provided.
+    customerDataSchema: ""    
+  
+  docker:
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      # Provide your Docker registry username and password to access the docker image. These credentials will be
+      # used for both the Pega Platform image and the Elasticsearch image.
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  
+  tier:
+    - name: "web"
+      # Enter the domain name to access web nodes via a load balancer.
+      #  e.g. web.mypega.example.com
+      service:
+        domain: "YOUR_WEB_NODE_DOMAIN"
+        port: 80
+        targetPort: 8080
+      nodeType: "WebUser"
+      replicas: 1
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each web node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each web node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each web node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each web node (recommended 8Gi).
+      memLimit: "8Gi"
+      # Enter any additional java options.
+      javaOpts: ""
+      # Initial heap size for the jvm.
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm.
+      maxHeap: "7168m"
+      # Set your Pega diagnostic credentials.
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors 
+      alb_stickiness_lb_cookie_duration_seconds: 3660
+      deploymentStrategy:
+      rollingUpdate:
+        # Enter the maximum number of Pods that can be unavailable during the update process. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+        maxSurge: 25%
+        # Enter the maximum number of Pods that can be created over the desired number of Pods. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+        maxUnavailable: 25%
+      type: RollingUpdate
+      hpa:
+        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes. For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
+        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
+        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
+        enabled: true
+        # Enter the minimum number of replicas that HPA can scale-down
+        minReplicas: 1
+        # Enter the maximum number of replicas that HPA can scale-up
+        maxReplicas: 5
+        # Enter the threshold value for average cpu utilization percentage.
+        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
+        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
+        targetAverageCPUUtilization: 700
+        # Enter the threshold value for average memory utilization percentage.
+        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
+        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
+        targetAverageMemoryUtilization: 85
+    - name: "batch"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+      replicas: 1
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each web node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each web node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each web node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each web node (recommended 8Gi).
+      memLimit: "8Gi"
+      # Enter any additional java options.
+      javaOpts: ""
+      # Initial heap size for the jvm.
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm.
+      maxHeap: "7168m"
+      # Set your Pega diagnostic credentials.
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors 
+      alb_stickiness_lb_cookie_duration_seconds: 3660
+      deploymentStrategy:
+      rollingUpdate:
+        # Enter the maximum number of Pods that can be unavailable during the update process. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+        maxSurge: 25%
+        # Enter the maximum number of Pods that can be created over the desired number of Pods. The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+        maxUnavailable: 25%
+      type: RollingUpdate
+      hpa:
+        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes. For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
+        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
+        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
+        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
+        enabled: true
+        # Enter the minimum number of replicas that HPA can scale-down
+        minReplicas: 1
+        # Enter the maximum number of replicas that HPA can scale-up
+        maxReplicas: 5
+        # Enter the threshold value for average cpu utilization percentage.
+        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
+        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
+        targetAverageCPUUtilization: 700
+        # Enter the threshold value for average memory utilization percentage.
+        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
+        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
+        targetAverageMemoryUtilization: 85
+    - name: "stream"
+      # Enter the domain name to access stream nodes via a load balancer.
+      #  e.g. stream.mypega.example.com
+      service:
+        domain: "YOUR_STREAM_NODE_DOMAIN"
+        port: 7003
+        targetPort: 7003
+      nodeType: "Stream"
+      # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
+      replicas: 2
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each stream node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each stream node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each stream node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each stream node (recommended 8Gi).
+      memLimit: "8Gi"
+      # Enter any additional java options
+      javaOpts: ""
+      # Initial heap size for the jvm
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm
+      maxHeap: "7168m"
+      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
+      alb_stickiness_lb_cookie_duration_seconds: 3660
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
+
+  # The following customization options are available for web, stream and batch tiers.
+  # - ports
+  # - init containers
+  # - volumes
+  # - volume mounts
+  # - environmental variable
+  # - prconfig.xml content
+  # - context.xml content
+  #
+  #custom:
+  #  initContainers:
+  #    - name: 'custom-wait-for-database'
+  #      image: 'xxbedy/postgres-pljava:latest'
+  #      command: [
+  #        'sh',
+  #        '-c',
+  #        'until pg_isready -h $host -p $port -U $user; do echo Waiting for database to become live...; sleep 10; done;'
+  #      ]
+  #  ports:
+  #    - name: 'custom-jmx-port'
+  #      containerPort: 9001
+  #  volumes:
+  #   - name: 'custom-ssh-secret'
+  #      secret: [
+  #        secretName: 'custom-ssh-secret'
+  #        defaultMode: 448
+  #      ]
+  #  volumeMounts:
+  #    - name: 'custom-ssh-secret'
+  #      mountPath: '/root/.ssh'
+  #  env:
+  #    - name: 'NODE_SETTINGS'
+  #      value: 'PEGA-RULESENGINE/IMPORT/ALLOWONLYBRANCHEDINSTANCES=true'
+  #  prconfig: |-
+  #    <?xml version="1.0" encoding="UTF-8"?>
+  #    <pegarules>
+  #        <!-- customize -->
+  #    </pegarules>
+  #  context: |-
+  #    <?xml version='1.0' encoding='utf-8'?>
+  #    <Context>
+  #      <!-- customize -->
+  #    </Context>
 
 # Docker image information for the Pega docker image, containing the application server.
 # To use this feature you MUST host the image using a private registry.
 # See https://kubernetes.io/docs/concepts/containers/images/#using-a-private-registry
 # Note: the imagePullPolicy is always for all images in this deployment, so pre-pulling images will not work.
 docker:
-  image: "YOUR_PEGA_IMAGE:TAG"
-  registry:
-    url: "YOUR_DOCKER_REGISTRY"
-    # Provide your Docker registry username and password to access the docker image. These credentials will be
-    # used for both the Pega Platform image and the Elasticsearch image.
-    username: "YOUR_DOCKER_REGISTRY_USERNAME"
-    password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-
-# JDBC information to connect to the Pega database.
-# Pega must be installed to this database before deploying on Kubernetes.
-#
-# Examples for jdbc url and driver class:
-# For Oracle:
-#   url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
-#   driverClass: oracle.jdbc.OracleDriver
-# For Microsoft SQL Server:
-#   url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
-#   driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
-# For IBM DB2 for LUW:
-#   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
-#   driverClass: com.ibm.db2.jcc.DB2Driver
-# For IBM DB2 for z/OS:
-#   url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME
-#   driverClass: com.ibm.db2.jcc.DB2Driver
-# For PostgreSQL:
-#   url: jdbc:postgresql://YOUR_DB_HOST:5432/YOUR_DB_NAME
-#   driverClass: org.postgresql.Driver
-jdbc:
-  url: "YOUR_JDBC_URL"
-  driverClass: "YOUR_JDBC_DRIVER_CLASS"
-  # Set the uri to download the database driver for your database.
-  driverUri: "YOUR_JDBC_DRIVER_URI"
-  # Set your database username and password. These values will be obfuscated and stored in a secrets file.
-  username: "YOUR_JDBC_USERNAME"
-  password: "YOUR_JDBC_PASSWORD"
-  # Set the rules and data schemas for your database. Additional schemas can be defined within Pega.
-  rulesSchema: "YOUR_RULES_SCHEMA"
-  dataSchema: "YOUR_DATA_SCHEMA"
-  # If configured, set the customerdata schema for your database. Defaults to value of dataSchema if not provided.
-  customerDataSchema:
-
-# Pega web deployment settings.
-web:
-  # Enter the domain name to access web nodes via a load balancer.
-  #  e.g. web.mypega.example.com
-  domain: "YOUR_WEB_NODE_DOMAIN"
-  # Enter the number of web nodes for Kubernetes to deploy (minimum 1).
-  replicas: 1
-  # Enter the CPU limit for each web node (recommended 2).
-  cpuLimit: 2
-  # Enter the memory limit for each web node (recommended 8Gi).
-  memLimit: "8Gi"
-  # Enter any additional java options.
-  javaOpts: ""
-  # Initial heap size for the jvm.
-  initialHeap: "2048m"
-  # Maximum heap size for the jvm.
-  maxHeap: "7168m"
-  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
-  # The file paths are relative to this project's root directory.
-  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
-  prconfigPath: "config/prconfig.xml"
-  prlog4j2Path: "config/prlog4j2.xml"
-  # Set your Pega diagnostic credentials.
-  pegaDiagnosticUser: ""
-  pegaDiagnosticPassword: ""
-  hpa:
-    enabled: true
-    # Enter the minimum number of replicas that HPA can scale-down
-    minReplicas: 1
-    # Enter the maximum number of replicas that HPA can scale-up
-    maxReplicas: 5
-    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of web pod cpu limit. Pega web pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c.
-    # HPA will scale up if pega web pods average cpu utilization reaches 1.4c
-    targetAverageCPUUtilization: 700
-    # Enter the threshold value for average memory utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of web pod memory limit. Pega web pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi.
-    # HPA will scale up if pega web pods average memory utilization reaches 5.6Gi
-    targetAverageMemoryUtilization: 280
-
-# Pega stream deployment settings.
-stream:
-  # Enter the domain name to access stream nodes via a load balancer.
-  #  e.g. stream.mypega.example.com
-  domain: "YOUR_STREAM_NODE_DOMAIN"
-  # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
-  replicas: 2
-  # Enter the CPU limit for each stream node (recommended 2).
-  cpuLimit: 2
-  # Enter the memory limit for each stream node (recommended 8Gi).
-  memLimit: "8Gi"
-  # Enter any additional java options
-  javaOpts: ""
-  # Initial heap size for the jvm
-  initialHeap: "2048m"
-  # Maximum heap size for the jvm
-  maxHeap: "7168m"
-  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
-  # The file paths are relative to this project's root directory.
-  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
-  prconfigPath: "config/prconfig.xml"
-  prlog4j2Path: "config/prlog4j2.xml"
-
-# Pega batch deployment settings.
-batch:
-  # Enter the number of batch nodes for Kubernetes to deploy (minimum 1).
-  replicas: 1
-  # Enter the CPU limit for each batch node (recommended 2).
-  cpuLimit: 2
-  # Enter the memory limit for each batch node (recommended 8Gi).
-  memLimit: "8Gi"
-  # Enter any additional java options.
-  javaOpts: ""
-  # Initial heap size for the jvm.
-  initialHeap: "2048m"
-  # Maximum heap size for the jvm.
-  maxHeap: "7168m"
-  # Enter the location of the prconfig.xml and prlog4j2.xml configuration files.
-  # The file paths are relative to this project's root directory.
-  # Pega includes default files, but supports overriding these files with customized prconfig and prlog4j2 files.
-  prconfigPath: "config/prconfig.xml"
-  prlog4j2Path: "config/prlog4j2.xml"
-  hpa:
-    enabled: true
-    # Enter the minimum number of replicas that HPA can scale-down
-    minReplicas: 1
-    # Enter the maximum number of replicas that HPA can scale-up
-    maxReplicas: 3
-    # Enter the threshold value for average cpu utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of batch pod cpu limit. Pega batch pod default cpu request is 200m & limit is 2c. 70% of limit or 700% request which is 1.4c.
-    # HPA will scale up if pega batch pods average cpu utilization reaches 1.4c
-    targetAverageCPUUtilization: 700
-    # Enter the threshold value for average memory utilization percentage. This value is calculated on resource request.
-    # Default value is set at 70% of batch pod memory limit. Pega batch pod default memory request is 2Gi & limit is 8Gi. 70% of limit or 280% request which is 5.6Gi.
-    # HPA will scale up if pega batch pods average memory utilization reaches 5.6Gi
-    targetAverageMemoryUtilization: 280
+  pega:
+    image: "YOUR_PEGA_DEPLOY_IMAGE:TAG"
 
 # Cassandra automatic deployment settings.
 cassandra:
@@ -207,91 +284,20 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
-search:
-  # Enter the number of search nodes for Kubernetes to deploy (minimum 1).
-  replicas: 1
-  # If externalURL is set, no search nodes will be deployed automatically, and Pega will use this search node url.
-  externalURL: ""
+pegasearch:
   # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
   # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
   image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
-  # Enter the CPU limit for each search node (recommended 1).
-  cpuLimit: 1
-  # Enter the Memory limit for each search node (recommended 4Gi).
-  memLimit: "4Gi"
-  # Enter the volume size limit for each search node (recommended 5Gi).
-  volumeSize: "5Gi"
 
-
-# Configure EFK stack for logging:
-#   For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
-#   Pega recommends deploying EFK only on k8s
-#   On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
-#   On EKS, see https://eksworkshop.com/logging/
-
-# Replace false with true to deploy EFK.
-# Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
-deploy_efk: &deploy_efk false
-
-elasticsearch:
-  enabled: *deploy_efk
-  # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
-  #
-  # If you need to change this value then you will also need to replace the same
-  # part of the value within the following properties further below:
-  #
-  #   kibana.files.kibana.yml.elasticsearch.url
-  #   fluentd-elasticsearch.elasticsearch.host
-  #
-  fullnameOverride: "elastic-search"
-
-kibana:
-  enabled: *deploy_efk
-  # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
-  files:
-    kibana.yml:
-      elasticsearch.url: http://elastic-search-client:9200
-  service:
-    externalPort: 80
-  ingress:
-    # If enabled is set to "true", an ingress is created to access kibana.
-    enabled: true
-    # Enter the domain name to access kibana via a load balancer.
-    hosts:
-      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
-
-fluentd-elasticsearch:
-  enabled: *deploy_efk
-  # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
-  elasticsearch:
-    host: elastic-search-client
-    buffer_chunk_limit: 250M
-    buffer_queue_limit: 30
-
-metrics-server:
-  # Set this to true to install metrics-server. Follow below guidelines specific
-  #  to each provider, open-source Kubernetes, Openshift & EKS - mandatory to
-  #  set this to true if web.hpa.enabled or batch.hpa.enabled is true GKE or
-  #  AKS - set this to false since metrics-server is installed in the cluster
-  #  by default.
-  enabled: true
-  # Set any additional metrics-server parameters. These values will be used by
-  #  metrics-server's helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
-  args:
-    - --logtostderr
-    # The order in which to consider different Kubelet node address types when
-    #  connecting to Kubelet. Uncomment below arguemnt if host names are not
-    #  resolvable from metrics server pod. This setting is not required for
-    #  public cloud providers & openshift enterprise. It may be required for
-    #  open-source Kubernetes.
-    # - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-    # Uncomment below arguemnt to skip verifying Kubelet CA certificates.
-    #  Not recommended for production usage, but can be useful in test clusters
-    #  with self-signed Kubelet serving certificates. This setting is not
-    #  required for public cloud providers & openshift enterprise. It may be
-    #  required for open-source Kubernetes.
-    # - --kubelet-insecure-tls
+#Pega Installer settings
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  adminPassword: "ADMIN_PASSWORD"
+# Upgrade specific properties
+  upgrade:
+    # Type of upgrade
+    # Valid values are 'in-place' , 'out-of-place'
+    upgradeType: "in-place"
+    # Specify target rules schema for migration and upgrade
+    targetRulesSchema: ""
+ 

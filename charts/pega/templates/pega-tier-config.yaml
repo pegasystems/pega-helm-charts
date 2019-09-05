@@ -1,0 +1,5 @@
+{{ if (eq (include "performDeployment" $) "true") }}
+{{ range $index, $dep := .Values.global.tier}}
+{{ template "pega.config" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "mode" (include "deployConfig" $) "custom" $dep.custom }}
+{{ end }}
+{{ end }}

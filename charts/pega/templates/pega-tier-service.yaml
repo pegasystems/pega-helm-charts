@@ -1,0 +1,7 @@
+{{ if (eq (include "performDeployment" $) "true") }}
+{{ range $index, $dep := .Values.global.tier }}
+{{ if ($dep.service) }}
+{{ template "pega.service" dict "root" $ "name" (printf "pega-%s" $dep.name) "port" $dep.service.port "targetPort" $dep.service.targetPort }}
+{{ end }}
+{{ end }}
+{{ end }}
