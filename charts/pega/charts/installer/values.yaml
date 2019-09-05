@@ -18,7 +18,7 @@ jdbcCustomConnection: ""
 # Distribution kit URL
 distributionKitURL: ""
 # A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
-# This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence. 
+# This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence.
 # Only distriubtion kit zip file is expected inside the volume.
 distributionKitVolumeClaimName: ""
 threads:
@@ -44,7 +44,8 @@ upgrade:
   dbLoadCommitRate: 100
   # Update existing application will be run if this property is set to true
   updateExistingApplications: "false"
-  # Runs the Update Applications Schema utility to update the cloned Rule, Data, Work and Work History tables with the schema changes in the latest base tables if this property is set to true
+  # Runs the Update Applications Schema utility to update the cloned Rule, Data, Work
+  # And Work History tables with the schema changes in the latest base tables if this property is set to true
   updateApplicationsSchema: "false"
   # Generate and execute an SQL script to clean old rulesets and their rules from the system if this property is set to true
   runRulesetCleanup: "false"

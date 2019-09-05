@@ -3,7 +3,7 @@ language: python
 env:
   global:
     - HELM_URL=https://storage.googleapis.com/kubernetes-helm
-    - HELM_TGZ=helm-v2.11.0-linux-amd64.tar.gz
+    - HELM_TGZ=helm-v2.14.0-linux-amd64.tar.gz
     - YAMLLINT_VERSION=1.15.0
 install:
   # Install Helm

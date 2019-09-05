@@ -31,7 +31,6 @@ traefik:
       cpu: 500m
       # Enter the memory limit for traefik
       memory: 500Mi
-      
 # Set this to true to install aws-alb-ingress-controller. Follow below guidelines specific to each provider,
 # For EKS - set this to true.
 # GKE or AKS or K8s or Openshift - set this to false and enable traefik.
@@ -49,10 +48,9 @@ aws-alb-ingress-controller:
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
   awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv: 
-     AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-     AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
-     
+  extraEnv:
+    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 # Configure EFK stack for logging:
 #   For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
 #   Pega recommends deploying EFK only on k8s
@@ -109,8 +107,12 @@ metrics-server:
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
   args:
-  - --logtostderr
-  # The order in which to consider different Kubelet node address types when connecting to Kubelet. Uncomment below arguemnt if host names are not resolvable from metrics server pod. This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-  #- --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-  # Uncomment below arguemnt to skip verifying Kubelet CA certificates. Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates. This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.  
-  #- --kubelet-insecure-tls
+    - --logtostderr
+  # The order in which to consider different Kubelet node address types when connecting to Kubelet.
+  # Uncomment below arguemnt if host names are not resolvable from metrics server pod.
+  # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
+  # - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+  # Uncomment below arguemnt to skip verifying Kubelet CA certificates.
+  # Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
+  # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
+  # - --kubelet-insecure-tls
