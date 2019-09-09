@@ -91,12 +91,28 @@ spec:
         resources:
           # Maximum CPU and Memory that the containers for {{ .name }} can use
           limits:
+          {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
+          {{- else }}
+            cpu: 2
+          {{- end }}
+          {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
+          {{- else }}
+            memory: "8Gi"
+          {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
+          {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
+          {{- else }}
+            cpu: 200m
+          {{- end }}
+          {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"
+          {{- else }}
+            memory: "6Gi"
+          {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeConfig" }}

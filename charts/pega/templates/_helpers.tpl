@@ -116,10 +116,18 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
   value: "{{ .node.javaOpts }}"
 # Initial JVM heap size, equivalent to -Xms
 - name: INITIAL_HEAP
+{{- if .node.initialHeap }}
   value: "{{ .node.initialHeap }}"
+{{- else }}
+  value: "4096m"
+{{- end }}
 # Maximum JVM heap size, equivalent to -Xmx
 - name: MAX_HEAP
+{{- if .node.maxHeap }}
   value: "{{ .node.maxHeap }}"
+{{- else }}
+  value: "7168m"
+{{- end }}
 {{- end -}}
 
 {{- define "pega.health.probes" -}}
