@@ -61,6 +61,14 @@ global:
       # used for both the Pega Platform image and the Elasticsearch image.
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  # Upgrade specific properties
+  upgrade:
+    # Configure only for aks/pks
+    # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
+    # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
+    kube-apiserver:
+      serviceHost: "API_SERVICE_ADDRESS"
+      httpsServicePort: "SERVICE_PORT_HTTPS"
 
   tier:
     - name: "web"

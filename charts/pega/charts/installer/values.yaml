@@ -52,9 +52,3 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
-  # Configure only for aks/pks
-  # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
-  # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
-  kube-apiserver:
-    serviceHost: "API_SERVICE_ADDRESS"
-    httpsServicePort: "SERVICE_PORT_HTTPS"
