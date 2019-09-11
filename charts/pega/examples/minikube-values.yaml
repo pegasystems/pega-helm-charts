@@ -149,10 +149,3 @@ pegasearch:
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   adminPassword: "ADMIN_PASSWORD"
-  # Upgrade specific properties
-  upgrade:
-    # Type of upgrade
-    # Valid values are 'in-place' , 'out-of-place'
-    upgradeType: "in-place"
-    # Specify target rules schema for migration and upgrade
-    targetRulesSchema: ""
