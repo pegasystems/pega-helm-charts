@@ -81,7 +81,7 @@
 
 {{- define "initContainerEnvs" -}}
 {{- if or (eq .Values.global.provider "aks") (eq .Values.global.provider "pks") -}}
-{{ $apiserver := index .Values.upgrade "kube-apiserver" }}
+{{ $apiserver := index .Values.global.upgrade "kube-apiserver" }}
   env:
   - name: KUBERNETES_SERVICE_HOST
     value: {{ $apiserver.serviceHost | quote }}
