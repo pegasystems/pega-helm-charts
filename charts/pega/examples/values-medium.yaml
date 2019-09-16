@@ -61,6 +61,14 @@ global:
       # used for both the Pega Platform image and the Elasticsearch image.
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  # Upgrade specific properties
+  upgrade:
+    # Configure only for aks/pks
+    # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
+    # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
+    kube-apiserver:
+      serviceHost: "API_SERVICE_ADDRESS"
+      httpsServicePort: "SERVICE_PORT_HTTPS"
 
   tier:
     - name: "web"
@@ -72,21 +80,8 @@ global:
         targetPort: 8080
       nodeType: "WebUser"
       replicas: 1
-      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
-      # Enter the CPU request for each web node (recommended 200m).
-      cpuRequest: 200m
-      # Enter the memory request for each web node (recommended 6Gi).
-      memRequest: "6Gi"
-      # Enter the CPU limit for each web node (recommended 2).
-      cpuLimit: 2
-      # Enter the memory limit for each web node (recommended 8Gi).
-      memLimit: "8Gi"
       # Enter any additional java options.
       javaOpts: ""
-      # Initial heap size for the jvm.
-      initialHeap: "4096m"
-      # Maximum heap size for the jvm.
-      maxHeap: "7168m"
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
@@ -108,36 +103,11 @@ global:
         # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
         # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
         enabled: true
-        # Enter the minimum number of replicas that HPA can scale-down
-        minReplicas: 1
-        # Enter the maximum number of replicas that HPA can scale-up
-        maxReplicas: 5
-        # Enter the threshold value for average cpu utilization percentage.
-        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
-        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
-        targetAverageCPUUtilization: 700
-        # Enter the threshold value for average memory utilization percentage.
-        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
-        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
-        targetAverageMemoryUtilization: 85
     - name: "batch"
-      nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
       replicas: 1
-      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
-      # Enter the CPU request for each web node (recommended 200m).
-      cpuRequest: 200m
-      # Enter the memory request for each web node (recommended 6Gi).
-      memRequest: "6Gi"
-      # Enter the CPU limit for each web node (recommended 2).
-      cpuLimit: 2
-      # Enter the memory limit for each web node (recommended 8Gi).
-      memLimit: "8Gi"
       # Enter any additional java options.
       javaOpts: ""
-      # Initial heap size for the jvm.
-      initialHeap: "4096m"
-      # Maximum heap size for the jvm.
-      maxHeap: "7168m"
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
@@ -159,18 +129,6 @@ global:
         # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
         # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
         enabled: true
-        # Enter the minimum number of replicas that HPA can scale-down
-        minReplicas: 1
-        # Enter the maximum number of replicas that HPA can scale-up
-        maxReplicas: 5
-        # Enter the threshold value for average cpu utilization percentage.
-        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
-        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
-        targetAverageCPUUtilization: 700
-        # Enter the threshold value for average memory utilization percentage.
-        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
-        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
-        targetAverageMemoryUtilization: 85
     - name: "stream"
       # Enter the domain name to access stream nodes via a load balancer.
       #  e.g. stream.mypega.example.com
@@ -181,129 +139,14 @@ global:
       nodeType: "Stream"
       # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
       replicas: 2
-      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
-      # Enter the CPU request for each stream node (recommended 200m).
-      cpuRequest: 200m
-      # Enter the memory request for each stream node (recommended 6Gi).
-      memRequest: "6Gi"
-      # Enter the CPU limit for each stream node (recommended 2).
-      cpuLimit: 2
-      # Enter the memory limit for each stream node (recommended 8Gi).
-      memLimit: "8Gi"
       # Enter any additional java options
       javaOpts: ""
-      # Initial heap size for the jvm
-      initialHeap: "4096m"
-      # Maximum heap size for the jvm
-      maxHeap: "7168m"
       # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
       alb_stickiness_lb_cookie_duration_seconds: 3660
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
-    - name: "bix"
-      nodeType: "BIX"
-      replicas: 1
-      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
-      # Enter the CPU request for each web node (recommended 200m).
-      cpuRequest: 200m
-      # Enter the memory request for each web node (recommended 6Gi).
-      memRequest: "6Gi"
-      # Enter the CPU limit for each web node (recommended 2).
-      cpuLimit: 2
-      # Enter the memory limit for each web node (recommended 8Gi).
-      memLimit: "8Gi"
-      # Enter any additional java options.
-      javaOpts: ""
-      # Initial heap size for the jvm.
-      initialHeap: "4096m"
-      # Maximum heap size for the jvm.
-      maxHeap: "7168m"
-      # Set your Pega diagnostic credentials.
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
-      deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
-      hpa:
-        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
-        # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
-        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
-        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
-        enabled: true
-        # Enter the minimum number of replicas that HPA can scale-down
-        minReplicas: 1
-        # Enter the maximum number of replicas that HPA can scale-up
-        maxReplicas: 5
-        # Enter the threshold value for average cpu utilization percentage.
-        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
-        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
-        targetAverageCPUUtilization: 700
-        # Enter the threshold value for average memory utilization percentage.
-        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
-        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
-        targetAverageMemoryUtilization: 85
-    - name: "realtime"
-      nodeType: "RealTime"
-      replicas: 1
-      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
-      # Enter the CPU request for each web node (recommended 200m).
-      cpuRequest: 200m
-      # Enter the memory request for each web node (recommended 6Gi).
-      memRequest: "6Gi"
-      # Enter the CPU limit for each web node (recommended 2).
-      cpuLimit: 2
-      # Enter the memory limit for each web node (recommended 8Gi).
-      memLimit: "8Gi"
-      # Enter any additional java options.
-      javaOpts: ""
-      # Initial heap size for the jvm.
-      initialHeap: "4096m"
-      # Maximum heap size for the jvm.
-      maxHeap: "7168m"
-      # Set your Pega diagnostic credentials.
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
-      deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
-      hpa:
-        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
-        # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
-        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
-        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
-        enabled: true
-        # Enter the minimum number of replicas that HPA can scale-down
-        minReplicas: 1
-        # Enter the maximum number of replicas that HPA can scale-up
-        maxReplicas: 5
-        # Enter the threshold value for average cpu utilization percentage.
-        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
-        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
-        targetAverageCPUUtilization: 700
-        # Enter the threshold value for average memory utilization percentage.
-        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
-        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
-        targetAverageMemoryUtilization: 85
 # The following customization options are available for web, stream and batch tiers.
 # - ports
 # - init containers

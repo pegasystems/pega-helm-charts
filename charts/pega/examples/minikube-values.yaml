@@ -141,7 +141,7 @@ dds:
 pegasearch:
   # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
   # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
-  image: "pegasystems/search:latest"
+  image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
   # Enter the Memory limit for each search node (recommended 4Gi).
   memLimit: "3Gi"
 
