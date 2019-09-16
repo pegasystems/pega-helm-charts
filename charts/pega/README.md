@@ -18,4 +18,4 @@ The following table lists the configurable parameters of the Pega chart and thei
 
 ## Examples
 
-Please refer [examples folder](/examples) to configure multiple tiers or to override default values while deploying Pega chart.
+Please refer [examples folder](examples) to configure multiple tiers or to override default values while deploying Pega chart.
