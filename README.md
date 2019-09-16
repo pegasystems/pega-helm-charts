@@ -28,6 +28,8 @@ Navigate to the project directory and open the values.yaml file.  This is the co
 
 ## Dependencies
 
+Before deploying Pega chart the client needs to deploy the required addons based on the configuration of your [values yaml file](charts/addons/values.yaml) from addons chart.
+
 The Pega chart depends on other charts supplied by third parties.  These are called out in the [requirements yaml file](charts/pega/requirements.yaml).  Individual dependencies may or may not be deployed based on the configuration of your values.yaml file.  When you first setup your helm chart, you will need to update your dependencies to pull down these additional charts from their repositories.  For convenience, the required commands are part of the [Makefile](Makefile) and can run with the ```make dependencies``` command.
 
 For more information about Helm dependencies, see the [Helm documentation](https://helm.sh/docs/helm/#helm-dependency).
