@@ -31,7 +31,9 @@ This document explains on how to deploy pega using minikube as a provider
 	There is no direct way to increase the memory limit of a running minikube.
 
 	``` minikube stop```
+	
 	```minikube delete ```
+	
 	```minikube start --cpus 4 --memory 12288 ```
 
 2. How to start minikube with custom CPU/memory limits
