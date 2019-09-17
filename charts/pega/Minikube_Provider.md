@@ -28,22 +28,23 @@ This document explains on how to deploy pega using minikube as a provider
 
 1. How to increase the memory limit of a running minikube
 
-There is no direct way to increase the memory limit of a running minikube.
+	There is no direct way to increase the memory limit of a running minikube.
 
-``` minikube stop```
-```minikube delete ```
-```minikube start --cpus 4 --memory 12288 ```
+	``` minikube stop```
+	```minikube delete ```
+	```minikube start --cpus 4 --memory 12288 ```
 
 2. How to start minikube with custom CPU/memory limits
 
-```minikube start --cpus 4 --memory 10240```
+	```minikube start --cpus 4 --memory 10240```
 
 3. How to set default memory which is considered on each minikube start
-```minikube config set memory 5000``` followed by ```minikube start```
+
+	```minikube config set memory 5000``` followed by ```minikube start```
 
 4. How to access Pega Designer Studio after deployment
 
-``` <minikube ip>:<Pega service nodePort>/prweb```
+	``` <minikube ip>:<Pega service nodePort>/prweb```
 
 minikube ip can be fetched using command - ``` minikube ip``` and Pega service Nodeport can be fetched using below command
 ```kubectl get service -o go-template='{{range.spec.ports}}{{"Port to access: "}}{{.nodePort}}{{end}}' <service-name> --namespace <namespace name> ```
@@ -55,7 +56,8 @@ Start minikube with at least 4 CPU’s and 10GB memory for complete pega deploym
 ***Note***
 1. Use “minikube-values.yaml” to deploy pega which is available in the example folder of [pega helm charts](\pega-helm-charts\charts\pega\examples). 
 
-Example helm command to deploy
-```helm install . -n mypega --namespace myproject --values /examples/minikube-values.yaml```
+	Example helm command to deploy
+	
+	```helm install . -n mypega --namespace myproject --values /examples/minikube-values.yaml```
 
 2. As this runs on the personal laptop for a day-to-day project with minimal memory and CPU limits, minikube supports only "install", "deploy" and "install-deploy" actions. It is advisable to use this kind of cluster configuration for simple activities on Pega as it might spike with CPU and memory.
