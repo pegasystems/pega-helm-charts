@@ -20,7 +20,7 @@ The following table lists the configurable parameters of the Pega chart and thei
 
 Please refer [examples folder](examples) to configure multiple tiers or to override default values while deploying Pega chart.
 
-### Minikube
+## Minikube
 
 Minikube runs a single-node Kubernetes cluster inside a Virtual Machine (VM) on your laptop for users looking to try out Kubernetes or develop with it day-to-day. For more information on minikube, refer [Minikube documentation] (https://kubernetes.io/docs/setup/learning-environment/minikube/)
 
