@@ -25,8 +25,8 @@ script:
   - helm lint ./charts/pega  
   #- trial=$(git diff --name-only $TRAVIS_COMMIT_RANGE); echo $trial; if [[ $trial == *"version.yaml"* ]]; then  echo "It's there!"; VERSION_CHANGE=true; fi
   - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-  - helm dep update ./pega/
-  - helm dep update ./addons/
+  - helm dep update ./charts/pega 
+  - helm dep update ./charts/pega 
   - mkdir /home/travis/build/scrumteamwhitewalkers/pega-helm-charts-1/terratest/bin
   - export GOPATH=$TRAVIS_BUILD_DIR/terratest
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
