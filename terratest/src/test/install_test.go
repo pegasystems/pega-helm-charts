@@ -17,25 +17,38 @@ func TestInstallActionShouldNotRenderDeployments(t *testing.T) {
 	t.Parallel()
 
 	// Path to the helm chart we will test
-	helmChartPath, err := filepath.Abs("../../../pega")
+	helmChartPath, err := filepath.Abs("../examples/pega-helm/src/main/helm/pega")
 	require.NoError(t, err)
 
 	// set action execute to install
 	options := &helm.Options{
 		SetValues: map[string]string{
-			"global.actions.execute": "install",
+			"actions.execute": "install",
 		},
 	}
 
 	// with action as 'install' below templates should not be rendered
 	output := helm.RenderTemplate(t, options, helmChartPath, []string{
         "templates/pega-action-validate.yaml",
+		"templates/pega-batch-config.yaml",
+		"templates/pega-batch-deployment.yaml",
+		"templates/pega-batch-hpa.yaml",
+		"templates/pega-deploy-role.yaml",
 		"templates/pega-environment-config.yaml",
-		"templates/pega-tier-config.yaml",
-		"templates/pega-tier-deployment.yaml",
-		"templates/pega-tier-hpa.yaml",
-		"templates/pega-tier-ingress.yaml",
-		"templates/pega-tier-service.yaml",
+		"templates/pega-installer-status-rolebinding.yaml",
+		"templates/pega-search-deployment.yaml",
+		"templates/pega-search-service.yaml",
+		"templates/pega-search-transport-service.yaml",
+		"templates/pega-stream-config.yaml",
+		"templates/pega-stream-deployment.yaml",
+		"templates/pega-stream-ingress.yaml",
+		"templates/pega-stream-service.yaml",
+		"templates/pega-upgrade-environment-config.yaml",
+		"templates/pega-web-config.yaml",
+		"templates/pega-web-deployment.yaml",
+		"templates/pega-web-hpa.yaml",
+		"templates/pega-web-ingress.yaml",
+		"templates/pega-web-service.yaml",
 	})
 
 	var deployment appsv1.Deployment
@@ -53,7 +66,7 @@ func TestInstallActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
 
 	// pega-install-environment-config.yaml
-	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"})
+	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-install-environment-config.yaml"})
 	var installEnvConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, installEnvConfig, &installEnvConfigMap)
 
@@ -68,8 +81,8 @@ func TestInstallActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
 	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
 	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
-	require.Equal(t, installEnvConfigData["ADMIN_PASSWORD"], "ADMIN_PASSWORD")
-	require.Equal(t, installEnvConfigData["STATIC_ASSEMBLER"], "")
+	require.Equal(t, installEnvConfigData["ADMIN_PASSWORD"], "")
+	require.Equal(t, installEnvConfigData["STATIC_ASSEMBLER"], "<nil>")
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "false")
 	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
 	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
@@ -90,18 +103,18 @@ func TestInstallActionShouldNotRenderDeployments(t *testing.T) {
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
 
 	// pega-installer-config.yaml
-    installerConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
+    installerConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-config.yaml"})
 	var installConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, installerConfig, &installConfigMap)
 
 	installConfigData := installConfigMap.Data
 	compareConfigMapData(t, []byte(installConfigData["prconfig.xml.tmpl"]), "expectedPrconfig.xml")
-	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "expectedSetupdatabase.properties")
+	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "expectedsetupDatabase.properties")
 	compareConfigMapData(t, []byte(installConfigData["prbootstrap.properties.tmpl"]), "expectedPRbootstrap.properties")
 	compareConfigMapData(t, []byte(installConfigData["prlog4j2.xml"]), "expectedPRlog4j2.xml")
 	
 	// pega-installer-job.yaml
-	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-job.yaml"})
 	var installerJobObj k8sbatch.Job
 	helm.UnmarshalK8SYaml(t, installerJob, &installerJobObj)
 	installerJobSpec := installerJobObj.Spec.Template.Spec
@@ -119,7 +132,7 @@ func TestInstallActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 
 	require.Equal(t, installerJobConatiners[0].Name, "pega-db-install")
-	require.Equal(t, installerJobConatiners[0].Image, "YOUR_INSTALLER_IMAGE:TAG")
+	require.Equal(t, installerJobConatiners[0].Image, "YOUR_PEGA_INSTALLER_IMAGE:TAG")
 	require.Equal(t, installerJobConatiners[0].Ports[0].ContainerPort, containerPort)
 	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].Name, "pega-volume-installer")
 	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].MountPath, "/opt/pega/config")
