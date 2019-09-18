@@ -1,0 +1,140 @@
+# Properties file for use with Pega Deployment Utilities.  Update this file 
+# before using install/upgrade.bat/sh scripts.
+# For more information, see the Pega Platform help.
+
+################### COMMON PROPERTIES - DB CONNECTION (REQUIRED) ##################
+###################################################################################
+#   Set the database connection properties.
+#   For databases that use multiple JDBC driver files (such as DB2), specify
+#   semicolon separated values for 'pega.jdbc.driver.jar'
+#
+#   pega.jdbc.driver.jar	-- path to jdbc jar
+#
+#   pega.jdbc.driver.class 	-- jdbc class.  Valid values are:
+#
+#   Oracle              oracle.jdbc.OracleDriver
+#   IBM DB/2            com.ibm.db2.jcc.DB2Driver
+#   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
+#   PostgreSQL          org.postgresql.Driver
+#
+#   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
+#
+#   pega.jdbc.url		Valid values are:
+#
+#   Oracle              jdbc:oracle:thin:@//localhost:1521/dbName
+#   IBM DB/2 z / OS 	jdbc:db2://localhost:50000/dbName
+#   IBM DB/2            jdbc:db2://localhost:50000/dbName:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+#   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
+#   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
+#
+#   pega.jdbc.username 	db username
+#   pega.jdbc.password  db password
+#
+#   ** If you are installing or upgrading on IBM DB2, update the udb.conf file in the /config directory
+#      with any additional connection properties.
+
+# CONNECTION INFORMATION
+pega.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
+pega.jdbc.driver.class={{ .Env.JDBC_CLASS }}
+pega.database.type={{ .Env.DB_TYPE }}
+pega.jdbc.url={{ .Env.JDBC_URL }}
+pega.jdbc.username={{ .Env.DB_USERNAME }}
+pega.jdbc.password={{ .Env.DB_PASSWORD }}
+
+# TEMPORARY ADMIN PASSWORD - New installs only
+# Set the temporary password for administrator@pega.com that is used to install Pega Platform.
+# You must set a password before installing Pega Platform or the installation will fail.
+# The password must be between 5 and 64 characters. You will be required to change this password on first login.
+pega.admin.password={{ .Env.ADMIN_PASSWORD }}
+
+# CUSTOM CONNECTION PROPERTIES
+# Uncomment this property and add a list of ; delimited connections properties
+# The list must end with ;
+# For example: jdbc.custom.connection.properties=user=usr;password=pwd;
+jdbc.custom.connection.properties={{ .Env.JDBC_CUSTOM_CONNECTION }}
+
+# RULES SCHEMA NAME
+# The default is the value specified for the user name
+rules.schema.name={{ .Env.RULES_SCHEMA }}
+
+# DATA SCHEMA NAME
+# The default is the value specified for the rules schema name
+data.schema.name={{ .Env.DATA_SCHEMA }}
+
+# CUSTOMER DATA SCHEMA NAME
+# The default is the value specified for the data schema name
+customerdata.schema.name={{ .Env.CUSTOMERDATA_SCHEMA }}
+
+# USER TEMP DIRECTORY
+# Will use default if not set to valid directory
+user.temp.dir=/opt/pega/temp
+
+# z/OS SITE-SPECIFIC PROPERTIES FILE
+pega.zos.properties={{ .Env.ZOS_PROPERTIES }}
+
+# BYPASS UDF GENERATION?
+# UDF generation will be skipped if this property is set to true
+# Note: Leave this property blank to generate the UDFs
+bypass.udf.generation={{ .Env.BYPASS_UDF_GENERATION }}
+
+# BYPASS AUTOMATICALLY TRUNCATING PR_SYS_UPDATESCACHE?
+# As a best practice, leave this property blank to automatically truncate the UpdatesCache table.
+# Set to true to bypass truncating the UpdatesCache table. Then, manually truncate the
+# PR_SYS_UPDATESCACHE in the data schema after the installation or upgrade and before the system starts.
+bypass.truncate.updatescache={{ .Env.BYPASS_TRUNCATE_UPDATESCACHE }}
+
+# REBUILD DATABASE RULES INDEXES
+# Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance.
+# Alternately, you can manually rebuild the database rules indexes by running the
+# stored procedure SPPR_REBUILD_INDEXES.
+# Default is false except for z/OS, where the default is true
+rebuild.indexes={{ .Env.REBUILD_INDEXES }}
+
+# SYSTEM NAME
+# The system name uniquely identifies a single system.
+# Since multiple systems may reference the same database, it is important that each
+# system has a unique name to distinguish them from each other.
+# During installs, the following system name will be created.
+system.name={{ .Env.SYSTEM_NAME }}
+
+# PRODUCTION LEVEL
+# During installations, the system name above is generated with the following production level.
+# The system production level can be set to one of the below integer values (1-5):
+# 5 = production;
+# 4 = preproduction;
+# 3 = test;
+# 2 = development;
+# 1 = experimental
+production.level={{ .Env.PRODUCTION_LEVEL }}
+
+# MULTITENANT SYSTEM?
+# A multitenant system allows organizations to act as separate Pega Platform installations
+multitenant.system={{ .Env.MT_SYSTEM }}
+
+# UPDATE EXISTING APPLICATIONS
+# Runs only during upgrades. Default setting is false.
+# You can also run this utility from the IUA, prpcUtils, or in Dev Studio.
+update.existing.applications={{ .Env.UPDATE_EXISTING_APPLICATIONS }}
+
+# UPDATE APPLICATIONS SCHEMA
+# Runs only during upgrades. Default setting is false.
+# Set to true to run the Update Applications Schema utility to update the cloned Rule, Data, Work,
+# and Work History tables with the schema changes in the latest base tables.
+# You can also run this utility later in prpcUtils or in Dev Studio.
+update.applications.schema={{ .Env.UPDATE_APPLICATIONS_SCHEMA }}
+
+# WORKLOAD MANAGER
+# Specify the workload manager to load UDFs into db2zos
+db2zos.udf.wlm={{ .Env.DB2_ZOS_UDF_WLM }}
+
+# RUN RULESET CLEANUP?
+# Generate and execute an SQL script to clean old rulesets and their rules from the system.
+# To generate the script and not execute it use the cleanup.bat/sh script.
+run.ruleset.cleanup={{ .Env.RUN_RULESET_CLEANUP }}
+
+# CUSTOM CONFIGURATION PROPERTIES FILE
+# The congfiguration files are dockerized using .tmpl files and are stored in opt/pega/config
+# inside the container. 
+pegarules.config=/opt/pega/scripts/prconfig.xml
+prbootstrap.config=/opt/pega/scripts/prbootstrap.properties
+prlogging.config=/opt/pega/scripts/prlog4j2.xml

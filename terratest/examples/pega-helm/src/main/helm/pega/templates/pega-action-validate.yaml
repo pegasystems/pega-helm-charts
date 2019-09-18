@@ -1,0 +1,11 @@
+{{- $validActions := list "install" "deploy" "install-deploy" "upgrade" "upgrade-deploy" }}
+{{- if not (has .Values.actions.execute $validActions) }}
+{{- fail "Action value is not correct. The valid values are 'install' 'deploy' 'install-deploy' 'upgrade' 'upgrade-deploy'" }}
+{{- end }}
+
+{{- if (eq (include "performUpgrade" .) "true") }}
+{{- $validUpgradeType := list "in-place" "out-of-place" }}
+{{- if not (has .Values.installer.upgrade.upgradeType $validUpgradeType) }}
+{{- fail "Upgrade Type  value is not correct. The valid values are 'in-place' 'out-of-place'" }}
+{{- end }}
+{{- end }}

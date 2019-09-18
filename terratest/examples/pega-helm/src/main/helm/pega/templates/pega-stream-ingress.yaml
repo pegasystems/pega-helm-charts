@@ -1,0 +1,10 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+{{ $alb := index .Values "aws-alb-ingress-controller" }}
+{{- if eq .Values.provider "openshift" -}}
+{{ template "pega.openshift.ingress" dict "root" $ "node" .Values.stream "port" 7003 "name" (include "pegaStreamName" .) }}
+{{- else if and (eq .Values.provider "eks") (eq $alb.enabled true) -}}
+{{ template "pega.eks.ingress" dict "root" $ "node" .Values.stream "port" 7003 "name" (include "pegaStreamName" .) }}
+{{- else -}}
+{{ template "pega.k8s.ingress" dict "root" $ "node" .Values.stream "port" 7003 "name" (include "pegaStreamName" .) }}
+{{- end -}}
+{{- end -}}

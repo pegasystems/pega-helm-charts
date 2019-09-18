@@ -1,0 +1,3 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+{{ template "pega.config" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) "mode" (include "deployConfig" .) "custom" .Values.web.custom }}
+{{ end }}

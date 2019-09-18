@@ -1,0 +1,3 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+{{ template "pega.config" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) "mode" (include "deployConfig" .) "custom" .Values.batch.custom }}
+{{ end }}

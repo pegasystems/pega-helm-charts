@@ -1,0 +1,9 @@
+{{ if (eq (include "performOnlyDeployment" .) "true") }}
+{{ template "pega.deployment" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" "Foreground" "initContainers" (list "waitForPegaSearch") "custom" .Values.web.custom }}
+{{ end }}
+{{ if (eq (include "performInstallAndDeployment" .) "true") }}
+{{ template "pega.deployment" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" "Foreground" "initContainers" (list "waitForPegaDBInstall" "waitForPegaSearch") "custom" .Values.web.custom }}
+{{ end }}
+{{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
+{{ template "pega.deployment" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" "Foreground" "initContainers" (list "waitForPegaDBUpgrade") "custom" .Values.web.custom }}
+{{ end }}
