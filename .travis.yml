@@ -10,47 +10,56 @@ install:
   - tar xzfv ${HELM_TGZ}
   - PATH=`pwd`/linux-amd64/:$PATH
   - helm init --client-only
+  # Install YamlLint
+  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
+  # Install Go
+  - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
+  - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
+  - export  PATH=$PATH:/usr/local/go/bin
 script:
-  - curl -o index.yaml https://stwhitewalkers.bintray.com/pega-helm-charts/index.yaml
+  - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
+  - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
+  # Now load the helm dependencies
+  - make dependencies
+  # Run Helm lint
+  - helm lint ./charts/pega  
+  #- trial=$(git diff --name-only $TRAVIS_COMMIT_RANGE); echo $trial; if [[ $trial == *"version.yaml"* ]]; then  echo "It's there!"; VERSION_CHANGE=true; fi
   - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-  - helm dep update ./charts/pega/
-  - helm package ./charts/pega/
-  - helm repo index --merge index.yaml --url https://dl.bintray.com/pegasystems/pega-helm-charts/ .
+  - helm dep update ./pega/
+  - helm dep update ./addons/
+  - mkdir /home/travis/build/scrumteamwhitewalkers/pega-helm-charts-1/terratest/bin
+  - export GOPATH=$TRAVIS_BUILD_DIR/terratest
+  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+  - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
+  - cd terratest/src/test
+  #- dep ensure
+  - cd $TRAVIS_BUILD_DIR
+  #- go test -v ./terratest/src/test/install_test.go
+  - chmod 777 before_deploy.sh
+before_deploy:
+  - ./before_deploy.sh
+  - make examples
 deploy:
-- provider: bintray
-  file: descriptor.json
-  user: scrumteamwhitewalkers
-  key:
-    secure: SC1mdfvKoEQC8JT+sHbQ3DhUbGdTKvDZ/lGFEStrupCpKyAnnmMI13pMsVmf7gwDclpWvbrsP/mn0IJficXKQ+BVPJV7/BSnRux77JDR+xBiVR/p/DTegvo5qSajl3HdcfgH+Lr+jdgsexU47GZrdS6mYUTSEl4kOCkFigcnbdDGspkj5RNcOhRysLEB4qyYoeUsKE45mSv+Ai6lBXqzbucfbH2fkYxYtyoJ5UHmMRT/EG4dCNRgg0Ew3tDBvNHUp5JGtZOLu01pIpuzCAxrX8koWMary29xbFmLu3r96QLXzZauqv1kdbFk0GQuVa6a5iYVsvGd3ohRz5sTgbdChVI0PX3IfKQoFA8mUeWFsrfneo2r6l3cBNQ6OTcLzKRRGGSuI9TehePodaiKtdGE1MyMPo+Uv6rcgxr/7h2GjzAdZX2d0KRdhuvafTCO8ySePpO3sh+OCcbZ/gVT9hGCk4cgx3kztyIYnsm1HtxLLEG+uUT6hLqNgLZ2eE6Gn7+cO6DllnflGpj1M1CKVmlcZLRNUxEVf3gDXPEJ2vJOh27cqfyaOU+mETBcQ1MQqOZMNS3Tn1foZdgZX5d70jpj5P0RP5w1O0/iPWU+U6hoTb4VlEhm/uTGdfvQZaZ0OgkA+/JR34HO2WKk7csTkI6s/Zi6R5Ud58SIhO0oZsYUX24=
-  skip_cleanup: true
-  on:
-    all_branches: true
-    tags: true    
-- provider: releases
-  api_key:
-    secure: >
-      GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
-      EawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnza
-      XJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXh
-      CO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1H
-      ml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39R
-      FcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql
-      0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT
-      /wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGW
-      JeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O
-      6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8
-      ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74g
-      AG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt
-      3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
-      a/rvc6hM6quXSmlAwA0U=
-  file:
-    - pega-kubernetes-example.tar.gz
-    - pega-openshift-example.tar.gz
-    - pega-azure-aks-example.tar.gz
-    - pega-aws-eks-example.tar.gz
-    - pega-google-gke-example.tar.gz
-    - pega-pivotal-pks-example.tar.gz
-  skip_cleanup: true
-  on:
-    repo: kishorv10/pega-helm-charts
-    tags: true
+  - provider: releases
+    api_key:
+      secure: BYtlhzzsWk85KrZejivAVO6W6bDWX85Ixv7aIPd4dFu0QPJA2vINqPGCOrOmSDDjrL3kIaosPfZzrtn/kqKJ3j/l7NrrQyfzGs09wuRS2sU1eycWS/PUD9+XrWen76Px9fFVMxgkf9Gp+C6N24BYwAesh05vjS7rYHad4Zkc9uSYO4AIQ1fmkDRsn2NhXrk6HMFaJkPyFiIqtYRbW852apRq8uj2y/S9xGSIjIpa1H9t5cYgDb1dKKxXY/Z8XvFrC+OwDz7E98tvM0jUbgr5FwHvXmbgieRBroMb3XIhlRt+8z0/EHX195pe9lyax5kH+xJe/JiTk+E2w6UIOpkBh8KQVo6G5/AV56DNrTR5jbm8nWAGOmraT9daD+1rO1X7Ub0aHogqt4nWnZYTrsa0fnGJ/wGev3uBCZrKnl7h6qP6PstwbJh8BxuVqbLvydkO5bkTiwWDwsuwWZYe4WvQkzXn2oAKg/0FruYPQDPV6g5plhc6IOnomsuZvJFR9OFoN0hKeofWCAEze/mPshD2t4j4VHZKXGtUpHhWDZgbVDf2wnDLdqyTu/fqh3wId5EXekVd3k2tcYT4MhpeiBEq47tHB0aFZt0poo4xvkcQhgKhUt+RheHgyaLy68iHXAGGBXUi9Ok6ongAIhjcTZYJaDgbDmrCYqY4f9r+1p30XTY=
+    file:
+      - pega-kubernetes-example.tar.gz
+      - pega-openshift-example.tar.gz
+      - pega-azure-aks-example.tar.gz
+      - pega-aws-eks-example.tar.gz
+      - pega-google-gke-example.tar.gz
+      - pega-pivotal-pks-example.tar.gz
+    skip_cleanup: true
+    on:
+      repo: scrumteamwhitewalkers/pega-helm-charts-1
+      tags: true
+  - provider: bintray
+    file: descriptor.json
+    user: kishorv
+    key:
+      secure: jRzfiG7pzgbCh+aGEvpskD+7cCs9fgiqtfUAdTMqG85qEi3n4KcqeB8+3eUGj3aNK5KQE86zUD6kCC4fQDXt+vH9BJWPQ/ltwHvlzW5TLG/rXeg8LOcBa8neOo+mlMoq5yzJUUFlWdaWmtj0/2pQtPIazb9gWGAZHCoEcgU8z0AI47k0GVfUSxXVobil2TgDWzL0IHf+L5yLWVsHi/70EuOkbKuNEDRhCAg9P18INGqdW8krTpb9cxIO1440dSBxC1UQVQcj+cpDzRq9dHgu/yVr/y00gIASQBo4mWNIXvpBEy/ytpUeJI5/28h/60jvKDjcOPHACS7GIALl4ufL9Nf7g2vLJxayKzEiTygbJEhQSmzpNwsVrzGOVsluOMoyZ9+pTArzuBW75WJj2vx0YMLHopSnS3TljC6lFGAgP9AvIFJUnhBOPMWfqXy18WpW2kyQqbyvB228s7zQ42iftA7+E7wLxCJZ/RqxCuWvy8K2u5OjqoAbslxttCXzUTuGtnUaV7dIgN6eIkQp+Ae2Q1htrRFFEmYoCg2GKGS2LuTdkAC52r9zM+hEsX1WZVBitPqVmzjTnXjPu8Jckexxf1IQ953mqOAV3nMicCkneT5QvWmSEVUlakX70euIO1vPmk1Ni/XBHlEe7AuwnQ4UehTjIQcuKmx/XIfFeJKoVJU=
+    skip_cleanup: true
+    on:
+      all_branches: true
+      tags: true 
