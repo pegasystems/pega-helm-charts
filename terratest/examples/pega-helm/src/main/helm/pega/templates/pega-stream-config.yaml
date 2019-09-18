@@ -1,3 +1,0 @@
-{{ if (eq (include "performDeployment" .) "true") }}
-{{ template "pega.config" dict "root" $ "node" .Values.stream "name" (include "pegaStreamName" .) "mode" (include "deployConfig" .) "custom" .Values.stream.custom }}
-{{ end }}

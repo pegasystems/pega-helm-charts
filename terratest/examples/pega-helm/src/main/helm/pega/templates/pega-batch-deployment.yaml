@@ -1,9 +1,0 @@
-{{ if (eq (include "performOnlyDeployment" .) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" (include "evaluateBackgroundNodeTypes" .) "initContainers" (list "waitForPegaSearch" "waitForCassandra") "custom" .Values.batch.custom }}
-{{ end }}
-{{ if (eq (include "performInstallAndDeployment" .) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" (include "evaluateBackgroundNodeTypes" .) "initContainers" (list "waitForPegaDBInstall" "waitForPegaSearch" "waitForCassandra") "custom" .Values.batch.custom }}
-{{ end }}
-{{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" .Values.batch "name" (include "pegaBatchName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" (include "evaluateBackgroundNodeTypes" .) "initContainers" (list "waitForPegaDBUpgrade") "custom" .Values.batch.custom }}
-{{ end }}

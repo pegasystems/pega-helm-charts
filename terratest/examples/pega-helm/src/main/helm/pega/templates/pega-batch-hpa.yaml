@@ -1,3 +1,0 @@
-{{ if (eq (include "performDeployment" .) "true") }}
-{{ template "pega.hpa" dict "root" $ "name" (printf "%s-hpa" (include "pegaBatchName" .)) "deploymentName" (include "pegaBatchName" .) "hpa" .Values.batch.hpa}}
-{{ end }}

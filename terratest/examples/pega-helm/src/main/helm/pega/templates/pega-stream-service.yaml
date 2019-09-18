@@ -1,3 +1,0 @@
-{{ if (eq (include "performDeployment" .) "true") }}
-{{ template "pega.service" dict "root" $ "name" (include "pegaStreamName" .) "port" 7003 "targetPort" 7003 }}
-{{ end }}
