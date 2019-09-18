@@ -69,7 +69,6 @@ global:
     kube-apiserver:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
-
   tier:
     - name: "web"
       # Enter the domain name to access web nodes via a load balancer.
@@ -80,8 +79,21 @@ global:
         targetPort: 8080
       nodeType: "WebUser"
       replicas: 1
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each web node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each web node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each web node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each web node (recommended 8Gi).
+      memLimit: "8Gi"
       # Enter any additional java options.
       javaOpts: ""
+      # Initial heap size for the jvm.
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm.
+      maxHeap: "7168m"
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
@@ -103,11 +115,34 @@ global:
         # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
         # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
         enabled: true
+        # Enter the minimum number of replicas that HPA can scale-down
+        minReplicas: 10
+        # Enter the maximum number of replicas that HPA can scale-up
+        # Enter the threshold value for average cpu utilization percentage.
+        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
+        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
+        # Enter the threshold value for average memory utilization percentage.
+        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
+        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
+        targetAverageMemoryUtilization: 185
     - name: "batch"
       nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
       replicas: 1
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each web node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each web node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each web node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each web node (recommended 8Gi).
+      memLimit: "8Gi"
       # Enter any additional java options.
       javaOpts: ""
+      # Initial heap size for the jvm.
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm.
+      maxHeap: "7168m"
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
@@ -129,6 +164,17 @@ global:
         # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
         # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
         enabled: true
+        # Enter the minimum number of replicas that HPA can scale-down
+        minReplicas: 1888
+        # Enter the maximum number of replicas that HPA can scale-up
+        maxReplicas: 5
+        # Enter the threshold value for average cpu utilization percentage.
+        # Recommended value is 700% i.e. 1.4c (700% of 200m(recommended cpuRequest))
+        # HPA will scale up if pega web pods average cpu utilization reaches 1.4c (based on Pega recommended values).
+        targetAverageCPUUtilization: 700
+        # Enter the threshold value for average memory utilization percentage.
+        # Recommended value is 85% i.e. 5.1Gi (85% of 6Gi(recommended memRequest))
+        # HPA will scale up if pega web pods average memory utilization reaches 5.1Gi (based on Pega recommended values).
     - name: "stream"
       # Enter the domain name to access stream nodes via a load balancer.
       #  e.g. stream.mypega.example.com
@@ -139,14 +185,37 @@ global:
       nodeType: "Stream"
       # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
       replicas: 2
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each stream node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each stream node (recommended 6Gi).
+      memRequest: "6Gi"
+      # Enter the CPU limit for each stream node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each stream node (recommended 8Gi).
+      memLimit: "8Gi"
       # Enter any additional java options
       javaOpts: ""
+      # Initial heap size for the jvm
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm
+      maxHeap: "7168m"
       # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
       alb_stickiness_lb_cookie_duration_seconds: 3660
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
+    - name: "custom-tier"
+      # Enter the domain name to access stream nodes via a load balancer.
+      #  e.g. stream.mypega.example.com
+      service:
+        domain: "YOUR_CUSTOM_NODE_DOMAIN"
+        port: 7003
+        targetPort: 7003
+      nodeType: "custom"
+      # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
+      replicas: 2
 # The following customization options are available for web, stream and batch tiers.
 # - ports
 # - init containers

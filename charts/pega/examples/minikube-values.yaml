@@ -7,7 +7,7 @@ global:
   #   gke - for a deployment using Google Kubernetes Engine
   #   pks - for a deployment using Pivotal Container Service
   #   aks - for a deployment using Azure Kubernetes Service
-  provider: "YOUR_KUBERNETES_PROVIDER"
+  provider: "k8s"
 
   actions:
     # valid values are install, deploy, install-deploy
@@ -61,135 +61,40 @@ global:
       # used for both the Pega Platform image and the Elasticsearch image.
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-  # Upgrade specific properties
-  upgrade:
-    # Configure only for aks/pks
-    # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
-    # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
-    kube-apiserver:
-      serviceHost: "API_SERVICE_ADDRESS"
-      httpsServicePort: "SERVICE_PORT_HTTPS"
 
   tier:
-    - name: "web"
-      # Enter the domain name to access web nodes via a load balancer.
-      #  e.g. web.mypega.example.com
+    - name: "minikube"     
+    # Enter the domain name to access web nodes via a load balancer.
+    #  e.g. web.mypega.example.com
       service:
-        domain: "YOUR_WEB_NODE_DOMAIN"
+        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
         port: 80
         targetPort: 8080
-      nodeType: "WebUser"
-      replicas: 1
-      # Enter any additional java options.
-      javaOpts: ""
-      # Set your Pega diagnostic credentials.
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
-      deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
-      hpa:
-        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
-        # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
-        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
-        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
-        enabled: true
-    - name: "batch"
-      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
-      replicas: 1
-      # Enter any additional java options.
-      javaOpts: ""
-      # Set your Pega diagnostic credentials.
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
-      deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
-      hpa:
-        # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
-        # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
-        # Deployments of Pega Platform supports setting autoscaling thresholds based on CPU utilization and memory resources for a given pod in the deployment.
-        # The recommended settings for CPU utilization and memory resource capacity thresholds are based on testing Pega application under heavy loads.
-        # Customizing your thresholds to match your workloads will be based on your initial cpuRequest and memRequest web pod settings.
-        enabled: true
-    - name: "stream"
-      # Enter the domain name to access stream nodes via a load balancer.
-      #  e.g. stream.mypega.example.com
-      service:
-        domain: "YOUR_STREAM_NODE_DOMAIN"
-        port: 7003
-        targetPort: 7003
-      nodeType: "Stream"
+      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
       # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
-      replicas: 2
+      replicas: 1
+      # For an overview of setting CPU and memory resources, see https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/.
+      # Enter the CPU request for each stream node (recommended 200m).
+      cpuRequest: 200m
+      # Enter the memory request for each stream node (recommended 6Gi).
+      memRequest: "5Gi"
+      # Enter the CPU limit for each stream node (recommended 2).
+      cpuLimit: 2
+      # Enter the memory limit for each stream node (recommended 8Gi).
+      memLimit: "6Gi"
       # Enter any additional java options
       javaOpts: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
+      # Initial heap size for the jvm
+      initialHeap: "4096m"
+      # Maximum heap size for the jvm
+      maxHeap: "4096m"
+      # Set your Pega diagnostic credentials.
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
-# The following customization options are available for web, stream and batch tiers.
-# - ports
-# - init containers
-# - volumes
-# - volume mounts
-# - environmental variable
-# - prconfig.xml content
-# - context.xml content
-#
-#     custom:
-#       initContainers:
-#         - name: 'custom-wait-for-database'
-#           image: 'xxbedy/postgres-pljava:latest'
-#           command: [
-#             'sh',
-#             '-c',
-#             'until pg_isready -h $host -p $port -U $user; do echo Waiting for database to become live...; sleep 10; done;'
-#            ]
-#       ports:
-#         - name: 'custom-jmx-port'
-#           containerPort: 9001
-#       volumes:
-#         - name: 'custom-ssh-secret'
-#           secret: [
-#             secretName: 'custom-ssh-secret'
-#             defaultMode: 448
-#           ]
-#       volumeMounts:
-#         - name: 'custom-ssh-secret'
-#           mountPath: '/root/.ssh'
-#       env:
-#         - name: 'NODE_SETTINGS'
-#           value: 'PEGA-RULESENGINE/IMPORT/ALLOWONLYBRANCHEDINSTANCES=true'
-#       prconfig: |-
-#         <?xml version="1.0" encoding="UTF-8"?>
-#         <pegarules>
-#             <!-- customize -->
-#         </pegarules>
-#       context: |-
-#         <?xml version='1.0' encoding='utf-8'?>
-#         <Context>
-#            <!-- customize -->
-#         </Context>
 
 # Docker image information for the Pega docker image, containing the application server.
 # To use this feature you MUST host the image using a private registry.
@@ -203,7 +108,7 @@ docker:
 cassandra:
   # Set cassandra.enabled to true to automatically deploy the Cassandra sub-chart.
   # Set to false if dds.externalNodes is set, or if you do not need Cassandra in your Pega environment.
-  enabled: true
+  enabled: false
   # Set any additional Cassandra parameters. These values will be used by Cassandra's helm chart.
   # See https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml
   persistence:
@@ -237,15 +142,10 @@ pegasearch:
   # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
   # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
   image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
+  # Enter the Memory limit for each search node (recommended 4Gi).
+  memLimit: "3Gi"
 
 # Pega Installer settings
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   adminPassword: "ADMIN_PASSWORD"
-  # Upgrade specific properties
-  upgrade:
-    # Type of upgrade
-    # Valid values are 'in-place' , 'out-of-place'
-    upgradeType: "in-place"
-    # Specify target rules schema for migration and upgrade
-    targetRulesSchema: ""

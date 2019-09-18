@@ -1,0 +1,7 @@
+{{ if (eq (include "performDeployment" $) "true") }}
+{{ range $dep := .Values.global.tier  }}
+{{ if ($dep.hpa) }}
+{{ template "pega.hpa" dict "root" $ "name" (printf "%s-hpa" (printf "pega-%s" $dep.name)) "deploymentName" (printf "pega-%s" $dep.name) "hpa" $dep.hpa }}
+{{ end }}
+{{ end }}
+{{ end }}

@@ -1,1 +1,0 @@
-{{ template "pega.service" dict "root" $ "name" (include "pegaStreamName" .) "port" 7003 "targetPort" 7003 }}

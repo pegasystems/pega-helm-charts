@@ -1,0 +1,95 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+# Only attempt to generate this file IF the user has NOT supplied
+# an external search URL which means we need to create one internally.
+{{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
+kind: StatefulSet
+apiVersion: apps/v1beta1
+metadata:
+  name: {{ template "searchName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "searchName" . }}
+    component: Pega
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "searchName" . }}
+      component: "Search"
+  serviceName: {{ template "searchName" . }}
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "searchName" . }}
+        component: "Search"
+    spec:
+      {{ if ne .Values.global.provider "openshift" }}
+      securityContext:
+        fsGroup: 1000
+      {{ end }}
+      initContainers:
+      {{ if eq .Values.global.provider "openshift" }}
+      - name: set-dir-owner
+        image: busybox:1.31.0
+        command: ['sh', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data']
+        volumeMounts:
+        - name: esstorage
+          mountPath: /usr/share/elasticsearch/data
+      {{ end }}
+      - name: set-max-map-count
+        image: busybox:1.31.0
+        command: ['sysctl', '-w', 'vm.max_map_count=262144']
+        securityContext:
+          privileged: true
+      containers:
+      - name: search
+        image: {{ .Values.image }}
+        securityContext:
+          runAsUser: 1000
+        env:
+        - name: HOST_LIST
+          value: {{ template "searchName" . }}-transport
+        - name: ES_JAVA_OPTS
+          value: "-Xmx2g -Xms2g"
+        - name: UNICAST_HOSTS
+          value: {{ template "searchName" . }}-transport
+        - name: NUMBER_OF_MASTERS
+          value: "{{ .Values.env.MINIMUM_MASTER_NODES }}"
+        resources:
+          requests:
+            cpu: "0.25"
+            memory: "2Gi"
+          limits:
+            cpu: "{{ .Values.cpuLimit }}"
+            memory: "{{ .Values.memLimit }}"
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: transport
+        livenessProbe:
+          tcpSocket:
+            port: transport
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /_cat
+            port: http
+          initialDelaySeconds: 20
+          timeoutSeconds: 5
+        volumeMounts:
+        - name: esstorage
+          mountPath: /usr/share/elasticsearch/data
+      imagePullSecrets:
+      - name: {{ template "pegaRegistrySecret" }}
+  volumeClaimTemplates:
+  - metadata:
+      name: esstorage
+    spec:
+      accessModes: [ ReadWriteOnce ]
+      resources:
+        requests:
+          storage: {{ .Values.volumeSize }}
+{{ end }}
+{{ end }}

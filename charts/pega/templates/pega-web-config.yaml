@@ -1,1 +1,0 @@
-{{ template "pega.config" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) }}
