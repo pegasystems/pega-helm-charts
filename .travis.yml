@@ -23,18 +23,21 @@ script:
   - make dependencies
   # Run Helm lint
   - helm lint ./charts/pega  
+  - helm lint ./charts/addons
   #- trial=$(git diff --name-only $TRAVIS_COMMIT_RANGE); echo $trial; if [[ $trial == *"version.yaml"* ]]; then  echo "It's there!"; VERSION_CHANGE=true; fi
-  - helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-  - helm dep update ./charts/pega 
-  - helm dep update ./charts/pega 
+  # moved below 3 lines to make dependencies
+  #- helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
+  #- helm dep update ./charts/pega 
+  #- helm dep update ./charts/pega 
+  # Run GO helm unit tests
   - mkdir /home/travis/build/scrumteamwhitewalkers/pega-helm-charts-1/terratest/bin
   - export GOPATH=$TRAVIS_BUILD_DIR/terratest
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
-  #- dep ensure
+  - dep ensure
   - cd $TRAVIS_BUILD_DIR
-  #- go test -v ./terratest/src/test/install_test.go
+  - go test -v ./terratest/src/test/install_test.go
   - chmod 777 before_deploy.sh
 before_deploy:
   - ./before_deploy.sh

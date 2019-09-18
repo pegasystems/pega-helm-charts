@@ -1,7 +1,9 @@
 dependencies:
 	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-	helm repo list
+	helm repo add stable https://kubernetes-charts.storage.googleapis.com
+	helm repo list	
 	helm dependency update ./charts/pega/
+	helm dependency update ./charts/addons/
 
 examples: dependencies
 	mkdir -p ./build/kubernetes
