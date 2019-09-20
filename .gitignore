@@ -2,9 +2,16 @@
 **/charts/*.tgz
 **/requirements.lock
 
+
 # Generated example yaml
 /build
 *.tar.gz
 
 # OSX trash
 .DS_Store
+
+#terratest 
+**/terratest/pkg/*
+**/terratest/bin/*
+**/terratest/src/test/Gopkg.lock
+**/terratest/src/test/vendor
