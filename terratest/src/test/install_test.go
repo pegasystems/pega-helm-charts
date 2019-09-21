@@ -14,7 +14,7 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
-const pegaHelmChartPath = "../../../charts/pega"
+const PegaHelmChartPath = "../../../charts/pega"
 
 // set action execute to install
 var options = &helm.Options{
@@ -28,7 +28,7 @@ func TestInstallActionSkippedTemplates(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
 
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	output := helm.RenderTemplate(t, options, helmChartPath, []string{
@@ -56,7 +56,7 @@ func TestInstallActionInstallJob(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
 
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
@@ -93,7 +93,7 @@ func TestInstallActionInstallJob(t *testing.T) {
 func TestInstallActionInstallerEnvironmentConfig(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	// pega-install-environment-config.yaml
@@ -128,7 +128,7 @@ func TestInstallActionInstallerEnvironmentConfig(t *testing.T) {
 func TestInstallActionRegistrySecret(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	// pega-registry-secret.yaml
@@ -144,7 +144,7 @@ func TestInstallActionRegistrySecret(t *testing.T) {
 func TestInstallActionCredentailsSecret(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
@@ -158,7 +158,7 @@ func TestInstallActionCredentailsSecret(t *testing.T) {
 func TestInstallActionInstallerConfig(t *testing.T) {
 	t.Skip("skipping this")
 	t.Parallel()
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	// pega-installer-config.yaml
