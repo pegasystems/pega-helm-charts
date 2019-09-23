@@ -8,7 +8,7 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
-func VerifyCredentialsSecret(t *testing.T, helmChartPath string) {
+func VerifyCredentialsSecret(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
 	var secretobj k8score.Secret
@@ -18,7 +18,7 @@ func VerifyCredentialsSecret(t *testing.T, helmChartPath string) {
 	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
 }
 
-func VerfiyRegistrySecret(t *testing.T, helmChartPath string) {
+func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
 	var registrySecretObj k8score.Secret
