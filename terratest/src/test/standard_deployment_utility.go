@@ -48,10 +48,6 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 	}
 }
 
-func sample() {
-	fmt.Println("sample called")
-}
-
 func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment *pegaDeployment) {
 
 	require.Equal(t, deploymentObj.Spec.Replicas, replicasPtr)
@@ -136,3 +132,19 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 
 	//
 }
+
+func VerifyPegaServices()
+
+func VerifyPegaIngress()
+
+func VerifyPegaStatefulset()
+
+// Just verify what is exposed in the values yaml & k8s objects
+func VerifyCassandraService()
+
+// Just verify what is exposed in the values yaml & k8s objects
+func VerifySearchService()
+
+func VefifyEnvironmentConfig()
+
+func VerifyTierConfig()
