@@ -88,14 +88,14 @@ global:
       # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
       alb_stickiness_lb_cookie_duration_seconds: 3660
       deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
+        rollingUpdate:
+          # Enter the maximum number of Pods that can be unavailable during the update process.
+          # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+          maxSurge: 25%
+          # Enter the maximum number of Pods that can be created over the desired number of Pods.
+          # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+          maxUnavailable: 25%
+        type: RollingUpdate
       hpa:
         # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
         # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
@@ -114,14 +114,14 @@ global:
       # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
       alb_stickiness_lb_cookie_duration_seconds: 3660
       deploymentStrategy:
-      rollingUpdate:
-        # Enter the maximum number of Pods that can be unavailable during the update process.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxSurge: 25%
-        # Enter the maximum number of Pods that can be created over the desired number of Pods.
-        # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
-        maxUnavailable: 25%
-      type: RollingUpdate
+        rollingUpdate:
+          # Enter the maximum number of Pods that can be unavailable during the update process.
+          # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+          maxSurge: 25%
+          # Enter the maximum number of Pods that can be created over the desired number of Pods.
+          # The value can be an absolute number (for example, 5) or a percentage of desired Pods (for example, 10%)
+          maxUnavailable: 25%
+        type: RollingUpdate
       hpa:
         # Pega supports autoscaling of pods in your deployment using the Horizontal Pod Autoscaler (HPA) of Kubernetes.
         # For details, see https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/
