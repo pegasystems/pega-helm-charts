@@ -53,9 +53,9 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.Equal(t, deploymentObj.Spec.Replicas, replicasPtr)
 	require.Equal(t, deploymentObj.Spec.ProgressDeadlineSeconds, ProgressDeadlineSecondsPtr)
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Selector.MatchLabels["app"])
-	//require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxSurge, rollingUpdatePtr)
-	//require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxUnavailable, rollingUpdatePtr)
-	//require.Equal(t, deploymentObj.Spec.Strategy.Type, appsv1.DeploymentStrategyType("RollingUpdate"))
+	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxSurge, rollingUpdatePtr)
+	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxUnavailable, rollingUpdatePtr)
+	require.Equal(t, deploymentObj.Spec.Strategy.Type, appsv1.DeploymentStrategyType("RollingUpdate"))
 
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Template.Labels["app"])
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
@@ -92,11 +92,10 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.Equal(t, webDeploymentSpec.Containers[0].Env[3].Value, "7168m")
 	require.Equal(t, webDeploymentSpec.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
 
-	//degah
-	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
-	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("memory")], "8Gi")
-	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
-	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("memory")], "6Gi")
+	require.Equal(t, "2", webDeploymentSpec.Containers[0].Resources.Limits.Cpu().String())
+	require.Equal(t, "8Gi", webDeploymentSpec.Containers[0].Resources.Limits.Memory().String())
+	require.Equal(t, "200m", webDeploymentSpec.Containers[0].Resources.Requests.Cpu().String())
+	require.Equal(t, "6Gi", webDeploymentSpec.Containers[0].Resources.Requests.Memory().String())
 
 	require.Equal(t, webDeploymentSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
 	require.Equal(t, webDeploymentSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
@@ -124,16 +123,9 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.Equal(t, webDeploymentSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
 	require.Equal(t, webDeploymentSpec.RestartPolicy, k8score.RestartPolicy("Always"))
 	require.Equal(t, webDeploymentSpec.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
-	// HPA
-
-	// resource limits
-
-	// rolling updates
-
-	//
 }
 
-func VerifyPegaServices()
+/*func VerifyPegaServices()
 
 func VerifyPegaIngress()
 
@@ -148,3 +140,6 @@ func VerifySearchService()
 func VefifyEnvironmentConfig()
 
 func VerifyTierConfig()
+
+func VerifyHPA()
+*/

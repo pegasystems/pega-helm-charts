@@ -131,14 +131,16 @@ func TestInstallActionRegistrySecret(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
+	VerfiyRegistrySecret(t, helmChartPath)
+
 	// pega-registry-secret.yaml
-	registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
+	/*registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
 
 	var registrySecretObj k8score.Secret
 	helm.UnmarshalK8SYaml(t, registrySecret, &registrySecretObj)
 	reqgistrySecretData := registrySecretObj.Data
 
-	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
+	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")*/
 }
 
 func TestInstallActionCredentailsSecret(t *testing.T) {
@@ -147,12 +149,14 @@ func TestInstallActionCredentailsSecret(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
-	var secretobj k8score.Secret
-	helm.UnmarshalK8SYaml(t, secretOutput, &secretobj)
-	secretData := secretobj.Data
-	require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
-	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
+	VerifyCredentialsSecret(t, helmChartPath)
+
+	/*	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
+		var secretobj k8score.Secret
+		helm.UnmarshalK8SYaml(t, secretOutput, &secretobj)
+		secretData := secretobj.Data
+		require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
+		require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")*/
 }
 
 func TestInstallActionInstallerConfig(t *testing.T) {
