@@ -8,12 +8,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
-	k8sAutoscale "k8s.io/api/autoscaling/v1"
 	k8sbatch "k8s.io/api/batch/v1"
 	k8score "k8s.io/api/core/v1"
-	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	k8srbac "k8s.io/api/rbac/v1"
-	intstr "k8s.io/apimachinery/pkg/util/intstr"
 
 	//k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
@@ -184,7 +181,7 @@ func TestInstallDeployActionStandardDeployment(t *testing.T) {
 
 }
 
-func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
+/*func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	t.Parallel()
 	t.Skip()
 
@@ -683,4 +680,4 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 
 	// pega-installer-job.yaml
 
-}
+}*/

@@ -25,14 +25,16 @@ script:
   - helm lint ./charts/pega  
   - helm lint ./charts/addons
   # Run GO helm unit tests
-  - mkdir /home/travis/build/scrumteamwhitewalkers/pega-helm-charts-1/terratest/bin
+  - mkdir $TRAVIS_BUILD_DIR/terratest/bin
   - export GOPATH=$TRAVIS_BUILD_DIR/terratest
   - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
   - dep ensure
+  - go test -v deploy_test.go common_utility.go standard_deployment_utility.go
+  - go test -v install_test.go common_utility.go standard_deployment_utility.go
+  - go test -v install_deploy_test.go common_utility.go standard_deployment_utility.go
   - cd $TRAVIS_BUILD_DIR
-  - go test -v ./terratest/src/test/install_test.go
   - chmod 777 before_deploy.sh
 before_deploy:
   - ./before_deploy.sh
