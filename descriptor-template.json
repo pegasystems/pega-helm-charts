@@ -2,7 +2,7 @@
     "package": {
         "name": "pega-helm-charts",
         "repo": "pega-helm-charts",
-        "subject": "stwhitewalkers",
+        "subject": "kishor",
         "vcs_url": "https://github.com/scrumteamwhitewalkers/pega-helm-charts-1",
         "licenses": ["Apache License 2.0"]
     },
@@ -13,7 +13,12 @@
 
     "files":
         [
-        {"includePattern": "(*.tgz)", "uploadPattern": "$1", 
+        {"includePattern": "${PEGA_FILE_NAME}" , "uploadPattern": "${PEGA_FILE_NAME}", 
+            "matrixParams": {
+                "override" : 1
+            }
+        },
+        {"includePattern": "${ADDONS_FILE_NAME}" , "uploadPattern": "${ADDONS_FILE_NAME}", 
             "matrixParams": {
                 "override" : 1
             }
