@@ -1,6 +1,8 @@
 package test
 
 import (
+	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -25,8 +27,18 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 	helm.UnmarshalK8SYaml(t, registrySecret, &registrySecretObj)
 	reqgistrySecretData := registrySecretObj.Data
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
+	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
 }
 
 func SplitOutput() {
 
+}
+
+// util function for comparing
+func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
+	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
+	require.Empty(t, err)
+
+	equal := bytes.Equal(expectedPrconfig, actualFile)
+	require.Equal(t, true, equal)
 }
