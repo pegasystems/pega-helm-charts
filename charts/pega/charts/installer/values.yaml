@@ -11,7 +11,7 @@ bypassUdfGeneration: "false"
 # Temporary password for administrator@pega.com that is used to install Pega Platform
 adminPassword: ""
 # Run the Static Assembler ('true' to run, 'false' to not run)
-assembler:
+assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
 bypassTruncateUpdatescache: "false"
 # JDBC custom connection properties
