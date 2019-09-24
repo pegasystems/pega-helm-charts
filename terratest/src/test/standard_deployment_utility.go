@@ -299,7 +299,6 @@ type hpa struct {
 }
 
 func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, expectedHpa hpa) {
-	require.Equal(t, hpaObj.Name, expectedHpa.name)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Name, expectedHpa.targetRefName)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Kind, expectedHpa.kind)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.APIVersion, expectedHpa.apiversion)
