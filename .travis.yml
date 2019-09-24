@@ -37,8 +37,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
-  #- ./before_deploy.sh
-  - make packages
+  - ./before_deploy.sh  
   - make examples
 deploy:
   - provider: releases
