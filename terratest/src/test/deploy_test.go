@@ -2,15 +2,9 @@ package test
 
 import (
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
-	k8score "k8s.io/api/core/v1"
-	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
-	intstr "k8s.io/apimachinery/pkg/util/intstr"
-	autoscaling "k8s.io/kubernetes/pkg/apis/autoscaling"
 
 	//k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
@@ -26,11 +20,16 @@ var options = &helm.Options{
 	},
 }
 
-func VerifyPegaStandardTierDeployment(t *testing.T) {
+func TestPegaStandardTierDeployment(t *testing.T) {
+	t.Parallel()
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
 
+	VerifyPegaStandardTierDeployment(t, helmChartPath, options, []string{"wait-for-pegasearch", "wait-for-cassandra"})
 }
 
-func TestPegaDeployments(t *testing.T) {
+/*func TestPegaDeployments(t *testing.T) {
 	t.Parallel()
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
@@ -158,4 +157,4 @@ func TestSearchTransportService(t *testing.T) {
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Name, "transport")
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Port, int32(80))
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9300))
-}
+}*/

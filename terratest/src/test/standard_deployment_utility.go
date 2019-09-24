@@ -310,12 +310,11 @@ func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 func VerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Options) {
 	pegaHpa := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
 	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
-	hpaSlice := strings.Split(pegaHpa, "#")
-
+	hpaSlice := strings.SplitAfter(pegaHpa, "85")
 	for index, hpaInfo := range hpaSlice {
-		if index >= 2 && index <= 3 {
+		if index >= 0 && index <= 1 {
 			helm.UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
-			if index == 2 {
+			if index == 0 {
 				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "extensions/v1beta1"})
 			} else {
 				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "extensions/v1beta1"})
