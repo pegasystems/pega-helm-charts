@@ -32,12 +32,12 @@ script:
   - cd terratest/src/test
   - dep ensure
   - go test deploy_test.go common_utility.go standard_deployment_utility.go
-  - go test install_test.go common_utility.go
-  - go test install_deploy_test.go common_utility.go standard_deployment_utility.go
+  - go test install_test.go common_utility.go standard_installer_utility.go
+  - go test install_deploy_test.go common_utility.go standard_deployment_utility.go standard_installer_utility.go
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
-  - ./before_deploy.sh
+  - ./before_deploy.sh  
   - make examples
 deploy:
   - provider: releases
