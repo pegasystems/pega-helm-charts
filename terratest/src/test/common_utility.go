@@ -25,6 +25,7 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 	helm.UnmarshalK8SYaml(t, registrySecret, &registrySecretObj)
 	reqgistrySecretData := registrySecretObj.Data
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
+	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
 }
 
 func SplitOutput() {
