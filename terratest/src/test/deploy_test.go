@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -100,7 +101,7 @@ func TestSearchService(t *testing.T) {
 		},
 	}
 	// pega-search-service.yaml
-	searchService := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-search-service.yaml"})
+	searchService := helm.RenderTemplate(t, options, helmChartPath, []string{"../charts/pegasearch/templates/pega-search-transport-service.yaml"})
 	var searchServiceObj k8score.Service
 	helm.UnmarshalK8SYaml(t, searchService, &searchServiceObj)
 	VerifySearchService(t, &searchServiceObj)
@@ -123,9 +124,9 @@ func TestPegaServices(t *testing.T) {
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
 			if index == 1 {
-				VerifyPegaServices(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), int32(8080)})
+				VerifyPegaServices(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}})
 			} else {
-				VerifyPegaServices(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), int32(7003)})
+				VerifyPegaServices(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}})
 			}
 		}
 	}
@@ -148,9 +149,9 @@ func TestPegaIngress(t *testing.T) {
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", int32(80)})
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}})
 			} else {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", int32(7003)})
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}})
 			}
 
 		}
@@ -169,11 +170,14 @@ func TestPegaHpa(t *testing.T) {
 	}
 	pegaHpa := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
 	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
-	hpaSlice := strings.Split(pegaHpa, "---")
+	hpaSlice := strings.Split(pegaHpa, "#")
+	fmt.Println("*************")
+	fmt.Println(hpaSlice[2])
+	fmt.Println("*************")
 	for index, hpaInfo := range hpaSlice {
-		if index >= 1 && index <= 2 {
+		if index >= 2 && index <= 3 {
 			helm.UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
-			if index == 1 {
+			if index == 2 {
 				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "extensions/v1beta1"})
 			} else {
 				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "extensions/v1beta1"})
@@ -193,7 +197,7 @@ func TestSearchTransportService(t *testing.T) {
 		},
 	}
 	// pega-search-transport-service.yaml
-	transportSearchService := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-search-transport-service.yaml"})
+	transportSearchService := helm.RenderTemplate(t, options, helmChartPath, []string{"../charts/pegasearch/templates/pega-search-transport-service.yaml"})
 	var transportSearchServiceObj k8score.Service
 	helm.UnmarshalK8SYaml(t, transportSearchService, &transportSearchServiceObj)
 

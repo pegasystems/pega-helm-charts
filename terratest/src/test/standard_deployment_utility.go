@@ -130,7 +130,7 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 type pegaServices struct {
 	Name       string
 	Port       int32
-	TargetPort int32
+	TargetPort intstr.IntOrString
 }
 
 func VerifyPegaServices(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices) {
@@ -145,7 +145,7 @@ func VerifyPegaServices(t *testing.T, serviceObj *k8score.Service, expectedServi
 
 type pegaIngress struct {
 	Name string
-	Port int32
+	Port intstr.IntOrString
 }
 
 func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
@@ -182,7 +182,7 @@ func VerifyEnvironmentConfig(t *testing.T, envConfigObj k8score.ConfigMap) {
 	require.Equal(t, envConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, envConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, envConfigData["CUSTOMERDATA_SCHEMA"], "")
-	require.Equal(t, envConfigData["JDBC_CONNECTION_PROPERTIES"], "socketTimeout=90")
+	require.Equal(t, envConfigData["JDBC_CONNECTION_PROPERTIES"], "")
 	require.Equal(t, envConfigData["PEGA_SEARCH_URL"], "http://pega-search")
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "release-name-cassandra")
