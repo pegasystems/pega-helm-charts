@@ -1,9 +1,7 @@
 package test
 
 import (
-	"bytes"
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -197,15 +195,6 @@ func VerifyTierConfig(t *testing.T, configObj k8score.ConfigMap) {
 	compareConfigMapData(t, []byte(pegaConfigMapData["prconfig.xml"]), "expectedInstallDeployPrconfig.xml")
 	compareConfigMapData(t, []byte(pegaConfigMapData["context.xml.tmpl"]), "expectedInstallDeployContext.xml")
 	compareConfigMapData(t, []byte(pegaConfigMapData["prlog4j2.xml"]), "expectedInstallDeployPRlog4j2.xml")
-}
-
-// util function for comparing
-func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
-	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
-	require.Empty(t, err)
-
-	equal := bytes.Equal(expectedPrconfig, actualFile)
-	require.Equal(t, true, equal)
 }
 
 type hpa struct {
