@@ -4,34 +4,158 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"testing"
+
 	//"fmt"
 	"bytes"
+
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
-	k8score "k8s.io/api/core/v1"
-	k8sbatch "k8s.io/api/batch/v1"
-	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	k8sAutoscale "k8s.io/api/autoscaling/v1"
+	k8sbatch "k8s.io/api/batch/v1"
+	k8score "k8s.io/api/core/v1"
+	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	k8srbac "k8s.io/api/rbac/v1"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
+
 	//k8sresource "k8s.io/apimachinery/pkg/api/resource"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
 )
 
+const pegaHelmChartPath = "../../../charts/pega"
+
+var options = &helm.Options{
+	SetValues: map[string]string{
+		"global.gactions.execute": "install-deploy",
+	},
+}
+
+func TestInstallDeployActionSkippedTemplates(t *testing.T) {
+	t.Parallel()
+
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+
+	// with action as 'install-deploy' below templates should not be rendered
+	output := helm.RenderTemplate(t, options, helmChartPath, []string{
+		"templates/pega-action-validate.yaml",
+		"charts/installer/templatestemplates/pega-upgrade-environment-config.yaml",
+	})
+
+	var deployment appsv1.Deployment
+	helm.UnmarshalK8SYaml(t, output, &deployment)
+	// assert that above templates are not rendered
+	require.Empty(t, deployment)
+}
+
+func TestInstallDeployActionInstallerRole(t *testing.T) {
+	deployRole := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-deploy-role.yaml"})
+	var deployRoleObj k8srbac.Role
+	helm.UnmarshalK8SYaml(t, deployRole, &deployRoleObj)
+	require.Equal(t, deployRoleObj.Rules[0].APIGroups, []string{"", "batch", "extensions", "apps"})
+	require.Equal(t, deployRoleObj.Rules[0].Resources, []string{"jobs", "deployments", "statefulsets"})
+	require.Equal(t, deployRoleObj.Rules[0].Verbs, []string{"get", "watch", "list"})
+
+}
+
+func TestInstallDeployActionInstallerRoleBinding(t *testing.T) {
+	installerRoleBinding := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-status-rolebinding.yaml"})
+	var installerRoleBindingObj k8srbac.RoleBinding
+	helm.UnmarshalK8SYaml(t, installerRoleBinding, &installerRoleBindingObj)
+	require.Equal(t, installerRoleBindingObj.RoleRef.APIGroup, "rbac.authorization.k8s.io")
+	require.Equal(t, installerRoleBindingObj.RoleRef.Kind, "Role")
+	require.Equal(t, installerRoleBindingObj.RoleRef.Name, "jobs-reader")
+
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Kind, "ServiceAccount")
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Name, "default")
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Namespace, "default")
+}
+
+func TestInstallDeployActionInstallerJob(t *testing.T) {
+	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-job.yaml"})
+	var installerJobObj k8sbatch.Job
+	helm.UnmarshalK8SYaml(t, installerJob, &installerJobObj)
+	installerJobSpec := installerJobObj.Spec.Template.Spec
+	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
+
+	var containerPort int32 = 8080
+
+	require.Equal(t, installerJobSpec.Volumes[0].Name, "pega-volume-credentials")
+	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, installerJobSpec.Volumes[1].Name, "pega-volume-installer")
+	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-installer-config")
+	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+
+	require.Equal(t, installerJobConatiners[0].Name, "pega-db-install")
+	require.Equal(t, installerJobConatiners[0].Image, "YOUR_PEGA_INSTALLER_IMAGE:TAG")
+	require.Equal(t, installerJobConatiners[0].Ports[0].ContainerPort, containerPort)
+	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].Name, "pega-volume-installer")
+	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].MountPath, "/opt/pega/config")
+	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].Name, "pega-volume-credentials")
+	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
+	require.Equal(t, installerJobConatiners[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-install-environment-config")
+
+	require.Equal(t, installerJobSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
+
+	require.Equal(t, installerJobSpec.RestartPolicy, k8score.RestartPolicy("Never"))
+
+}
+
+func TestInstallDeployActionInstallerConfig(t *testing.T) {
+	installerConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-config.yaml"})
+	var installConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, installerConfig, &installConfigMap)
+
+	installConfigData := installConfigMap.Data
+	compareConfigMapData(t, []byte(installConfigData["prconfig.xml.tmpl"]), "expectedPrconfig.xml")
+	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "expectedsetupDatabase.properties")
+	compareConfigMapData(t, []byte(installConfigData["prbootstrap.properties.tmpl"]), "expectedPRbootstrap.properties")
+	compareConfigMapData(t, []byte(installConfigData["prlog4j2.xml"]), "expectedPRlog4j2.xml")
+
+}
+
+func TestInstallDeployActionInstallerEnvConfig(t *testing.T) {
+	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-install-environment-config.yaml"})
+	var installEnvConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, installEnvConfig, &installEnvConfigMap)
+
+	installEnvConfigData := installEnvConfigMap.Data
+	require.Equal(t, installEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
+	require.Equal(t, installEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
+	require.Equal(t, installEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
+	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
+	require.Equal(t, installEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
+	require.Equal(t, installEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
+	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
+	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
+	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
+	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, installEnvConfigData["ADMIN_PASSWORD"], "")
+	require.Equal(t, installEnvConfigData["STATIC_ASSEMBLER"], "<nil>")
+	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "false")
+	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
+	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
+	require.Equal(t, installEnvConfigData["MAX_IDLE"], "5")
+	require.Equal(t, installEnvConfigData["MAX_WAIT"], "-1")
+	require.Equal(t, installEnvConfigData["MAX_ACTIVE"], "10")
+	require.Equal(t, installEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
+	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
+	require.Equal(t, installEnvConfigData["ACTION"], "install-deploy")
+
+}
+
+func TestInstallDeployActionStandardDeployment(t *testing.T) {
+
+}
+
 func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	t.Parallel()
 
 	// Path to the helm chart we will test
-	helmChartPath, err := filepath.Abs("../examples/pega-helm/src/main/helm/pega")
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
-
-	// set action execute to install
-	options := &helm.Options{
-		SetValues: map[string]string{
-			"actions.execute": "install-deploy",
-		},
-	}
 
 	// with action as 'install-deploy' below templates should not be rendered
 	output := helm.RenderTemplate(t, options, helmChartPath, []string{
@@ -45,7 +169,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Empty(t, deployment)
 
 	// pega-batch-config.yaml
-    batchConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-batch-config.yaml"})
+	batchConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-batch-config.yaml"})
 	var batchConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, batchConfig, &batchConfigMap)
 
@@ -55,16 +179,10 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	compareConfigMapData(t, []byte(batchConfigData["prlog4j2.xml"]), "expectedInstallDeployPRlog4j2.xml")
 
 	// pega-deploy-role.yaml
-	deployRole := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-deploy-role.yaml"})
-	var deployRoleObj k8srbac.Role
-	helm.UnmarshalK8SYaml(t, deployRole, &deployRoleObj)
-	require.Equal(t, deployRoleObj.Rules[0].APIGroups, []string{"", "batch", "extensions", "apps"})
-	require.Equal(t, deployRoleObj.Rules[0].Resources, []string{"jobs", "deployments", "statefulsets"})
-	require.Equal(t, deployRoleObj.Rules[0].Verbs, []string{"get", "watch", "list"})
 
 	// pega-environment-config.yaml
-    envConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-    var envConfigMap k8score.ConfigMap
+	envConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	var envConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, envConfig, &envConfigMap)
 
 	envConfigData := envConfigMap.Data
@@ -80,31 +198,21 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "release-name-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-	
-	//pega-installer-status-rolebinding.yaml
-	installerRoleBinding := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-status-rolebinding.yaml"})
-	var installerRoleBindingObj k8srbac.RoleBinding
-	helm.UnmarshalK8SYaml(t, installerRoleBinding, &installerRoleBindingObj)
-	require.Equal(t, installerRoleBindingObj.RoleRef.APIGroup, "rbac.authorization.k8s.io")
-	require.Equal(t, installerRoleBindingObj.RoleRef.Kind, "Role")
-	require.Equal(t, installerRoleBindingObj.RoleRef.Name, "jobs-reader")
 
-    require.Equal(t, installerRoleBindingObj.Subjects[0].Kind, "ServiceAccount")
-	require.Equal(t, installerRoleBindingObj.Subjects[0].Name, "default")
-	require.Equal(t, installerRoleBindingObj.Subjects[0].Namespace, "default")
+	//pega-installer-status-rolebinding.yaml
 
 	// pega-search-service.yaml
 	searchService := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-search-service.yaml"})
 	var searchServiceObj k8score.Service
 	helm.UnmarshalK8SYaml(t, searchService, &searchServiceObj)
-    var servicePort int32 = 80
+	var servicePort int32 = 80
 
 	require.Equal(t, searchServiceObj.Spec.Selector["component"], "Search")
 	require.Equal(t, searchServiceObj.Spec.Selector["app"], "pega-search")
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Name, "http")
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Port, servicePort)
 	require.Equal(t, searchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9200))
-	
+
 	// pega-search-transport-service.yaml
 	transportSearchService := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-search-transport-service.yaml"})
 	var transportSearchServiceObj k8score.Service
@@ -194,7 +302,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, batchDeploymemtObj.Spec.Replicas, replicasPtr)
 	require.Equal(t, batchDeploymemtObj.Spec.ProgressDeadlineSeconds, ProgressDeadlineSecondsPtr)
 	require.Equal(t, batchDeploymemtObj.Spec.Selector.MatchLabels["app"], "pega-batch")
-	
+
 	var rollingUpdate intstr.IntOrString = intstr.FromString("25%")
 	var rollingUpdatePtr = &rollingUpdate
 
@@ -208,7 +316,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 
 	require.Equal(t, batchDeploymemtSpec.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, batchDeploymemtSpec.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-batch")
-    require.Equal(t, batchDeploymemtSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, batchDeploymemtSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 	require.Equal(t, batchDeploymemtSpec.Volumes[1].Name, "pega-volume-credentials")
 	require.Equal(t, batchDeploymemtSpec.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
 	require.Equal(t, batchDeploymemtSpec.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
@@ -240,7 +348,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	//degah
 	//require.Equal(t, batchDeploymemtSpec.Containers[0].Resources.Limits[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, batchDeploymemtSpec.Containers[0].Resources.Limits[k8score.ResourceName("memory")], "8Gi")
-    //require.Equal(t, batchDeploymemtSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
+	//require.Equal(t, batchDeploymemtSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, batchDeploymemtSpec.Containers[0].Resources.Requests[k8score.ResourceName("memory")], "8Gi")
 
 	require.Equal(t, batchDeploymemtSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
@@ -305,7 +413,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 
 	//degah
 	//require.Equal(t, searchDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
-    //require.Equal(t, searchDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
+	//require.Equal(t, searchDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 
 	require.Equal(t, searchDeploymentSpec.Containers[0].Ports[0].Name, "http")
 	require.Equal(t, searchDeploymentSpec.Containers[0].Ports[0].ContainerPort, int32(9200))
@@ -325,7 +433,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, searchDeploymentSpec.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromString("http"))
 
 	require.Equal(t, searchDeploymentSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
-	
+
 	require.Equal(t, searchDeploymentObj.Spec.VolumeClaimTemplates[0].Name, "esstorage")
 	require.Equal(t, searchDeploymentObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
 	//require.Equal(t, searchDeploymentObj.Spec.VolumeClaimTemplates[0].Spec.Resources.Requests[k8score.ResourceName("storage")], "5Gi")
@@ -342,7 +450,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 
 	require.Equal(t, streamDeploymentSpec.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, streamDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-stream")
-    require.Equal(t, streamDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, streamDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 	require.Equal(t, streamDeploymentSpec.Volumes[1].Name, "pega-volume-credentials")
 	require.Equal(t, streamDeploymentSpec.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
 	require.Equal(t, streamDeploymentSpec.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
@@ -353,7 +461,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, streamDeploymentSpec.InitContainers[1].Name, "wait-for-pegasearch")
 	require.Equal(t, streamDeploymentSpec.InitContainers[1].Image, "busybox:1.27.2")
 	require.Equal(t, streamDeploymentSpec.InitContainers[1].Command, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://pega-search); do echo Waiting for search to become live...; sleep 10; done;"})
-	
+
 	require.Equal(t, streamDeploymentSpec.Containers[0].Name, "pega-web-tomcat")
 	require.Equal(t, streamDeploymentSpec.Containers[0].Image, "YOUR_PEGA_DEPLOY_IMAGE:TAG")
 	require.Equal(t, streamDeploymentSpec.Containers[0].Ports[0].Name, "pega-web-port")
@@ -371,7 +479,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	//degah
 	//require.Equal(t, streamDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, streamDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("memory")], "8Gi")
-    //require.Equal(t, streamDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
+	//require.Equal(t, streamDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, streamDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("memory")], "8Gi")
 
 	require.Equal(t, streamDeploymentSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
@@ -427,7 +535,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 
 	require.Equal(t, webDeploymentSpec.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, webDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-web")
-    require.Equal(t, webDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, webDeploymentSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 	require.Equal(t, webDeploymentSpec.Volumes[1].Name, "pega-volume-credentials")
 	require.Equal(t, webDeploymentSpec.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
 	require.Equal(t, webDeploymentSpec.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
@@ -438,7 +546,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, webDeploymentSpec.InitContainers[1].Name, "wait-for-pegasearch")
 	require.Equal(t, webDeploymentSpec.InitContainers[1].Image, "busybox:1.27.2")
 	require.Equal(t, webDeploymentSpec.InitContainers[1].Command, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://pega-search); do echo Waiting for search to become live...; sleep 10; done;"})
-	
+
 	require.Equal(t, webDeploymentSpec.Containers[0].Name, "pega-web-tomcat")
 	require.Equal(t, webDeploymentSpec.Containers[0].Image, "YOUR_PEGA_DEPLOY_IMAGE:TAG")
 	require.Equal(t, webDeploymentSpec.Containers[0].Ports[0].Name, "pega-web-port")
@@ -456,7 +564,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	//degah
 	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Limits[k8score.ResourceName("memory")], "8Gi")
-    //require.Equal(t, webDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
+	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("cpu")].Fromat, k8sresource.Quantity)
 	//require.Equal(t, webDeploymentSpec.Containers[0].Resources.Requests[k8score.ResourceName("memory")], "6Gi")
 
 	require.Equal(t, webDeploymentSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
@@ -499,7 +607,7 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, batchHPAobj.Spec.MinReplicas, replicasPtr)
 	require.Equal(t, batchHPAobj.Spec.MaxReplicas, int32(3))
 
-    // pega-batch-hpa.yaml
+	// pega-batch-hpa.yaml
 	webHPA := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-web-hpa.yaml"})
 	var webHPAobj k8sAutoscale.HorizontalPodAutoscaler
 	helm.UnmarshalK8SYaml(t, webHPA, &webHPAobj)
@@ -526,36 +634,10 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Equal(t, string(secretData["PEGA_DIAGNOSTIC_PASSWORD"]), "")
 
 	// pega-install-environment-config.yaml
-	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-install-environment-config.yaml"})
-	var installEnvConfigMap k8score.ConfigMap
-	helm.UnmarshalK8SYaml(t, installEnvConfig, &installEnvConfigMap)
-
-	installEnvConfigData := installEnvConfigMap.Data
-	require.Equal(t, installEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
-	require.Equal(t, installEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
-	require.Equal(t, installEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
-	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
-	require.Equal(t, installEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
-	require.Equal(t, installEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
-	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
-	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
-	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
-	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
-	require.Equal(t, installEnvConfigData["ADMIN_PASSWORD"], "")
-	require.Equal(t, installEnvConfigData["STATIC_ASSEMBLER"], "<nil>")
-	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "false")
-	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
-	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
-	require.Equal(t, installEnvConfigData["MAX_IDLE"], "5")
-	require.Equal(t, installEnvConfigData["MAX_WAIT"], "-1")
-	require.Equal(t, installEnvConfigData["MAX_ACTIVE"], "10")
-	require.Equal(t, installEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
-	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
-	require.Equal(t, installEnvConfigData["ACTION"], "install-deploy")
 
 	// pega-registry-secret.yaml
 	registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
-	
+
 	var registrySecretObj k8score.Secret
 	helm.UnmarshalK8SYaml(t, registrySecret, &registrySecretObj)
 	reqgistrySecretData := registrySecretObj.Data
@@ -563,51 +645,17 @@ func TestInstallDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
 
 	// pega-installer-config.yaml
-    installerConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-config.yaml"})
-	var installConfigMap k8score.ConfigMap
-	helm.UnmarshalK8SYaml(t, installerConfig, &installConfigMap)
 
-	installConfigData := installConfigMap.Data
-	compareConfigMapData(t, []byte(installConfigData["prconfig.xml.tmpl"]), "expectedPrconfig.xml")
-	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "expectedsetupDatabase.properties")
-	compareConfigMapData(t, []byte(installConfigData["prbootstrap.properties.tmpl"]), "expectedPRbootstrap.properties")
-	compareConfigMapData(t, []byte(installConfigData["prlog4j2.xml"]), "expectedPRlog4j2.xml")
-	
 	// pega-installer-job.yaml
-	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-installer-job.yaml"})
-	var installerJobObj k8sbatch.Job
-	helm.UnmarshalK8SYaml(t, installerJob, &installerJobObj)
-	installerJobSpec := installerJobObj.Spec.Template.Spec
-	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
 
-	var containerPort int32 = 8080
-
-	require.Equal(t, installerJobSpec.Volumes[0].Name, "pega-volume-credentials")
-	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.SecretName, "pega-credentials-secret")
-	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
-	require.Equal(t, installerJobSpec.Volumes[1].Name, "pega-volume-installer")
-	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-installer-config")
-	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
-
-	require.Equal(t, installerJobConatiners[0].Name, "pega-db-install")
-	require.Equal(t, installerJobConatiners[0].Image, "YOUR_PEGA_INSTALLER_IMAGE:TAG")
-	require.Equal(t, installerJobConatiners[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].Name, "pega-volume-installer")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].Name, "pega-volume-credentials")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
-	require.Equal(t, installerJobConatiners[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-install-environment-config")
-	
-	require.Equal(t, installerJobSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
-	
-	require.Equal(t, installerJobSpec.RestartPolicy, k8score.RestartPolicy("Never"))
 }
 
 // util function for comparing
-func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {	
-    expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
+func compareConfigMapData1(t *testing.T, actualFile []byte, expectedFileName string) {
+
+	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
 	require.Empty(t, err)
-	
+
 	equal := bytes.Equal(expectedPrconfig, actualFile)
 	require.Equal(t, true, equal)
 }

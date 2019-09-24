@@ -1,6 +1,8 @@
 package test
 
 import (
+	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -30,4 +32,13 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 
 func SplitOutput() {
 
+}
+
+// util function for comparing
+func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
+	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
+	require.Empty(t, err)
+
+	equal := bytes.Equal(expectedPrconfig, actualFile)
+	require.Equal(t, true, equal)
 }

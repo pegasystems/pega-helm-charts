@@ -17,6 +17,10 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 )
 
+func VerifyPegaStandradTierDeployment(t *testing.T) {
+
+}
+
 func TestPegaDeployments(t *testing.T) {
 	t.Parallel()
 
