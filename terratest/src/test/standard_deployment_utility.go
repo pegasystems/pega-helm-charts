@@ -2,8 +2,10 @@ package test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
+	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	k8score "k8s.io/api/core/v1"
@@ -46,6 +48,50 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 		} else {
 			fmt.Println("in last else", name)
 			t.Fail()
+		}
+	}
+}
+
+func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
+
+	// Deployment objects
+	VerifyPegaDeployments(t, helmChartPath, options, initContainers)
+
+	// Verify tier config
+	VerifyTierConfg(t, helmChartPath, options)
+
+	// Verify environment config
+	VerifyEnvironmentConfig(t, helmChartPath, options)
+
+	// Verify search service
+	VerifySearchService(t, helmChartPath, options)
+
+	// Verfiy pega services
+	VerifyPegaServices(t, helmChartPath, options)
+
+	// Verify pega ingresses
+	VerifyPegaIngresses(t, helmChartPath, options)
+
+	// Verify Pega HPAObjects
+	VerifyPegaHPAs(t, helmChartPath, options)
+
+	// Verify search transport service
+	VerifySearchTransportService(t, helmChartPath, options)
+
+}
+
+func VerifyPegaDeployments(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
+	deployment := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+	var deploymentObj appsv1.Deployment
+	deploymentSlice := strings.Split(deployment, "---")
+	for index, deploymentInfo := range deploymentSlice {
+		if index >= 1 && index <= 3 {
+			helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
+			if index == 1 {
+				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
+			} else if index == 2 {
+				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
+			}
 		}
 	}
 }
@@ -133,7 +179,23 @@ type pegaServices struct {
 	TargetPort intstr.IntOrString
 }
 
-func VerifyPegaServices(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices) {
+func VerifyPegaServices(t *testing.T, helmChartPath string, options *helm.Options) {
+	service := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
+	var pegaServiceObj k8score.Service
+	serviceSlice := strings.Split(service, "---")
+	for index, serviceInfo := range serviceSlice {
+		if index >= 1 && index <= 2 {
+			helm.UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
+			if index == 1 {
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}})
+			} else {
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}})
+			}
+		}
+	}
+}
+
+func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices) {
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, expectedService.TargetPort)
@@ -154,6 +216,23 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort, expectedIngress.Port)
 }
 
+func VerifyPegaIngresses(t *testing.T, helmChartPath string, options *helm.Options) {
+	ingress := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+	var pegaIngressObj k8sv1beta1.Ingress
+	ingressSlice := strings.Split(ingress, "---")
+	for index, ingressInfo := range ingressSlice {
+		if index >= 1 && index <= 2 {
+			helm.UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
+			if index == 1 {
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}})
+			} else {
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}})
+			}
+
+		}
+	}
+}
+
 func VerifyPegaStatefulset() {
 
 }
@@ -164,7 +243,11 @@ func VerifyCassandraService() {
 }
 
 // Just verify what is exposed in the values yaml & k8s objects
-func VerifySearchService(t *testing.T, searchServiceObj *k8score.Service) {
+func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Options) {
+
+	searchService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-service.yaml"})
+	var searchServiceObj k8score.Service
+	helm.UnmarshalK8SYaml(t, searchService, &searchServiceObj)
 	require.Equal(t, searchServiceObj.Spec.Selector["component"], "Search")
 	require.Equal(t, searchServiceObj.Spec.Selector["app"], "pega-search")
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Name, "http")
@@ -173,8 +256,12 @@ func VerifySearchService(t *testing.T, searchServiceObj *k8score.Service) {
 }
 
 // VerifyEnvironmentConfig
-func VerifyEnvironmentConfig(t *testing.T, envConfigObj k8score.ConfigMap) {
-	envConfigData := envConfigObj.Data
+func VerifyEnvironmentConfig(t *testing.T, helmChartPath string, options *helm.Options) {
+
+	envConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	var envConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, envConfig, &envConfigMap)
+	envConfigData := envConfigMap.Data
 	require.Equal(t, envConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, envConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, envConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
@@ -189,12 +276,19 @@ func VerifyEnvironmentConfig(t *testing.T, envConfigObj k8score.ConfigMap) {
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
 }
 
-//VerifyTierConfig
-func VerifyTierConfig(t *testing.T, configObj k8score.ConfigMap) {
-	pegaConfigMapData := configObj.Data
-	compareConfigMapData(t, []byte(pegaConfigMapData["prconfig.xml"]), "expectedInstallDeployPrconfig.xml")
-	compareConfigMapData(t, []byte(pegaConfigMapData["context.xml.tmpl"]), "expectedInstallDeployContext.xml")
-	compareConfigMapData(t, []byte(pegaConfigMapData["prlog4j2.xml"]), "expectedInstallDeployPRlog4j2.xml")
+func VerifyTierConfg(t *testing.T, helmChartPath string, options *helm.Options) {
+	config := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
+	var pegaConfigMap k8score.ConfigMap
+	configSlice := strings.Split(config, "---")
+	for index, configData := range configSlice {
+		if index >= 1 && index <= 3 {
+			helm.UnmarshalK8SYaml(t, configData, &pegaConfigMap)
+			//pegaConfigMapData := pegaConfigMap.Data
+			//compareConfigMapData(t, []byte(pegaConfigMapData["data/prconfig.xml"]), "expectedInstallDeployPrconfig.xml")
+			//compareConfigMapData(t, []byte(pegaConfigMapData["data/context.xml.tmpl"]), "expectedInstallDeployContext.xml")
+			//compareConfigMapData(t, []byte(pegaConfigMapData["data/prlog4j2.xml"]), "expectedInstallDeployPRlog4j2.xml")
+		}
+	}
 }
 
 type hpa struct {
@@ -212,4 +306,35 @@ func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 
 	require.Equal(t, hpaObj.Spec.MinReplicas, replicasPtr)
 	require.Equal(t, hpaObj.Spec.MaxReplicas, int32(5))
+}
+
+func VerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Options) {
+	pegaHpa := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
+	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
+	hpaSlice := strings.Split(pegaHpa, "#")
+
+	for index, hpaInfo := range hpaSlice {
+		if index >= 2 && index <= 3 {
+			helm.UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
+			if index == 2 {
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "extensions/v1beta1"})
+			} else {
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "extensions/v1beta1"})
+			}
+		}
+	}
+}
+
+func VerifySearchTransportService(t *testing.T, helmChartPath string, options *helm.Options) {
+	// pega-search-transport-service.yaml
+	transportSearchService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-transport-service.yaml"})
+	var transportSearchServiceObj k8score.Service
+	helm.UnmarshalK8SYaml(t, transportSearchService, &transportSearchServiceObj)
+
+	require.Equal(t, transportSearchServiceObj.Spec.Selector["component"], "Search")
+	require.Equal(t, transportSearchServiceObj.Spec.Selector["app"], "pega-search")
+	require.Equal(t, transportSearchServiceObj.Spec.ClusterIP, "None")
+	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Name, "transport")
+	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Port, int32(80))
+	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9300))
 }
