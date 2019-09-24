@@ -8,7 +8,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
-	k8sbatch "k8s.io/api/batch/v1"
 	k8score "k8s.io/api/core/v1"
 	k8srbac "k8s.io/api/rbac/v1"
 
@@ -80,38 +79,11 @@ func TestInstallDeployActionInstallerRoleBinding(t *testing.T) {
 
 func TestInstallDeployActionInstallerJob(t *testing.T) {
 	t.Parallel()
-	//t.Skip()
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
 
-	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
-	var installerJobObj k8sbatch.Job
-	helm.UnmarshalK8SYaml(t, installerJob, &installerJobObj)
-	installerJobSpec := installerJobObj.Spec.Template.Spec
-	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
-
-	var containerPort int32 = 8080
-
-	require.Equal(t, installerJobSpec.Volumes[0].Name, "pega-volume-credentials")
-	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.SecretName, "pega-credentials-secret")
-	require.Equal(t, installerJobSpec.Volumes[0].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
-	require.Equal(t, installerJobSpec.Volumes[1].Name, "pega-volume-installer")
-	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-installer-config")
-	require.Equal(t, installerJobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
-
-	require.Equal(t, installerJobConatiners[0].Name, "pega-db-install")
-	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", installerJobConatiners[0].Image)
-	require.Equal(t, installerJobConatiners[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].Name, "pega-volume-installer")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].Name, "pega-volume-credentials")
-	require.Equal(t, installerJobConatiners[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
-	require.Equal(t, installerJobConatiners[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-install-environment-config")
-
-	require.Equal(t, installerJobSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
-
-	require.Equal(t, installerJobSpec.RestartPolicy, k8score.RestartPolicy("Never"))
+	VerifyPegaJob(t, helmChartPath, options, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
 
 }
 
@@ -140,7 +112,6 @@ func TestInstallDeployActionInstallerEnvConfig(t *testing.T) {
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
-
 	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"})
 	var installEnvConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, installEnvConfig, &installEnvConfigMap)
