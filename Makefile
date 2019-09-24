@@ -13,7 +13,7 @@ examples:
 		--namespace example \
 		--set global.provider=k8s \
 		--set global.actions.execute=deploy
-	tar -C ./build/kubernetes/pega/templates -cvzf ./pega-kubernetes-example.tar.gz .
+	tar -C ./build/kubernetes/pega -cvzf ./pega-kubernetes-example.tar.gz .
 
 	mkdir -p ./build/openshift
 	helm template ./charts/pega/ \
@@ -22,7 +22,7 @@ examples:
 		--namespace example \
 		--set global.provider=openshift \
 		--set global.actions.execute=deploy
-	tar -C ./build/openshift/pega/templates -cvzf ./pega-openshift-example.tar.gz .
+	tar -C ./build/openshift/pega -cvzf ./pega-openshift-example.tar.gz .
 
 	mkdir -p ./build/aws-eks
 	helm template ./charts/pega/ \
@@ -31,7 +31,7 @@ examples:
 		--namespace example \
 		--set global.provider=eks \
 		--set global.actions.execute=deploy
-	tar -C ./build/aws-eks/pega/templates -cvzf ./pega-aws-eks-example.tar.gz .
+	tar -C ./build/aws-eks/pega -cvzf ./pega-aws-eks-example.tar.gz .
 
 	mkdir -p ./build/azure-aks
 	helm template ./charts/pega/ \
@@ -40,7 +40,7 @@ examples:
 		--namespace example \
 		--set global.provider=aks \
 		--set global.actions.execute=deploy
-	tar -C ./build/azure-aks/pega/templates -cvzf ./pega-azure-aks-example.tar.gz .
+	tar -C ./build/azure-aks/pega -cvzf ./pega-azure-aks-example.tar.gz .
 
 	mkdir -p ./build/google-gke
 	helm template ./charts/pega/ \
@@ -49,7 +49,7 @@ examples:
 		--namespace example \
 		--set global.provider=gke \
 		--set global.actions.execute=deploy
-	tar -C ./build/google-gke/pega/templates -cvzf ./pega-google-gke-example.tar.gz .
+	tar -C ./build/google-gke/pega -cvzf ./pega-google-gke-example.tar.gz .
 
 	mkdir -p ./build/pivotal-pks
 	helm template ./charts/pega/ \
@@ -58,7 +58,7 @@ examples:
 		--namespace example \
 		--set global.provider=pks \
 		--set global.actions.execute=deploy
-	tar -C ./build/pivotal-pks/pega/templates -cvzf ./pega-pivotal-pks-example.tar.gz .
+	tar -C ./build/pivotal-pks/pega -cvzf ./pega-pivotal-pks-example.tar.gz .
 
 clean:
 	rm -rf ./build
