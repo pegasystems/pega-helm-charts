@@ -10,6 +10,9 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
+var volumeDefaultMode int32 = 420
+var volumeDefaultModePtr = &volumeDefaultMode
+
 func VerifyCredentialsSecret(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
