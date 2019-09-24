@@ -110,7 +110,7 @@ func TestInstallActionInstallerEnvironmentConfig(t *testing.T) {
 	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
 	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
 	require.Equal(t, installEnvConfigData["ADMIN_PASSWORD"], "ADMIN_PASSWORD")
-	require.Equal(t, installEnvConfigData["STATIC_ASSEMBLER"], "<nil>")
+	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "false")
 	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
 	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
