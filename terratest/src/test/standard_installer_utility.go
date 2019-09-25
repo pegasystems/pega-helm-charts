@@ -3,6 +3,7 @@ package test
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -25,30 +26,46 @@ type pegaJob struct {
 
 /* func VerifyPegaJobs(t *testing.T, helmChartPath string, options *helm.Options, expectedJob pegaJob) {
 	deployment := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-	var deploymentObj appsv1.Deployment
+	var installerObj appsv1.Deployment
 	deploymentSlice := strings.Split(deployment, "---")
 	for index, deploymentInfo := range deploymentSlice {
 		if index >= 1 && index <= 3 {
-			helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
+			helm.UnmarshalK8SYaml(t, deploymentInfo, &installerObj)
 			if index == 1 {
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
+				VerifyPegaDeployment(t, &installerObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
 			} else if index == 2 {
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
+				VerifyPegaDeployment(t, &installerObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
 			}
 		}
 	}
 } */
 
-//To verify Peg ajob
-func VerifyPegaJob(t *testing.T, pegaHelmChartPath string, options *helm.Options, expectedJob pegaJob) {
-	//t.Skip()
-	// Path to the helm chart we will test
+func returnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Options) []string {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
 
 	installerJob := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
-	var installerJobObj k8sbatch.Job
-	helm.UnmarshalK8SYaml(t, installerJob, &installerJobObj)
+
+	installerSlice := strings.Split(installerJob, "---")
+	return installerSlice
+}
+
+//To verify Pega job
+func VerifyPegaJob(t *testing.T, pegaHelmChartPath string, options *helm.Options, expectedJob pegaJob) {
+	//t.Skip()
+	// Path to the helm chart we will test
+
+	/* 	println(len(installerSlice))
+	   	for index, installerInfo := range installerSlice {
+	   		if index >= 1 && index <= len(installerSlice)-1 {
+	   			helm.UnmarshalK8SYaml(t, installerInfo, &installerJobObj)
+	   			VerifyJob(t, options, &installerJobObj, expectedJob)
+	   		}
+	   	} */
+}
+
+//To verify Pega job
+func VerifyJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Job, expectedJob pegaJob) {
 	installerJobSpec := installerJobObj.Spec.Template.Spec
 	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
 
@@ -83,7 +100,6 @@ func VerifyPegaJob(t *testing.T, pegaHelmChartPath string, options *helm.Options
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
 	VerifyInstallerInitContinerData(t, actualInitContainers)
-
 }
 
 func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container) {
@@ -103,6 +119,15 @@ func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Containe
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+		} else if name == "wait-for-pre-dbupgrade" {
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
+			require.Equal(t, []string{"job", "pega-pre-upgrade"}, container.Args)
+		} else if name == "wait-for-pegaupgrade" {
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
+			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
+		} else if name == "wait-for-rolling-updates" {
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
+			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/pega-web --namespace default && kubectl rollout status deployment/pega-batch --namespace default && kubectl rollout status statefulset/pega-stream --namespace default"}, container.Command)
 		} else {
 			fmt.Println("in last else", name)
 			t.Fail()

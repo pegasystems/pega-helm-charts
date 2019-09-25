@@ -8,6 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
+	k8sbatch "k8s.io/api/batch/v1"
 	k8score "k8s.io/api/core/v1"
 	k8srbac "k8s.io/api/rbac/v1"
 
@@ -83,8 +84,10 @@ func TestInstallDeployActionInstallerJob(t *testing.T) {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
 
-	VerifyPegaJob(t, helmChartPath, options, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
-
+	var installerJobObj k8sbatch.Job
+	var installerSlice = returnJobSlices(t, helmChartPath, options)
+	helm.UnmarshalK8SYaml(t, installerSlice[1], &installerJobObj)
+	VerifyJob(t, options, &installerJobObj, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
 }
 
 func TestInstallDeployActionInstallerConfig(t *testing.T) {
