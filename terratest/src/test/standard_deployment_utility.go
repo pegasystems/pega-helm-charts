@@ -30,6 +30,7 @@ type pegaDeployment struct {
 	nodeType       string
 }
 
+// VerifyInitContinerData - Verifies initContainers of the pod
 func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 
 	for i := 0; i < len(containers); i++ {
@@ -51,10 +52,11 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 	}
 }
 
+// VerifyPegaStandardTierDeployment - Verifies Pega standard tier deployment for basic values.yaml from pega chart
 func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
 
-	// Deployment objects
-	VerifyPegaDeployments(t, helmChartPath, options, initContainers)
+	// Verify Deployment objects
+	IdentifyAndVerifyPegaDeployments(t, helmChartPath, options, initContainers)
 
 	// Verify tier config
 	VerifyTierConfg(t, helmChartPath, options)
@@ -65,10 +67,10 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 	// Verify search service
 	VerifySearchService(t, helmChartPath, options)
 
-	// Verfiy pega services
+	// Verfiy Pega deployed services
 	VerifyPegaServices(t, helmChartPath, options)
 
-	// Verify pega ingresses
+	// Verify pega deployed ingresses
 	VerifyPegaIngresses(t, helmChartPath, options)
 
 	// Verify Pega HPAObjects
@@ -79,7 +81,8 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 
 }
 
-func VerifyPegaDeployments(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
+// IdentifyAndVerifyPegaDeployments - Identifies the type of deployment from the template and creates deployment/statefulset objects against them
+func IdentifyAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
 	deployment := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 	var deploymentObj appsv1.Deployment
 	var statefulsetObj appsv1beta2.StatefulSet
@@ -102,6 +105,7 @@ func VerifyPegaDeployments(t *testing.T, helmChartPath string, options *helm.Opt
 	}
 }
 
+// VerifyDeployment - performs generic unit test assertions for pega deployment/statefulset
 func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment) {
 	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
@@ -165,6 +169,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 }
 
+// VerifyPegaDeployment - Performs only deployment specific assertions
 func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment) {
 	require.Equal(t, deploymentObj.Spec.Replicas, replicasPtr)
 	require.Equal(t, deploymentObj.Spec.ProgressDeadlineSeconds, ProgressDeadlineSecondsPtr)
@@ -182,6 +187,7 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 
 }
 
+// VerifyPegaStatefulSet - Performs only statefulset specific assertions
 func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment) {
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Name, "pega-stream")
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
@@ -197,6 +203,7 @@ type pegaServices struct {
 	TargetPort intstr.IntOrString
 }
 
+// VerifyPegaServices - Splits the service tpl to required number of objects and calls VerifyPegaService for unit testing
 func VerifyPegaServices(t *testing.T, helmChartPath string, options *helm.Options) {
 	service := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
 	var pegaServiceObj k8score.Service
@@ -213,6 +220,7 @@ func VerifyPegaServices(t *testing.T, helmChartPath string, options *helm.Option
 	}
 }
 
+// VerifyPegaService - Verifies Pega Service deployment with values expected from default values.yaml
 func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices) {
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
@@ -228,12 +236,7 @@ type pegaIngress struct {
 	Port intstr.IntOrString
 }
 
-func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
-	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName, expectedIngress.Name)
-	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort, expectedIngress.Port)
-}
-
+// VerifyPegaIngresses - Splits the tier-ingress tpl to required number of objects and calls VerifyPegaIngress for unit testing
 func VerifyPegaIngresses(t *testing.T, helmChartPath string, options *helm.Options) {
 	ingress := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
 	var pegaIngressObj k8sv1beta1.Ingress
@@ -251,12 +254,14 @@ func VerifyPegaIngresses(t *testing.T, helmChartPath string, options *helm.Optio
 	}
 }
 
-// Just verify what is exposed in the values yaml & k8s objects
-func VerifyCassandraService() {
-
+// VerifyPegaIngress - Verifies Pega Ingress deployment with values expected from default values.yaml
+func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
+	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName, expectedIngress.Name)
+	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort, expectedIngress.Port)
 }
 
-// Just verify what is exposed in the values yaml & k8s objects
+// VerifySearchService - Verifies search service deployment used by search pod with the values expected from default values.yaml
 func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	searchService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-service.yaml"})
@@ -269,7 +274,7 @@ func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Optio
 	require.Equal(t, searchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9200))
 }
 
-// VerifyEnvironmentConfig
+// VerifyEnvironmentConfig - Verifies the environment configuration used by the pods with the values expected from default values.yaml
 func VerifyEnvironmentConfig(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	envConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
@@ -290,6 +295,7 @@ func VerifyEnvironmentConfig(t *testing.T, helmChartPath string, options *helm.O
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
 }
 
+// VerifyTierConfg - Verifies if the tier specific config is deployed with values expected from default values.yaml
 func VerifyTierConfg(t *testing.T, helmChartPath string, options *helm.Options) {
 	config := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
 	var pegaConfigMap k8score.ConfigMap
@@ -312,15 +318,7 @@ type hpa struct {
 	apiversion    string
 }
 
-func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, expectedHpa hpa) {
-	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Name, expectedHpa.targetRefName)
-	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Kind, expectedHpa.kind)
-	require.Equal(t, hpaObj.Spec.ScaleTargetRef.APIVersion, expectedHpa.apiversion)
-
-	require.Equal(t, hpaObj.Spec.MinReplicas, replicasPtr)
-	require.Equal(t, hpaObj.Spec.MaxReplicas, int32(5))
-}
-
+// VerifyPegaHPAs - Splits and verifies the HPA deployed as part of each tier using VerifyPegaHpa
 func VerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Options) {
 	pegaHpa := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
 	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
@@ -337,8 +335,18 @@ func VerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Options) {
 	}
 }
 
+// VerifyPegaHpa - Verifies if the tier specific HPA is deployed with values expected from default values.yaml
+func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, expectedHpa hpa) {
+	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Name, expectedHpa.targetRefName)
+	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Kind, expectedHpa.kind)
+	require.Equal(t, hpaObj.Spec.ScaleTargetRef.APIVersion, expectedHpa.apiversion)
+
+	require.Equal(t, hpaObj.Spec.MinReplicas, replicasPtr)
+	require.Equal(t, hpaObj.Spec.MaxReplicas, int32(5))
+}
+
+// VerifySearchTransportService - Verifies if the search transport service is deployed with values expected from default values.yaml
 func VerifySearchTransportService(t *testing.T, helmChartPath string, options *helm.Options) {
-	// pega-search-transport-service.yaml
 	transportSearchService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-transport-service.yaml"})
 	var transportSearchServiceObj k8score.Service
 	helm.UnmarshalK8SYaml(t, transportSearchService, &transportSearchServiceObj)
