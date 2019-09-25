@@ -8,6 +8,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
+	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	k8score "k8s.io/api/core/v1"
 	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
@@ -81,17 +82,87 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 func VerifyPegaDeployments(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
 	deployment := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 	var deploymentObj appsv1.Deployment
+	var statefulsetObj appsv1beta2.StatefulSet
 	deploymentSlice := strings.Split(deployment, "---")
 	for index, deploymentInfo := range deploymentSlice {
 		if index >= 1 && index <= 3 {
-			helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
+
 			if index == 1 {
+				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
 				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
 			} else if index == 2 {
+				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
 				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
+			} else if index == 3 {
+				helm.UnmarshalK8SYaml(t, deploymentInfo, &statefulsetObj)
+				VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{"pega-stream", initContainers, "Stream"})
+
 			}
 		}
 	}
+}
+
+func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment) {
+	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
+	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
+	require.Equal(t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
+	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
+
+	actualInitContainers := pod.InitContainers
+	count := len(actualInitContainers)
+	actualInitContainerNames := make([]string, count)
+	for i := 0; i < count; i++ {
+		actualInitContainerNames[i] = actualInitContainers[i].Name
+	}
+
+	require.Equal(t, expectedSpec.initContainers, actualInitContainerNames)
+	VerifyInitContinerData(t, actualInitContainers)
+	require.Equal(t, pod.Containers[0].Name, "pega-web-tomcat")
+	require.Equal(t, pod.Containers[0].Image, "YOUR_PEGA_DEPLOY_IMAGE:TAG")
+	require.Equal(t, pod.Containers[0].Ports[0].Name, "pega-web-port")
+	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
+	require.Equal(t, pod.Containers[0].Env[0].Name, "NODE_TYPE")
+	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[0].Value)
+	require.Equal(t, pod.Containers[0].Env[1].Name, "JAVA_OPTS")
+	require.Equal(t, pod.Containers[0].Env[1].Value, "")
+	require.Equal(t, pod.Containers[0].Env[2].Name, "INITIAL_HEAP")
+	require.Equal(t, pod.Containers[0].Env[2].Value, "4096m")
+	require.Equal(t, pod.Containers[0].Env[3].Name, "MAX_HEAP")
+	require.Equal(t, pod.Containers[0].Env[3].Value, "7168m")
+	require.Equal(t, pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
+
+	require.Equal(t, "2", pod.Containers[0].Resources.Limits.Cpu().String())
+	require.Equal(t, "8Gi", pod.Containers[0].Resources.Limits.Memory().String())
+	require.Equal(t, "200m", pod.Containers[0].Resources.Requests.Cpu().String())
+	require.Equal(t, "6Gi", pod.Containers[0].Resources.Requests.Memory().String())
+
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
+
+	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
+	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(10))
+	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
+	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Port, intstr.FromInt(8080))
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+
+	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(10))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromInt(8080))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+
+	require.Equal(t, pod.ImagePullSecrets[0].Name, "pega-registry-secret")
+	require.Equal(t, pod.RestartPolicy, k8score.RestartPolicy("Always"))
+	require.Equal(t, pod.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
+
 }
 
 func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment) {
@@ -106,69 +177,18 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
 
 	deploymentSpec := deploymentObj.Spec.Template.Spec
-
-	require.Equal(t, deploymentSpec.Volumes[0].Name, "pega-volume-config")
-	require.Equal(t, expectedDeployment.name, deploymentSpec.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
-	require.Equal(t, deploymentSpec.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
-	require.Equal(t, deploymentSpec.Volumes[1].Name, "pega-volume-credentials")
-	require.Equal(t, deploymentSpec.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
-	require.Equal(t, deploymentSpec.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
-
-	actualInitContainers := deploymentSpec.InitContainers
-	count := len(actualInitContainers)
-	actualInitContainerNames := make([]string, count)
-	for i := 0; i < count; i++ {
-		actualInitContainerNames[i] = actualInitContainers[i].Name
-	}
-
-	require.Equal(t, expectedDeployment.initContainers, actualInitContainerNames)
-	VerifyInitContinerData(t, actualInitContainers)
-	require.Equal(t, deploymentSpec.Containers[0].Name, "pega-web-tomcat")
-	require.Equal(t, deploymentSpec.Containers[0].Image, "YOUR_PEGA_DEPLOY_IMAGE:TAG")
-	require.Equal(t, deploymentSpec.Containers[0].Ports[0].Name, "pega-web-port")
-	require.Equal(t, deploymentSpec.Containers[0].Ports[0].ContainerPort, int32(8080))
-	require.Equal(t, deploymentSpec.Containers[0].Env[0].Name, "NODE_TYPE")
-	require.Equal(t, expectedDeployment.nodeType, deploymentSpec.Containers[0].Env[0].Value)
-	require.Equal(t, deploymentSpec.Containers[0].Env[1].Name, "JAVA_OPTS")
-	require.Equal(t, deploymentSpec.Containers[0].Env[1].Value, "")
-	require.Equal(t, deploymentSpec.Containers[0].Env[2].Name, "INITIAL_HEAP")
-	require.Equal(t, deploymentSpec.Containers[0].Env[2].Value, "4096m")
-	require.Equal(t, deploymentSpec.Containers[0].Env[3].Name, "MAX_HEAP")
-	require.Equal(t, deploymentSpec.Containers[0].Env[3].Value, "7168m")
-	require.Equal(t, deploymentSpec.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
-
-	require.Equal(t, "2", deploymentSpec.Containers[0].Resources.Limits.Cpu().String())
-	require.Equal(t, "8Gi", deploymentSpec.Containers[0].Resources.Limits.Memory().String())
-	require.Equal(t, "200m", deploymentSpec.Containers[0].Resources.Requests.Cpu().String())
-	require.Equal(t, "6Gi", deploymentSpec.Containers[0].Resources.Requests.Memory().String())
-
-	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
-	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[1].Name, "pega-volume-credentials")
 	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
+	VerifyDeployment(t, &deploymentSpec, expectedDeployment)
 
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.PeriodSeconds, int32(10))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.FailureThreshold, int32(3))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.HTTPGet.Port, intstr.FromInt(8080))
-	require.Equal(t, deploymentSpec.Containers[0].LivenessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+}
 
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.PeriodSeconds, int32(10))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromInt(8080))
-	require.Equal(t, deploymentSpec.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
-
-	require.Equal(t, deploymentSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
-	require.Equal(t, deploymentSpec.RestartPolicy, k8score.RestartPolicy("Always"))
-	require.Equal(t, deploymentSpec.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
-
+func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment) {
+	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Name, "pega-stream")
+	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
+	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
+	statefulsetSpec := statefulsetObj.Spec.Template.Spec
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/streamvol")
+	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset)
 }
 
 type pegaServices struct {
@@ -229,10 +249,6 @@ func VerifyPegaIngresses(t *testing.T, helmChartPath string, options *helm.Optio
 
 		}
 	}
-}
-
-func VerifyPegaStatefulset() {
-
 }
 
 // Just verify what is exposed in the values yaml & k8s objects

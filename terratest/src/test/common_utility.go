@@ -33,10 +33,6 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
 }
 
-func SplitOutput() {
-
-}
-
 // util function for comparing
 func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
 	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
