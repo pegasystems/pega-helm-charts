@@ -5,5 +5,4 @@ cat descriptor-template.json | jq '.files[0].includePattern=env.PEGA_FILE_NAME' 
 curl -o index.yaml https://kishor.bintray.com/pega-helm-charts/index.yaml
 helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
-#ls -l
 helm repo index --merge index.yaml --url https://kishor.bintray.com/pega-helm-charts/ .

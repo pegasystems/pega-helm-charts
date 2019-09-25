@@ -20,8 +20,6 @@ var ProgressDeadlineSeconds int32 = 2147483647
 var ProgressDeadlineSecondsPtr = &ProgressDeadlineSeconds
 var rollingUpdate intstr.IntOrString = intstr.FromString("25%")
 var rollingUpdatePtr = &rollingUpdate
-var volumeDefaultMode int32 = 420
-var volumeDefaultModePtr = &volumeDefaultMode
 var terminationGracePeriodSeconds int64 = 300
 var terminationGracePeriodSecondsPtr = &terminationGracePeriodSeconds
 
