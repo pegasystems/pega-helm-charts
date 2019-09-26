@@ -1,8 +1,8 @@
 package test
 
 import (
-	"bytes"
 	"io/ioutil"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -36,10 +36,15 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 }
 
 // compareConfigMapData - Compares the config map deployed for each kind of tier with the excepted xml's
-func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
-	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
+func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName string) {
+	expectedFile, err := ioutil.ReadFile(expectedFileName)
 	require.Empty(t, err)
+	expectedFileData := string(expectedFile)
+	expectedFileData = strings.Replace(expectedFileData, "\r", "", -1)
 
-	equal := bytes.Equal(expectedPrconfig, actualFile)
+	equal := false
+	if expectedFileData == actualFileData {
+		equal = true
+	}
 	require.Equal(t, true, equal)
 }
