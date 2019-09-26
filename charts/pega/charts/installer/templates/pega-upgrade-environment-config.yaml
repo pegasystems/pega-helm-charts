@@ -1,5 +1,5 @@
+{{ if (eq (include "performUpgrade" .) "true") -}}
 # Config map used for common configuration between pre-upgrades, post-upgrades and upgrades
-{{ if (eq (include "performUpgrade" .) "true") }}
 kind: ConfigMap
 apiVersion: v1
 metadata:

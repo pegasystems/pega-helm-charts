@@ -17,6 +17,7 @@ var options = &helm.Options{
 	SetValues: map[string]string{
 		"global.actions.execute": "install",
 		"cassandra.enabled":      "false",
+		"global.provider":        "k8s",
 	},
 }
 

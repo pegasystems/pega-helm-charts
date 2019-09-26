@@ -14,6 +14,7 @@ const pegaHelmChartPath = "../../../charts/pega"
 var options = &helm.Options{
 	SetValues: map[string]string{
 		"global.actions.execute": "upgrade-deploy",
+		"global.provider":        "k8s",
 	},
 }
 
