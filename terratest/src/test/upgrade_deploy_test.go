@@ -14,11 +14,12 @@ const pegaHelmChartPath = "../../../charts/pega"
 var options = &helm.Options{
 	SetValues: map[string]string{
 		"global.actions.execute": "upgrade-deploy",
+		"global.provider":        "k8s",
 	},
 }
 
 // VerifyUpgradeDeployActionShouldNotRenderDeployments - Tests all the skipped templates for action upgrade-deploy. These templates not supposed to be rendered for upgrade-deploy action.
-func VerifyUpgradeDeployActionShouldNotRenderDeployments(t *testing.T) {
+func VerifyUpgradeActionSkippedTemplates(t *testing.T) {
 	t.Parallel()
 	output := helm.RenderTemplate(t, options, pegaHelmChartPath, []string{
 		"templates/pega-action-validate.yaml",
@@ -56,11 +57,11 @@ func ValidateUpgradeJobs(t *testing.T) {
 
 // TestUpgradeDeployActions - Test all objects deployed for upgrade-deploy action with the values as provided in default values.yaml
 func TestUpgradeDeployActions(t *testing.T) {
-	VerifyUpgradeDeployActionShouldNotRenderDeployments(t)
+	VerifyUpgradeActionSkippedTemplates(t)
 	ValidateUpgradeJobs(t)
-	VerifyPegaStandardTierDeployment(t, pegaHelmChartPath, options, []string{"wait-for-pegaupgrade"})
 	VerifyUpgradeEnvConfig(t, options, pegaHelmChartPath)
 	VerifyInstallerConfigMaps(t, options, pegaHelmChartPath)
 	VerifyInstallerRoleBinding(t, options, pegaHelmChartPath)
 	VerifyInstallerRole(t, options, pegaHelmChartPath)
+	VerifyPegaStandardTierDeployment(t, pegaHelmChartPath, options, []string{"wait-for-pegaupgrade"})
 }

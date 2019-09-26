@@ -13,6 +13,7 @@ const PegaHelmChartPath = "../../../charts/pega"
 // set action execute to install
 var options = &helm.Options{
 	SetValues: map[string]string{
+		"global.provider":        "k8s",
 		"global.actions.execute": "deploy",
 	},
 }
