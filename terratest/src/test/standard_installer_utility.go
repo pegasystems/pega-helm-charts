@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	k8sbatch "k8s.io/api/batch/v1"
 	k8score "k8s.io/api/core/v1"
+	k8srbac "k8s.io/api/rbac/v1"
 )
 
 type pegaJob struct {
@@ -17,28 +18,6 @@ type pegaJob struct {
 	initContainers []string
 	configMapName  string
 }
-
-/* func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
-
-	// Deployment objects
-	VerifyPegaJobs(t, helmChartPath, options, initContainers)
-} */
-
-/* func VerifyPegaJobs(t *testing.T, helmChartPath string, options *helm.Options, expectedJob pegaJob) {
-	deployment := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-	var installerObj appsv1.Deployment
-	deploymentSlice := strings.Split(deployment, "---")
-	for index, deploymentInfo := range deploymentSlice {
-		if index >= 1 && index <= 3 {
-			helm.UnmarshalK8SYaml(t, deploymentInfo, &installerObj)
-			if index == 1 {
-				VerifyPegaDeployment(t, &installerObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
-			} else if index == 2 {
-				VerifyPegaDeployment(t, &installerObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
-			}
-		}
-	}
-} */
 
 func returnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Options) []string {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
@@ -50,21 +29,7 @@ func returnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Optio
 	return installerSlice
 }
 
-//To verify Pega job
-func VerifyPegaJob(t *testing.T, pegaHelmChartPath string, options *helm.Options, expectedJob pegaJob) {
-	//t.Skip()
-	// Path to the helm chart we will test
-
-	/* 	println(len(installerSlice))
-	   	for index, installerInfo := range installerSlice {
-	   		if index >= 1 && index <= len(installerSlice)-1 {
-	   			helm.UnmarshalK8SYaml(t, installerInfo, &installerJobObj)
-	   			VerifyJob(t, options, &installerJobObj, expectedJob)
-	   		}
-	   	} */
-}
-
-//To verify Pega job
+//To VERify Pega job
 func VerifyJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Job, expectedJob pegaJob) {
 	installerJobSpec := installerJobObj.Spec.Template.Spec
 	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
@@ -103,7 +68,6 @@ func VerifyJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Jo
 }
 
 func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container) {
-
 	if len(containers) == 0 {
 		println("no init containers")
 	}
@@ -133,4 +97,115 @@ func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Containe
 			t.Fail()
 		}
 	}
+}
+
+func VerifyUpgradeEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+	// pega-install-environment-config.yaml
+	upgradeEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"})
+	var upgradeEnvConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, upgradeEnvConfig, &upgradeEnvConfigMap)
+
+	upgradeEnvConfigData := upgradeEnvConfigMap.Data
+
+	require.Equal(t, upgradeEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
+	require.Equal(t, upgradeEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
+	require.Equal(t, upgradeEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
+	require.Equal(t, upgradeEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
+	require.Equal(t, upgradeEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
+	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
+	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
+	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "in-place")
+	require.Equal(t, upgradeEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "false")
+	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
+	require.Equal(t, upgradeEnvConfigData["DB2ZOS_UDF_WLM"], "")
+	require.Equal(t, upgradeEnvConfigData["TARGET_RULES_SCHEMA"], "")
+	require.Equal(t, upgradeEnvConfigData["TARGET_ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
+	require.Equal(t, upgradeEnvConfigData["MIGRATION_DB_LOAD_COMMIT_RATE"], "100")
+	require.Equal(t, upgradeEnvConfigData["UPDATE_EXISTING_APPLICATIONS"], "false")
+	require.Equal(t, upgradeEnvConfigData["UPDATE_APPLICATIONS_SCHEMA"], "false")
+	require.Equal(t, upgradeEnvConfigData["RUN_RULESET_CLEANUP"], "false")
+	require.Equal(t, upgradeEnvConfigData["REBUILD_INDEXES"], "false")
+	require.Equal(t, upgradeEnvConfigData["DISTRIBUTION_KIT_URL"], "")
+}
+
+func VerifyInstallEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
+
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+	installEnvConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"})
+	var installEnvConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, installEnvConfig, &installEnvConfigMap)
+
+	installEnvConfigData := installEnvConfigMap.Data
+	require.Equal(t, installEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
+	require.Equal(t, installEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
+	require.Equal(t, installEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
+	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
+	require.Equal(t, installEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
+	require.Equal(t, installEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
+	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
+	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
+	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
+	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, "ADMIN_PASSWORD", installEnvConfigData["ADMIN_PASSWORD"])
+	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
+	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "false")
+	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
+	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
+	require.Equal(t, installEnvConfigData["MAX_IDLE"], "5")
+	require.Equal(t, installEnvConfigData["MAX_WAIT"], "-1")
+	require.Equal(t, installEnvConfigData["MAX_ACTIVE"], "10")
+	require.Equal(t, installEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
+	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
+	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
+}
+
+func VerifyInstallerRoleBinding(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+
+	installerRoleBinding := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-status-rolebinding.yaml"})
+	var installerRoleBindingObj k8srbac.RoleBinding
+	helm.UnmarshalK8SYaml(t, installerRoleBinding, &installerRoleBindingObj)
+	require.Equal(t, installerRoleBindingObj.RoleRef.APIGroup, "rbac.authorization.k8s.io")
+	require.Equal(t, installerRoleBindingObj.RoleRef.Kind, "Role")
+	require.Equal(t, installerRoleBindingObj.RoleRef.Name, "jobs-reader")
+
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Kind, "ServiceAccount")
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Name, "default")
+	require.Equal(t, installerRoleBindingObj.Subjects[0].Namespace, "default")
+}
+
+func VerifyInstallerRole(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+
+	deployRole := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-role.yaml"})
+	var deployRoleObj k8srbac.Role
+	helm.UnmarshalK8SYaml(t, deployRole, &deployRoleObj)
+	require.Equal(t, deployRoleObj.Rules[0].APIGroups, []string{"", "batch", "extensions", "apps"})
+	require.Equal(t, deployRoleObj.Rules[0].Resources, []string{"jobs", "deployments", "statefulsets"})
+	require.Equal(t, deployRoleObj.Rules[0].Verbs, []string{"get", "watch", "list"})
+}
+
+func VerifyInstallerConfigMaps(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
+	require.NoError(t, err)
+
+	installerConfig := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
+	var installConfigMap k8score.ConfigMap
+	helm.UnmarshalK8SYaml(t, installerConfig, &installConfigMap)
+
+	//installConfigData := installConfigMap.Data
+	/* 	compareConfigMapData(t, []byte(installConfigData["prconfig.xml.tmpl"]), "data/expectedPrconfig.xml")
+	   	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "data/expectedSetupDatabase.properties")
+	   	compareConfigMapData(t, []byte(installConfigData["prbootstrap.properties.tmpl"]), "data/expectedPRbootstrap.properties")
+	   	compareConfigMapData(t, []byte(installConfigData["prlog4j2.xml"]), "data/expectedPRlog4j2.xml") */
 }
