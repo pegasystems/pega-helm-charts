@@ -267,7 +267,11 @@ func VerifyEnvironmentConfig(t *testing.T, helmChartPath string, options *helm.O
 	require.Equal(t, envConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, envConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
 	require.Equal(t, envConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
-	require.Equal(t, envConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
+	if options.SetValues["global.actions.execute"] == "upgrade-deploy" {
+		require.Equal(t, envConfigData["RULES_SCHEMA"], "")
+	} else {
+		require.Equal(t, envConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
+	}
 	require.Equal(t, envConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, envConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, envConfigData["JDBC_CONNECTION_PROPERTIES"], "")
@@ -356,8 +360,14 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+		} else if name == "wait-for-cassandra" {
+			require.Equal(t, "cassandra:3.11.3", container.Image)
+			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+		} else if name == "wait-for-pegaupgrade" {
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
+			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
 		} else {
-			fmt.Println("in last else", name)
+			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()
 		}
 	}
