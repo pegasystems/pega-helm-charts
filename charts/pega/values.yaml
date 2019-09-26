@@ -80,7 +80,7 @@ global:
         targetPort: 8080
       nodeType: "WebUser"
       replicas: 1
-      # Provide additional java options if any, like configuring timezone for the deployment using "-Duser.timezone" variable in javaOpts 
+      # Provide additional java options if any, like configuring timezone using "-Duser.timezone" 
       javaOpts: ""
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
