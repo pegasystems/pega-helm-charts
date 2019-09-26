@@ -13,6 +13,7 @@ import (
 var volumeDefaultMode int32 = 420
 var volumeDefaultModePtr = &volumeDefaultMode
 
+// VerifyCredentialsSecret - Verifies the credential secret deployed with the values as provided in default values.yaml
 func VerifyCredentialsSecret(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
@@ -23,6 +24,7 @@ func VerifyCredentialsSecret(t *testing.T, helmChartPath string, options *helm.O
 	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
 }
 
+// VerfiyRegistrySecret - Verifies the registry secret deployed with the values as provided in default values.yaml
 func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Options) {
 
 	registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
@@ -33,11 +35,7 @@ func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Opti
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
 }
 
-func SplitOutput() {
-
-}
-
-// util function for comparing
+// compareConfigMapData - Compares the config map deployed for each kind of tier with the excepted xml's
 func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName string) {
 	expectedPrconfig, err := ioutil.ReadFile(expectedFileName)
 	require.Empty(t, err)

@@ -19,7 +19,8 @@ type pegaJob struct {
 	configMapName  string
 }
 
-func returnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Options) []string {
+//ReturnJobSlices - returns string array of rendered yaml sepearted by delimiter as "---"
+func ReturnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Options) []string {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -29,8 +30,8 @@ func returnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Optio
 	return installerSlice
 }
 
-//To VERify Pega job
-func VerifyJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Job, expectedJob pegaJob) {
+//VerifyPegaJob -  Tests installer jobs rendered with the values as provided in default values.yaml
+func VerifyPegaJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Job, expectedJob pegaJob) {
 	installerJobSpec := installerJobObj.Spec.Template.Spec
 	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
 
@@ -67,6 +68,7 @@ func VerifyJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Jo
 	VerifyInstallerInitContinerData(t, actualInitContainers)
 }
 
+// VerifyInstallerInitContinerData - Tests installer init containers rendered with the values as provided in default values.yaml
 func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container) {
 	if len(containers) == 0 {
 		println("no init containers")
@@ -99,6 +101,7 @@ func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Containe
 	}
 }
 
+// VerifyUpgradeEnvConfig - Tests upgrade environment config rendered with the values as provided in default values.yaml
 func VerifyUpgradeEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
@@ -131,6 +134,7 @@ func VerifyUpgradeEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPa
 	require.Equal(t, upgradeEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 }
 
+// VerifyInstallEnvConfig - Tests Installer environment config rendered with the values as provided in default values.yaml
 func VerifyInstallEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
 
 	// Path to the helm chart we will test
@@ -164,6 +168,7 @@ func VerifyInstallEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPa
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
 }
 
+// VerifyInstallerRoleBinding - Tests Installer role binding rendered with the values as provided in default values.yaml
 func VerifyInstallerRoleBinding(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
@@ -181,6 +186,7 @@ func VerifyInstallerRoleBinding(t *testing.T, options *helm.Options, pegaHelmCha
 	require.Equal(t, installerRoleBindingObj.Subjects[0].Namespace, "default")
 }
 
+// VerifyInstallerRole - Tests Installer role rendered with the values as provided in default values.yaml
 func VerifyInstallerRole(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
@@ -194,6 +200,7 @@ func VerifyInstallerRole(t *testing.T, options *helm.Options, pegaHelmChartPath 
 	require.Equal(t, deployRoleObj.Rules[0].Verbs, []string{"get", "watch", "list"})
 }
 
+// VerifyInstallerConfigMaps - Tests Installer configuration rendered with the values as provided in default values.yaml
 func VerifyInstallerConfigMaps(t *testing.T, options *helm.Options, pegaHelmChartPath string) {
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)

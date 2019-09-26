@@ -17,9 +17,9 @@ var options = &helm.Options{
 	},
 }
 
+// VerifyUpgradeDeployActionShouldNotRenderDeployments - Tests all the skipped templates for action upgrade-deploy. These templates not supposed to be rendered for upgrade-deploy action.
 func VerifyUpgradeDeployActionShouldNotRenderDeployments(t *testing.T) {
 	t.Parallel()
-	// with action as 'upgrade-deploy' below templates should not be rendered
 	output := helm.RenderTemplate(t, options, pegaHelmChartPath, []string{
 		"templates/pega-action-validate.yaml",
 		"charts/installer/templates/pega-install-environment-config.yaml",
@@ -31,9 +31,10 @@ func VerifyUpgradeDeployActionShouldNotRenderDeployments(t *testing.T) {
 	require.Empty(t, deployment)
 }
 
+// ValidateUpgradeJobs - Tests Upgrade jobs yaml rendered with the values as provided in default values.yaml for action upgrade-deploy
 func ValidateUpgradeJobs(t *testing.T) {
 	var installerJobObj k8sbatch.Job
-	var installerSlice = returnJobSlices(t, pegaHelmChartPath, options)
+	var installerSlice = ReturnJobSlices(t, pegaHelmChartPath, options)
 	println(len(installerSlice))
 	var expectedJob pegaJob
 	for index, installerInfo := range installerSlice {
@@ -47,11 +48,13 @@ func ValidateUpgradeJobs(t *testing.T) {
 			}
 
 			helm.UnmarshalK8SYaml(t, installerInfo, &installerJobObj)
-			VerifyJob(t, options, &installerJobObj, expectedJob)
+			VerifyPegaJob(t, options, &installerJobObj, expectedJob)
 		}
 
 	}
 }
+
+// TestUpgradeDeployActions - Test all objects deployed for upgrade-deploy action with the values as provided in default values.yaml
 func TestUpgradeDeployActions(t *testing.T) {
 	VerifyUpgradeDeployActionShouldNotRenderDeployments(t)
 	ValidateUpgradeJobs(t)

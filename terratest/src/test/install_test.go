@@ -20,15 +20,14 @@ var options = &helm.Options{
 	},
 }
 
+// VerifyInstallActionSkippedTemplates - Tests all the skipped templates for action install. These templates not supposed to be rendered for install action.
 func VerifyInstallActionSkippedTemplates(t *testing.T) {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
 
 	output := helm.RenderTemplate(t, options, helmChartPath, []string{
 		"templates/pega-action-validate.yaml",
-		//		"templates/pega-credentials-secret.yaml",
 		"templates/pega-environment-config.yaml",
-		//		"templates/pega-registry-secret.yaml",
 		"templates/pega-tier-config.yaml",
 		"templates/pega-tier-deployment.yaml",
 		"templates/pega-tier-hpa.yaml",
@@ -45,17 +44,15 @@ func VerifyInstallActionSkippedTemplates(t *testing.T) {
 	require.Empty(t, emptyObjects)
 }
 
+// VerifyInstallActionInstallJob - Tests Install job yaml rendered with the values as provided in default values.yaml
 func VerifyInstallActionInstallJob(t *testing.T) {
-	// Path to the helm chart we will test
-	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
-	require.NoError(t, err)
-
 	var upgradeJobObj k8sbatch.Job
-	var upgradeSlice = returnJobSlices(t, helmChartPath, options)
+	var upgradeSlice = ReturnJobSlices(t, pegaHelmChartPath, options)
 	helm.UnmarshalK8SYaml(t, upgradeSlice[1], &upgradeJobObj)
-	VerifyJob(t, options, &upgradeJobObj, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
+	VerifyPegaJob(t, options, &upgradeJobObj, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
 }
 
+//TestInstallActions - Test all objects deployed for install action with the values as provided in default values.yaml
 func TestInstallActions(t *testing.T) {
 	VerifyInstallActionSkippedTemplates(t)
 	VerifyInstallActionSkippedTemplates(t)
