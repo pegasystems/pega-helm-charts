@@ -49,9 +49,10 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 	// Verfiy Pega deployed services
 	SplitAndVerifyPegaServices(t, helmChartPath, options)
 
-	// Verify pega deployed ingresses
-	SplitAndVerifyPegaIngresses(t, helmChartPath, options)
-
+	if options.SetValues["global.provider"] != "openshift" {
+		// Verify pega deployed ingresses
+		SplitAndVerifyPegaIngresses(t, helmChartPath, options)
+	}
 	// Verify Pega HPAObjects
 	SplitAndVerifyPegaHPAs(t, helmChartPath, options)
 
@@ -191,23 +192,25 @@ func SplitAndVerifyPegaServices(t *testing.T, helmChartPath string, options *hel
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
 			if index == 1 {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}})
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}}, options)
 			} else {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}})
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}}, options)
 			}
 		}
 	}
 }
 
 // VerifyPegaService - Performs Pega Service assertions with the values as provided in default values.yaml
-func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices) {
+func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices, options *helm.Options) {
+	if options.SetValues["global.provider"] != "openshift" {
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/affinity"], "true")
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/load-balancer-method"], "drr")
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
+	}
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, expectedService.TargetPort)
-	require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/affinity"], "true")
-	require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/load-balancer-method"], "drr")
-	require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
-	require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
 }
 
 type pegaIngress struct {
@@ -224,9 +227,9 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}})
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}}, options)
 			} else {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}})
+				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}}, options)
 			}
 
 		}
@@ -234,7 +237,7 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 }
 
 // VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
-func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress, options *helm.Options) {
 	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
 	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName, expectedIngress.Name)
 	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort, expectedIngress.Port)
