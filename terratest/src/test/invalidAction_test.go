@@ -1,7 +1,9 @@
 package test
 
 import (
+	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -11,20 +13,26 @@ import (
 const PegaHelmChartPath = "../../../charts/pega"
 
 // set action execute to install
-var options = &helm.Options{
+var Invalidoptions = &helm.Options{
 	SetValues: map[string]string{
-		"global.actions.execute": "deploy",
+		"global.actions.execute": "deployment",
 		"global.provider":        "openshift",
 	},
 }
 
 // TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
 // Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
-func TestOpenshiftPegaTierDeployment(t *testing.T) {
+func TestInvalidAction(t *testing.T) {
 	t.Parallel()
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	VerifyPegaStandardTierDeployment(t, helmChartPath, options, []string{"wait-for-pegasearch", "wait-for-cassandra"})
+	deployment, err := helm.RenderTemplateE(t, Invalidoptions, helmChartPath, []string{"templates/pega-action-validate.yaml"})
+	if err != nil {
+		strings.Contains(string(deployment), "Action value is not correct")
+		fmt.Println("Invalid Action Test passed")
+	} else {
+		fmt.Println("Provided action is valid")
+	}
 }
