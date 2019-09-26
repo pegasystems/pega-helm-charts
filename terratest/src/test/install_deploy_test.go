@@ -14,6 +14,7 @@ const pegaHelmChartPath = "../../../charts/pega"
 // Sets the the action to install-deploy, all test cases present in this file uses this action
 var options = &helm.Options{
 	SetValues: map[string]string{
+		"global.provider":        "k8s",
 		"global.actions.execute": "install-deploy",
 	},
 }
@@ -43,10 +44,9 @@ func VerifyInstallDeployActionInstallerJob(t *testing.T) {
 func TestInstallDeployActions(t *testing.T) {
 	VerifyInstallDeployActionSkippedTemplates(t)
 	VerifyInstallDeployActionInstallerJob(t)
-	VerifyPegaStandardTierDeployment(t, pegaHelmChartPath, options, []string{"wait-for-pegainstall", "wait-for-pegasearch", "wait-for-cassandra"})
 	VerifyInstallerConfigMaps(t, options, pegaHelmChartPath)
 	VerifyInstallEnvConfig(t, options, pegaHelmChartPath)
 	VerifyInstallerRoleBinding(t, options, pegaHelmChartPath)
 	VerifyInstallerRole(t, options, pegaHelmChartPath)
-
+	VerifyPegaStandardTierDeployment(t, pegaHelmChartPath, options, []string{"wait-for-pegainstall", "wait-for-pegasearch", "wait-for-cassandra"})
 }

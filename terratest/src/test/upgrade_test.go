@@ -22,7 +22,7 @@ var options = &helm.Options{
 }
 
 // VerifyUpgradeActionShouldNotRenderDeployments - Tests all the skipped templates for action upgrade. These templates not supposed to be rendered for upgrade action.
-func VerifyUpgradeActionShouldNotRenderDeployments(t *testing.T) {
+func VerifyUpgradeActionSkippedTemplates(t *testing.T) {
 	output := helm.RenderTemplate(t, options, pegaHelmChartPath, []string{
 		"templates/pega-action-validate.yaml",
 		"charts/installer/templates/pega-installer-role.yaml",
@@ -55,7 +55,7 @@ func VerifyUpgradeActionInstallJob(t *testing.T) {
 
 //TestUpgradeActions - Test all objects deployed for upgrade action with the values as provided in default values.yaml
 func TestUpgradeActions(t *testing.T) {
-	VerifyUpgradeActionShouldNotRenderDeployments(t)
+	VerifyUpgradeActionSkippedTemplates(t)
 	VerifyUpgradeActionInstallJob(t)
 	VerifyUpgradeEnvConfig(t, options, pegaHelmChartPath)
 	VerfiyRegistrySecret(t, pegaHelmChartPath, options)

@@ -56,7 +56,7 @@ func VerifyInstallActionInstallJob(t *testing.T) {
 //TestInstallActions - Test all objects deployed for install action with the values as provided in default values.yaml
 func TestInstallActions(t *testing.T) {
 	VerifyInstallActionSkippedTemplates(t)
-	VerifyInstallActionSkippedTemplates(t)
+	VerifyInstallActionInstallJob(t)
 	VerifyInstallEnvConfig(t, options, pegaHelmChartPath)
 	VerfiyRegistrySecret(t, pegaHelmChartPath, options)
 	VerifyCredentialsSecret(t, pegaHelmChartPath, options)
