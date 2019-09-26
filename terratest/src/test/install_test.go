@@ -21,8 +21,8 @@ var options = &helm.Options{
 	},
 }
 
+// TestInstallActionSkippedTemplates - Tests all the skipped templates for action install. These templates not supposed to be rendered for install action.
 func TestInstallActionSkippedTemplates(t *testing.T) {
-	//t.Skip("skipping this")
 	t.Parallel()
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
@@ -30,9 +30,7 @@ func TestInstallActionSkippedTemplates(t *testing.T) {
 
 	output := helm.RenderTemplate(t, options, helmChartPath, []string{
 		"templates/pega-action-validate.yaml",
-		//		"templates/pega-credentials-secret.yaml",
 		"templates/pega-environment-config.yaml",
-		//		"templates/pega-registry-secret.yaml",
 		"templates/pega-tier-config.yaml",
 		"templates/pega-tier-deployment.yaml",
 		"templates/pega-tier-hpa.yaml",
@@ -49,6 +47,7 @@ func TestInstallActionSkippedTemplates(t *testing.T) {
 	require.Empty(t, emptyObjects)
 }
 
+// TestInstallActionInstallJob - Tests Install job yaml rendered with the values as provided in default values.yaml
 func TestInstallActionInstallJob(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
@@ -87,6 +86,7 @@ func TestInstallActionInstallJob(t *testing.T) {
 	require.Equal(t, installerJobSpec.RestartPolicy, k8score.RestartPolicy("Never"))
 }
 
+// TestInstallActionInstallerEnvironmentConfig - Tests Installer environment config rendered with the values as provided in default values.yaml
 func TestInstallActionInstallerEnvironmentConfig(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
@@ -122,6 +122,7 @@ func TestInstallActionInstallerEnvironmentConfig(t *testing.T) {
 	require.Equal(t, installEnvConfigData["ACTION"], "install")
 }
 
+// TestInstallActionRegistrySecret - Tests Installer registry secret rendered with the values as provided in default values.yaml
 func TestInstallActionRegistrySecret(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
@@ -131,6 +132,7 @@ func TestInstallActionRegistrySecret(t *testing.T) {
 	VerfiyRegistrySecret(t, helmChartPath, options)
 }
 
+// TestInstallActionCredentailsSecret - Tests Installer db credentials secret rendered with the values as provided in default values.yaml
 func TestInstallActionCredentailsSecret(t *testing.T) {
 	//t.Skip("skipping this")
 	t.Parallel()
@@ -140,6 +142,7 @@ func TestInstallActionCredentailsSecret(t *testing.T) {
 	VerifyCredentialsSecret(t, helmChartPath, options)
 }
 
+// TestInstallActionInstallerConfig - Tests Installer configuration rendered with the values as provided in default values.yaml
 func TestInstallActionInstallerConfig(t *testing.T) {
 	t.Skip("skipping this")
 	t.Parallel()

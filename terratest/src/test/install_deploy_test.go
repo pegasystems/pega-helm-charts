@@ -4,27 +4,24 @@ import (
 	"path/filepath"
 	"testing"
 
-	//"fmt"
-
+	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	appsv1 "k8s.io/api/apps/v1"
 	k8sbatch "k8s.io/api/batch/v1"
 	k8score "k8s.io/api/core/v1"
 	k8srbac "k8s.io/api/rbac/v1"
-
-	//k8sresource "k8s.io/apimachinery/pkg/api/resource"
-
-	"github.com/gruntwork-io/terratest/modules/helm"
 )
 
 const pegaHelmChartPath = "../../../charts/pega"
 
+// Sets the the action to install-deploy, all test cases present in this file uses this action
 var options = &helm.Options{
 	SetValues: map[string]string{
 		"global.actions.execute": "install-deploy",
 	},
 }
 
+// TestInstallDeployActionSkippedTemplates - Tests all the skipped templates for action install-deploy. These templates not supposed to be rendered for install-deploy action.
 func TestInstallDeployActionSkippedTemplates(t *testing.T) {
 	t.Parallel()
 
@@ -44,6 +41,7 @@ func TestInstallDeployActionSkippedTemplates(t *testing.T) {
 	require.Empty(t, deployment)
 }
 
+// TestInstallDeployActionInstallerRole - Tests Install role rendered with the values as provided in default values.yaml
 func TestInstallDeployActionInstallerRole(t *testing.T) {
 	t.Parallel()
 	// Path to the helm chart we will test
@@ -59,6 +57,7 @@ func TestInstallDeployActionInstallerRole(t *testing.T) {
 
 }
 
+// TestInstallDeployActionInstallerRoleBinding - Tests Install role binding rendered with the values as provided in default values.yaml
 func TestInstallDeployActionInstallerRoleBinding(t *testing.T) {
 	t.Parallel()
 
@@ -78,6 +77,7 @@ func TestInstallDeployActionInstallerRoleBinding(t *testing.T) {
 	require.Equal(t, installerRoleBindingObj.Subjects[0].Namespace, "default")
 }
 
+// TestInstallDeployActionInstallerJob - Tests Install job yaml rendered with the values as provided in default values.yaml
 func TestInstallDeployActionInstallerJob(t *testing.T) {
 	t.Parallel()
 	// Path to the helm chart we will test
@@ -90,6 +90,7 @@ func TestInstallDeployActionInstallerJob(t *testing.T) {
 	VerifyJob(t, options, &installerJobObj, pegaJob{"pega-db-install", []string{}, "pega-install-environment-config"})
 }
 
+// TestInstallActionRegistrySecret - Tests Installer registry secret rendered with the values as provided in default values.yaml
 func TestInstallDeployActionInstallerConfig(t *testing.T) {
 	t.Parallel()
 	t.Skip()
@@ -109,6 +110,7 @@ func TestInstallDeployActionInstallerConfig(t *testing.T) {
 
 }
 
+// TestInstallActionInstallerEnvironmentConfig - Tests Installer environment config rendered with the values as provided in default values.yaml
 func TestInstallDeployActionInstallerEnvConfig(t *testing.T) {
 	t.Parallel()
 	//.Skip()
@@ -144,6 +146,7 @@ func TestInstallDeployActionInstallerEnvConfig(t *testing.T) {
 
 }
 
+// TestInstallDeployActionStandardDeployment - Test case to verify the standard pega tier deployment.
 func TestInstallDeployActionStandardDeployment(t *testing.T) {
 	t.Parallel()
 	//t.Skip()
@@ -152,5 +155,4 @@ func TestInstallDeployActionStandardDeployment(t *testing.T) {
 	require.NoError(t, err)
 
 	VerifyPegaStandardTierDeployment(t, helmChartPath, options, []string{"wait-for-pegainstall", "wait-for-pegasearch", "wait-for-cassandra"})
-
 }

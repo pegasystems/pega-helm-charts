@@ -4,11 +4,8 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
-	//k8sresource "k8s.io/apimachinery/pkg/api/resource"
-
 	"github.com/gruntwork-io/terratest/modules/helm"
+	"github.com/stretchr/testify/require"
 )
 
 const PegaHelmChartPath = "../../../charts/pega"
@@ -20,7 +17,8 @@ var options = &helm.Options{
 	},
 }
 
-// TestPegaStandardTierDeployment - Test case to verify the standard pega deployment
+// TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
+// Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
 func TestPegaStandardTierDeployment(t *testing.T) {
 	t.Parallel()
 	// Path to the helm chart we will test
