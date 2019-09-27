@@ -65,11 +65,11 @@ func VerifyPegaJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatc
 	}
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
-	VerifyInstallerInitContinerData(t, actualInitContainers)
+	VerifyInstallerInitContinerData(t, actualInitContainers, options)
 }
 
 // VerifyInstallerInitContinerData - Tests installer init containers rendered with the values as provided in default values.yaml
-func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container) {
+func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 	if len(containers) == 0 {
 		println("no init containers")
 	}
@@ -91,6 +91,7 @@ func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Containe
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
+			aksSpecificUpgraderDeployEnvs(t, options, container)
 		} else if name == "wait-for-rolling-updates" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/pega-web --namespace default && kubectl rollout status deployment/pega-batch --namespace default && kubectl rollout status statefulset/pega-stream --namespace default"}, container.Command)

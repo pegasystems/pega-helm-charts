@@ -72,13 +72,13 @@ func SplitAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *
 
 			if index == 1 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"})
+				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"}, options)
 			} else if index == 2 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"})
+				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"}, options)
 			} else if index == 3 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &statefulsetObj)
-				VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{"pega-stream", initContainers, "Stream"})
+				VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{"pega-stream", initContainers, "Stream"}, options)
 
 			}
 		}
@@ -86,7 +86,7 @@ func SplitAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *
 }
 
 // VerifyDeployment - Performs common pega deployment/statefulset assertions with the values as provided in default values.yaml
-func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment) {
+func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment, options *helm.Options) {
 	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
 	require.Equal(t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
@@ -102,7 +102,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	}
 
 	require.Equal(t, expectedSpec.initContainers, actualInitContainerNames)
-	VerifyInitContinerData(t, actualInitContainers)
+	VerifyInitContinerData(t, actualInitContainers, options)
 	require.Equal(t, pod.Containers[0].Name, "pega-web-tomcat")
 	require.Equal(t, pod.Containers[0].Image, "YOUR_PEGA_DEPLOY_IMAGE:TAG")
 	require.Equal(t, pod.Containers[0].Ports[0].Name, "pega-web-port")
@@ -150,7 +150,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 }
 
 // VerifyPegaDeployment - Performs specific Pega deployment assertions with the values as provided in default values.yaml
-func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment) {
+func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment, options *helm.Options) {
 	require.Equal(t, deploymentObj.Spec.Replicas, replicasPtr)
 	require.Equal(t, deploymentObj.Spec.ProgressDeadlineSeconds, ProgressDeadlineSecondsPtr)
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Selector.MatchLabels["app"])
@@ -163,18 +163,18 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 
 	deploymentSpec := deploymentObj.Spec.Template.Spec
 	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
-	VerifyDeployment(t, &deploymentSpec, expectedDeployment)
+	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options)
 
 }
 
 // VerifyPegaStatefulSet - Performs specific Pega statefulset assertions with the values as provided in default values.yaml
-func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment) {
+func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment, options *helm.Options) {
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Name, "pega-stream")
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
 	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/streamvol")
-	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset)
+	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options)
 }
 
 type pegaServices struct {
@@ -346,7 +346,7 @@ func VerifySearchTransportService(t *testing.T, helmChartPath string, options *h
 }
 
 // VerifyInitContinerData - Performs any possible initContainer data assertions with the default values
-func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
+func VerifyInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 
 	for i := 0; i < len(containers); i++ {
 		container := containers[i]
@@ -366,6 +366,7 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container) {
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
+			aksSpecificUpgraderDeployEnvs(t, options, container)
 		} else {
 			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()

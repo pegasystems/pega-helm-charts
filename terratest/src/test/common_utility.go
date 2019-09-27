@@ -43,3 +43,15 @@ func compareConfigMapData(t *testing.T, actualFile []byte, expectedFileName stri
 	equal := bytes.Equal(expectedPrconfig, actualFile)
 	require.Equal(t, true, equal)
 }
+
+//aksSpecificUpgraderDeployEnvs - Test aks specific upgrade-deploy environmnet variables in case of upgrade-deploy
+func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, container k8score.Container) {
+	if options.SetValues["global.provider"] == "aks" && options.SetValues["global.actions.execute"] == "upgrade-deploy" {
+		require.Equal(t, container.Env[0].Name, "KUBERNETES_SERVICE_HOST")
+		require.Equal(t, container.Env[0].Value, "API_SERVICE_ADDRESS")
+		require.Equal(t, container.Env[1].Name, "KUBERNETES_SERVICE_PORT_HTTPS")
+		require.Equal(t, container.Env[1].Value, "SERVICE_PORT_HTTPS")
+		require.Equal(t, container.Env[2].Name, "KUBERNETES_SERVICE_PORT")
+		require.Equal(t, container.Env[2].Value, "SERVICE_PORT_HTTPS")
+	}
+}
