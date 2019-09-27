@@ -1,9 +1,7 @@
 package test
 
 import (
-	"fmt"
 	"path/filepath"
-	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -12,27 +10,43 @@ import (
 
 const PegaHelmChartPath = "../../../charts/pega"
 
-// set action execute to install
-var Invalidoptions = &helm.Options{
-	SetValues: map[string]string{
-		"global.actions.execute": "deployment",
-		"global.provider":        "openshift",
-	},
-}
-
-// TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
-// Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
+// TestInvalidAction - Tests in valid action correctly rendering error
 func TestInvalidAction(t *testing.T) {
 	t.Parallel()
+
+	// set action execute to install
+	var Invalidoptions = &helm.Options{
+		SetValues: map[string]string{
+			"global.actions.execute": "invalid-action",
+			"global.provider":        "openshift",
+		},
+	}
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	deployment, err := helm.RenderTemplateE(t, Invalidoptions, helmChartPath, []string{"templates/pega-action-validate.yaml"})
-	if err != nil {
-		strings.Contains(string(deployment), "Action value is not correct")
-		fmt.Println("Invalid Action Test passed")
-	} else {
-		fmt.Println("Provided action is valid")
+
+	require.Error(t, err)
+	require.Contains(t, string(deployment), "Action value is not correct")
+
+}
+
+// TestValidAction - Tests valid action
+func TestValidAction(t *testing.T) {
+	t.Parallel()
+	// set action execute to install
+	var Invalidoptions = &helm.Options{
+		SetValues: map[string]string{
+			"global.actions.execute": "deploy",
+			"global.provider":        "openshift",
+		},
 	}
+	// Path to the helm chart we will test
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	deployment, err := helm.RenderTemplateE(t, Invalidoptions, helmChartPath, []string{"templates/pega-action-validate.yaml"})
+	require.NoError(t, err)
+	require.NotContains(t, string(deployment), "Action value is not correct")
 }

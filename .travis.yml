@@ -36,6 +36,7 @@ script:
   - go test install_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
   - go test upgrade_test.go common_utility.go installer_utility.go
   - go test upgrade_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
+  - go test aks_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
   - go test invalidAction_test.go
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh

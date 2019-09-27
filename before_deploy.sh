@@ -1,3 +1,5 @@
+# CHART_VERSION is computed from the TAG details of the commit. Every Github release creates tag with the release name.
+# Release name (or) Tag name should be in vX.X.X format. Helm CHART_VERSION would be X.X.X
 export CHART_VERSION=$(expr ${TRAVIS_TAG:1})
 export PEGA_FILE_NAME=pega-${CHART_VERSION}.tgz
 export ADDONS_FILE_NAME=addons-${CHART_VERSION}.tgz

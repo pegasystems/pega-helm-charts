@@ -19,7 +19,7 @@ type pegaJob struct {
 	configMapName  string
 }
 
-//ReturnJobSlices - returns string array of rendered yaml sepearted by delimiter as "---"
+// ReturnJobSlices - returns string array of rendered yaml sepearted by delimiter as "---"
 func ReturnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Options) []string {
 	helmChartPath, err := filepath.Abs(pegaHelmChartPath)
 	require.NoError(t, err)
@@ -30,7 +30,7 @@ func ReturnJobSlices(t *testing.T, pegaHelmChartPath string, options *helm.Optio
 	return installerSlice
 }
 
-//VerifyPegaJob -  Tests installer jobs rendered with the values as provided in default values.yaml
+// VerifyPegaJob -  Tests installer jobs rendered with the values as provided in default values.yaml
 func VerifyPegaJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatch.Job, expectedJob pegaJob) {
 	installerJobSpec := installerJobObj.Spec.Template.Spec
 	installerJobConatiners := installerJobObj.Spec.Template.Spec.Containers
@@ -65,11 +65,11 @@ func VerifyPegaJob(t *testing.T, options *helm.Options, installerJobObj *k8sbatc
 	}
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
-	VerifyInstallerInitContinerData(t, actualInitContainers)
+	VerifyInstallerInitContinerData(t, actualInitContainers, options)
 }
 
 // VerifyInstallerInitContinerData - Tests installer init containers rendered with the values as provided in default values.yaml
-func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container) {
+func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 	if len(containers) == 0 {
 		println("no init containers")
 	}
@@ -91,6 +91,7 @@ func VerifyInstallerInitContinerData(t *testing.T, containers []k8score.Containe
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
+			aksSpecificUpgraderDeployEnvs(t, options, container)
 		} else if name == "wait-for-rolling-updates" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/pega-web --namespace default && kubectl rollout status deployment/pega-batch --namespace default && kubectl rollout status statefulset/pega-stream --namespace default"}, container.Command)
@@ -210,9 +211,12 @@ func VerifyInstallerConfigMaps(t *testing.T, options *helm.Options, pegaHelmChar
 	var installConfigMap k8score.ConfigMap
 	helm.UnmarshalK8SYaml(t, installerConfig, &installConfigMap)
 
-	//installConfigData := installConfigMap.Data
-	/* 	compareConfigMapData(t, []byte(installConfigData["prconfig.xml.tmpl"]), "data/expectedPrconfig.xml")
-	   	compareConfigMapData(t, []byte(installConfigData["setupDatabase.properties.tmpl"]), "data/expectedSetupDatabase.properties")
-	   	compareConfigMapData(t, []byte(installConfigData["prbootstrap.properties.tmpl"]), "data/expectedPRbootstrap.properties")
-	   	compareConfigMapData(t, []byte(installConfigData["prlog4j2.xml"]), "data/expectedPRlog4j2.xml") */
+	installConfigData := installConfigMap.Data
+
+	compareConfigMapData(t, installConfigData["prconfig.xml.tmpl"], "data/expectedPrconfig.xml")
+	compareConfigMapData(t, installConfigData["setupDatabase.properties.tmpl"], "data/expectedSetupdatabase.properties")
+	compareConfigMapData(t, installConfigData["prbootstrap.properties.tmpl"], "data/expectedPRbootstrap.properties")
+	compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
+	compareConfigMapData(t, installConfigData["migrateSystem.properties.tmpl"], "data/expectedMigrateSystem.properties.tmpl")
+	compareConfigMapData(t, installConfigData["prpcUtils.properties.tmpl"], "data/expectedPRPCUtils.properties.tmpl")
 }

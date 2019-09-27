@@ -60,4 +60,5 @@ func TestUpgradeActions(t *testing.T) {
 	VerifyUpgradeEnvConfig(t, options, pegaHelmChartPath)
 	VerfiyRegistrySecret(t, pegaHelmChartPath, options)
 	VerifyCredentialsSecret(t, pegaHelmChartPath, options)
+	VerifyInstallerConfigMaps(t, options, pegaHelmChartPath)
 }
