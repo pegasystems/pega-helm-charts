@@ -25,13 +25,13 @@
   <env name="database/databases/PegaRULES/userName" value="{{ .Env.DB_USERNAME }}" />
   <env name="database/databases/PegaRULES/password" value="{{ .Env.DB_PASSWORD }}" />
   <env name="database/databases/PegaRULES/defaultSchema" value="{{ .Env.RULES_SCHEMA }}" />
-  <env name="database/databases/PegaRULES/propertiesFile" value="/opt/pega/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/PegaRULES/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
   <env name="database/databases/PegaRULES/forceComponentConnectionBroker" value="false" />
   <env name="database/databases/PegaDATA/url" value="{{ .Env.JDBC_URL }}" />
   <env name="database/databases/PegaDATA/userName" value="{{ .Env.DB_USERNAME }}" />
   <env name="database/databases/PegaDATA/password" value="{{ .Env.DB_PASSWORD }}" />
   <env name="database/databases/PegaDATA/defaultSchema" value="{{ .Env.DATA_SCHEMA }}" />
-  <env name="database/databases/PegaDATA/propertiesFile" value="/opt/pega/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/PegaDATA/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
   <env name="database/databases/PegaDATA/forceComponentConnectionBroker" value="false" />
   <env name="database/databases/PegaRULES/connectionPoolSize" value="30" />
   <env name="database/databases/PegaDATA/connectionPoolSize" value="30" />
@@ -39,7 +39,7 @@
   <env name="database/databases/CustomerData/userName" value="{{ .Env.DB_USERNAME }}" />
   <env name="database/databases/CustomerData/password" value="{{ .Env.DB_PASSWORD }}" />
   <env name="database/databases/CustomerData/defaultSchema" value="{{ .Env.CUSTOMERDATA_SCHEMA }}" />
-  <env name="database/databases/CustomerData/propertiesFile" value="/opt/pega/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/CustomerData/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
   <env name="database/databases/CustomerData/forceComponentConnectionBroker" value="false" />
   <env name="database/databases/CustomerData/connectionPoolSize" value="30" />
   <env name="install/parallel/threadcount" value="-1" />

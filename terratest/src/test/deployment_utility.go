@@ -289,10 +289,10 @@ func VerifyTierConfg(t *testing.T, helmChartPath string, options *helm.Options) 
 	for index, configData := range configSlice {
 		if index >= 1 && index <= 3 {
 			helm.UnmarshalK8SYaml(t, configData, &pegaConfigMap)
-			//pegaConfigMapData := pegaConfigMap.Data
-			//compareConfigMapData(t, []byte(pegaConfigMapData["data/prconfig.xml"]), "expectedInstallDeployPrconfig.xml")
-			//compareConfigMapData(t, []byte(pegaConfigMapData["data/context.xml.tmpl"]), "expectedInstallDeployContext.xml")
-			//compareConfigMapData(t, []byte(pegaConfigMapData["data/prlog4j2.xml"]), "expectedInstallDeployPRlog4j2.xml")
+			pegaConfigMapData := pegaConfigMap.Data
+			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
+			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
+			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 		}
 	}
 }
