@@ -1,7 +1,6 @@
 package test
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 
@@ -343,33 +342,4 @@ func VerifySearchTransportService(t *testing.T, helmChartPath string, options *h
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Name, "transport")
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Port, int32(80))
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9300))
-}
-
-// VerifyInitContinerData - Performs any possible initContainer data assertions with the default values
-func VerifyInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
-
-	for i := 0; i < len(containers); i++ {
-		container := containers[i]
-		name := container.Name
-		if name == "wait-for-pegainstall" {
-			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
-			require.Equal(t, []string{"job", "pega-db-install"}, container.Args)
-		} else if name == "wait-for-pegasearch" {
-			require.Equal(t, "busybox:1.31.0", container.Image)
-			require.Equal(t, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://pega-search); do echo Waiting for search to become live...; sleep 10; done;"}, container.Command)
-		} else if name == "wait-for-cassandra" {
-			require.Equal(t, "cassandra:3.11.3", container.Image)
-			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
-		} else if name == "wait-for-cassandra" {
-			require.Equal(t, "cassandra:3.11.3", container.Image)
-			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
-		} else if name == "wait-for-pegaupgrade" {
-			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
-			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
-			aksSpecificUpgraderDeployEnvs(t, options, container)
-		} else {
-			fmt.Println("invalid init containers found.. please check the list", name)
-			t.Fail()
-		}
-	}
 }
