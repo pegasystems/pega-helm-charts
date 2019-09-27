@@ -201,7 +201,8 @@ func SplitAndVerifyPegaServices(t *testing.T, helmChartPath string, options *hel
 
 // VerifyPegaService - Performs Pega Service assertions with the values as provided in default values.yaml
 func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices, options *helm.Options) {
-	if options.SetValues["global.provider"] != "openshift" {
+	provider := options.SetValues["global.provider"]
+	if !(provider == "openshift" || provider == "eks") {
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/affinity"], "true")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/load-balancer-method"], "drr")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
@@ -235,11 +236,33 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 	}
 }
 
-// VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
 func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress, options *helm.Options) {
+	provider := options.SetValues["global.provider"]
+	if provider == "eks" {
+		VerifyEKSIngress(t, ingressObj, expectedIngress)
+	} else {
+		VerifyK8SIngress(t, ingressObj, expectedIngress)
+	}
+}
+
+func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	require.Equal(t, "alb", ingressObj.Annotations["kubernetes.io/ingress.class"])
+	require.Equal(t, "[{\"HTTP\": 80}, {\"HTTPS\": 443}]", ingressObj.Annotations["alb.ingress.kubernetes.io/listen-ports"])
+	require.Equal(t, "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}", ingressObj.Annotations["alb.ingress.kubernetes.io/actions.ssl-redirect"])
+	require.Equal(t, "internet-facing", ingressObj.Annotations["alb.ingress.kubernetes.io/scheme"])
+	require.Equal(t, "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=3660", ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
+	require.Equal(t, "ip", ingressObj.Annotations["alb.ingress.kubernetes.io/target-type"])
+	require.Equal(t, "ssl-redirect", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, "use-annotation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort.StrVal)
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[1].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[1].HTTP.Paths[0].Backend.ServicePort)
+}
+
+// VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
+func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
 	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
-	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName, expectedIngress.Name)
-	require.Equal(t, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort, expectedIngress.Port)
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
 
 // VerifySearchService - Verifies search service deployment used by search pod with the values as provided in default values.yaml
