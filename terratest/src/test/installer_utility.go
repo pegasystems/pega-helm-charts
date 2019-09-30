@@ -133,6 +133,7 @@ func VerifyInstallEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPa
 	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
 	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
+	require.Equal(t, "", installEnvConfigData["DISTRIBUTION_KIT_URL"])
 
 }
 
