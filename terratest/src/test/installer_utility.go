@@ -131,7 +131,9 @@ func VerifyInstallEnvConfig(t *testing.T, options *helm.Options, pegaHelmChartPa
 	require.Equal(t, installEnvConfigData["MAX_ACTIVE"], "10")
 	require.Equal(t, installEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
+	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
+
 }
 
 // VerifyInstallerRoleBinding - Tests Installer role binding rendered with the values as provided in default values.yaml

@@ -12,6 +12,7 @@ import (
 	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 	autoscaling "k8s.io/kubernetes/pkg/apis/autoscaling"
+	api "k8s.io/kubernetes/pkg/apis/core"
 )
 
 var replicas int32 = 1
@@ -145,6 +146,11 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.ImagePullSecrets[0].Name, "pega-registry-secret")
 	require.Equal(t, pod.RestartPolicy, k8score.RestartPolicy("Always"))
 	require.Equal(t, pod.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
+	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
+	require.Equal(t, pod.Volumes[1].Secret.SecretName, "pega-credentials-secret")
 
 }
 
@@ -156,14 +162,10 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxSurge, rollingUpdatePtr)
 	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxUnavailable, rollingUpdatePtr)
 	require.Equal(t, deploymentObj.Spec.Strategy.Type, appsv1.DeploymentStrategyType("RollingUpdate"))
-
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Template.Labels["app"])
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
-
 	deploymentSpec := deploymentObj.Spec.Template.Spec
-	require.Equal(t, deploymentSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options)
-
 }
 
 // VerifyPegaStatefulSet - Performs specific Pega statefulset assertions with the values as provided in default values.yaml
@@ -172,7 +174,10 @@ func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
 	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-stream")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/streamvol")
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].Name, "pega-volume-credentials")
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].MountPath, "/opt/pega/secrets")
 	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options)
 }
 
@@ -208,6 +213,7 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
 	}
+	require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("NodePort"))
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, expectedService.TargetPort)
@@ -348,8 +354,8 @@ func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Name, expectedHpa.targetRefName)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Kind, expectedHpa.kind)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.APIVersion, expectedHpa.apiversion)
-
-	require.Equal(t, hpaObj.Spec.MinReplicas, replicasPtr)
+	require.Equal(t, hpaObj.Spec.Metrics[0].Resource.Name, api.ResourceName("cpu"))
+	require.Equal(t, hpaObj.Spec.Metrics[1].Resource.Name, api.ResourceName("memory"))
 	require.Equal(t, hpaObj.Spec.MaxReplicas, int32(5))
 }
 

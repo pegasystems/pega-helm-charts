@@ -18,7 +18,7 @@ var options = &helm.Options{
 	},
 }
 
-// TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
+// TestOpenshiftPegaTierDeployment - Test case to verify the standard pega tier deployment in Openshift.
 // Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
 func TestOpenshiftPegaTierDeployment(t *testing.T) {
 	t.Parallel()
