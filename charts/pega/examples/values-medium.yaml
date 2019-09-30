@@ -78,6 +78,8 @@ global:
         domain: "YOUR_WEB_NODE_DOMAIN"
         port: 80
         targetPort: 8080
+        # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
+        alb_stickiness_lb_cookie_duration_seconds: 3660
       nodeType: "WebUser"
       replicas: 1
       # Enter any additional java options.
@@ -85,8 +87,6 @@ global:
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
       deploymentStrategy:
         rollingUpdate:
           # Enter the maximum number of Pods that can be unavailable during the update process.
@@ -111,8 +111,6 @@ global:
       # Set your Pega diagnostic credentials.
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
       deploymentStrategy:
         rollingUpdate:
           # Enter the maximum number of Pods that can be unavailable during the update process.
@@ -136,13 +134,13 @@ global:
         domain: "YOUR_STREAM_NODE_DOMAIN"
         port: 7003
         targetPort: 7003
+        # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
+        alb_stickiness_lb_cookie_duration_seconds: 3660
       nodeType: "Stream"
       # Enter the number of stream nodes for Kubernetes to deploy (minimum 2).
       replicas: 2
       # Enter any additional java options
       javaOpts: ""
-      # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-      alb_stickiness_lb_cookie_duration_seconds: 3660
       volumeClaimTemplate:
         resources:
           requests:

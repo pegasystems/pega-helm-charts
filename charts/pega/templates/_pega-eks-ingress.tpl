@@ -15,7 +15,7 @@ metadata:
     # override the default scheme internal as ALB should be internet-facing 
     alb.ingress.kubernetes.io/scheme: internet-facing
     # enable sticky sessions on target group
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ .node.alb_stickiness_lb_cookie_duration_seconds }}
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ .node.service.alb_stickiness_lb_cookie_duration_seconds }}
     # set to ip mode to route traffic directly to the pods ip
     alb.ingress.kubernetes.io/target-type: ip
 spec:
