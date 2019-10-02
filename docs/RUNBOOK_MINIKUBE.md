@@ -1,5 +1,9 @@
+# Minikube
 
-This document explains on how to deploy pega using minikube as a provider
+Minikube runs a single-node Kubernetes cluster inside a Virtual Machine (VM) on your laptop for users looking to try out Kubernetes or develop with it day-to-day. For more information on minikube, see the [Minikube documentation](https://kubernetes.io/docs/setup/learning-environment/minikube/).
+
+
+This document explains on how to deploy pega using minikube as a provider.
 
 # Quick Start
 
@@ -56,10 +60,10 @@ minikube ip can be fetched using command - ``` minikube ip``` and Pega service N
 Start minikube with at least 4 CPU’s and 10GB memory for complete pega deployment. As per the need increase the limits of minikube.
 
 ***Note***
-1. Use “minikube-values.yaml” to deploy pega which is available in the example folder of [pega helm charts](\pega-helm-charts\charts\pega\examples). 
+1. Use “values-minimal.yaml” to deploy pega which is available in the [pega chart](\pega-helm-charts\charts\pega) directory. 
 
 	Example helm command to deploy
 	
-	```helm install . -n mypega --namespace myproject --values /examples/minikube-values.yaml```
+	```helm install . -n mypega --namespace myproject --values ./values-minimal.yaml```
 
 2. As this runs on the personal laptop for a day-to-day project with minimal memory and CPU limits, minikube supports only "install", "deploy" and "install-deploy" actions. It is advisable to use this kind of cluster configuration for simple activities on Pega as it might spike with CPU and memory.
