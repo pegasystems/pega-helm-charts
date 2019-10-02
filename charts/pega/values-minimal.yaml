@@ -1,0 +1,89 @@
+---
+global:
+  # This values.yaml file is an example of a minimal Pega 
+  # deployment configuration.  For more information about 
+  # configuration options, see the project readme for the Pega chart.
+
+  # Enter your Kubernetes provider.
+  provider: "k8s"
+
+  # Deploy by default, but installations and upgrades are possible as well.
+  actions:
+    execute: "deploy"
+  
+  # Provide JDBC connection information to the Pega relational database
+  jdbc:
+    url: "YOUR_JDBC_URL"
+    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    dbType: "YOUR_DATABASE_TYPE"
+    driverUri: "YOUR_JDBC_DRIVER_URI"
+    username: "YOUR_JDBC_USERNAME"
+    password: "YOUR_JDBC_PASSWORD"
+    connectionProperties: ""
+    rulesSchema: "YOUR_RULES_SCHEMA"
+    dataSchema: "YOUR_DATA_SCHEMA"
+    customerDataSchema: ""
+  
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  docker:
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+
+  tier:
+    # Deploy as a single tier for minimal resource consumption.
+    - name: "minikube"     
+      service:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+        port: 80
+        targetPort: 8080
+      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+
+      # Set resource consumption to minimal levels
+      replicas: 1
+      cpuRequest: 200m
+      memRequest: "5Gi"
+      cpuLimit: 2
+      memLimit: "6Gi"
+      javaOpts: ""
+      initialHeap: "4096m"
+      maxHeap: "4096m"
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
+
+# Docker image information for the Pega docker image, containing the application server.
+docker:
+  pega:
+    image: "pegasystems/pega:8.3"
+
+# Cassandra automatic deployment settings.
+# Disabled by default for minimal deployments.
+cassandra:
+  enabled: false
+
+# DDS (external Cassandra) connection settings.
+# These settings should only be modified if you are using a custom Cassandra deployment.
+dds:
+  externalNodes: ""
+  port: "9042"
+  username: "dnode_ext"
+  password: "dnode_ext"
+
+# Elasticsearch deployment settings.
+# Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
+# These search nodes will be deployed regardless of the Elasticsearch configuration above.
+pegasearch:
+  image: "pegasystems/search:8.3"
+  memLimit: "3Gi"
+
+# Pega Installer settings
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  adminPassword: "ADMIN_PASSWORD"
