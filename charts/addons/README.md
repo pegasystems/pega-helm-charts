@@ -4,6 +4,15 @@ The addons chart installs a collection of supporting services and tools required
 
 ## Load balancer
 
+Environment                               | Suggested load balancer
+---                                       | ---
+Open-source Kubernetes                    | Traefik
+Red Hat Openshift                         | HAProxy (Using the `roundrobin` load balancer strategy)
+Amazon Elastic Kubernetes Service (EKS)   | Amazon Load Balancer (ALB)
+Google Kubernetes Engine (GKE)            | Traefik
+Pivotal Container Service (PKS)           | Traefik
+Microsoft Azure Kubernetes Service (AKS)  | Traefik
+
 ### Traefik
 
 Deploying Pega Infinity with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/helm/charts/blob/master/stable/traefik/values.yaml).
@@ -59,7 +68,18 @@ aws-alb-ingress-controller:
     AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 ```
 
-## Logging with EFK
+## Aggregated logging
+
+Environment                               | Suggested logging tools
+---                                       | ---
+Open-source Kubernetes                    | EFK
+Red Hat Openshift                         | Built-in EFK
+Amazon Elastic Kubernetes Service (EKS)   | Built-in EFK
+Google Kubernetes Engine (GKE)            | Stackdriver
+Pivotal Container Service (PKS)           | EFK
+Microsoft Azure Kubernetes Service (AKS)  | Azure Monitor
+
+## Logging with Elasticsearch-Fluentd-Kibana (EFK)
 
 EFK is a standard logging stack that is provided as an example for ease of getting started in environments that do not have aggregated logging configured such as open-source Kubernetes. Other IaaS and PaaS providers typically include a logging system out of the box. You may enable the three components of EFK ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml),[Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml), and [Kibana](https://github.com/helm/charts/tree/master/stable/kibana/values.yaml)) in the addons values.yaml file to deploy EFK automatically. For more configuration options available for each of the components, see their Helm Charts.
 
@@ -97,6 +117,11 @@ fluentd-elasticsearch:
 ```
 
 ## Metrics
+
+Environment             | Suggested metrics server
+---                     | ---
+Open-source Kubernetes  | Metrics server
+All others              | Built-in metrics server
 
 Autoscaling in Kubernetes requires the use of a metrics server, a cluster-wide aggregator of resource usage data.  Most PaaS and IaaS providers supply a metrics server, but if you wish to deploy into open source kubernetes, you will need to supply your own.
 
