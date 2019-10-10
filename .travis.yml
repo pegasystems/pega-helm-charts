@@ -76,9 +76,9 @@ deploy:
       tags: true
   - provider: bintray
     file: descriptor.json
-    user: TBD
+    user: bintrayautomation
     key:
-      secure: TBD
+      secure: k361CwNOJvRnIsM7HkHlXN/9tR+7Y9Y1caxrwC/sHXDFYd5ddD6YfYoZnfThUks+NY2PeZUQ8cPwXmSnEmj3i/HUV1sm9PFdSwlrII14JBZ6wocLNt7VzDsv7p3oQ+c+WomYqkS7/QXmJzotDfh4W/tlC3/5YiJMfR1SF25RaZz2cZNGdR3+u6VG1uQV8AfrseTBMjielsQajjmMeWYTUlPZvntYMTFAdbtVRUUvZWgya9ac/Jh6Tm+X0xHI97WO8u4js+btcoQJrlN7V7KXOtCaO8j+rpHOLSP3bZCAhIsGPcQAEk80FFVygtb/9C0RFJo/a4+Op4ZfDMJXuB401mnMdKhl73ygmEtELVXCh8shBbNuZykSLH+tmyLb1+Cl8WU3fXZqoKeia0S4dig5L+7gQlIgYIQsk0q4nglCSjQaCCH/uyY37WNXCRPpbCR74NYzXHfJewk5cB9dtYIZe4GCOTcXHP/UOQiGTCScwXgT/rSIxzAK8NxL14G5U1B6d9nBJe9b4Pml4S9TG6RWDRGXlEDj3XXSEBm/QMGq92U0dxIovoLY6Psbuo5KiYb0JFbuwqSLm2HLmaxJjtfGJmJc8fasU8+lvBX9R+fzcbT0Rzg//Tx7/7pssw8JFrArcZNEHG6xU1/8QuE34+0XIogCvb4hHlTZmMLFBfFhBtk=
     skip_cleanup: true
     on:
       all_branches: true
