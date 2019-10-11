@@ -1,5 +1,5 @@
+{{ if (eq (include "performInstall" .) "true") -}}
 # Config map used for Pega Installation
-{{ if (eq (include "performInstall" .) "true") }}
 kind: ConfigMap
 apiVersion: v1
 metadata:
