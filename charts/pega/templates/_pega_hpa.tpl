@@ -38,5 +38,6 @@ spec:
       {{- else }}
       targetAverageUtilization: 85
       {{- end }}
+---
 {{- end -}}
 {{- end -}}
