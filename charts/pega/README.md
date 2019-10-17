@@ -18,7 +18,7 @@ aks         | Microsoft Azure Kubernetes Service (AKS)
 Example for a kubernetes environment:
 
 ```yaml
-provider:"k8s"
+provider: "k8s"
 ```
 
 ## Actions
@@ -37,7 +37,7 @@ upgrade-deploy    | Upgrade the Pega Platform installation in your database, and
 
 Example:
 
- ```yaml
+```yaml
 action: "deploy"
 ```
 
@@ -50,37 +50,36 @@ These required connection details will point Pega to the correct database and pr
 
 Example for Oracle:
 ```yaml
-      jdbc:
-        url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
-        driverClass: oracle.jdbc.OracleDriver
+jdbc:
+  url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
+  driverClass: oracle.jdbc.OracleDriver
 ```
 Example for Microsoft SQL Server:
 ```yaml
-      jdbc:
-        url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
-   driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
-        driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
+jdbc:
+  url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
+  driverClass: com.microsoft.sqlserver.jdbc.SQLServerDriver
 ```
 
 Example for IBM DB2 for LUW:
 ```yaml
-      jdbc:
-        url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
-        driverClass: com.ibm.db2.jcc.DB2Driver
+jdbc:
+  url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+  driverClass: com.ibm.db2.jcc.DB2Driver
 ```
 
 Example for IBM DB2 for z/OS:
 ```yaml
-      jdbc:
-        url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME
-        driverClass: com.ibm.db2.jcc.DB2Driver
+jdbc:
+  url: jdbc:db2://YOUR_DB_HOST:50000/YOUR_DB_NAME
+  driverClass: com.ibm.db2.jcc.DB2Driver
 ```
 
 Example for PostgreSQL:
 ```yaml
-      jdbc:
-        url: jdbc:postgresql://YOUR_DB_HOST:5432/YOUR_DB_NAME
-        driverClass: org.postgresql.Driver
+jdbc:
+  url: jdbc:postgresql://YOUR_DB_HOST:5432/YOUR_DB_NAME
+  driverClass: org.postgresql.Driver
 ```
 
 ### Driver URI
@@ -102,11 +101,11 @@ It is standard practice to have seperate schemas for your rules and data.  You m
  Example:
  
  ```yaml
-      jdbc:
-        ...
-        rulesSchema: "rules"
-        dataSchema: "data"
-        customerDataSchema: ""
+jdbc:
+  ...
+  rulesSchema: "rules"
+  dataSchema: "data"
+  customerDataSchema: ""
 ```
 
 ## Docker
@@ -204,10 +203,10 @@ Configuration parameters:
 Example:
 
 ```yaml
-      service:
-        domain: "tier.example.com"
-        port: 1234
-        targetPort: 1234
+service:
+  domain: "tier.example.com"
+  port: 1234
+  targetPort: 1234
 ```
 
 
