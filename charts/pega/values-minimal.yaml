@@ -1,7 +1,7 @@
 ---
 global:
-  # This values.yaml file is an example of a minimal Pega 
-  # deployment configuration.  For more information about 
+  # This values.yaml file is an example of a minimal Pega
+  # deployment configuration.  For more information about
   # configuration options, see the project readme.
 
   # Enter your Kubernetes provider.
@@ -10,7 +10,7 @@ global:
   # Deploy Pega nodes
   actions:
     execute: "deploy"
-  
+
   # Provide JDBC connection information to the Pega relational database
   jdbc:
     url: "YOUR_JDBC_URL"
@@ -23,7 +23,7 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
-  
+
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
     registry:
@@ -34,7 +34,7 @@ global:
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
   tier:
-    - name: "minikube"     
+    - name: "minikube"
       nodeType: "Stream,BackgroundProcessing,WebUser,Search"
       service:
         # Enter the domain name to access web nodes via a load balancer.

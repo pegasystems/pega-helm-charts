@@ -18,7 +18,7 @@ install:
   - export  PATH=$PATH:/usr/local/go/bin
 script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "values.yaml")
+  - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
   # Now load the helm dependencies
   - make dependencies
   # Run Helm lint

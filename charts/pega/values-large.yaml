@@ -1,7 +1,7 @@
 ---
 global:
-  # This values.yaml file is an example of a large Pega deployment.  
-  # For more information about each configuration option, see the 
+  # This values.yaml file is an example of a large Pega deployment.
+  # For more information about each configuration option, see the
   # project readme.
 
   # Enter your Kubernetes provider.
@@ -10,7 +10,7 @@ global:
   # Deploy Pega nodes
   actions:
     execute: "deploy"
-  
+
   # Provide JDBC connection information to the Pega relational database
   jdbc:
     url: "YOUR_JDBC_URL"
@@ -23,14 +23,14 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
-  
+
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
     registry:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-  
+
   # Upgrade specific properties
   upgrade:
     # Configure only for aks/pks
@@ -42,8 +42,8 @@ global:
 
   tier:
     - name: "web"
-      # Create a an interactive tier for web users.  This tier uses 
-      # the WebUser node type and will be exposed via a service to 
+      # Create a an interactive tier for web users.  This tier uses
+      # the WebUser node type and will be exposed via a service to
       # the load balancer.
       nodeType: "WebUser"
 
@@ -55,7 +55,7 @@ global:
         targetPort: 8080
         # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
         alb_stickiness_lb_cookie_duration_seconds: 3660
-      
+
       replicas: 1
       javaOpts: ""
 
@@ -70,13 +70,13 @@ global:
 
       hpa:
         enabled: true
-      
+
     - name: "batch"
-      # Create a background tier for batch processing.  This tier uses 
-      # a collection of background node types and will not be exposed to 
+      # Create a background tier for batch processing.  This tier uses
+      # a collection of background node types and will not be exposed to
       # the load balancer.
       nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5"
-      
+
       replicas: 1
       javaOpts: ""
 
@@ -88,16 +88,16 @@ global:
           maxSurge: 25%
           maxUnavailable: 25%
         type: RollingUpdate
-      
+
       hpa:
         enabled: true
-      
+
     - name: "stream"
-      # Create a stream tier for queue processing.  This tier deploys 
-      # as a stateful set to ensure durability of queued data. It may 
-      # be optionally exposed to the load balancer. 
+      # Create a stream tier for queue processing.  This tier deploys
+      # as a stateful set to ensure durability of queued data. It may
+      # be optionally exposed to the load balancer.
       nodeType: "Stream"
-      
+
       service:
         # Enter the domain name to access stream nodes via a load balancer.
         #  e.g. stream.mypega.example.com
@@ -107,14 +107,14 @@ global:
 
       replicas: 2
       javaOpts: ""
-      
+
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
-      
+
     - name: "bix"
-      # Create a background tier for BIX processing.  This tier uses 
+      # Create a background tier for BIX processing.  This tier uses
       # the BIX node type and will not be exposed to the load balancer.
       nodeType: "BIX"
 
@@ -129,7 +129,7 @@ global:
           maxSurge: 25%
           maxUnavailable: 25%
         type: RollingUpdate
-      
+
       hpa:
         enabled: true
 
@@ -148,10 +148,10 @@ global:
           maxSurge: 25%
           maxUnavailable: 25%
         type: RollingUpdate
-      
+
       hpa:
         enabled: true
-      
+
 # Docker image information for the Pega docker image, containing the application server.
 docker:
   pega:
