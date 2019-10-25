@@ -2,12 +2,12 @@
 global:
   # This values.yaml file is an example of a minimal Pega 
   # deployment configuration.  For more information about 
-  # configuration options, see the project readme for the Pega chart.
+  # configuration options, see the project readme.
 
   # Enter your Kubernetes provider.
   provider: "k8s"
 
-  # Deploy by default, but installations and upgrades are possible as well.
+  # Deploy Pega nodes
   actions:
     execute: "deploy"
   
@@ -31,17 +31,17 @@ global:
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
+  # Specify the Pega tiers to deploy
+  # For a minimal deployment, use a single tier to reduce resource consumption.
   tier:
-    # Deploy as a single tier for minimal resource consumption.
     - name: "minikube"     
+      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
       service:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_MINIKUBE_NODE_DOMAIN"
         port: 80
         targetPort: 8080
-      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
-
       # Set resource consumption to minimal levels
       replicas: 1
       cpuRequest: 200m
