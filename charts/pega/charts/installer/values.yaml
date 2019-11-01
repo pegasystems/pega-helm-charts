@@ -58,3 +58,11 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
+
+  resources:
+    requests:
+      memory: "5Gi"
+      cpu: 1
+    limits:
+      memory: "6Gi"
+      cpu: 2

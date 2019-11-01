@@ -36,6 +36,14 @@ spec:
         image: {{ .root.Values.image }}
         ports:
         - containerPort: 8080
+        resources:
+          # CPU and Memory that the containers for {{ .name }} request
+          requests:
+            cpu: "{{ .root.Values.resources.requests.cpu }}"
+            memory: "{{ .root.Values.resources.requests.memory }}"
+          limits:
+            cpu: "{{ .root.Values.resources.limits.cpu }}"
+            memory: "{{ .root.Values.resources.limits.memory }}"
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeInstall" }}
