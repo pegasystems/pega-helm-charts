@@ -2,7 +2,13 @@
 image: "YOUR_IMAGE_NAME"
 # Creates a new System and replaces this with default system.Default is pega
 systemName: "pega"
-# Creates the system with this production level.Default is 2
+# During installations, the system name above is generated with the following production level.Default is 2
+# The system production level can be set to one of the below integer values (1-5):
+# 5 = production;
+# 4 = preproduction;
+# 3 = test;
+# 2 = development;
+# 1 = experimental
 productionLevel: 2
 # Whether this is a Multitenant System ('true' if yes, 'false' if no)
 multitenantSystem: "false"

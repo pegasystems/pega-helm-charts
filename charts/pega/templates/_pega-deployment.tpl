@@ -62,7 +62,7 @@ spec:
       - name: pega-web-tomcat
         # The pega image, you may use the official pega distribution or you may extend
         # and host it yourself.  See the image documentation for more information.
-        image: {{ .root.Values.docker.pega.image }}
+        image: {{ .root.Values.global.docker.pega.image }}
         # Pod (app instance) listens on this port
         ports:
         - containerPort: 8080
