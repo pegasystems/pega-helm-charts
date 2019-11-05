@@ -11,10 +11,10 @@
     url="{{ .Env.JDBC_URL }}"
     username="{{ .Env.SECRET_DB_USERNAME }}"
     password="{{ .Env.SECRET_DB_PASSWORD }}"
-    maxActive="{{ .Env.JDBC_MAX_ACTIVE }}"
+    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
     minIdle="{{ .Env.JDBC_MIN_IDLE }}"
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
-    maxWait="{{ .Env.JDBC_MAX_WAIT }}"
+    maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
   />
