@@ -59,6 +59,7 @@ upgrade:
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
 
+# Memory and CPU settings for installer
 resources:
   requests:
     memory: "5Gi"
