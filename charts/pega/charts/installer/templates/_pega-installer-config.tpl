@@ -16,6 +16,7 @@ data:
 {{- $setupDatabasetemplatePath := "config/setupDatabase.properties.tmpl" }}
 {{- $prbootstraptemplatePath := "config/prbootstrap.properties.tmpl" }}
 {{- $prpcUtilsPropertiestemplatePath := "config/prpcUtils.properties.tmpl" }}
+{{- $migrateSystempropertiestemplatePath := "config/migrateSystem.properties.tmpl" }}
 
 {{ if $prconfigTemplate := .root.Files.Glob $prconfigTemplatePath }}
   # prconfigTemplate to be used by {{ .name }}
@@ -45,6 +46,12 @@ data:
   # prpcUtilsPropertiestemplate to be used by {{ .name }}
   prpcUtils.properties.tmpl: |-
 {{ .root.Files.Get $prpcUtilsPropertiestemplatePath | indent 6 }}
+{{- end }}
+
+{{ if $migrateSystempropertiestemplate := .root.Files.Glob $migrateSystempropertiestemplatePath }}
+  # migrateSystempropertiestemplate to be used by {{ .name }}
+  migrateSystem.properties.tmpl: |-
+{{ .root.Files.Get $migrateSystempropertiestemplatePath | indent 6 }}
 {{- end }}
 
 {{- $prlog4j2Path := "config/prlog4j2.xml" }}

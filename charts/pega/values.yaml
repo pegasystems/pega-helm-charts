@@ -56,7 +56,7 @@ global:
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
       # Docker image information for the Pega docker image, containing the application server.
     pega:
-      image: "pegasystems/pega:8.3"
+      image: "YOUR_PEGA_IMAGE:TAG"
 
   # Upgrade specific properties
   upgrade:
@@ -149,7 +149,7 @@ global:
           requests:
             storage: 5Gi
 
-# Services or Addons
+# External services
 
 # Cassandra automatic deployment settings.
 cassandra:
@@ -176,7 +176,7 @@ dds:
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
 pegasearch:
-  image: "pegasystems/search:8.3"
+  image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
   memLimit: "3Gi"
 
 # Pega Installer settings
