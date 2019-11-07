@@ -34,19 +34,14 @@ global:
     dbType: "YOUR_DATABASE_TYPE"
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
     driverUri: "YOUR_JDBC_DRIVER_URI"
-    #   db username
     username: "YOUR_JDBC_USERNAME"
-    #   db password
     password: "YOUR_JDBC_PASSWORD"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
     connectionProperties: ""
-    # RULES SCHEMA NAME
     rulesSchema: "YOUR_RULES_SCHEMA"
-    # DATA SCHEMA NAME
     dataSchema: "YOUR_DATA_SCHEMA"
-    # CUSTOMER DATA SCHEMA NAME
     customerDataSchema: ""
 
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
