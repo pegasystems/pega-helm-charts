@@ -1,6 +1,7 @@
 package test
 
 import (
+	"io/ioutil"
 	"path/filepath"
 	"testing"
 
@@ -11,6 +12,7 @@ import (
 )
 
 const pegaHelmChartPath = "../../../charts/pega"
+const dbConfFileLocation = "../../../charts/pega/charts/installer/config"
 
 // set action execute to install
 var options = &helm.Options{
@@ -61,4 +63,19 @@ func TestInstallActions(t *testing.T) {
 	VerfiyRegistrySecret(t, pegaHelmChartPath, options)
 	VerifyCredentialsSecret(t, pegaHelmChartPath, options)
 	VerifyInstallerConfigMaps(t, options, pegaHelmChartPath)
+}
+
+//TestDBConfFiles - Test all the files in "../../../charts/pega/charts/installer/config" folder where DB Conf files are present
+func TestDBConfFiles(t *testing.T) {
+	actuallist, _ := ioutil.ReadDir(dbConfFileLocation)
+	require.Equal(t, 12, len(actuallist))
+
+	names := []string{"DB2SiteDependent.properties", "db2zos.conf", "migrateSystem.properties.tmpl", "mssql.conf", "oracledate.conf", "postgres.conf", "prbootstrap.properties.tmpl", "prconfig.xml.tmpl",
+		"prlog4j2.xml", "prpcUtils.properties.tmpl", "setupDatabase.properties.tmpl", "udb.conf"}
+
+	require.Equal(t, len(names), len(actuallist))
+
+	for i, v := range actuallist {
+		require.Equal(t, names[i], v.Name())
+	}
 }
