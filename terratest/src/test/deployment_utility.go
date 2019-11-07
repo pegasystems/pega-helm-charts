@@ -104,7 +104,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, expectedSpec.initContainers, actualInitContainerNames)
 	VerifyInitContinerData(t, actualInitContainers, options)
 	require.Equal(t, pod.Containers[0].Name, "pega-web-tomcat")
-	require.Equal(t, pod.Containers[0].Image, "YOUR_PEGA_IMAGE:TAG")
+	require.Equal(t, pod.Containers[0].Image, "pegasystems/pega")
 	require.Equal(t, pod.Containers[0].Ports[0].Name, "pega-web-port")
 	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
 	require.Equal(t, pod.Containers[0].Env[0].Name, "NODE_TYPE")

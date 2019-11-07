@@ -13,7 +13,7 @@ productionLevel: 2
 # Whether this is a Multitenant System ('true' if yes, 'false' if no)
 multitenantSystem: "false"
 # UDF generation will be skipped if this property is set to true
-bypassUdfGeneration: "false"
+bypassUdfGeneration: "true"
 # Temporary password for administrator@pega.com that is used to install Pega Platform
 adminPassword: ""
 # Run the Static Assembler ('true' to run, 'false' to not run)

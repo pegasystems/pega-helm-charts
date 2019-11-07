@@ -57,7 +57,7 @@ global:
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
       # Docker image information for the Pega docker image, containing the application server.
     pega:
-      image: "YOUR_PEGA_IMAGE:TAG"
+      image: "pegasystems/pega"
 
   # Upgrade specific properties
   upgrade:
@@ -195,7 +195,7 @@ dds:
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
 pegasearch:
-  image: "YOUR_ELASTICSEARCH_IMAGE:TAG"
+  image: "pegasystems/search"
   memLimit: "3Gi"
 
 # Pega Installer settings
