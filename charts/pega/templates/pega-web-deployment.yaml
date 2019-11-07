@@ -1,1 +1,0 @@
-{{ template "pega.deployment" dict "root" $ "node" .Values.web "name" (include "pegaWebName" .) "kind" "Deployment" "apiVersion" "extensions/v1beta1" "nodeType" "Foreground" "initContainers" (list "waitForPegaSearch") }}

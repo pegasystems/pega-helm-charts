@@ -1,1 +1,0 @@
-{{ template "pega.ingress" dict "root" $ "node" .Values.web "port" 80 "name" (include "pegaWebName" .) }}

@@ -1,0 +1,35 @@
+{{ $kindName := "" }}
+{{ $apiVer := "" }}
+{{ range $index, $dep := .Values.global.tier}}
+{{ if ($dep.volumeClaimTemplate) }}
+{{ $kindName = "StatefulSet" }}
+{{ $apiVer = "apps/v1beta2" }}
+{{ else }}
+{{ $kindName = "Deployment" }}
+{{ $apiVer = "extensions/v1beta1" }}
+{{ end }}
+
+{{ $containerWaitList := list  }}
+{{ if (eq (include "performOnlyDeployment" $) "true") }}
+{{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ if (eq (include "cassandraEnabled" $) "true" ) }}
+{{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
+{{ end }}
+{{ end }}
+
+{{ if (eq (include "performInstallAndDeployment" $) "true") }}
+{{ $containerWaitList = append $containerWaitList "waitForPegaDBInstall" }} 
+{{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ if (eq (include "cassandraEnabled" $) "true" ) }}
+{{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
+{{ end }}
+{{ end }}
+
+{{ if (eq (include "performUpgradeAndDeployment" $) "true") }}
+{{ $containerWaitList = append $containerWaitList "waitForPegaDBUpgrade" }}
+{{ end }}
+
+{{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
+{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
+{{- end }}
+{{ end }}

@@ -1,1 +1,0 @@
-{{ template "pega.ingress" dict "root" $ "node" .Values.stream "port" 7003 "name" (include "pegaStreamName" .) }}

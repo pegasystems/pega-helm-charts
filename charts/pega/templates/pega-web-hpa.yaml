@@ -1,1 +1,0 @@
-{{ template "pega.hpa" dict "root" $ "name" (printf "%s-hpa" (include "pegaWebName" .)) "deploymentName" (include "pegaWebName" .) "hpa" .Values.web.hpa}}

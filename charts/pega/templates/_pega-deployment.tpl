@@ -5,18 +5,27 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
-    app: {{ template "pegaWebName" .root }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
+    app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
   # Replicas specify the number of copies for {{ .name }}
   replicas: {{ .node.replicas }}
+{{- if (eq .kind "Deployment") }}
+  progressDeadlineSeconds: 2147483647
+{{- end }}
   selector:
     matchLabels:
       app: {{ .name }}
+{{- if .node.deploymentStrategy }}
+  strategy:
+{{ toYaml .node.deploymentStrategy | indent 4 }}
+{{- end }}
   template:
     metadata:
       labels:
         app: {{ .name }}
+      annotations:
+        config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
     spec:
       volumes:
       # Volume used to mount config files.
@@ -32,41 +41,91 @@ spec:
           secretName: {{ template "pegaCredentialsSecret" }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
+{{- if .custom }}
+{{- if .custom.volumes }}
+      # Additional custom volumes
+{{ toYaml .custom.volumes | indent 6 }}
+{{- end }}
+{{- end }}
       initContainers:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
+{{- end }}
+{{- if .custom }}
+{{- if .custom.initContainers }}
+        # Additional custom init containers
+{{ toYaml .custom.initContainers | indent 6 }}
+{{- end }}
 {{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
         # The pega image, you may use the official pega distribution or you may extend
         # and host it yourself.  See the image documentation for more information.
-        image: {{ .root.Values.docker.image }}
+        image: {{ .root.Values.global.docker.pega.image }}
         # Pod (app instance) listens on this port
         ports:
         - containerPort: 8080
+          name: pega-web-port
+{{- if .custom }}
+{{- if .custom.ports }}
+        # Additional custom ports
+{{ toYaml .custom.ports | indent 8 }}
+{{- end }}
+{{- end }}
         # Specify any of the container environment variables here
         env:
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
+{{- if .custom }}
+{{- if .custom.env }}
+        # Additional custom env vars
+{{ toYaml .custom.env | indent 8 }}
+{{- end }}
+{{- end }}
 {{ include "pega.jvmconfig" (dict "node" .node) | indent 8 }}
-{{ include "commonEnvironmentVariables" .root | indent 8 }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "pegaEnvironmentConfig" }}
         resources:
           # Maximum CPU and Memory that the containers for {{ .name }} can use
           limits:
+          {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
+          {{- else }}
+            cpu: 2
+          {{- end }}
+          {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
+          {{- else }}
+            memory: "8Gi"
+          {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
-            cpu: "200m"
-            memory: "2Gi"
+          {{- if .node.cpuRequest }}
+            cpu: "{{ .node.cpuRequest }}"
+          {{- else }}
+            cpu: 200m
+          {{- end }}
+          {{- if .node.memRequest }}
+            memory: "{{ .node.memRequest }}"
+          {{- else }}
+            memory: "6Gi"
+          {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeConfig" }}
           mountPath: "/opt/pega/config"
-{{- if .extraVolume }}
-{{ include .extraVolume .root | indent 8 }}
+{{- if (.node.volumeClaimTemplate) }}
+        - name: {{ .name }}
+          mountPath: "/opt/pega/streamvol"
+{{- end }}
+{{- if .custom }}
+{{- if .custom.volumeMounts }}
+        # Additional custom mounts
+{{ toYaml .custom.volumeMounts | indent 8 }}
+{{- end }}
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
@@ -79,7 +138,18 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
-{{- if .extraSpecData }}
-{{ include .extraSpecData .root | indent 2 }}
+{{- if (.node.volumeClaimTemplate) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: {{ .name }}
+      creationTimestamp:
+    spec:
+      accessModes:
+      - ReadWriteOnce
+      resources:
+        requests:
+          storage: {{ .node.volumeClaimTemplate.resources.requests.storage }}
+  serviceName: {{ .name }}
 {{- end }}
+---
 {{- end -}}

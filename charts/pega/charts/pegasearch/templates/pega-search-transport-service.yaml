@@ -1,0 +1,23 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+# Only attempt to generate this file IF the user has NOT supplied
+# an external search URL which means we need to create one internally.
+{{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "searchName" . }}-transport
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "searchName" . }}
+    component: Pega
+spec:
+  ports:
+  - port: 80
+    targetPort: 9300
+    name: transport
+  clusterIP: None
+  selector:
+    app: {{ template "searchName" . }}
+    component: "Search"
+{{ end }}
+{{ end }}

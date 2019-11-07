@@ -1,0 +1,33 @@
+{
+    "package": {
+        "name": "pega-helm-charts",
+        "repo": "pega-helm-charts",
+        "subject": "pegasystems",
+        "vcs_url": "https://github.com/pegasystems/pega-helm-charts",
+        "licenses": ["Apache License 2.0"]
+    },
+
+    "version": {
+        "name": "1.0.0"
+    },
+
+    "files":
+        [
+        {"includePattern": "${PEGA_FILE_NAME}" , "uploadPattern": "${PEGA_FILE_NAME}", 
+            "matrixParams": {
+                "override" : 1
+            }
+        },
+        {"includePattern": "${ADDONS_FILE_NAME}" , "uploadPattern": "${ADDONS_FILE_NAME}", 
+            "matrixParams": {
+                "override" : 1
+            }
+        },
+        {"includePattern": "index.yaml", "uploadPattern": "index.yaml", 
+            "matrixParams": {
+                "override" : 1
+            }
+        }
+        ],
+    "publish": true
+}

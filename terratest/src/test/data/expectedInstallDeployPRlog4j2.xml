@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+<Appenders>
+    <Console name="CONSOLE" target="SYSTEM_OUT">
+        <LogStashJSONLayoutPega/>
+    </Console>
+    <RollingRandomAccessFile  name="PEGA" fileName="${sys:pega.logdir}/PegaRULES.log" filePattern="${sys:pega.logdir}/PegaRULES-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+        </PatternLayout>
+        <Filters>
+            <!--Deny message logged under ALERT log level-->
+            <ThresholdFilter level="ALERT" onMatch="DENY" onMismatch="NEUTRAL"/>
+        </Filters>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+        <DefaultRolloverStrategy max="20"/>
+    </RollingRandomAccessFile>
+    <!-- RollingFile Appender for pegarules PERFORMANCE Alert logs -->
+    <RollingRandomAccessFile  name="ALERT" fileName="${sys:pega.logdir}/PegaRULES-ALERT.log" filePattern="${sys:pega.logdir}/PegaRULES-ALERT-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <ThreadContextMapFilter onMatch="DENY" onMismatch="NEUTRAL" operator="or">
+            <KeyValuePair key="alertType" value="security"/>
+        </ThreadContextMapFilter>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+    <!-- RollingFile Appender for PegaRULES-ALERTSECURITY logs -->
+    <RollingRandomAccessFile name="ALERTSECURITY" fileName="${sys:pega.logdir}/PegaRULES-ALERTSECURITY.log" filePattern="${sys:pega.logdir}/PegaRULES-ALERTSECURITY-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <ThreadContextMapFilter onMatch="ACCEPT" onMismatch="DENY" operator="or">
+            <KeyValuePair key="alertType" value="security"/>
+        </ThreadContextMapFilter>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+    <!-- RollingFile Appender for PegaBIX logs -->
+    <RollingRandomAccessFile  name="BIX" fileName="${sys:pega.logdir}/PegaBIX.log" filePattern="${sys:pega.logdir}/PegaBIX-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+    <!-- RollingFile Appender for PegaRULES-SecurityEvent logs -->
+    <RollingRandomAccessFile  name="SECURITYEVENT" fileName="${sys:pega.logdir}/PegaRULES-SecurityEvent.log" filePattern="${sys:pega.logdir}/PegaRULES-SecurityEvent-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+    <!-- RollingFile Appender for PegaCLUSTER logs -->
+    <RollingRandomAccessFile  name="CLUSTER" fileName="${sys:pega.logdir}/PegaCLUSTER.log" filePattern="${sys:pega.logdir}/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="50 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+
+    <!-- RollingFile Appender for PegaDATAFLOW logs -->
+    <RollingRandomAccessFile  name="DATAFLOW" fileName="${sys:pega.logdir}/PegaDATAFLOW.log" filePattern="${sys:pega.logdir}/PegaDATAFLOW-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%d (%30.30c{3}) %-5p - %m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="50 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+</Appenders>
+<Loggers>
+    <asyncRoot>
+        <AppenderRef ref="CONSOLE"/>
+        <AppenderRef ref="PEGA"/>
+        <AppenderRef ref="JSONAppender" />
+        <AppenderRef ref="ALERT" level="ALERT"/>
+        <AppenderRef ref="ALERTSECURITY" level="ALERT"/>
+    </asyncRoot>
+    <Logger name="com.pega.pegarules.session.internal.mgmt.SecurityEventLogger" additivity="false" level="info">
+        <AppenderRef ref="SECURITYEVENT"/>
+    </Logger>
+    <Logger name="com.pega.pegarules.data.internal.access.ExtractImpl" additivity="false" level="info">
+        <AppenderRef ref="BIX"/>
+    </Logger>
+    <Logger name="com.pega.pegarules.data.internal.access.ExtractParameters" additivity="false" level="info">
+        <AppenderRef ref="BIX"/>
+    </Logger>
+    <Logger name="com.pega.pegarules.data.internal.access.DatabaseUtilsCommonImpl" additivity="false" level="info">
+        <AppenderRef ref="BIX"/>
+    </Logger>
+    <Logger name="com.hazelcast" additivity="false" level="info">
+        <AppenderRef ref="CLUSTER"/>
+    </Logger>
+    <Logger name="org.apache.ignite" additivity="false" level="info">
+        <AppenderRef ref="CLUSTER"/>
+    </Logger>
+    <Logger name="com.pega.dsm.dnode.impl.dataflow.service.DataFlowDiagnosticsFileLogger" additivity="false" level="info">
+        <AppenderRef ref="DATAFLOW"/>
+    </Logger>
+</Loggers>
+</Configuration>
