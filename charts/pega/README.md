@@ -314,6 +314,7 @@ dds:
 You may deploy a Cassandra instance along with Pega.  Cassandra is a seperate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml).
 
 *Cassandra minimum resource requirements*
+
 Deployment  | CPU     | Memory
 ---         | ---     | ---
 Development | 2 cores | 4Gi
