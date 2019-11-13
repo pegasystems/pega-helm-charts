@@ -77,6 +77,7 @@ global:
         domain: "YOUR_WEB_NODE_DOMAIN"
         port: 80
         targetPort: 8080
+        serviceType: LoadBalancer
         # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
         alb_stickiness_lb_cookie_duration_seconds: 3660
 
