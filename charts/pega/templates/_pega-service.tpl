@@ -19,7 +19,7 @@ metadata:
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
   {{ end }}
 spec:
-  type: NodePort
+  type: LoadBalancer
   # Specification of on which port the service is enabled
   ports:
   - name: http
