@@ -78,7 +78,21 @@ deploy:
     file: descriptor.json
     user: bintrayautomation
     key:
-      secure: M1CPmmjJ1OI2luWFRW9Aqregj3b4rQLSnP4ROurkHkewB+HwoZ+QHAQ4JJD0B+br2AddaGKgN1rdzYpyvg0Cl7ZhWnMb96bE+lVbmDzYnUc+Iwd8/PWXNoaFuB5sn5LPVESe8H/ZLdP0IyMbBknBDgdNgKpD9XqH7/UrrNT9jvZSpGFAcMCwLVFiQ1auusnSLOYVr611JadpNZarx7QgPLBtlit+cfi/vEGy7GyYTtFzSbM86gBnm1kViSVM4w1bE4cFs+14KVNiNiwpSzFzK/gBncqQVTz6yaD3bV48Cla5sz3/sDkh3If7pUhcmMYyy9BPk35176TWTHKcqATv/5GxDvQpgaBMlyl0Dhwhb2d++ZZ6V+kYYj+Uf4m4NaxGV6WNrUnW+IPw9qlBWFHnw17u80HU5GapXXNedUi2CjzrH25A0Y6DHqfZubDBXJh31RfWKz0r58bLSGLYxdl96purfLUCeSrsKkZAWS59EmpXiR/f+zSbNmlpG+ryVBsQIPG+cwdPSVUdGBGVp3QzEjVze6gABSQ/2GaMeRterjzBypi8ab4vbIyxY905deoMAwcQHUcvybpNJfRcaowToK0BnMNhy8pn26KYct3oGLVxQe6rlGbQNZrFePSCyNd/ZfYlkWDcLh/j0OH0gdspHTdDfsy8dgS8QzvgNsNKRHk=
+      secure: >
+        M1CPmmjJ1OI2luWFRW9Aqregj3b4rQLSnP4ROurkHkewB+HwoZ+
+        QHAQ4JJD0B+br2AddaGKgN1rdzYpyvg0Cl7ZhWnMb96bE+lVbmD
+        zYnUc+Iwd8/PWXNoaFuB5sn5LPVESe8H/ZLdP0IyMbBknBDgdNg
+        KpD9XqH7/UrrNT9jvZSpGFAcMCwLVFiQ1auusnSLOYVr611Jadp
+        NZarx7QgPLBtlit+cfi/vEGy7GyYTtFzSbM86gBnm1kViSVM4w1
+        bE4cFs+14KVNiNiwpSzFzK/gBncqQVTz6yaD3bV48Cla5sz3/sD
+        kh3If7pUhcmMYyy9BPk35176TWTHKcqATv/5GxDvQpgaBMlyl0D
+        hwhb2d++ZZ6V+kYYj+Uf4m4NaxGV6WNrUnW+IPw9qlBWFHnw17u
+        80HU5GapXXNedUi2CjzrH25A0Y6DHqfZubDBXJh31RfWKz0r58b
+        LSGLYxdl96purfLUCeSrsKkZAWS59EmpXiR/f+zSbNmlpG+ryVB
+        sQIPG+cwdPSVUdGBGVp3QzEjVze6gABSQ/2GaMeRterjzBypi8a
+        b4vbIyxY905deoMAwcQHUcvybpNJfRcaowToK0BnMNhy8pn26KY
+        ct3oGLVxQe6rlGbQNZrFePSCyNd/ZfYlkWDcLh/j0OH0gdspHTd
+        Dfsy8dgS8QzvgNsNKRHk=
     skip_cleanup: true
     on:
       all_branches: true
