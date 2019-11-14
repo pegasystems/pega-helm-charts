@@ -65,6 +65,8 @@ global:
         domain: "YOUR_MINIKUBE_NODE_DOMAIN"
         port: 80
         targetPort: 8080
+        # Without a load balancer, use a direct NodePort instead.
+        serviceType: "NodePort"
       # Set resource consumption to minimal levels
       replicas: 1
       cpuRequest: 200m

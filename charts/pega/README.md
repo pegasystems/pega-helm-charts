@@ -197,9 +197,8 @@ Specify that the Kubernetes service block is expose to other Kubernetes run serv
 Configuration parameters:
 
 - `domain` - specify a domain on your network in which you create an ingress to the service.  If not specified, no ingress is created.
-
 - `port` and `targetPort` - specify values other than the web node defaults of `80` and `8080`, respectively, if required for your networking domain. You can use these settings for external access to the stream tier when required.
-
+- `serviceType` - specify the [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose.  The default value is `LoadBalancer`.
 - `alb_stickiness_lb_cookie_duration_seconds` - when deploying on Amazon EKS, configure alb cookie duration seconds equal to passivation time of requestors. By default this is `3660`, or just over one hour.
 
 Example:

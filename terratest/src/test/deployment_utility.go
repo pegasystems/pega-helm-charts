@@ -213,7 +213,7 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
 	}
-	require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("NodePort"))
+	require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, expectedService.TargetPort)
