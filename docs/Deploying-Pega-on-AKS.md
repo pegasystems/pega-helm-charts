@@ -22,15 +22,15 @@ Pega provides customized orchestration tools and docker images required to
 orchestrate a deployment in an AKS cluster you create for the deployment using
 the following stepped tasks:
 
-1. [Prepare your local system – 45 minutes](#prepare-your-local-system-45-minutes) – install required applications and configuration files.
+1. [Prepare your local system – 45 minutes](#prepare-your-local-system--45-minutes) – install required applications and configuration files.
 
 2. [Prepare your Pega Platform installation Docker image – 15 minutes](#prepare-your-pega-platform-installation-docker-image--15-minutes) – download Pega Platform 8.3.1 or later and build a docker image used to install Pega Platform into your SQL database.
 
-3. [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources-45-minutes) – create an AKS cluster, an SQL database, and a storage resource in your Azure account.
+3. [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--45-minutes) – create an AKS cluster, an SQL database, and a storage resource in your Azure account.
 
-4. [Deploying Pega Platform using Helm charts – 30 minutes](#installing-and-deploying-pega-platform-using-helm-charts-90-minutes) – customize a configuration file with your AKS details and use kubectl and helm to install and then deploy Pega Platform onto your AKS cluster.
+4. [Deploying Pega Platform using Helm charts – 30 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your AKS details and use kubectl and helm to install and then deploy Pega Platform onto your AKS cluster.
 
-5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform-10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
+5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
 You can review the Pega architecture overview to understand how Pega maps
 Kubernetes objects with Pega applications and services: [How Pega Platform and
@@ -69,9 +69,8 @@ This guide assumes:
 - You have a basic familiarity with running commands from a Windows 10
     PowerShell with Administrator privileges.
 
-- You use the opensource packaging tool chocolatey to install applications
-    onto your Windows laptop. For more information, see
-    [chocolatey](https://chocolatey.org/packages?q=open-source).
+- You use  opensource packaging tools on Windows or Linux to install applications
+    onto your local system.
 
 - Basic familiarity with GitHub account with which you will download a
     Pega-managed GitHub repository containing configuration files and scripts
@@ -147,12 +146,12 @@ name\>\\aks-demo that is specific to your local system.
 For Windows users: To create this folder, open a Windows PowerShell command
 prompt with Administrator privileges and enter:
 
-`$ mkdir C:\\Users\\\<*Windows-username*\>\\aks-demo`
+`$ mkdir C:\Users\<Windows-username>\aks-demo`
 
 For Linux users: To create this folder, open a Windows PowerShell command prompt
 with Administrator privileges and enter:
 
-`$ mkdir /home/\<*linux-username*\>/aks-demo`
+`$ mkdir /home/<linux-username>/aks-demo`
 
 You are ready to continue preparing your local system.
 
@@ -222,7 +221,7 @@ install the Community Edition (CE) of docker on your local system instead of
 using chocolatey. Do to so, you must download, install, and log into Docker for
 Windows in order to complete the section, [Prepare your Pega Platform
 installation Docker image – 15
-minutes](#prepare-your-pega-platform-installation-docker-image-15-minutes).
+minutes](#prepare-your-pega-platform-installation-docker-image--15-minutes).
 
 For Linux users, see [Installing CE for
 Ubuntu](#linux-users-install-required-applications-for-the-deployment).
@@ -310,6 +309,8 @@ For details about this method and other supported installation methods, see
 
 `$ helm version`
 
+which returns
+
 `Client: &version.Version{SemVer:"v2.16.1",
 GitCommit:"bbdfe5e7803a12bbdf97e94cd847859890cf4050", GitTreeState:"clean"}`
 
@@ -361,7 +362,7 @@ software-properties-common`
 
 3. Add Docker’s official GPG key:
 
-`$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg \| sudo apt-key add –`
+`$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add –`
 
 4. Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38
     854A E2D8 8D81 803C 0EBF CD88, by searching for the last 8 characters of the
@@ -423,7 +424,7 @@ For details, see the article,
 For Linux users, you can install the Azure CLI as a super user with a single
 command with the command curl piped into your bash:
 
-`$ curl -sL https://aka.ms/InstallAzureCLIDeb \| sudo bash`
+`$ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`
 
 For details, see the article,
 <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest>.
@@ -459,14 +460,14 @@ To access the GitHub website and begin the cloning process:
     a repository on your local system:
 
 `$ Expand-Archive -LiteralPath pega-helm-charts-master.zip -DestinationPath
-\<local filepath\>\\aks-demo`
+<local filepath>\aks-demo`
 
 - In a Linux bash shell, change folders to the /home/\<local
     filepath\>/aks-demo folder, where you saved the Pega Platform distribution
     zip and extract your files to create a new distribution image folder on your
     local system:
 
-`$ unzip .\\\<pega-distribution-image\>.zip`
+`$ unzip .\<pega-distribution-image>.zip`
 
 After you extract the files from the archive, you will run the deployment
 commands from several of the folders in the \<local
@@ -632,13 +633,13 @@ If it is not the right version number, you must complete a new request.
     folder, where you saved the Pega Platform distribution zip and extract your
     files to create a new distribution image folder on your local system:
 
-     `$ Expand-Archive .\\\<pega-distribution-image\>.zip`
+     `$ Expand-Archive .\<pega-distribution-image>.zip`
 
 After you expand the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
 
 - In a Linux bash shell, change directory to the /home/\<local filepath\>/aks-demo folder, where you saved the Pega Platform distribution zip and extract your files to create a new distribution image folder on your local system:
 
-    `$ unzip .\\\<pega-distribution-image\>.zip`
+    `$ unzip .\<pega-distribution-image>.zip`
 
 Prepare your Pega Platform installation Docker image – 15 minutes
 -----------------------------------------------------------------
@@ -669,7 +670,7 @@ Pega Platform.
 1. From your command prompt (Linux or Powershell running with Administrator
     privileges), ensure you are logged into your DockerHub account:
 
-`$ docker login -u \<username\> --p \<username-password\>`
+`$ docker login -u <username> --p <username-password>`
 
 For details about logging into Docker from a secure password file, see
 <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you
@@ -679,7 +680,7 @@ system.
 2. Change your directory to the top folder of your Pega distribution,
     \<pega-distribution-image\>.
 
-`$ cd .\<pega-distribution-image\>`
+`$ cd .\<pega-distribution-image>`
 
 3. Create a text file with the text editor of your choice in the \<local
     filepath\>\\aks-demo\\\<pega-distribution-image\> folder where you extracted
@@ -1036,7 +1037,7 @@ To finalize these details, follow these steps:
 | Jdbc.url:                                | Specify the server and database name for your Pega Platform installation.                                                                                                                                                           | url: “jdbc:sqlserver://**YOUR_DB_HOST_NAME**:1433; databaseName=**YOUR_DB_NAME**; selectMethod=cursor; sendStringParametersAsUnicode=false” You can locate **YOUR_DB_HOST_NAME** and **YOUR_DB_NAME** of your Azure SQL database, see [Locate your SQL database details](#locate-your-sql-database-details). |
 | Jdbc.driverClass:                        | Specify the driver class for this type of database.                                                                                                                                                                                 | driverClass: "com.microsoft.sqlserver.jdbc.SQLServerDriver"                                                                                                                                                                                                                                                  |
 | Jdbc.dbType:                             | Specify the database type.                                                                                                                                                                                                          | dbType: " mssql”                                                                                                                                                                                                                                                                                             |
-| Jdbc.driverUri:                          | Specify the database driver Pega Platform uses during the deployment. For AKS, we can obtain the URL of the required 7.4.1. driver file that is publicly available in the referenced Maven repository.                              | driverUri: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/7.4.1.jre11/mssql-jdbc-7.4.1.jre11.jar”                                                                                                                                                                                        |
+| Jdbc.driverUri:                          | Specify the database driver Pega Platform uses during the deployment. For AKS, we can obtain the URL of the required 7.4.1. driver file that is publicly available in the referenced Maven repository.                              | driverUri: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/7.4.1.jre11/mssql-jdbc-7.4.1.jre11.jar"                                                                                                                                                                                        |
 | Jdbc: username: password:                | Set the security credentials for your database server to allow installation of Pega Platform into your database.                                                                                                                    | username: "\<name of your database user\>" password: "\<password for your database user\>"                                                                                                                                                                                                                   |
 | jdbc.rulesSchema: jdbc.dataSchema:       | Set the names of both your rules and the data schema to the values that Pega uses for these two schemas.                                                                                                                            | rulesSchema: "rules" dataSchema: "data"                                                                                                                                                                                                                                                                      |
 | docker.registry.url: username: password: | This object maps the hostname of a registry to an object containing the “username” and “password” for that registry. For details, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | url: “<https://index.docker.io/v1/>” username: "\<DockerHub account username\>" password: "\< DockerHub account password\>"                                                                                                                                                                                  |
@@ -1074,14 +1075,14 @@ Platform is already installed in your database.
     created in [Create a local folder to access all of the configuration
     file](#create-a-local-folder-to-access-all-of-the-configuration-files).
 
-`$ cd \<local filepath\>\\aks-demo`
+`$ cd <local filepath>\aks-demo`
 
 - Open a Linux bash shell and change the location to the top folder of your
     aks-demo directory that you created in [Create a local folder to access all
     of the configuration
     file](#create-a-local-folder-to-access-all-of-the-configuration-files)..
 
-`$ cd /home/\<local filepath\>/aks-demo`
+`$ cd /home/<local filepath>/aks-demo`
 
 2. Use the Azure CLI to log into your account.
 
@@ -1115,8 +1116,7 @@ information in your command prompt. For example, in a Windows PowerShell you'll 
 $ az aks get-credentials --resource-group <resource-group-name> --name
 <cluster-name>
 
-Merged "runbook-demo" as current context in \<local
-filepath\>\\\<*cluster-name*\>.kube\\config
+Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube\config
 ```
 
 7.  Use the kubectl command to view the VM nodes created when you created the
