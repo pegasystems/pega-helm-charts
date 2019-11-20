@@ -555,13 +555,13 @@ and then click **Continue**. You will receive an email with a link to your
 software using an email address that is associated with the organization you
 select on this screen.
 
-1. In the **You're viewing products available** page, enter **Pega Platform**
+5. In the **You're viewing products available** page, enter **Pega Platform**
     in the **Search**, which will filter the list of products in the page.
 
 The **Pega Platform** card should appear near the top of the card list, below
 the list of all of the **Language packs for Pega Platform.**
 
-2. In the Pega Platform card, use your mouse to activate the icon into a
+6. In the Pega Platform card, use your mouse to activate the icon into a
     shopping cart and click the shopping cart.
 
 The icon changes to a green check and a new cart item appears in the top right
@@ -569,16 +569,16 @@ of the product list.
 
 ![](media/029c6531bd52109598047a2ee6966657.png)
 
-3. Click **Continue**.
+7. Click **Continue**.
 
-4. In the cart review page, in the **Pega Platform** area, select the version
+8. In the cart review page, in the **Pega Platform** area, select the version
     of Pega Platform for your deployment.
 
     ![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
 
-5. After your selection and review are complete, click **Finish.**
+9. After your selection and review are complete, click **Finish.**
 
-6. When the order is processed, a confirmation screen displays with details
+    When the order is processed, a confirmation screen displays with details
     about your order.
 
     An email with a link to the requested Pega Platform software is sent within
@@ -587,7 +587,7 @@ of the product list.
 
 ![](media/748ea91e3ff43cf4544ce2f4638e86bf.png)
 
-7. When satisfied with the order, click **Close**.
+10. When satisfied with the order, click **Close**.
 
 ### Downloading Pega Platform to your local system
 
@@ -1067,7 +1067,7 @@ automatically followed by a deploy. In subsequent helm deployments, you should
 not use the override argument, “--set global.actions.execute=”, since Pega
 Platform is already installed in your database.
 
-1.  Do one of the following:
+1. Do one of the following:
 
 - Open a Windows PowerShell running as Administrator on your local system and
     change the location to the top folder of your aks-demo folder that you
@@ -1203,11 +1203,11 @@ version.
 
 `$ helm install -n pegaaddons ./charts/addons --namespace addon`
 
-    A successful addon deployment immediately returns details that show progress.
+A successful addon deployment immediately returns details that show progress.
 
 ![C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML76b4f92.PNG](media/e9d3cebd5f133fc15161c637763981c4.png)
 
-    For further verification of your deployment progress, you can list the deployments in your pegaaddons configuration with either a helm option or a kubectl option:
+For further verification of your deployment progress, you can list the deployments in your pegaaddons configuration with either a helm option or a kubectl option:
 
 `$ helm ls`
 
@@ -1222,7 +1222,7 @@ version.
 
 `$ helm dep update ./charts/pega`
 
-    You are ready for the final phase of installing and then deploying Pega in your AKS environment.
+You are ready for the final phase of installing and then deploying Pega in your AKS environment.
 
 19. Deploy Pega Platform for the first time by installing Pega Platform into the
     database you specified in the Helm chart:
@@ -1230,22 +1230,22 @@ version.
 `$ helm install -n pega ./charts/pega --namespace pega --set
 global.actions.execute=install-deploy`
 
-    For subsequent Helm installs, use the command “helm install -n pega ./charts/pega --namespace pega” to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command “helm install -n pega ./charts/pega --namespace pega” to deploy Pega Platform and avoid another Pega Platform installation.
 
-    A successful Pega deployment immediately returns details that show progress for your deployment.
+A successful Pega deployment immediately returns details that show progress for your deployment.
 
 20. Refresh the Kubernetes dashboard you opened in step 10; if you closed it,
     open a new command prompt running as Administrator and relaunch the browser
-    as directed in Step 10.
+    as directed in Step 9.
 
     In the dashboard, use the **Namespace** pulldown to change the view to **pega**
 and click on the **Pods** view.
 
 ![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
 
-    Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
+Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
 
-    A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour. To follow the progress of an installation, use the dashboard; for subsequent deployments, you will not need to do this.
+A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour. To follow the progress of an installation, use the dashboard; for subsequent deployments, you will not need to do this.
 
 21. (Only for installations) On the Kubernetes dashboard, select **Jobs**,
     locate the **pega-db-install** job, and click the logs icon located on the
@@ -1258,7 +1258,7 @@ and click on the **Pods** view.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
-    A successful deployment will not show errors across the various workloads. The pega Namespace and Overview view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete Workloads.
+A successful deployment will not show errors across the various workloads. The pega Namespace and Overview view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete Workloads.
 
 ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
@@ -1356,6 +1356,6 @@ The DNS zone page displays.
 
 ![](media/ccb6329a621c6f11970e25531cfa1857.png)
 
-    With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://<the hostname for your web service tier>/prweb
+With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://<the hostname for your web service tier>/prweb
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
