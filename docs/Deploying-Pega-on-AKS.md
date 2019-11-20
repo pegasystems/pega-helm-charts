@@ -24,7 +24,7 @@ the following stepped tasks:
 
 1. [Prepare your local system – 45 minutes](#prepare-your-local-system-45-minutes) – install required applications and configuration files.
 
-2. [Prepare your Pega Platform installation Docker image – 15 minutes](#prepare-your-pega-platform-installation-docker-image-15-minutes) – download Pega Platform 8.3.1 or later and build a docker image used to install Pega Platform into your SQL database.
+2. [Prepare your Pega Platform installation Docker image – 15 minutes](#prepare-your-pega-platform-installation-docker-image--15-minutes) – download Pega Platform 8.3.1 or later and build a docker image used to install Pega Platform into your SQL database.
 
 3. [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources-45-minutes) – create an AKS cluster, an SQL database, and a storage resource in your Azure account.
 
