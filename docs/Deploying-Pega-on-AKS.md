@@ -712,48 +712,48 @@ COPY rules /opt/pega/kit/rules
 
 `$ docker build -t pega-installer .`
 
-    This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”.
+This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”.
 
 ![](media/4d770cffe00661f38d0bf1c9a0578648.png)
 
-    You can use the docker command to see that your new image exists in your Docker
+You can use the docker command to see that your new image exists in your Docker
 image inventory.
 
 7. Tag the local version of your new image, pega-installer, with your DockerHub ID:
 
 `$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
 
-1. Create a private repository on your [DockerHub](https://hub.docker.com/)
+8. Create a private repository on your [DockerHub](https://hub.docker.com/)
     account that is tagged as a private repository.
 
-2. From your default login page, click the Repositories link (at the top of the
+9. From your default login page, click the Repositories link (at the top of the
     page).
 
-3. In the Repositories view, click **Create Repository +**.
+10. In the Repositories view, click **Create Repository +**.
 
-4. Enter a Name that matches the docker image you just built.
+11. Enter a Name that matches the docker image you just built.
 
-5. Provide a brief Description, that will help you remember the version of Pega
+12. Provide a brief Description, that will help you remember the version of Pega
     with which you built this image, or any other useful information.
 
-6. In the Visibility area, select the **Private**.
+13. In the Visibility area, select the **Private**.
 
     You should not mage this image with Pega proprietary software a viewable
     **Public** image.
 
-7. Click **Create**.
+14. Click **Create**.
 
-   Free DockerHub accounts support the use of a single private repository, so you
+Free DockerHub accounts support the use of a single private repository, so you
 may have to delete an existing private repository in order to create a new one
 for your Pega docker installation image.
 
-8. From your command prompt (Linux or Powershell running with Administrator
+15. From your command prompt (Linux or Powershell running with Administrator
     privileges), use the docker command to push the new image to your new
     private repository:
 
 `$ docker push <your-dockerbug-ID>/pega-installer`
 
-    After the command completes you will see your new image in your private repository, similar to the image below.
+After the command completes you will see your new image in your private repository, similar to the image below.
 
 ![](media/9fd09158a821f828a93d6ab7c74e278a.png)
 
