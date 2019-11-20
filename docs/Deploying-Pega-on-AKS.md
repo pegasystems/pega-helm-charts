@@ -272,8 +272,7 @@ prompt. These instructions were mostly sourced from the article,
 
 Some of the required applications are binary files that you download from the
 organizations, download area. In order to use the docker command, the
-instructions available on the docker website are included in this document if
-you’d prefer to just doc the installation and not navigate to the docker
+instructions available on the docker website are included in this document so you can follow the installation steps here instead of navigating to the docker
 documentation support website.
 
 #### Installing unzip
