@@ -1356,6 +1356,6 @@ The DNS zone page displays.
 
 ![](media/ccb6329a621c6f11970e25531cfa1857.png)
 
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://<the hostname for your web service tier>/prweb
+With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
