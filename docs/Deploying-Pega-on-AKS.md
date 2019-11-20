@@ -527,9 +527,8 @@ filepath\>\\aks-demo\\pega-helm-charts-master\\charts\\pega\\config\\deploy:
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
 
-Make these changes before you begin in the section, [Deploying Pega Platform
-using Helm charts – 30
-minutes](#installing-and-deploying-pega-platform-using-helm-charts-90-minutes).
+Make these changes before you begin in the section, [Installing and deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
+
 
 ### Request a Pega Platform distribution
 
