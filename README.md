@@ -10,7 +10,7 @@ This project provides Helm charts and basic examples for deploying Pega on Kuber
 Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS environments.
 
 * Open-source Kubernetes (and [MiniKube for personal deployments](docs/RUNBOOK_MINIKUBE.md))
-* Microsoft Azure Kubernetes Service (AKS)
+* Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
 * Amazon Elastic Kubernetes Service (EKS)
 * Google Kubernetes Engine (GKE)
 * Red Hat OpenShift
