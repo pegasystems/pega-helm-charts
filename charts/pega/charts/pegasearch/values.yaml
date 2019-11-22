@@ -12,6 +12,8 @@ cpuLimit: 1
 memLimit: "4Gi"
 # Enter the volume size limit for each search node (recommended 5Gi).
 volumeSize: "5Gi"
+# Specify a user to run as - Default runAsUser is 1000
+runAsUser: 1000
 env:
   # IMPORTANT: https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html#minimum_master_nodes
   # To prevent data loss, it is vital to configure the discovery.zen.minimum_master_nodes setting so that each master-eligible
