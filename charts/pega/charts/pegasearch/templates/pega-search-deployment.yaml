@@ -36,11 +36,13 @@ spec:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
       {{ end }}
+      {{ if .Values.set_vm_max_map_count }}
       - name: set-max-map-count
         image: busybox:1.31.0
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
         securityContext:
           privileged: true
+      {{ end }}
       containers:
       - name: search
         image: {{ .Values.image }}
