@@ -3,7 +3,7 @@
 # an external search URL which means we need to create one internally.
 {{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
 kind: StatefulSet
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 metadata:
   name: {{ template "searchName" . }}
   namespace: {{ .Release.Namespace }}

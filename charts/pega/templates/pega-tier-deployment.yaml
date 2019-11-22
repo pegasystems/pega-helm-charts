@@ -3,7 +3,7 @@
 {{ range $index, $dep := .Values.global.tier}}
 {{ if ($dep.volumeClaimTemplate) }}
 {{ $kindName = "StatefulSet" }}
-{{ $apiVer = "apps/v1beta2" }}
+{{ $apiVer = "apps/v1" }}
 {{ else }}
 {{ $kindName = "Deployment" }}
 {{ $apiVer = "extensions/v1beta1" }}
