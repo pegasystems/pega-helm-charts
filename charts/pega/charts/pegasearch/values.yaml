@@ -18,6 +18,10 @@ runAsUser: 1000
 # configured manually on your system and if so, you may bypass this privileged init container.
 # For more information, see https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
 set_vm_max_map_count: true
+# Run a chown command on the mapped volume at startup to reset the owner of the ES data to the
+# current user.  This is needed if a random user is used to run the pod, but also requires
+# privileges to change the ownership of files.
+set_data_owner_on_startup: false
 env:
   # IMPORTANT: https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html#minimum_master_nodes
   # To prevent data loss, it is vital to configure the discovery.zen.minimum_master_nodes setting so that each master-eligible

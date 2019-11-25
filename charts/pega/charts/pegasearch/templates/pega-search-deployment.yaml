@@ -28,7 +28,8 @@ spec:
         fsGroup: {{ .Values.runAsUser | default 1000 }}
       {{ end }}
       initContainers:
-      {{ if eq .Values.global.provider "openshift" }}
+        # Init containers
+      {{- if and (eq .Values.global.provider "openshift") (eq .Values.set_data_owner_on_startup true) }}
       - name: set-dir-owner
         image: busybox:1.31.0
         command: ['sh', '-c', 'chown -R {{ .Values.runAsUser | default 1000 }}:{{ .Values.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
@@ -36,7 +37,7 @@ spec:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
       {{ end }}
-      {{ if .Values.set_vm_max_map_count }}
+      {{- if .Values.set_vm_max_map_count }}
       - name: set-max-map-count
         image: busybox:1.31.0
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
