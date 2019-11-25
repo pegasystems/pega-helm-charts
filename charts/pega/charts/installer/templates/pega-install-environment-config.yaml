@@ -52,4 +52,7 @@ data:
   ACTION: {{ .Values.global.actions.execute }}
   # Distribution kit URL
   DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
+  # Web requestor passivation timeout
+  WEB_REQUESTOR_PASSIVATION_TIMEOUT: {{ include "pega.webRequestorTimeout" . }}
+
 {{ end }}

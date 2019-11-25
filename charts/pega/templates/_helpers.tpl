@@ -187,3 +187,7 @@ readinessProbe:
     Background
   {{- end -}}
 {{- end }}
+
+{{- define "pega.webRequestorTimeout" }}
+  {{- sub .node.service.alb_stickiness_lb_cookie_duration_seconds .node.service.requestorPassivationToAlbStickinessMargin -}}
+{{- end }}

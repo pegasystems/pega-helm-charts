@@ -76,8 +76,12 @@ global:
         domain: "YOUR_WEB_NODE_DOMAIN"
         port: 80
         targetPort: 8080
-        # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
-        alb_stickiness_lb_cookie_duration_seconds: 3660
+        # When provider is eks, configure alb cookie duration seconds equal to passivation time plus passivation margin
+        alb_stickiness_lb_cookie_duration_seconds: 1020
+        # Value specifies how much shorter is requestor passivation timeout from alb cookie duration.
+        # The requestor passivation timeout is set to:
+        #  alb_stickiness_lb_cookie_duration_seconds - requestorPassivationToAlbStickinessMargin
+        requestorPassivationToAlbStickinessMargin: 120
 
       replicas: 1
       javaOpts: ""
@@ -127,8 +131,12 @@ global:
         domain: "YOUR_STREAM_NODE_DOMAIN"
         port: 7003
         targetPort: 7003
-        # When provider is eks, configure alb cookie duration seconds equal to passivation time of requestors
+        # When provider is eks, configure alb cookie duration seconds equal to passivation time plus passivation margin
         alb_stickiness_lb_cookie_duration_seconds: 3660
+        # Value specifies how much shorter is requestor passivation timeout from alb cookie duration.
+        # The requestor passivation timeout is set to:
+        #  alb_stickiness_lb_cookie_duration_seconds - requestorPassivationToAlbStickinessMargin
+        requestorPassivationToAlbStickinessMargin: 60
 
       replicas: 2
       cpuRequest: 200m
