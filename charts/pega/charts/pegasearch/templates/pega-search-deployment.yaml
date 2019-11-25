@@ -25,14 +25,14 @@ spec:
     spec:
       {{ if ne .Values.global.provider "openshift" }}
       securityContext:
-        fsGroup: {{ .Values.runAsUser | default 1000 }}
+        fsGroup: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
       {{ end }}
       initContainers:
         # Init containers
       {{- if and (eq .Values.global.provider "openshift") (eq .Values.set_data_owner_on_startup true) }}
       - name: set-dir-owner
         image: busybox:1.31.0
-        command: ['sh', '-c', 'chown -R {{ .Values.runAsUser | default 1000 }}:{{ .Values.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
+        command: ['sh', '-c', 'chown -R {{ .Values.podSecurityContext.runAsUser | default 1000 }}:{{ .Values.podSecurityContext.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
         volumeMounts:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
@@ -48,7 +48,7 @@ spec:
       - name: search
         image: {{ .Values.image }}
         securityContext:
-          runAsUser: {{ .Values.runAsUser | default 1000 }}
+          runAsUser: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
         env:
         - name: HOST_LIST
           value: {{ template "searchName" . }}-transport

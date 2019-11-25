@@ -13,7 +13,8 @@ memLimit: "4Gi"
 # Enter the volume size limit for each search node (recommended 5Gi).
 volumeSize: "5Gi"
 # Specify a user to run as - Default runAsUser is 1000
-runAsUser: 1000
+podSecurityContext:
+  runAsUser: 1000
 # Elasticsearch requires vm.max_map_count to be configured to an appropriate value.  This may be
 # configured manually on your system and if so, you may bypass this privileged init container.
 # For more information, see https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html
