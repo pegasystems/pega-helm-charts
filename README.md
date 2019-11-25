@@ -10,7 +10,7 @@ This project provides Helm charts and basic examples for deploying Pega on Kuber
 Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS environments.
 
 * Open-source Kubernetes (and [MiniKube for personal deployments](docs/RUNBOOK_MINIKUBE.md))
-* Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
+* Microsoft Azure Kubernetes Service (AKS)
 * Amazon Elastic Kubernetes Service (EKS)
 * Google Kubernetes Engine (GKE)
 * Red Hat OpenShift
@@ -18,66 +18,67 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 
 # Getting started
 
-This project assumes you have an installation of Kubernetes available and have Helm installed locally.  The following commands will verify your installation.  The exact output may be slightly different, but they should return without error.  
-```console
-$ kubectl get nodes
-NAME                              STATUS    ROLES     AGE       VERSION
-ip-xxx-xxx-xxx-xxx.ec2.internal   Ready     <none>    2d        v1.11.5
-ip-yyy-yyy-yyy-yyy.ec2.internal   Ready     <none>    2d        v1.11.5
-ip-zzz-zzz-zzz-zzz.ec2.internal   Ready     <none>    2d        v1.11.5
+This project assumes you have an installation of Kubernetes available and have Helm installed locally. The following commands will verify your installation. The exact output may be slightly different, but they should return without error.
 
-$ helm version
-Client: &version.Version{SemVer:"v2.12.2", GitCommit:"7d2b0c73d734f6586ed222a567c5d103fed435be", GitTreeState:"clean"}
-Server: &version.Version{SemVer:"v2.12.2", GitCommit:"7d2b0c73d734f6586ed222a567c5d103fed435be", GitTreeState:"clean"}
-```
+    ```bash
+    $ helm version
+    version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
+    ```
 
-Start by performing a clone (or download) of the latest Charts.
+If this command does not successfully return, install Helm 3 for your operating system.  See [Helm Installation](https://helm.sh/docs/intro/install/) for more information.  If you are running Helm 2.x, you will see both a client and server (tiller) portion returned by the version command.  Some of the commands below will also differ slightly for Helm 2.x.
 
-```bash
-git clone https://github.com/pegasystems/pega-helm-charts.git
-```
+1. Add the Pega repository to your Helm installation.
+    ```bash
+    $ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
+    ```
+2. Verify the new repository by searching it.
+   ```bash
+   $ helm search repo pega
+   NAME       	CHART VERSION	APP VERSION	DESCRIPTION
+   pega/pega  	1.2.0        	           	Pega installation on kubernetes
+   pega/addons	1.2.0        	1.0        	A Helm chart for Kubernetes 
+   ```
+There are two charts available in this repository - addons and pega.
 
-## Update dependencies
+The addons chart installs a collection of supporting services and tools required for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
 
-The Pega charts depends on other charts supplied by third parties.  These are called out in the requirements yaml file for the [pega](charts/pega/requirements.yaml) and [addons](charts/addons/requirements.yaml) charts.  Individual dependencies may or may not be deployed based on the configuration of your values.yaml files.  When you first setup your helm chart, you will need to update your dependencies to pull down these additional charts from their repositories.  For convenience, the required commands are part of the [Makefile](Makefile) and can run with the following command.
+3. Download the values file for pega/pega and pega/addons.
+   ```bash
+   $ helm inspect values pega/pega > pega.yaml
+   $ helm inspect values pega/addons > addons.yaml
+   ```
 
-```bash
-make dependencies
-```
+4. Edit your values yaml files to specify all required information and customizations for your environment.
 
-For more information about Helm dependencies, see the [Helm documentation](https://helm.sh/docs/helm/#helm-dependency).
+* [Instructions to configure the Pega chart](charts/pega/README.md)
+* [Instructions to configure the Pega addons](charts/addons/README.md)
 
-## Configure and install using the charts
-
-There are two charts available in this repository - *addons* and *pega*. 
-
-The addons chart installs a collection of supporting services and tools required for a Pega deployment.  The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
-
-[Instructions to configure the Pega addons](charts/addons/README.md)
-
-To install the addons chart, run the following helm command after configuring your values.yaml file.
+5. Create namespaces for your Pega deployment and the addons (if applicable for your environment).
 
 ```bash
-helm install . -n pegaaddons --namespace pegaaddons --values /home/user/my-overridden-values.yaml
+$ kubectl create namespace mypega
+$ kubectl create namespace pegaaddons
 ```
 
-After installing the addons, you can deploy Pega. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace.  
-
-[Instructions to configure the Pega chart](charts/pega/README.md)
-
-To install the pega chart, run the following helm command after configuring your values.yaml file.
+6. To install the addons chart, run the following helm command after configuring your values.yaml file (if applicable for your environment). 
 
 ```bash
-helm install . -n mypega --namespace myproject --values /home/user/my-overridden-values.yaml
+$ helm install mypega pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-To delete this chart, enter:
+7. Now you can deploy Pega using the Helm chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace.  
 
 ```bash
-helm delete mypega --purge
+$ helm install mypega pega/pega --namespace mypega --values pega.yaml
 ```
 
-Navigate to the project directory and open the values.yaml file.  This is the configuration file that tells Helm what and how to deploy.  For additional documentation covering the different deployment options, see the Pega Community article on [Deploying the Pega Platform by using Kubnernetes](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes).
+*If you want to edit the charts and build using your local copy, replace pega/addons or pega/pega with the path to your chart directory.*
+
+8. If you wish to delete your deployment of Pega nodes, enter the following command (this will not delete your database):
+
+```bash
+$ helm delete mypega
+```
 
 # Contributing
 
