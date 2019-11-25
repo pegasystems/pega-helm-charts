@@ -20,33 +20,38 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 
 This project assumes you have an installation of Kubernetes available and have Helm installed locally. The following commands will verify your installation. The exact output may be slightly different, but they should return without error.
 
-    ```bash
-    $ helm version
-    version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
-    ```
+```bash
+$ helm version
+version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
+```
 
 If this command does not successfully return, install Helm 3 for your operating system.  See [Helm Installation](https://helm.sh/docs/intro/install/) for more information.  If you are running Helm 2.x, you will see both a client and server (tiller) portion returned by the version command.  Some of the commands below will also differ slightly for Helm 2.x.
 
 1. Add the Pega repository to your Helm installation.
-    ```bash
-    $ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
-    ```
+
+```bash
+$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
+```
+
 2. Verify the new repository by searching it.
-   ```bash
-   $ helm search repo pega
-   NAME       	CHART VERSION	APP VERSION	DESCRIPTION
-   pega/pega  	1.2.0        	           	Pega installation on kubernetes
-   pega/addons	1.2.0        	1.0        	A Helm chart for Kubernetes 
-   ```
+
+```bash
+$ helm search repo pega
+NAME       	CHART VERSION	APP VERSION	DESCRIPTION
+pega/pega  	1.2.0        	           	Pega installation on kubernetes
+pega/addons	1.2.0        	1.0        	A Helm chart for Kubernetes 
+```
+
 There are two charts available in this repository - addons and pega.
 
 The addons chart installs a collection of supporting services and tools required for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
 
 3. Download the values file for pega/pega and pega/addons.
-   ```bash
-   $ helm inspect values pega/pega > pega.yaml
-   $ helm inspect values pega/addons > addons.yaml
-   ```
+
+```bash
+$ helm inspect values pega/pega > pega.yaml
+$ helm inspect values pega/addons > addons.yaml
+```
 
 4. Edit your values yaml files to specify all required information and customizations for your environment.
 
