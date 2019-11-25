@@ -220,8 +220,9 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 }
 
 type pegaIngress struct {
-	Name string
-	Port intstr.IntOrString
+	Name          string
+	Port          intstr.IntOrString
+	AlbStickiness intstr.IntOrString
 }
 
 // VerifyPegaIngresses - Splits the ingresses from the rendered template and asserts each ingress object
@@ -233,9 +234,13 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}}, options)
+				VerifyPegaIngress(t, &pegaIngressObj,
+					pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}, intstr.IntOrString{IntVal: 1020}},
+					options)
 			} else {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}}, options)
+				VerifyPegaIngress(t, &pegaIngressObj,
+					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, intstr.IntOrString{IntVal: 3660}},
+					options)
 			}
 
 		}
@@ -256,7 +261,9 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, "[{\"HTTP\": 80}, {\"HTTPS\": 443}]", ingressObj.Annotations["alb.ingress.kubernetes.io/listen-ports"])
 	require.Equal(t, "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}", ingressObj.Annotations["alb.ingress.kubernetes.io/actions.ssl-redirect"])
 	require.Equal(t, "internet-facing", ingressObj.Annotations["alb.ingress.kubernetes.io/scheme"])
-	require.Equal(t, "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=3660", ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
+	expectedStickiness := "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=" + expectedIngress.AlbStickiness.StrVal
+	require.Equal(t, expectedStickiness,
+		ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
 	require.Equal(t, "ip", ingressObj.Annotations["alb.ingress.kubernetes.io/target-type"])
 	require.Equal(t, "ssl-redirect", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, "use-annotation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort.StrVal)
