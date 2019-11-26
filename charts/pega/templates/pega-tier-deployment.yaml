@@ -6,7 +6,7 @@
 {{ $apiVer = "apps/v1" }}
 {{ else }}
 {{ $kindName = "Deployment" }}
-{{ $apiVer = "extensions/v1beta1" }}
+{{ $apiVer = "apps/v1" }}
 {{ end }}
 
 {{ $containerWaitList := list  }}
