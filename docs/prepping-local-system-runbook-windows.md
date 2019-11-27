@@ -1,0 +1,563 @@
+Preparing your local Windows 10 system to deploy Pega Platform– 45 minutes
+==========================================================================
+
+In order to deploy using a local Windows 10 system on which you can run commands
+with Administrator privileges, you must prepare your system with required
+applications and configuration files you will use for your deployment of Pega
+Platform. Pega recommends doing this first so you can complete the deployment
+without having to pause in order to obtain a Windows application or prepare a
+configuration file that is required to complete the deployment.
+
+Assumptions and Prerequisites
+-----------------------------
+
+This guide assumes:
+
+-   You have a basic familiarity with running commands from a Windows 10
+    PowerShell with Administrator privileges.
+
+-   You use the opensource packaging tool chocolatey to install applications
+    onto your Windows laptop. For more information, see
+    [chocolatey](https://chocolatey.org/packages?q=open-source).
+
+-   Basic familiarity with GitHub account with which you will download a
+    Pega-managed GitHub repository containing configuration files and scripts
+    that you use to install Pega Platform and then deploy it in the Kubernetes
+    cluster.
+
+Creating a local folder to access all of the configuration files
+----------------------------------------------------------------
+
+Deploying with Helm requires that you run commands from a specific folder on
+your local system. To ensure you stay oriented to the correct filepath, these
+instructions always use the reference \<local filepath\>/\<platform\>-demo
+folder when you must extract files to a folder or run commands from a folder.
+
+In order to stay consistent with the instructions, it is recommended that you
+create a folder called \<platform\>-demo on your local system at the top level
+of your Windows user folder. This way, you associate the generic \<local
+filepath\>/\<platform\>-demo references to the folder C:\\Users\\\<your user
+name\>\\\<platform\>-demo that is specific to your local system.
+
+For Windows users: To create this folder, open a Windows PowerShell command
+prompt with Administrator privileges and enter:
+
+\$ mkdir C:\\Users\\\<*Windows-username*\>\\\<platform\>-demo
+
+Where \<platform\>-demo is:
+
+-   AKS-demo -for the AKS runbook
+
+-   EKS-demo -for the EKS runbook
+
+-   GKE-demo -for the GKE runbook
+
+-   PKS-demo -for the PKS runbook
+
+-   Openshift-demo - for the Openshift runbook
+
+You are ready to continue preparing your local system.
+
+Installing required applications for the deployment 
+----------------------------------------------------
+
+You can use the Windows package manager application,
+[Chocolatey](https://chocolatey.org/), to install or upgrade the Windows
+versions of the applications that you must have in order to deploy Pega Platform
+in your Kubernetes cluster.
+
+To install chocolatey, follow these steps which are sourced from the [Install
+chocolatey](https://chocolatey.org/install) page.
+
+1.  Open a Windows PowerShell command prompt with Administrator privileges.
+
+2.  To ensure your PowerShell commands run without restrictions enter:
+
+\$ Get-ExecutionPolicy
+
+If it returns RemoteSigned, continue to the next step; if it returns Restricted,
+then enter:
+
+\$ Get-ExecutionPolicy Set-ExecutionPolicy Bypass -Scope Process
+
+![](media/55c16706069b5f1809435bb76c2ae181.png)
+
+Enter **Yes** to ensure you are not restricted to run chocolatey install or
+update commands on your computer. You will be able to run in bypass or
+RemoteSigned mode.
+
+1.  To install chocolatey and appropriate security scripts that it uses to
+    ensure safety when you install applications using the chocolatey
+    application, enter:
+
+\$ Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object
+System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+
+The command returns messaging describing useful details and indicating a
+successful installation. You are ready to use chocolatey to install each
+required application.
+
+### Installing Helm and the kubernetes CLI commands:
+
+To do so, enter the choco install command listed for each application into your
+Powershell command prompt as shown:
+
+-   To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the
+    Powershell command prompt, enter:
+
+\$ choco install kubernetes-helm
+
+If during the install process you are prompted to run the script, reply with
+**Yes**.
+
+-   To install [Kubernetes Command Line
+    Interface](https://chocolatey.org/packages/kubernetes-cli): in the
+    Powershell command prompt, enter:
+
+\$ choco install kubernetes-cli
+
+The kubernetes-cli application includes the kubectl command.
+
+### For AKS only: installing the Azure CLI
+
+For Windows users, use a Windows PowerShell command prompt with Administrator
+privileges to install the Azure CLI by entering:
+
+\$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile
+.\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi
+/quiet'
+
+For details, see the article,
+<https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest>
+
+### For PKS only: installing the PKS CLI
+
+Install the PKS CLI binary file from the Pivotal support site as an executable
+that you as a super user with a single command with the command curl piped into
+your bash:
+
+1.  Use the browser of your choice to navigate to [Pivotal
+    Network](https://network.pivotal.io/) and log in.
+
+2.  Open the [Pivotal Container Service
+    (PKS)](https://network.pivotal.io/products/pivotal-container-service) page
+    and select release version **1.5.1** in the pulldown.
+
+3.  Click **PKS CLI – v1.5.1**.
+
+4.  Click **PKS CLI - Windows** and for the EULA, click **AGREE**.
+
+5.  In the Windows explorer window, choose a folder in which to save the file,
+    pks-windows-amd64-1.5.1-build.xx.exe, change the name to pks.exe, and click
+    **Save**.
+
+The binary, executable file is now called “pks.exe” and should be moved to any
+PowerShell PATH on your local computer so it can be run from the command line as
+simply “pks”.
+
+1.  Navigate to the local path folder where you saved this file, for instance
+    \<local filepath\>/\<platform\>-demo.
+
+2.  You must add this executable file to the PATH on your local computer so it
+    can be run from the command line as simply “pks”. Advanced users may
+    accomplish this using their preferred method. Otherwise, you can add the
+    \<platform\>-demo folder to your environment path by running the following
+    command:
+
+\$env:path += ";C:\\Users\\\<Windows-username\>\\\<platform\>-demo"
+
+These instructions were mostly sourced from the [Installing the PKS
+CLI](https://docs.pivotal.io/pks/1-6/installing-pks-cli.html).
+
+#### Installing Docker Desktop on Windows 10
+
+For Windows users, in order to build a docker installation image, you must
+install the Community Edition (CE) of docker on your local system instead of
+using chocolatey. Do to so, you must download, install, and log into Docker for
+Windows in order to complete the section, [Prepare your Pega Platform
+installation Docker image – 15 minutes](#_Prepare_your_Pega_1).
+
+1.  Download the installer (Docker for Windows Installer.exe) from
+    [download.docker.com](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe).
+
+It typically downloads to your Downloads folder, or you can run it from the
+recent downloads bar at the bottom of your web browser.
+
+1.  Double-click Docker for Windows Installer.exe to run the installer.
+
+2.  Follow the install wizard to accept the license, authorize the installer to
+    make changes on your computer, and proceed with the install.
+
+You must authorize Docker.app with your system password during the install
+process. Privileged access is needed to install networking components, links to
+the Docker apps, and manage the Hyper-V VMs.
+
+1.  In the **Configuration** window, do not select **Use Windows containers
+    instead of Linux containers (this can be changed after the installation)**
+    and click **OK**.
+
+![](media/e4f1283256e86e5b7957d9285ecabf1c.png)
+
+![](media/1dab0fd4aa740565b247ffb852919028.png)
+
+1.  Click **Close**.
+
+To complete the installation, continue to the next step.
+
+1.  To complete your Docker Desktop setup, In the windows search bar, enter
+    “docker” in the search field and select the Docker Desktop app in the search
+    results.
+
+![](media/a3caf914ced634e3b0dddada806082dc.png)
+
+1.  Log into the Docker Desktop application when you are prompted, using your
+    DockerHub credentials.
+
+![](media/5a215a2316542f28c2d66ba77ea8383a.png)
+
+After you log in, the docker CLI is available from a Windows Powershell command
+prompt. These instructions were mostly sourced from the article,
+<https://docs.docker.com/v17.09/docker-for-windows/install/>.
+
+Cloning the pega-helm-charts github repository to your local system
+-------------------------------------------------------------------
+
+Pega maintains a Github repository that contains the Helm charts that are
+required to deploy Pega Platform using Helm. You must clone the repository to
+your local system from which you will complete the deployment. You can either
+clone by downloading a zip file of the repository or using Github desktop.
+
+To access the GitHub website and begin the cloning process:
+
+1.  Sign in to [GitHub](https://github.com/) with your GitHub credentials using
+    the browser of your choice.
+
+2.  Navigate to the main page of the
+    [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts)
+    repository and choose the **Master** branch.
+
+3.  In the repository heading, click **Clone or download**.
+
+4.  In the **Clone with HTTPS** popup window, click **Download Zip**.
+
+5.  In the Windows explorer window, navigate to the local path, \<local
+    filepath\>\\Downloads, ensure that the file name is
+    pega-helm-charts-master.zip and click **Save**.
+
+6.  In a Windows PowerShell, change folders to the Downloads folder where you
+    saved the pega-helm-charts-master.zip file and extract your files to create
+    a repository on your local system:
+
+\$ Expand-Archive -LiteralPath pega-helm-charts-master.zip -DestinationPath
+\<local filepath\>\\\<platform\>-demo
+
+After you extract the files from the archive, you will run the deployment
+commands from several of the folders in the \<local
+filepath\>\\\<platform\>-demo\\pega-helm-charts-master\\charts folder.
+
+These instructions were mostly sourced from the [GitHub
+help](https://help.github.com/en/desktop/contributing-to-projects/cloning-a-repository-from-github-to-github-desktop).
+
+Updating the Pega addons Helm chart
+-----------------------------------
+
+Update this Helm chart in order to enable the Traefik load balancer and disable
+the metrics-server for deployments to the following platforms:
+
+-   AKS
+
+-   PKS
+
+-   GKE
+
+If you are deploying to a different platform you can skip this section.
+
+1.  In your pega-helm-chart repository, navigate to the \<local
+    filepath\>\\\<platform\>-demo \\pega-helm-charts-master\\charts\\addons
+    folder.
+
+2.  Open the values.yaml file from this folder in a text editor
+
+3.  In the traefik configuration area, ensure the following two settings are
+    configured to use Traefik for your deployment load-balancer:
+
+traefik:
+
+enabled: **true**
+
+\# Set any additional Traefik parameters. These values will be used by Traefik's
+Helm chart.
+
+\# See https://github.com/Helm/charts/blob/master/stable/traefik/values.yaml
+
+\# Set traefik.serviceType to "LoadBalancer" on gke, PKS, and pks
+
+serviceType: **LoadBalancer**
+
+Note: Do not enclose the text in quotes.
+
+1.  For PKS deployments, you must ensure that the Pega metrics server is
+    disabled in the metrics-server section of this *addon* values.yaml file,
+    since PKS deployments use the PKS metrics server
+
+metrics-server:
+
+\# Set this to true to install metrics-server. Follow below guidelines specific
+to each provider,
+
+\# open-source Kubernetes, Openshift & EKS - mandatory to set this to true if
+any tier as hpa.enabled is true
+
+\# GKE or PKS - set this to false since metrics-server is installed in the
+cluster by default.
+
+enabled: **false**
+
+1.  Save the file.
+
+Add any known, customized settings for Pega to your deployment
+--------------------------------------------------------------
+
+The Pega deployment model supports advanced configurations to fit most existing
+client’s needs. If you are a Pega client and have known, required customizations
+for your deployment and you already use the following files to add your known
+customizations, you can copy those configurations into the configuration files
+Pega added for this purpose in the pega-helm-charts repository folder, \<local
+filepath\>\\\<platform\>-demo\\pega-helm-charts-master\\charts\\pega\\config\\deploy:
+
+-   context.xml: add additional required data sources
+
+-   prlog4j2.xml modify your logging configuration, if required
+
+-   prconfig.xml: adjust the standard Pega Platform configuration with known,
+    required settings
+
+Make these changes before you begin in the section, [Deploying Pega Platform
+using Helm charts – 30 minutes](#_Deploying_Pega_Platform).
+
+Downloading a Pega Platform distribution to your local system
+-------------------------------------------------------------
+
+These instructions require the Pega Platform distribution image to install the
+Pega Platform onto your database. To obtain a copy, you must download an image
+from Pega. For detailed instructions, see [Pega Digital Software Delivery User
+Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
+
+### Requesting access to a Pega Platform distribution
+
+1.  In the browser of your choice, navigate to the Pega [Digital Software
+    Delivery](https://community1.pega.com/digital-delivery) site.
+
+2.  Log into the [Pega
+    Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
+    site with the credentials your Pega representative provided.
+
+3.  In the **Download and Upgrade Licensed Software** area, click **New
+    request**.
+
+4.  In the right side of the page click **Continue**.
+
+If you have multiple associations with the Pega Community, the page requests you
+to first select the organization with which you want to affiliate this request
+and then click **Continue**. You will receive an email with a link to your
+software using an email address that is associated with the organization you
+select on this screen.
+
+1.  In the **You're viewing products available** page, enter **Pega Platform**
+    in the **Search**, which will filter the list of products in the page.
+
+The **Pega Platform** card should appear near the top of the card list, below
+the list of all of the **Language packs for Pega Platform.**
+
+1.  In the Pega Platform card, use your mouse to activate the icon into a
+    shopping cart and click the shopping cart.
+
+The icon changes to a green check and a new cart item appears in the top right
+of the product list.
+
+![](media/029c6531bd52109598047a2ee6966657.png)
+
+1.  Click **Continue**.
+
+2.  In the cart review page, in the **Pega Platform** area, select the version
+    of Pega Platform for your deployment.
+
+    ![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
+
+3.  After your selection and review are complete, click **Finish.**
+
+4.  When the order is processed, a confirmation screen displays with details
+    about your order.
+
+    An email with a link to the requested Pega Platform software is sent within
+    a few minutes. The email address used is associated with the organization
+    you selected in this section.
+
+![](media/748ea91e3ff43cf4544ce2f4638e86bf.png)
+
+1.  When satisfied with the order, click **Close**.
+
+### Downloading Pega Platform to your local system
+
+To download your Pega Platform image,
+
+1.  Open the email you received. It will look similar to the image shown.
+
+![](media/98b1055e0e63487db7bbb2c90c9ea40c.png)
+
+1.  Click **Download now**.
+
+2.  The **Pega Licensed Software Downloads** page opens.
+
+You can download your requested Pega Platform software using the link under **My
+Downloads**.
+
+1.  Click **Download software**.
+
+Your secure **Inbox** of requested Pega software products opens. Your request
+for a version of Pega Platform software is listed at the top of the inbox table.
+
+1.  In the **Subject** column, click the link to your requested Pega Platform
+    software.
+
+The Package details window opens in the Package tab, which shows details about
+the Pega Platform software distribution package that you requested.
+
+1.  In the **Files:** area of the window, ensure that version of the Pega
+    distribution image is correct.
+
+If it is not the right version number, you must complete a new request.
+
+1.  To download the file, select the Pega distribution image checkbox and click
+    **Download**.
+
+2.  In the **Save as** window, choose the \<local filepath\>\\\<platform\>-demo
+    folder to which you save the Pega Platform distribution zip file.
+
+3.  In a Windows PowerShell, change folders to the \<local
+    filepath\>\\\<platform\>-demo folder, where you saved the Pega Platform
+    distribution zip and extract your files to create a new distribution image
+    folder on your local system:
+
+\$ Expand-Archive .\\\<pega-distribution-image\>.zip
+
+![C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML2318748.PNG](media/1edabbc855175f2bdca62f8a529d8c88.png)
+
+After you expand the archive, the files in the Pega Platform distribution image
+are available to use in preparing your Pega Platform installation Docker image .
+
+Prepare your Pega Platform installation Docker image – 15 minutes
+-----------------------------------------------------------------
+
+As stated previously, you are required to have a
+[DockerHub](https://hub.docker.com/) account and log into it in order to see the
+[pega-installer-ready Docker
+image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need
+the docker cli and docker-desktop installed on your system before you begin this
+procedure. The Pega-provided Docker image, pega-installer-ready, includes some
+components of a full installation image that you can use to install or upgrade
+the Pega Platform database. While it is built on top of a JDK, it does not
+contain the contents of the Pega distribution kit which are essential for
+installing or upgrading Pega Platform.
+
+Pega provides this image as the primary content of the final Docker image you
+will use to install or upgrade Pega Platform. This section describes how you can
+use this Docker image in combination with a Dockerfile and the Pega Platform
+distribution image that you have made available on your local system. The
+procedure assumes you’ve downloaded the software in [Downloading Pega Platform
+to your local system](#_Downloading_Pega_Platform) and installed the required
+components on your local system listed in [Install required applications for the
+deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
+
+Follow these steps to create a Docker image you can use to install or upgrade
+Pega Platform.
+
+1.  From your Powershell running with Administrator privileges, ensure you are
+    logged into your DockerHub account:
+
+\$ docker login -u \<username\> --p \<username-password\>
+
+For details about logging into Docker from a secure password file, see
+<https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you
+can also ensure you are logged by used the Docker Desktop client running on your
+system.
+
+1.  Change your directory to the top folder of your Pega distribution,
+    \<pega-distribution-image\>.
+
+\$ cd .\\\<pega-distribution-image\>\\
+
+1.  Create a text file with the text editor of your choice in the \<local
+    filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you
+    extracted the Pega distribution on your local system.
+
+You can list the folder content and see folders for Pega archives, Images,
+rules, and scripts.
+
+![](media/152260ae774fe07d717f1b31b5560f25.png)
+
+1.  Copy the following lines into the file to build your docker image using the
+    public image on DockerHub that Pega provides to build install images,
+    pegasystems/pega-installer-ready:
+
+>   FROM pegasystems/pega-installer-ready
+
+>   COPY scripts /opt/pega/kit/scripts
+
+>   COPY archives /opt/pega/kit/archives
+
+>   COPY rules /opt/pega/kit/rules
+
+1.  Save the text-only file as dockerfile, without an extension.
+
+2.  From your Powershell running with Administrator privileges, in your current
+    directory, build your pega install docker image by entering:
+
+`$ docker build -t pega-installer .`
+
+This command uses your dockerfile to build a full Docker image with the name
+“pega-installer” and gives it the tag, “latest”.
+
+![](media/4d770cffe00661f38d0bf1c9a0578648.png)
+
+You can use the docker command to see that your new image exists in your Docker
+image inventory.
+
+1.  Tag the local version of your new image, pega-installer, with your DockerHub
+    ID:
+
+`$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
+
+1.  Create a private repository on your [DockerHub](https://hub.docker.com/)
+    account that is tagged as a private repository.
+
+2.  From your default login page, click the Repositories link (at the top of the
+    page).
+
+3.  In the Repositories view, click **Create Repository +**.
+
+4.  Enter a Name that matches the docker image you just built.
+
+5.  Provide a brief Description, that will help you remember the version of Pega
+    with which you built this image, or any other useful information.
+
+6.  In the Visibility area, select the **Private**.
+
+    You should not mage this image with Pega proprietary software a viewable
+    **Public** image.
+
+7.  Click **Create**.
+
+Free DockerHub accounts support the use of a single private repository, so you
+may have to delete an existing private repository in order to create a new one
+for your Pega docker installation image.
+
+1.  From your Powershell running with Administrator privileges, use the docker
+    command to push the new image to your new private repository:
+
+`$ docker push <your-dockerbug-ID>/pega-installer`
+
+After the command completes you will see your new image in your private
+repository, similar to the image below.
+
+![](media/9fd09158a821f828a93d6ab7c74e278a.png)
