@@ -22,11 +22,11 @@ This guide assumes:
 
 -   Basic familiarity with GitHub account with which you will download a
     Pega-managed GitHub repository containing configuration files and scripts
-    that you use to install Pega Platform and then deploy it in a Kubernetes
+    that you use to install Pega Platform and then deploy it in the Kubernetes
     cluster.
 
-Create a local folder to access all of the configuration files
---------------------------------------------------------------
+Creating a local folder to access all of the configuration files
+----------------------------------------------------------------
 
 Deploying with Helm requires that you run commands from a specific folder on
 your local system. To ensure you stay oriented to the correct filepath, these
