@@ -5,7 +5,7 @@ In order to deploy using a local Linux system on which you can run commands with
 Administrator privileges, you must prepare your system with required
 applications and configuration files you will use for your deployment of Pega
 Platform. Pega recommends doing this first so you can complete the deployment
-without having to pause in order to obtain a Linus executable files or prepare a
+without having to pause in order to obtain a Linux executable file or prepare a
 configuration file that is required to complete the deployment.
 
 Assumptions and Prerequisites
