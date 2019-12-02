@@ -52,13 +52,4 @@ data:
   ACTION: {{ .Values.global.actions.execute }}
   # Distribution kit URL
   DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
-  # Web requestor passivation timeout
-  {{ range $index, $dep := .Values.global.tier}}
-  {{ if or (eq $dep.name "web") (eq $dep.name "stream") }}
-  WEB_REQUESTOR_PASSIVATION_TIMEOUT: {{- sub $dep.service.alb_stickiness_lb_cookie_duration_seconds $dep.service.requestorPassivationToAlbStickinessMargin -}}
-  {{ else }}
-  WEB_REQUESTOR_PASSIVATION_TIMEOUT: 3660
-  {{ end }}
-  {{ end }}
-
 {{ end }}
