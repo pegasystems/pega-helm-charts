@@ -34,8 +34,4 @@ data:
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
-  # Web requestor passivation timeout
-{{ if .requestor }}
-  WEB_REQUESTOR_PASSIVATION_TIMEOUT: {{ .requestor.passivationTimeSec }}
-{{ end }}
 {{ end }}

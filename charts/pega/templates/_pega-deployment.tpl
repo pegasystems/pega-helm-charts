@@ -78,6 +78,10 @@ spec:
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
+{{- if .node.requestor }}
+        - name: WEB_REQUESTOR_PASSIVATION_TIMEOUT
+          value: {{ .node.requestor.passivationTimeSec }}
+{{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
         # Additional custom env vars
