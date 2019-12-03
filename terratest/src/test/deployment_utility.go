@@ -29,7 +29,7 @@ type pegaDeployment struct {
 	name               string
 	initContainers     []string
 	nodeType           string
-	passivationTimeout int32
+	passivationTimeout string
 }
 
 // VerifyPegaStandardTierDeployment - Verifies Pega standard tier deployment for values as provided in default values.yaml.
@@ -75,17 +75,17 @@ func SplitAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *
 			if index == 1 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
 				VerifyPegaDeployment(t, &deploymentObj,
-					pegaDeployment{"pega-web", initContainers, "WebUser", 900},
+					pegaDeployment{"pega-web", initContainers, "WebUser", "900"},
 					options)
 			} else if index == 2 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
 				VerifyPegaDeployment(t, &deploymentObj,
-					pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", -1},
+					pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
 					options)
 			} else if index == 3 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &statefulsetObj)
 				VerifyPegaStatefulSet(t, &statefulsetObj,
-					pegaDeployment{"pega-stream", initContainers, "Stream", 900},
+					pegaDeployment{"pega-stream", initContainers, "Stream", "900"},
 					options)
 
 			}
