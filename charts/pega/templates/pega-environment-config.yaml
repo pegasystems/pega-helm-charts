@@ -35,7 +35,7 @@ data:
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
   # Web requestor passivation timeout
-{{ if .albStickinness }}
-  WEB_REQUESTOR_PASSIVATION_TIMEOUT: {{ sub .albStickinness .passivationTostickinessMargin }}
+{{ if .requestor }}
+  WEB_REQUESTOR_PASSIVATION_TIMEOUT: {{ .requestor.passivationTimeSec }}
 {{ end }}
 {{ end }}

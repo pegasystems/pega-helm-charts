@@ -187,3 +187,14 @@ readinessProbe:
     Background
   {{- end -}}
 {{- end }}
+
+# Load balancer session cookie stickiness time in seconds,
+# calculated as sum of .requestor.passivationTimeSec and passivation delay.
+{{- define "lbSessionCookieStickiness" }}
+  {{- $passivationTime := 3600 -}}
+  {{- $passivationDelay := 120 -}}
+  {{- if .node.requestor.passivationTimeSec -}}
+    {{- $passivationTime = .node.requestor.passivationTimeSec -}}
+  {{- end -}}
+  {{- add $passivationTime $passivationDelay -}}
+{{- end -}}

@@ -240,7 +240,7 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 					options)
 			} else {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, 3660},
+					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, 1020},
 					options)
 			}
 
@@ -315,6 +315,9 @@ func VerifyEnvironmentConfig(t *testing.T, helmChartPath string, options *helm.O
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "release-name-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
+	if options.SetValues["global.provider"] == "eks" {
+		require.Equal(t, envConfigData["WEB_REQUESTOR_PASSIVATION_TIMEOUT"], "900")
+	}
 }
 
 // VerifyTierConfg - Performs the tier specific configuration assetions with the values as provided in default values.yaml

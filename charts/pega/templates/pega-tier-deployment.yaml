@@ -30,6 +30,6 @@
 {{ end }}
 
 {{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom "albStickinness" $dep.node.service.alb_stickiness_lb_cookie_duration_seconds "passivationTostickinessMargin" $dep.service.requestorPassivationToAlbStickinessMargin }}
+{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
 {{- end }}
 {{ end }}
