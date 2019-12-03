@@ -80,7 +80,7 @@ spec:
           value: {{ .nodeType }}
 {{- if .node.requestor }}
         - name: WEB_REQUESTOR_PASSIVATION_TIMEOUT
-          value: {{ .node.requestor.passivationTimeSec }}
+          value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
