@@ -236,6 +236,14 @@ Parameter           | Description    | Default value
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `700` which corresponds to 700% of 200m ) | `700`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
 
+### Volume claim template
+
+A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
+
+### Deployment strategy
+
+The `deploymentStrategy` can be used to optionally configure the [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for any tiers deployed as a Kubernetes Deployment. This value will cannot be applied to StatefulSet deployed tiers which use the `volumeClaimTemplate` parameter.
+
 ### Pega configuration files
 
 While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.

@@ -17,6 +17,10 @@ spec:
     matchLabels:
       app: {{ .name }}
 {{- if .node.deploymentStrategy }}
+{{- if (ne .kind "Deployment") }}
+  {{- $error := printf "tier[%s] may not specify a deploymentStrategy because it uses a volumeClaimTemplate which requires it be a StatefulSet" .name -}}
+  {{ required $error nil }}
+{{- end }}
   strategy:
 {{ toYaml .node.deploymentStrategy | indent 4 }}
 {{- end }}
