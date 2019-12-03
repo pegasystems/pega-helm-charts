@@ -121,7 +121,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	if expectedSpec.name == "pega-web" || expectedSpec.name == "pega-stream" {
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "WEB_REQUESTOR_PASSIVATION_TIMEOUT")
-		require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
