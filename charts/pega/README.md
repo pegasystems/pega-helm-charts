@@ -244,6 +244,19 @@ A `volumeClaimTemplate` may be configured for any tier to allow for persistent s
 
 The `deploymentStrategy` can be used to optionally configure the [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for any tiers deployed as a Kubernetes Deployment. This value will cannot be applied to StatefulSet deployed tiers which use the `volumeClaimTemplate` parameter.
 
+### Environment variables
+
+While Pega supports a variety of configuration options for cluster wide and application settings, in some cases you may want to pass a specific environment variable into your deployment on a tier-by-tier basis.  This can be accomplished by specifying a custom `env` block for your tier as shown in the example below.
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: MY_ENV_NAME
+          value: MY_ENV_VALUE
+```
+
 ### Pega configuration files
 
 While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.
