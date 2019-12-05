@@ -193,8 +193,14 @@ readinessProbe:
 {{- define "lbSessionCookieStickiness" }}
   {{- $passivationTime := 3600 -}}
   {{- $passivationDelay := 120 -}}
-  {{- if .node.requestor.passivationTimeSec -}}
-    {{- $passivationTime = .node.requestor.passivationTimeSec -}}
+
+  {{- if .node.requestor -}}
+    {{- if .node.requestor.passivationTimeSec -}}
+      {{- $passivationTime = .node.requestor.passivationTimeSec -}}
+    {{- end -}}
+  {{- else if .node.service.alb_stickiness_lb_cookie_duration_seconds -}}
+    {{- $passivationTime = .node.service.alb_stickiness_lb_cookie_duration_seconds -}}
   {{- end -}}
+
   {{- add $passivationTime $passivationDelay -}}
 {{- end -}}
