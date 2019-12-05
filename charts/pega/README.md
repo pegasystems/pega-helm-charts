@@ -207,7 +207,7 @@ requestor:
 
 ### service (*Optional*)
 
-Specify that the Kubernetes service block is expose to other Kubernetes run services, or externally to systems outside the environment.  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubenretes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
+Specify that the Kubernetes service block is expose to other Kubernetes run services, or externally to systems outside the environment.  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
 
 Configuration parameters:
 
