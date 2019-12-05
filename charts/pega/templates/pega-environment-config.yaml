@@ -37,5 +37,5 @@ data:
   # Comma separated list of cassandra hosts
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
-  CASSANDRA_PORT: "{{ .Values.dds.port }}"  
+  CASSANDRA_PORT: "{{ .Values.dds.port }}"
 {{ end }}

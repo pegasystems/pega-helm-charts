@@ -1,6 +1,7 @@
 package test
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -25,9 +26,10 @@ var terminationGracePeriodSeconds int64 = 300
 var terminationGracePeriodSecondsPtr = &terminationGracePeriodSeconds
 
 type pegaDeployment struct {
-	name           string
-	initContainers []string
-	nodeType       string
+	name               string
+	initContainers     []string
+	nodeType           string
+	passivationTimeout string
 }
 
 // VerifyPegaStandardTierDeployment - Verifies Pega standard tier deployment for values as provided in default values.yaml.
@@ -72,13 +74,19 @@ func SplitAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *
 
 			if index == 1 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser"}, options)
+				VerifyPegaDeployment(t, &deploymentObj,
+					pegaDeployment{"pega-web", initContainers, "WebUser", "900"},
+					options)
 			} else if index == 2 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &deploymentObj)
-				VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"}, options)
+				VerifyPegaDeployment(t, &deploymentObj,
+					pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
+					options)
 			} else if index == 3 {
 				helm.UnmarshalK8SYaml(t, deploymentInfo, &statefulsetObj)
-				VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{"pega-stream", initContainers, "Stream"}, options)
+				VerifyPegaStatefulSet(t, &statefulsetObj,
+					pegaDeployment{"pega-stream", initContainers, "Stream", "900"},
+					options)
 
 			}
 		}
@@ -107,14 +115,23 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].Image, "pegasystems/pega")
 	require.Equal(t, pod.Containers[0].Ports[0].Name, "pega-web-port")
 	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
-	require.Equal(t, pod.Containers[0].Env[0].Name, "NODE_TYPE")
-	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[0].Value)
-	require.Equal(t, pod.Containers[0].Env[1].Name, "JAVA_OPTS")
-	require.Equal(t, pod.Containers[0].Env[1].Value, "")
-	require.Equal(t, pod.Containers[0].Env[2].Name, "INITIAL_HEAP")
-	require.Equal(t, pod.Containers[0].Env[2].Value, "4096m")
-	require.Equal(t, pod.Containers[0].Env[3].Name, "MAX_HEAP")
-	require.Equal(t, pod.Containers[0].Env[3].Value, "7168m")
+	var envIndex int32 = 0
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "NODE_TYPE")
+	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)
+	if expectedSpec.name == "pega-web" || expectedSpec.name == "pega-stream" {
+		envIndex++
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "REQUESTOR_PASSIVATION_TIMEOUT")
+		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
+	}
+	envIndex++
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
+	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "")
+	envIndex++
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "INITIAL_HEAP")
+	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "4096m")
+	envIndex++
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "MAX_HEAP")
+	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "7168m")
 	require.Equal(t, pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
 
 	require.Equal(t, "2", pod.Containers[0].Resources.Limits.Cpu().String())
@@ -220,8 +237,9 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 }
 
 type pegaIngress struct {
-	Name string
-	Port intstr.IntOrString
+	Name          string
+	Port          intstr.IntOrString
+	AlbStickiness int32
 }
 
 // VerifyPegaIngresses - Splits the ingresses from the rendered template and asserts each ingress object
@@ -233,9 +251,13 @@ func SplitAndVerifyPegaIngresses(t *testing.T, helmChartPath string, options *he
 		if index >= 1 && index <= 2 {
 			helm.UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}}, options)
+				VerifyPegaIngress(t, &pegaIngressObj,
+					pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}, 1020},
+					options)
 			} else {
-				VerifyPegaIngress(t, &pegaIngressObj, pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}}, options)
+				VerifyPegaIngress(t, &pegaIngressObj,
+					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, 1020},
+					options)
 			}
 
 		}
@@ -256,7 +278,9 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, "[{\"HTTP\": 80}, {\"HTTPS\": 443}]", ingressObj.Annotations["alb.ingress.kubernetes.io/listen-ports"])
 	require.Equal(t, "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}", ingressObj.Annotations["alb.ingress.kubernetes.io/actions.ssl-redirect"])
 	require.Equal(t, "internet-facing", ingressObj.Annotations["alb.ingress.kubernetes.io/scheme"])
-	require.Equal(t, "stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=3660", ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
+	expectedStickiness := fmt.Sprint("stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=", expectedIngress.AlbStickiness)
+	require.Equal(t, expectedStickiness,
+		ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
 	require.Equal(t, "ip", ingressObj.Annotations["alb.ingress.kubernetes.io/target-type"])
 	require.Equal(t, "ssl-redirect", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, "use-annotation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort.StrVal)
