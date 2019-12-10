@@ -5,7 +5,13 @@ metadata:
   name: {{ template "installerJobReaderRole" }}
   namespace: {{ .Release.Namespace }}
 rules:
-- apiGroups: ["", "batch", "extensions", "apps"]
-  resources: ["jobs", "deployments", "statefulsets"]
+- apiGroups: ["apps"]
+  resources: ["deployments", "statefulsets"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["batch"]
+  resources: ["jobs"]
+  verbs: ["get", "watch", "list"]
+- apiGroups: ["extensions"]
+  resources: ["deployments"]
   verbs: ["get", "watch", "list"]
 {{ end }}
