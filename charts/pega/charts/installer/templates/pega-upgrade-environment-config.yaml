@@ -18,8 +18,10 @@ data:
   RULES_SCHEMA: {{ .Values.global.jdbc.rulesSchema }}
   # Data schema of the Pega installation
   DATA_SCHEMA: {{ .Values.global.jdbc.dataSchema }}
+{{- if .Values.global.jdbc.customerDataSchema }}
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
+{{- end }}
   # Type of Upgrade
   UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
@@ -28,12 +30,16 @@ data:
   BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
   # Z/OS SITE-SPECIFIC PROPERTIES FILE
   ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
+{{- if .Values.zos.db2zosUdfWlm }}
   # Specify the workload manager to load UDFs into db2zos
   DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
+{{- end }}
   # Target Rules Schema name
   TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
+{{- if .Values.zos.zosProperties }}
   # The location of the db2zos site specific properties file. Only used if the target system is a db2zos database
   TARGET_ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
+{{- end }}
   # The commit count to use when loading database tables
   MIGRATION_DB_LOAD_COMMIT_RATE: {{ .Values.upgrade.dbLoadCommitRate | quote }}
   # Update existing application will be run if this property is set to true
@@ -44,7 +50,9 @@ data:
   RUN_RULESET_CLEANUP: {{ .Values.upgrade.runRulesetCleanup | quote }}
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   REBUILD_INDEXES:  {{ .Values.upgrade.rebuildIndexes | quote }}
+{{- if .Values.distributionKitURL }}
   # Distribution kit URL
-  DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}  
+  DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
+{{- end }}
 {{ end }}  
  
