@@ -68,7 +68,7 @@ $ kubectl create namespace pegaaddons
 6. To install the addons chart, run the following helm command after configuring your values.yaml file (if applicable for your environment). 
 
 ```bash
-$ helm install mypega pega/addons --namespace pegaaddons --values addons.yaml
+$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
 7. Now you can deploy Pega using the Helm chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace.  

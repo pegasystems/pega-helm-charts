@@ -258,6 +258,19 @@ A `volumeClaimTemplate` may be configured for any tier to allow for persistent s
 
 The `deploymentStrategy` can be used to optionally configure the [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for any tiers deployed as a Kubernetes Deployment. This value will cannot be applied to StatefulSet deployed tiers which use the `volumeClaimTemplate` parameter.
 
+### Environment variables
+
+Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: MY_ENV_NAME
+          value: MY_ENV_VALUE
+```
+
 ### Pega configuration files
 
 While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.
@@ -371,14 +384,25 @@ Use the `pegasearch` section to configure a deployment of ElasticSearch for sear
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `image`   | Set the `pegasearch.image` location to a registry that can access the Pega search Docker image. The image is [available on DockerHub](https://hub.docker.com/r/pegasystems/search), and you may choose to mirror it in a private Docker repository. | `pegasystems/search:latest`
+`replicas` | Specify the desired replica count. | `1`
+`minimumMasterNodes` | To prevent data loss, you must configure the minimumMasterNodes setting so that each master-eligible node is set to the minimum number of master-eligible nodes that must be visible in order to form a cluster. Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.  For more information, see the ElasticSearch [important setting documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html) for more information. | `1`
 `podSecurityContext.runAsUser`   | ElasticSearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
 `set_vm_max_map_count`   | Elasticsearch requires `vm.max_map_count` to be configured to an appropriate value. This may be configured manually on your system and if so, you may bypass this privileged init container. For more information, see the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
+
+Additional env settings supported by ElasticSearch may be specified in a `custom.env` block as shown in the example below.
 
 Example:
 
 ```yaml
 pegasearch:
   image: "pegasystems/search:8.3"
+  memLimit: "3Gi"
+  replicas: 1
+  minimumMasterNodes: 2
+  custom:
+    env:
+    - name: TZ
+      value: "EST5EDT"
 ```
 

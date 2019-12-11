@@ -57,7 +57,16 @@ spec:
         - name: UNICAST_HOSTS
           value: {{ template "searchName" . }}-transport
         - name: NUMBER_OF_MASTERS
+        {{- if .Values.env }}
           value: "{{ .Values.env.MINIMUM_MASTER_NODES }}"
+        {{- else }}
+          value: {{ .Values.minimumMasterNodes | quote }}
+        {{- end }}
+{{- if .Values.custom }}
+{{- if .Values.custom.env }}
+{{ toYaml .Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
         resources:
           requests:
             cpu: "0.25"

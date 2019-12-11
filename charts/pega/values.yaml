@@ -179,6 +179,7 @@ dds:
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
+  replicas: 1
 
 # Pega Installer settings
 installer:
