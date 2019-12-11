@@ -1,0 +1,30 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: constellation
+  labels:
+    app: constellation
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: constellation
+  template:
+    metadata:
+      labels:
+        app: constellation
+    spec:
+      imagePullSecrets:
+      - name: regcred
+      containers:
+      # cli - the sidecar - here be the brains
+      - name: clln-cli
+        #imagePullPolicy: Never
+        image: {{ .Values.dockerRepos }}
+        args:
+        - port=3000
+        - infinity={{ .Values.infinityUrl }}
+        - sync=true
+        - {{ .Values.logLevel }}
+        ports:
+        - containerPort: 3000
