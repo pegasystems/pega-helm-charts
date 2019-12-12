@@ -58,8 +58,8 @@ Where \<platform\>-demo is:
 
 You are ready to continue preparing your local system.
 
-Installing required applications for the deployment 
-----------------------------------------------------
+Installing required applications for the deployment
+---------------------------------------------------
 
 Some of the required applications are binary files that you download from the
 organizations, download area. In order to use the docker command, the
@@ -75,13 +75,22 @@ Install the unzip utility with a packaging tool such as apt.
 
 ### Installing Helm
 
-Helm supports a variety of installation methods. Pega supports using v2.16.1.
+Pega supports using Helm version 2.1 and later. The latest runbooks use version
+3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the
+commands will differ slightly for Helm 2.x.
+
+Helm supports a variety of installation methods. To learn more, see
+https://helm.sh/docs/intro/install/.
+
 Helm provides a script that you can download and then run to install the latest
 version:
 
-1.  To download the helm installation script from their git repository, enter:
+1.  To download the helm installation script from their git repository, from
+    your home directory enter:
 
-\$ curl -LO https://git.io/get_helm.sh
+\$ sudo curl
+https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \>
+get_helm.sh \| bash
 
 1.  To update the permissions of the file to you can use it for installations,
     enter:
@@ -92,15 +101,24 @@ version:
 
 \$ ./get_helm.sh
 
-For details about this method and other supported installation methods, see
-<https://v2.helm.sh/docs/using_helm/#installing-helm>.
+Helm v3.0.1 is available. Changing from version .
+
+Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
+
+Preparing to install helm into /usr/local/bin
+
+helm installed into /usr/local/bin/helm
 
 1.  To review your version, enter:
 
 \$ helm version
 
-Client: &version.Version{SemVer:"v2.16.1",
-GitCommit:"bbdfe5e7803a12bbdf97e94cd847859890cf4050", GitTreeState:"clean"}
+version.BuildInfo{Version:"v3.0.1",
+GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
+GoVersion:"go1.13.4"}
+
+For details about installation methods for previous Helm versions, see
+<https://v2.helm.sh/docs/using_helm/#installing-helm>.
 
 ### Installing kubectl
 
@@ -174,7 +192,7 @@ curl piped into your bash:
 For details, see the article,
 <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest>.
 
-### Installing Docker 
+### Installing Docker
 
 For Linux command line users, you can follow these steps to install Docker CE
 for the first time on a new host machine. For these instructions, you need to
@@ -244,46 +262,46 @@ These instructions are sourced from the article
 For additional information and links to other Linux flavors, you can find
 instructions for other supported flavors of Linux.
 
-Cloning the pega-helm-charts github repository to your local system
--------------------------------------------------------------------
+Adding the Pega configuration files to your Helm installation on your local system
+----------------------------------------------------------------------------------
 
 Pega maintains a Github repository that contains the Helm charts that are
-required to deploy Pega Platform using Helm. You must clone the repository to
-your local system from which you will complete the deployment. You can either
-clone by downloading a zip file of the repository or using Github desktop.
+required to deploy Pega Platform using Helm. You must add the repository to your
+local system in order to customize two Pega configuration files for your Pega
+Platform deployment:
 
-To access the GitHub website and begin the cloning process:
+-   pega/pega - Use this chart to set customization parameters for your
+    deployment. You must modify this chart in the environment-specific runbook
+    that you are using in the section, **Update the Helm chart values**.
 
-1.  Sign in to [GitHub](https://github.com/) with your GitHub credentials using
-    the browser of your choice.
+-   pega/addons – Use this chart to install any supporting services and tools
+    which your Kubernetes environment will require to support a Pega deployment:
+    the required services, such as a load balancer or metrics server, that your
+    deployment requires depend on your cloud environment. For instance you can
+    specify whether you want to use a generic load-balancer or use one that is
+    offered in your Kubernetes environment, such as in AKS or EKS. The runbooks
+    provide instructions to deploy these supporting services once per Kubernetes
+    environment, regardless of how many Pega Infinity instances are deployed,
+    when you install the addons chart.
 
-2.  Navigate to the main page of the
-    [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts)
-    repository and choose the **Master** branch.
+1.  To add the Pega repository to your Helm installation, enter:
 
-3.  In the repository heading, click **Clone or download**.
+\$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 
-4.  In the **Clone with HTTPS** popup window, click **Download Zip**.
+1.  To verify the new repository, you can search it by entering:
 
-5.  In the explorer window, navigate to the local path, \<local
-    filepath\>/\<platform\>-demo, ensure that the file name is
-    pega-helm-charts-master.zip and click **Save**.
+\$ helm search repo pega
 
-6.  In a Linux bash shell, change folders to the \<local
-    filepath\>/\<platform\>-demo directory, where you saved the Pega Platform
-    distribution zip and extract your files to create a new distribution image
-    folder on your local system:
+NAME CHART VERSION APP VERSION DESCRIPTION
 
-\$ unzip ./\<pega-distribution-image\>.zip
+pega/pega 1.2.0 Pega installation on kubernetes
 
-After you extract the files from the archive, you will run the deployment
-commands from several of the folders in the \<local
-filepath\>/\<platform\>-demo/pega-helm-charts-master/charts folder.
+pega/addons 1.2.0 1.0 A Helm chart for Kubernetes
 
-These instructions were mostly sourced from the [GitHub
-help](https://help.github.com/en/desktop/contributing-to-projects/cloning-a-repository-from-github-to-github-desktop).
+These two charts in this repository, pega and pega, require customization for
+your deployment of Pega Platform.
 
-Updating the Pega addons Helm chart
+Updating the Pega/addons Helm chart
 -----------------------------------
 
 Update this Helm chart in order to enable the Traefik load balancer and disable
@@ -297,12 +315,14 @@ the metrics-server for deployments to the following platforms:
 
 If you are deploying to a different platform you can skip this section.
 
-1.  In your pega-helm-chart repository, navigate to the \<local
-    filepath\>/\<platform\>-demo /pega-helm-charts-master/charts/addons folder.
+1.  To download pega/addons Helm chat to the \<local
+    filepath\>/\<platform\>-demo, enter:
 
-2.  Open the values.yaml file from this folder in a text editor
+\$ helm inspect values pega/addons \> addons.yaml
 
-3.  In the traefik configuration area, ensure the following two settings are
+1.  Open the addons.yaml file from this folder in a text editor
+
+2.  In the traefik configuration area, ensure the following two settings are
     configured to use Traefik for your deployment load-balancer:
 
 traefik:
@@ -320,7 +340,7 @@ serviceType: **LoadBalancer**
 
 Note: Do not enclose the text in quotes.
 
-1.  For PKS deployments, you must ensure that the Pega metrics server is
+1.  For GKE or PKS deployments, you must ensure that the Pega metrics server is
     disabled in the metrics-server section of this *addon* values.yaml file,
     since PKS deployments use the PKS metrics server
 
@@ -406,14 +426,14 @@ of the product list.
 2.  In the cart review page, in the **Pega Platform** area, select the version
     of Pega Platform for your deployment.
 
-    ![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
+![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
 
-3.  After your selection and review are complete, click **Finish.**
+1.  After your selection and review are complete, click **Finish.**
 
-4.  When the order is processed, a confirmation screen displays with details
+2.  When the order is processed, a confirmation screen displays with details
     about your order.
 
-    An email with a link to the requested Pega Platform software is sent within
+-   An email with a link to the requested Pega Platform software is sent within
     a few minutes. The email address used is associated with the organization
     you selected in this section.
 
@@ -561,10 +581,10 @@ to see that your new image exists in your Docker image inventory.
 
 6.  In the Visibility area, select the **Private**.
 
-    You should not mage this image with Pega proprietary software a viewable
+-   You should not mage this image with Pega proprietary software a viewable
     **Public** image.
 
-7.  Click **Create**.
+1.  Click **Create**.
 
 Free DockerHub accounts support the use of a single private repository, so you
 may have to delete an existing private repository in order to create a new one

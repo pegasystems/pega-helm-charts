@@ -58,8 +58,8 @@ Where \<platform\>-demo is:
 
 You are ready to continue preparing your local system.
 
-Installing required applications for the deployment 
-----------------------------------------------------
+Installing required applications for the deployment
+---------------------------------------------------
 
 You can use the Windows package manager application,
 [Chocolatey](https://chocolatey.org/), to install or upgrade the Windows
@@ -75,17 +75,6 @@ chocolatey](https://chocolatey.org/install) page.
 
 \$ Get-ExecutionPolicy
 
-If it returns RemoteSigned, continue to the next step; if it returns Restricted,
-then enter:
-
-\$ Get-ExecutionPolicy Set-ExecutionPolicy Bypass -Scope Process
-
-![](media/55c16706069b5f1809435bb76c2ae181.png)
-
-Enter **Yes** to ensure you are not restricted to run chocolatey install or
-update commands on your computer. You will be able to run in bypass or
-RemoteSigned mode.
-
 1.  To install chocolatey and appropriate security scripts that it uses to
     ensure safety when you install applications using the chocolatey
     application, enter:
@@ -99,8 +88,16 @@ required application.
 
 ### Installing Helm and the kubernetes CLI commands:
 
-To do so, enter the choco install command listed for each application into your
-Powershell command prompt as shown:
+Pega supports using Helm version 2.1 and later and the Kubernetes Command Line
+Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
+kubernetes-cli 1.17.0. It’s recommended to use these versions. If you use Helm
+2.x, some of the commands will differ slightly for Helm 2.x.
+
+The default Helm version available in chocolatey is 3.0.x; the default version
+of kubernetes-cli is 1.17.x.
+
+Enter the choco install command listed for each application into your Powershell
+command prompt as shown:
 
 -   To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the
     Powershell command prompt, enter:
@@ -126,6 +123,8 @@ privileges to install the Azure CLI by entering:
 \$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile
 .\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi
 /quiet'
+
+The prompt returns when the installation is complete.
 
 For details, see the article,
 <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest>
@@ -192,19 +191,17 @@ You must authorize Docker.app with your system password during the install
 process. Privileged access is needed to install networking components, links to
 the Docker apps, and manage the Hyper-V VMs.
 
+it will reboot again 1-2 minutes to install/enable these features
+
+Docker Desktop takes 1-3 minutes to display on initial start
+
 1.  In the **Configuration** window, do not select **Use Windows containers
     instead of Linux containers (this can be changed after the installation)**
     and click **OK**.
 
-![](media/e4f1283256e86e5b7957d9285ecabf1c.png)
+2.  Click **Close**.
 
-![](media/1dab0fd4aa740565b247ffb852919028.png)
-
-1.  Click **Close**.
-
-To complete the installation, continue to the next step.
-
-1.  To complete your Docker Desktop setup, In the windows search bar, enter
+3.  To complete your Docker Desktop setup, in the windows search bar, enter
     “docker” in the search field and select the Docker Desktop app in the search
     results.
 
@@ -219,44 +216,44 @@ After you log in, the docker CLI is available from a Windows Powershell command
 prompt. These instructions were mostly sourced from the article,
 <https://docs.docker.com/v17.09/docker-for-windows/install/>.
 
-Cloning the pega-helm-charts github repository to your local system
--------------------------------------------------------------------
+Adding the Pega configuration files to your Helm installation on your local system
+----------------------------------------------------------------------------------
 
 Pega maintains a Github repository that contains the Helm charts that are
-required to deploy Pega Platform using Helm. You must clone the repository to
-your local system from which you will complete the deployment. You can either
-clone by downloading a zip file of the repository or using Github desktop.
+required to deploy Pega Platform using Helm. You must add the repository to your
+local system in order to customize two Pega configuration files for your Pega
+Platform deployment:
 
-To access the GitHub website and begin the cloning process:
+-   pega/pega - Use this chart to set customization parameters for your
+    deployment. You must modify this chart in the environment-specific runbook
+    that you are using in the section, **Update the Helm chart values**.
 
-1.  Sign in to [GitHub](https://github.com/) with your GitHub credentials using
-    the browser of your choice.
+-   pega/addons – Use this chart to install any supporting services and tools
+    which your Kubernetes environment will require to support a Pega deployment:
+    the required services, such as a load balancer or metrics server, that your
+    deployment requires depend on your cloud environment. For instance you can
+    specify whether you want to use a generic load-balancer or use one that is
+    offered in your Kubernetes environment, such as in AKS or EKS. The runbooks
+    provide instructions to deploy these supporting services once per Kubernetes
+    environment, regardless of how many Pega Infinity instances are deployed,
+    when you install the addons chart.
 
-2.  Navigate to the main page of the
-    [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts)
-    repository and choose the **Master** branch.
+1.  To add the Pega repository to your Helm installation, enter:
 
-3.  In the repository heading, click **Clone or download**.
+\$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 
-4.  In the **Clone with HTTPS** popup window, click **Download Zip**.
+1.  To verify the new repository, you can search it by entering:
 
-5.  In the Windows explorer window, navigate to the local path, \<local
-    filepath\>\\Downloads, ensure that the file name is
-    pega-helm-charts-master.zip and click **Save**.
+\$ helm search repo pega
 
-6.  In a Windows PowerShell, change folders to the Downloads folder where you
-    saved the pega-helm-charts-master.zip file and extract your files to create
-    a repository on your local system:
+NAME CHART VERSION APP VERSION DESCRIPTION
 
-\$ Expand-Archive -LiteralPath pega-helm-charts-master.zip -DestinationPath
-\<local filepath\>\\\<platform\>-demo
+pega/pega 1.2.0 Pega installation on kubernetes
 
-After you extract the files from the archive, you will run the deployment
-commands from several of the folders in the \<local
-filepath\>\\\<platform\>-demo\\pega-helm-charts-master\\charts folder.
+pega/addons 1.2.0 1.0 A Helm chart for Kubernetes
 
-These instructions were mostly sourced from the [GitHub
-help](https://help.github.com/en/desktop/contributing-to-projects/cloning-a-repository-from-github-to-github-desktop).
+These two charts in this repository, pega and pega, require customization for
+your deployment of Pega Platform.
 
 Updating the Pega addons Helm chart
 -----------------------------------
@@ -296,7 +293,7 @@ serviceType: **LoadBalancer**
 
 Note: Do not enclose the text in quotes.
 
-1.  For PKS deployments, you must ensure that the Pega metrics server is
+1.  For GKE or PKS deployments, you must ensure that the Pega metrics server is
     disabled in the metrics-server section of this *addon* values.yaml file,
     since PKS deployments use the PKS metrics server
 
@@ -382,14 +379,14 @@ of the product list.
 2.  In the cart review page, in the **Pega Platform** area, select the version
     of Pega Platform for your deployment.
 
-    ![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
+![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
 
-3.  After your selection and review are complete, click **Finish.**
+1.  After your selection and review are complete, click **Finish.**
 
-4.  When the order is processed, a confirmation screen displays with details
+2.  When the order is processed, a confirmation screen displays with details
     about your order.
 
-    An email with a link to the requested Pega Platform software is sent within
+-   An email with a link to the requested Pega Platform software is sent within
     a few minutes. The email address used is associated with the organization
     you selected in this section.
 
@@ -442,6 +439,8 @@ If it is not the right version number, you must complete a new request.
 \$ Expand-Archive .\\\<pega-distribution-image\>.zip
 
 ![C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML2318748.PNG](media/1edabbc855175f2bdca62f8a529d8c88.png)
+
+C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML2318748.PNG
 
 After you expand the archive, the files in the Pega Platform distribution image
 are available to use in preparing your Pega Platform installation Docker image .
@@ -543,10 +542,10 @@ image inventory.
 
 6.  In the Visibility area, select the **Private**.
 
-    You should not mage this image with Pega proprietary software a viewable
+-   You should not mage this image with Pega proprietary software a viewable
     **Public** image.
 
-7.  Click **Create**.
+1.  Click **Create**.
 
 Free DockerHub accounts support the use of a single private repository, so you
 may have to delete an existing private repository in order to create a new one
