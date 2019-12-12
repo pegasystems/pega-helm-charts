@@ -363,36 +363,36 @@ The icon changes to a green check and a new cart item appears in the top right o
 
 To download your Pega Platform image,
 
-12. Open the email you received. It will look similar to the image shown.
+1. Open the email you received. It will look similar to the image shown.
 
 ![](media/98b1055e0e63487db7bbb2c90c9ea40c.png)
 
-13. Click **Download now**.
+2. Click **Download now**.
 
-14. The **Pega Licensed Software Downloads** page opens.
+3. The **Pega Licensed Software Downloads** page opens.
 
 You can download your requested Pega Platform software using the link under **My Downloads**.
 
-15. Click **Download software**.
+4. Click **Download software**.
 
 Your secure **Inbox** of requested Pega software products opens. Your request for a version of Pega Platform software is listed at the top of the inbox table.
 
-16. In the **Subject** column, click the link to your requested Pega Platform software.
+5. In the **Subject** column, click the link to your requested Pega Platform software.
 
 The Package details window opens in the Package tab, which shows details about the Pega Platform software distribution package that you requested.
 
-17. In the **Files:** area of the window, ensure that version of the Pega distribution image is correct.
+6. In the **Files:** area of the window, ensure that version of the Pega distribution image is correct.
 
 If it is not the right version number, you must complete a new request.
 
-18. To download the file, select the Pega distribution image checkbox and click
+7. To download the file, select the Pega distribution image checkbox and click
     **Download**.
 
-19. In the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the Pega Platform distribution zip file.
+8. In the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the Pega Platform distribution zip file.
 
-20. In a Linux bash shell, change folders to the /home/\<local filepath\>/\<platform\>-demo directory, where you saved the Pega Platform distribution zip and extract your files to create a new distribution image folder on your local system:
+9. In a Linux bash shell, change folders to the /home/\<local filepath\>/\<platform\>-demo directory, where you saved the Pega Platform distribution zip and extract your files to create a new distribution image folder on your local system:
 
-`$ unzip .\\\<pega-distribution-image\>.zip`
+`$ unzip ./<pega-distribution-image>.zip`
 
 After you extract the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
 
@@ -407,13 +407,13 @@ Follow these steps to create a Docker image you can use to install or upgrade Pe
 
 1. From a Linux bash shell, ensure you are logged into your DockerHub account:
 
-`$ docker login -u \<username\> --p \<username-password\>`
+`$ docker login -u <username> --p <username-password>`
 
 For details about logging into Docker from a secure password file, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
 
 2. Change your directory to the top folder of your Pega distribution <pega-distribution-image\>.
 
-`$ cd ./\<pega-distribution-image\>/`
+`$ cd ./<pega-distribution-image>/`
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
