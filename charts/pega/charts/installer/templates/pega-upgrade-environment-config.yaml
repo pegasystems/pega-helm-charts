@@ -34,8 +34,10 @@ data:
   # Specify the workload manager to load UDFs into db2zos
   DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
 {{- end }}
+{{- if .Values.upgrade.targetRulesSchema }}
   # Target Rules Schema name
   TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
+{{- end }}
 {{- if .Values.zos.zosProperties }}
   # The location of the db2zos site specific properties file. Only used if the target system is a db2zos database
   TARGET_ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
