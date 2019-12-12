@@ -92,12 +92,12 @@ version:
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 \>
 get_helm.sh \| bash
 
-1.  To update the permissions of the file to you can use it for installations,
+2.  To update the permissions of the file to you can use it for installations,
     enter:
 
 \$ chmod 700 get_helm.sh
 
-1.  To run the script, enter:
+3.  To run the script, enter:
 
 \$ ./get_helm.sh
 
@@ -109,7 +109,7 @@ Preparing to install helm into /usr/local/bin
 
 helm installed into /usr/local/bin/helm
 
-1.  To review your version, enter:
+4.  To review your version, enter:
 
 \$ helm version
 
@@ -136,11 +136,11 @@ This command downloads and parses the \`stable.txt\` in the repository,
 navigates to the version listed in the file, and downloads the kubectl binary
 file in the /bin/linux/amd64/ directory.
 
-1.  Make the kubectl binary executable:
+2.  Make the kubectl binary executable:
 
 \$ chmod +x ./kubectl
 
-1.  Move the script to your executable PATH:
+3.  Move the script to your executable PATH:
 
 \$ sudo mv ./kubectl /usr/local/bin/kubectl
 
@@ -175,7 +175,7 @@ your bash:
 
 \$ chmod +x pks
 
-1.  Move the binary file into your \$PATH directory.
+8.  Move the binary file into your \$PATH directory.
 
 \$ sudo mv ./pks /bin
 
@@ -205,16 +205,16 @@ the repository.
 
 \$ sudo apt-get update
 
-1.  Install packages to allow apt to use a repository over HTTPS:
+2.  Install packages to allow apt to use a repository over HTTPS:
 
 \$ sudo apt-get install apt-transport-https ca-certificates curl
 software-properties-common
 
-1.  Add Docker’s official GPG key:
+3.  Add Docker’s official GPG key:
 
 \$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg \| sudo apt-key add –
 
-1.  Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38
+4.  Verify that you now have the key with the fingerprint 9DC8 5822 9FC7 DD38
     854A E2D8 8D81 803C 0EBF CD88, by searching for the last 8 characters of the
     fingerprint.
 
@@ -230,7 +230,7 @@ uid Docker Release (CE deb) \<docker\@docker.com\>
 
 sub 4096R/F273FCD8 2017-02-22
 
-1.  Use the following command to set up the stable repository. You always need
+5.  Use the following command to set up the stable repository. You always need
     the stable repository, even if you want to install builds from the edge or
     test repositories as well. To add the edge or test repository, add the word
     edge or test (or both) after the word stable in the commands below.
@@ -247,12 +247,12 @@ and test repositories.
 
 \$ sudo apt-get update
 
-1.  Install the latest version of Docker CE, or go to the next step to install a
+2.  Install the latest version of Docker CE, or go to the next step to install a
     specific version. Any existing installation of Docker is replaced.
 
 \$ sudo apt-get install docker-ce docker-ce-cli containerd.io
 
-1.  Verify that Docker Engine - Community is installed correctly by running the
+3.  Verify that Docker Engine - Community is installed correctly by running the
     hello-world image.
 
 \$ sudo docker run hello-world
@@ -284,11 +284,11 @@ Platform deployment:
     environment, regardless of how many Pega Infinity instances are deployed,
     when you install the addons chart.
 
-1.  To add the Pega repository to your Helm installation, enter:
+4.  To add the Pega repository to your Helm installation, enter:
 
 \$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 
-1.  To verify the new repository, you can search it by entering:
+5.  To verify the new repository, you can search it by entering:
 
 \$ helm search repo pega
 
@@ -320,9 +320,9 @@ If you are deploying to a different platform you can skip this section.
 
 \$ helm inspect values pega/addons \> addons.yaml
 
-1.  Open the addons.yaml file from this folder in a text editor
+2.  Open the addons.yaml file from this folder in a text editor
 
-2.  In the traefik configuration area, ensure the following two settings are
+3.  In the traefik configuration area, ensure the following two settings are
     configured to use Traefik for your deployment load-balancer:
 
 traefik:
@@ -340,7 +340,7 @@ serviceType: **LoadBalancer**
 
 Note: Do not enclose the text in quotes.
 
-1.  For GKE or PKS deployments, you must ensure that the Pega metrics server is
+4.  For GKE or PKS deployments, you must ensure that the Pega metrics server is
     disabled in the metrics-server section of this *addon* values.yaml file,
     since PKS deployments use the PKS metrics server
 
@@ -357,7 +357,7 @@ cluster by default.
 
 enabled: **false**
 
-1.  Save the file.
+5.  Save the file.
 
 Add any known, customized settings for Pega to your deployment
 --------------------------------------------------------------
@@ -407,13 +407,13 @@ and then click **Continue**. You will receive an email with a link to your
 software using an email address that is associated with the organization you
 select on this screen.
 
-1.  In the **You're viewing products available** page, enter **Pega Platform**
+5.  In the **You're viewing products available** page, enter **Pega Platform**
     in the **Search**, which will filter the list of products in the page.
 
 The **Pega Platform** card should appear near the top of the card list, below
 the list of all of the **Language packs for Pega Platform.**
 
-1.  In the Pega Platform card, use your mouse to activate the icon into a
+6.  In the Pega Platform card, use your mouse to activate the icon into a
     shopping cart and click the shopping cart.
 
 The icon changes to a green check and a new cart item appears in the top right
@@ -421,16 +421,16 @@ of the product list.
 
 ![](media/029c6531bd52109598047a2ee6966657.png)
 
-1.  Click **Continue**.
+7.  Click **Continue**.
 
-2.  In the cart review page, in the **Pega Platform** area, select the version
+8.  In the cart review page, in the **Pega Platform** area, select the version
     of Pega Platform for your deployment.
 
 ![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
 
-1.  After your selection and review are complete, click **Finish.**
+9.  After your selection and review are complete, click **Finish.**
 
-2.  When the order is processed, a confirmation screen displays with details
+10.  When the order is processed, a confirmation screen displays with details
     about your order.
 
 -   An email with a link to the requested Pega Platform software is sent within
@@ -439,46 +439,46 @@ of the product list.
 
 ![](media/748ea91e3ff43cf4544ce2f4638e86bf.png)
 
-1.  When satisfied with the order, click **Close**.
+11.  When satisfied with the order, click **Close**.
 
 ### Downloading Pega Platform to your local system
 
 To download your Pega Platform image,
 
-1.  Open the email you received. It will look similar to the image shown.
+12.  Open the email you received. It will look similar to the image shown.
 
 ![](media/98b1055e0e63487db7bbb2c90c9ea40c.png)
 
-1.  Click **Download now**.
+13.  Click **Download now**.
 
-2.  The **Pega Licensed Software Downloads** page opens.
+14.  The **Pega Licensed Software Downloads** page opens.
 
 You can download your requested Pega Platform software using the link under **My
 Downloads**.
 
-1.  Click **Download software**.
+15.  Click **Download software**.
 
 Your secure **Inbox** of requested Pega software products opens. Your request
 for a version of Pega Platform software is listed at the top of the inbox table.
 
-1.  In the **Subject** column, click the link to your requested Pega Platform
+16.  In the **Subject** column, click the link to your requested Pega Platform
     software.
 
 The Package details window opens in the Package tab, which shows details about
 the Pega Platform software distribution package that you requested.
 
-1.  In the **Files:** area of the window, ensure that version of the Pega
+17.  In the **Files:** area of the window, ensure that version of the Pega
     distribution image is correct.
 
 If it is not the right version number, you must complete a new request.
 
-1.  To download the file, select the Pega distribution image checkbox and click
+18.  To download the file, select the Pega distribution image checkbox and click
     **Download**.
 
-2.  In the **Save as** window, choose the \<local filepath\>/\<platform\>-demo
+19.  In the **Save as** window, choose the \<local filepath\>/\<platform\>-demo
     folder to which you save the Pega Platform distribution zip file.
 
-3.  In a Linux bash shell, change folders to the /home/\<local
+20.  In a Linux bash shell, change folders to the /home/\<local
     filepath\>/\<platform\>-demo directory, where you saved the Pega Platform
     distribution zip and extract your files to create a new distribution image
     folder on your local system:
@@ -523,12 +523,12 @@ For details about logging into Docker from a secure password file, see
 can also ensure you are logged by used the Docker Desktop client running on your
 system.
 
-1.  Change your directory to the top folder of your Pega distribution,
+2.  Change your directory to the top folder of your Pega distribution,
     \<pega-distribution-image\>.
 
 \$ cd ./\<pega-distribution-image\>/
 
-1.  Create a text file with the text editor of your choice in the \<local
+3.  Create a text file with the text editor of your choice in the \<local
     filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you
     extracted the Pega distribution on your local system.
 
@@ -537,7 +537,7 @@ rules, and scripts.
 
 ![](media/152260ae774fe07d717f1b31b5560f25.png)
 
-1.  Copy the following lines into the file to build your docker image using the
+4.  Copy the following lines into the file to build your docker image using the
     public image on DockerHub that Pega provides to build install images,
     pegasystems/pega-installer-ready:
 
@@ -549,9 +549,9 @@ rules, and scripts.
 
 >   COPY rules /opt/pega/kit/rules
 
-1.  Save the text-only file as dockerfile, without an extension.
+5.  Save the text-only file as dockerfile, without an extension.
 
-2.  From your command prompt (Linux or Powershell running with Administrator
+6.  From your command prompt (Linux or Powershell running with Administrator
     privileges), in your current directory, build your pega install docker image
     by entering:
 
@@ -561,36 +561,36 @@ This command uses your dockerfile to build a full Docker image with the name
 “pega-installer” and gives it the tag, “latest”. You can use the docker command
 to see that your new image exists in your Docker image inventory.
 
-1.  Tag the local version of your new image, pega-installer, with your DockerHub
+7.  Tag the local version of your new image, pega-installer, with your DockerHub
     ID:
 
 `$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
 
-1.  Create a private repository on your [DockerHub](https://hub.docker.com/)
+8.  Create a private repository on your [DockerHub](https://hub.docker.com/)
     account that is tagged as a private repository.
 
-2.  From your default login page, click the Repositories link (at the top of the
+9.  From your default login page, click the Repositories link (at the top of the
     page).
 
-3.  In the Repositories view, click **Create Repository +**.
+10.  In the Repositories view, click **Create Repository +**.
 
-4.  Enter a Name that matches the docker image you just built.
+11.  Enter a Name that matches the docker image you just built.
 
-5.  Provide a brief Description, that will help you remember the version of Pega
+12.  Provide a brief Description, that will help you remember the version of Pega
     with which you built this image, or any other useful information.
 
-6.  In the Visibility area, select the **Private**.
+13.  In the Visibility area, select the **Private**.
 
 -   You should not mage this image with Pega proprietary software a viewable
     **Public** image.
 
-1.  Click **Create**.
+14.  Click **Create**.
 
 Free DockerHub accounts support the use of a single private repository, so you
 may have to delete an existing private repository in order to create a new one
 for your Pega docker installation image.
 
-1.  From a Linux bash shell, use the docker command to push the new image to
+15.  From a Linux bash shell, use the docker command to push the new image to
     your new private repository:
 
 `$ docker push <your-dockerbug-ID>/pega-installer`
