@@ -1,4 +1,4 @@
-Preparing your local Windows 10 system to deploy Pega Platform– 45 minutes
+Preparing your local Windows 10 system to – 45 minutes
 ==========================================================================
 
 In order to deploy using a local Windows 10 system on which you can run commands with Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment of Pega Platform. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Windows application or prepare a configuration file that is required to complete the deployment.
@@ -42,7 +42,7 @@ You are ready to continue preparing your local system.
 Installing required applications for the deployment
 ---------------------------------------------------
 
-Some of the required applications are binary files that you download from the organization's download area; other applicaitons can be installed by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
+Some of the required applications are binary files that you download from the organization's download area; other applications can be installed by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
 Note: In order to use the docker command in the runbooks, you must have the docker application installed; however, you must install the applicaton directly from the docker website. For your convenience, the instructions available on the docker website are included in this document.
 
@@ -182,14 +182,13 @@ prompt. These instructions were mostly sourced from the article,
 Adding the Pega configuration files to your Helm installation on your local system
 ----------------------------------------------------------------------------------
 
-Pega maintains a repository that contains the Helm charts that are
-required to deploy Pega Platform using Helm. You must add the repository to your
-local system in order to customize two Pega configuration files for your Pega
-Platform deployment:
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
 
-- pega/pega - Use this chart to set customization parameters for your deployment. You must modify this chart in the environment-specific runbook that you are using in the section, **Update the Helm chart values**.
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
 - pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed, when you install the addons chart.
+
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you'll focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
 
 1. To add the Pega repository to your Helm installation, enter:
 
@@ -198,10 +197,10 @@ Platform deployment:
 2. To verify the new repository, you can search it by entering:
 
 ```yaml
-$ helm search repo pega
-NAME        CHART VERSION   APP VERSION     DESCRIPTION
-pega/pega   1.2.0                           Pega installation on kubernetes
-pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+  $ helm search repo pega
+  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega   1.2.0                           Pega installation on kubernetes
+  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
 ```
 
 These two charts in this repository, pega and pega, require customization for your deployment of Pega Platform.
@@ -230,15 +229,15 @@ If you are deploying to a different platform you can skip this section.
     configured to use Traefik for your deployment load-balancer:
 
 ```yaml
-traefik:
-enabled: **true**
+  traefik:
+  enabled: **true**
 
-# Set any additional Traefik parameters. These values will be used by Traefik's Helm chart.
-# See https://github.com/Helm/charts/blob/master/stable/traefik/values.yaml
-# Set traefik.serviceType to "LoadBalancer" on gke, PKS, and pks
-serviceType: **LoadBalancer**
+  # Set any additional Traefik parameters. These values will be used by Traefik's Helm chart.
+  # See https://github.com/Helm/charts/blob/master/stable/traefik/values.yaml
+  # Set traefik.serviceType to "LoadBalancer" on gke, PKS, and pks
+  serviceType: **LoadBalancer**
 
-Note: Do not enclose the text in quotes.
+  Note: Do not enclose the text in quotes.
 ```
 
 4. For GKE or PKS deployments, you must ensure that the Pega metrics server is disabled in the metrics-server section of this *addon* values.yaml file, since PKS deployments use the PKS metrics server
@@ -391,10 +390,10 @@ You can list the folder content and see folders for Pega archives, Images, rules
 4. Copy the following lines into the file to build your docker image using the public image on DockerHub that Pega provides to build install images, pegasystems/pega-installer-ready:
 
 ```yaml
-> FROM pegasystems/pega-installer-ready
-> COPY scripts /opt/pega/kit/scripts
-> COPY archives /opt/pega/kit/archives
-> COPY rules /opt/pega/kit/rules
+  > FROM pegasystems/pega-installer-ready
+  > COPY scripts /opt/pega/kit/scripts
+  > COPY archives /opt/pega/kit/archives
+  > COPY rules /opt/pega/kit/rules
 ```
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.

@@ -1,4 +1,4 @@
-Preparing your local Linux system to deploy Pega Platform– 45 minutes
+Preparing your local Linux system – 45 minutes
 =====================================================================
 
 In order to deploy using a local Linux system on which you can run commands with
@@ -219,14 +219,15 @@ These instructions are sourced from the article <https://docs.docker.com/v17.09/
 Adding the Pega configuration files to your Helm installation on your local system
 ----------------------------------------------------------------------------------
 
-Pega maintains a repository that contains the Helm charts that are
-required to deploy Pega Platform using Helm. You must add the repository to your
-local system in order to customize two Pega configuration files for your Pega
-Platform deployment:
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
 
-- pega/pega - Use this chart to set customization parameters for your deployment. You must modify this chart in the environment-specific runbook that you are using in the section, **Update the Helm chart values**.
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
 - pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed, when you install the addons chart.
+
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you'll focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+
+To simplify the instruction, you can download the file to the \<platform\>-demo fold you have already created on your local system. 
 
 1. To add the Pega repository to your Helm installation, enter:
 
@@ -409,7 +410,7 @@ Follow these steps to create a Docker image you can use to install or upgrade Pe
 
 `$ docker login -u <username> -p <username-password>`
 
-For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
+For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>.
 
 2. Change your directory to the top folder of your Pega distribution <pega-distribution-image\>.
 
