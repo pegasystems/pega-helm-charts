@@ -425,7 +425,7 @@ Platform is already installed in your database.
 
 `$ az login`
 
-    A browser window opens and you are asked to log into your Azure account.
+A browser window opens and you are asked to log into your Azure account.
 
 3. Log into the Azure account you will use to deploy Pega Platform.
 
@@ -434,7 +434,7 @@ information in your command prompt. For example, in a Windows PowerShell you'll 
 
 ![](media/0a2d6fd5f1c8174de2e5f9a97b8801a6.png)
 
-    If you cannot log into your Azure home page or see that the Azure CLI recognizes your account correctly, contact your Microsoft account representative.
+If you cannot log into your Azure home page or see that the Azure CLI recognizes your account correctly, contact your Microsoft account representative.
 
 4. In the upper right corner of your browser, click **Portal**.
 
@@ -452,7 +452,6 @@ information in your command prompt. For example, in a Windows PowerShell you'll 
 ```yaml
 $ az aks get-credentials --resource-group <resource-group-name> --name
 <cluster-name>
-
 Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube\config
 ```
 
@@ -475,107 +474,55 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 ![](media/81a7ae961cabc463381869e3bae5c722.png)
 
-    You can now view your deployment details visually using the Kubernetes dashboard. You’ll use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
+You can now view your deployment details visually using the Kubernetes dashboard. You’ll use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
 
-    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell command prompt open and open a new PowerShell command prompt for the remaining steps.
+In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
 
 10. Do one of the following:
 
-  - Open a new, second Windows PowerShell running as Administrator on your local
+  - Open a new Windows PowerShell running as Administrator on your local
     system and change the location to the top folder of your
-    aks-demo/pega-helm-charts-master folder that you created in [Create a local
+    aks-demo folder that you created in [Create a local
     folder to access all of the configuration
     file](#create-a-local-folder-to-access-all-of-the-configuration-files).
 
-`$ cd \<local filepath>\aks-demo\pega-helm-charts-master`
+`$ cd \<local filepath>\aks-demo`
 
-  - Open a new, second Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
+  - Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
 
-`$ cd /home/<local filepath>/aks-demo/pega-helm-charts-master`
+`$ cd /home/<local filepath>/aks-demo`
 
-11. Initialize your Helm installation:
-
-`$ helm init`
-
-12. To create a required service account for tiller:
+11. Create namespaces for both your Pega deployment and the addons:
 
 ```yaml
-$ kubectl create serviceaccount --namespace kube-system tiller
-
-serviceaccount/tiller created
+$ kubectl create namespace mypega
+namespace/mypega created
+$ kubectl create namespace pegaaddons
+namespace/pegaaddons created
 ```
 
-13. To allow tiller to have a required clusterrolebinding account access with
-    required rbac authorization:
+12. To install the addons chart, which enables the deployment’s load balancer and disables the metric server and you havealready configured onyour local system, enter:
 
 ```yaml
-$ kubectl create clusterrolebinding tiller-cluster-rule
---clusterrole=cluster-admin --serviceaccount=kube-system:tiller
-
-clusterrolebinding.rbac.authorization.k8s.io/tiller-cluster-rule created
+$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-14. To ensure that the tiller service account is upgraded to the latest version:
+A successful pegaaddon deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+
+13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
 ```yaml
-$ helm init --service-account tiller --upgrade
-
-$HELM_HOME has been configured at C:\Users\<user name>\.helm.
-
-Tiller (the Helm server-side component) has been upgraded to the current
-version.
+helm install mypega pega/pega --namespace mypega --values pega.yaml --set
+ global.actions.execute=install-deploy
 ```
 
-15. Verify the Helm connection with the cluster by checking the version:
-
-`$ helm version`
-
-16. Update the deployment to include the repository files in your \<local
-    filepath\>\\aks-demo\\pega-helm-charts-master\\charts\\addons folder:
-
-`$ helm dep update ./charts/addons`
-
-17. Install the addon deployment which enables the deployment’s load balancer
-    and disables the metric server by invoking the appropriate version.
-
-`$ helm install -n pegaaddons ./charts/addons --namespace addon`
-
-A successful addon deployment immediately returns details that show progress.
-
-![C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML76b4f92.PNG](media/e9d3cebd5f133fc15161c637763981c4.png)
-
-For further verification of your deployment progress, you can list the deployments in your pegaaddons configuration with either a helm option or a kubectl option:
-
-`$ helm ls`
-
-![](media/c7c9f74e859087b900732ebb453cfdb8.png)
-
-`$ kubectl get services --namespace addon`
-
-![](media/a7ec6b4456a51172889f191faf241cc2.png)
-
-18. Update the deployment to include the repository files in your \<local
-    filepath\>/aks-demo/pega-helm-charts-master/charts/pega folder:
-
-`$ helm dep update ./charts/pega`
-
-You are ready for the final phase of installing and then deploying Pega in your AKS environment.
-
-19. Deploy Pega Platform for the first time by installing Pega Platform into the
-    database you specified in the Helm chart:
-
-`$ helm install -n pega ./charts/pega --namespace pega --set
-global.actions.execute=install-deploy`
-
-For subsequent Helm installs, use the command “helm install -n pega ./charts/pega --namespace pega” to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command 'helm install mypega pega/pega --namespace mypega --values pega.yaml' to deploy Pega Platform and avoid another Pega Platform installation.
 
 A successful Pega deployment immediately returns details that show progress for your deployment.
 
-20. Refresh the Kubernetes dashboard you opened in step 10; if you closed it,
-    open a new command prompt running as Administrator and relaunch the browser
-    as directed in Step 9.
+14. Refresh the Kubernetes dashboard you opened in step 9; if you closed it, open a new command prompt running as Administrator and relaunch the browser as directed in Step 9.
 
-    In the dashboard, use the **Namespace** pulldown to change the view to **pega**
+In the dashboard, use the **Namespace** pulldown to change the view to **pega**
 and click on the **Pods** view.
 
 ![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
@@ -584,18 +531,15 @@ Initially, some of the resources are making requests to complete the configurati
 
 A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour. To follow the progress of an installation, use the dashboard; for subsequent deployments, you will not need to do this.
 
-21. (Only for installations) On the Kubernetes dashboard, select **Jobs**,
-    locate the **pega-db-install** job, and click the logs icon located on the
-    right side of that row.
+15. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon located on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-22. To see the final deployment in the Kubernetes dashboard after about 15
-    minutes, refresh the pega namespace pods.
+16. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
-A successful deployment will not show errors across the various workloads. The pega Namespace and Overview view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete Workloads.
+A successful deployment will not show errors across the various workloads. The **mypega** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
 
 ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 

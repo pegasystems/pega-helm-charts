@@ -221,7 +221,7 @@ If you are deploying to a different platform you can skip this section.
 
 1. To download pega/addons Helm chat to the \<local filepath\>/\<platform\>-demo, enter:
 
-`$ helm inspect values pega/addons \> addons.yaml`
+`$ helm inspect values pega/addons > addons.yaml`
 
 2. Open the addons.yaml file from this folder in a text editor
 
