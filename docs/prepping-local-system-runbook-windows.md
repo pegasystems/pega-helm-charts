@@ -1,4 +1,4 @@
-Preparing your local Windows 10 system to – 45 minutes
+Preparing your local Windows 10 system – 45 minutes
 ==========================================================================
 
 In order to deploy using a local Windows 10 system on which you can run commands with Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment of Pega Platform. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Windows application or prepare a configuration file that is required to complete the deployment.
