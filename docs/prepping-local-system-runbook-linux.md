@@ -45,7 +45,7 @@ Installing required applications for the deployment
 ---------------------------------------------------
 
 Some of the required applications are binary files that you download from the
-organizations, download area. In order to use the docker command, the instructions available on the docker website are included in this document if you’d prefer to just doc the installation and not navigate to the docker documentation support website.
+organization's download area; other applicaitons can be installed by using a Linux package manager. In order to use the docker command in the runbooks, you must have the docker application installed; however, you must install the applicaton directly from the docker website. For your convenience, the instructions available on the docker website are included in this document.
 
 ### Installing unzip
 
@@ -173,7 +173,7 @@ software-properties-common`
 
 3. Add Docker’s official GPG key:
 
-`$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg \| sudo apt-key add –`
+`$ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add –`
 
 4. Verify that you now have the key with the fingerprint `9DC8 5822 9FC7 DD38
     854A E2D8 8D81 803C 0EBF CD88` by searching for the last 8 characters of the
@@ -186,7 +186,7 @@ The command should return:
 ```yaml
 pub 4096R/0EBFCD88 2017-02-22
 9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
-uid Docker Release (CE deb) \<docker\@docker.com\>
+uid Docker Release (CE deb) <docker@docker.com>
 sub 4096R/F273FCD8 2017-02-22
 ```
 
@@ -214,7 +214,7 @@ and test repositories.
 
 `$ sudo docker run hello-world`
 
-These instructions are sourced from the article <https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/>. For additional information and links to other Linux flavors, you can find instructions for other supported flavors of Linux.
+These instructions are sourced from the article <https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/>. For additional information and links to other Linux distributions, see the instructions provided by other supported Linux distributions.
 
 Adding the Pega configuration files to your Helm installation on your local system
 ----------------------------------------------------------------------------------
@@ -407,9 +407,9 @@ Follow these steps to create a Docker image you can use to install or upgrade Pe
 
 1. From a Linux bash shell, ensure you are logged into your DockerHub account:
 
-`$ docker login -u <username> --p <username-password>`
+`$ docker login -u <username> -p <username-password>`
 
-For details about logging into Docker from a secure password file, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
+For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
 
 2. Change your directory to the top folder of your Pega distribution <pega-distribution-image\>.
 
