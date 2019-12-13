@@ -450,8 +450,7 @@ If you cannot log into your Azure home page or see that the Azure CLI recognizes
 6. Prepare your environment using the Azure CLI, in your Windows PowerShell:
 
 ```yaml
-$ az aks get-credentials --resource-group <resource-group-name> --name
-<cluster-name>
+$ az aks get-credentials --resource-group <resource-group-name> --name <cluster-name>
 Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube\config
 ```
 
@@ -480,15 +479,11 @@ In order to continue using the Kubernetes dashboard to see the progress of your 
 
 10. Do one of the following:
 
-  - Open a new Windows PowerShell running as Administrator on your local
-    system and change the location to the top folder of your
-    aks-demo folder that you created in [Create a local
-    folder to access all of the configuration
-    file](#create-a-local-folder-to-access-all-of-the-configuration-files).
+- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
 
 `$ cd \<local filepath>\aks-demo`
 
-  - Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
+- Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
 
 `$ cd /home/<local filepath>/aks-demo`
 
