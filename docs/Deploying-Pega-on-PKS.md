@@ -353,8 +353,7 @@ A successful pegaaddon deployment returns details of deployment progress. For fu
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
 ```yaml
-helm install mypega pega/pega --namespace mypega --values pega.yaml --set
- global.actions.execute=install-deploy
+helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
 For subsequent Helm installs, use the command 'helm install mypega pega/pega --namespace mypega --values pega.yaml' to deploy Pega Platform and avoid another Pega Platform installation.
