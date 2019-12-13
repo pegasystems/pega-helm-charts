@@ -368,7 +368,7 @@ To finalize these details, follow these steps:
 
 1. To download pega/pega Helm chat to the \<local filepath>\aks-demo, enter:
 
-`$ helm inspect values pega/pega \> pega.yaml`
+`$ helm inspect values pega/pega > pega.yaml`
 
 2. Open the pega.yaml file from this folder in a text editor and update the following
     settings in the chart based on your AKS requirements:
