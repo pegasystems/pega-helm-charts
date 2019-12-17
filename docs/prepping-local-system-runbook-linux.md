@@ -1,8 +1,8 @@
 Preparing your local Linux system – 45 minutes
 =====================================================================
 
-In order to deploy using a local Linux system on which you can run commands with
-Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment of Pega Platform. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
+In order to deploy Pega Platform using a local Linux system on which you can run commands with
+Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
 
 Assumptions and Prerequisites
 -----------------------------
@@ -29,13 +29,13 @@ To create this folder, open a Linux command prompt and enter:
 
 Where \<platform\>-demo is:
 
-- AKS-demo -for the AKS runbook
+- AKS-demo - for the AKS runbook
 
-- EKS-demo -for the EKS runbook
+- EKS-demo - for the EKS runbook
 
-- GKE-demo -for the GKE runbook
+- GKE-demo - for the GKE runbook
 
-- PKS-demo -for the PKS runbook
+- PKS-demo - for the PKS runbook
 
 - Openshift-demo - for the Openshift runbook
 

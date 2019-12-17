@@ -19,7 +19,7 @@ deployments.
 How the deployment works
 ------------------------
 
-Pega provides customized orchestration tools and docker images required to
+Pega provides customized orchestration tools and Docker images required to
 orchestrate a deployment in an GKE cluster you create for the deployment using
 the following stepped tasks:
 
@@ -31,7 +31,7 @@ the following stepped tasks:
 
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – request a GKE cluster form Pivotal, an SQL database, and a storage resource in an account such as Google Cloud Platform (GPC).
 
-3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your GKE details and use kubectl and helm to install and then deploy Pega Platform onto your GKE cluster.
+3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your GKE details and use kubectl and Helm to install and then deploy Pega Platform onto your GKE cluster.
 
 5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
@@ -68,6 +68,8 @@ document:
 
 - A GCP account with a payment method set up to pay for the GCP resources you create using this document. You should also have sufficient GCP account permissions and knowledge to:
 
+- Create a Google Cloud Platform project.
+
 - Create a PostgreSQL Database.
 
 - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
@@ -80,11 +82,29 @@ document:
 
   - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
 
-  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from docker on your local system.
+  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker applcation on your local system.
 
-- Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the Helm documentation portal.
+- Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the [Helm documentation portal](https://helm.sh/docs/).
 
 - Kubectl –the kubernetes command line tool you must use to connect and to manage your Kubernetes resources.
+
+Create a Google Cloud Platofrm Project - 5 minutes
+-----------------------------------------
+In order to deploy Pega Platform to a GKE cluster, you must create a Google Cloud project inwhich you will create your Kubernetes cluster resources.
+
+1. Using the browser of your choice, log into [Google Cloud](#https://cloud.google.com/) with your Google Cloud account credentials.
+
+2. Click **Console** next to your profile name to open the Google Cloud Platform console page.
+
+3. In the search tool, search for "Manage resources" and select **Manage resources IAM & admin** to display the **Google Cloud Platform console > Manage resources** page.
+
+Alternatively, you can click the link, [Create a Google Cloud Platform project](#https://console.cloud.google.com/cloud-resource-manager?_ga=2.261938061.-1452042395.1574691090) to open the **Manage resources** page.
+
+4. Click **+CREATE PROJECT**.
+
+5. In the New Project window, enter a unique **Project name**, select a **Location**, if appropiate, and click **CREATE**.
+
+With the new project created, you can proceed with completing the preparation of your local system.
 
 Prepare your local system – 45 minutes
 --------------------------------------
@@ -124,7 +144,7 @@ In order to login to your demo cluster, you must have the following information:
 
 ### Create a database resource
 
-Create a PostgreSQL database in which to install Pega Platform. GKE deployments require you to install in an SQL database. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” helm chart with this information.
+Create a PostgreSQL database in which to install Pega Platform. GKE deployments require you to install in an SQL database. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” Helm chart with this information.
 
 1. Use a browser to log onto <https://cloud.google.com/> and navigate to your
     **Console** in the upper right corner.
@@ -187,8 +207,8 @@ displays all of the SQL resources in your account, which includes your newly cre
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-In order to deploy Pega Platform using Helm, you must customize the “pega” helm
-chart that holds the specific settings for your deployment needs and then run a series of helm commands to complete the deployment.
+In order to deploy Pega Platform using Helm, you must customize the “pega” Helm
+chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation followed by a deployment will take about 90 minutes total, since it takes about an hour for Pega Platform to completely install in your postgres database.
 
@@ -204,7 +224,7 @@ To customize this file, you must download it from the repository to your local s
 
 - Access your GCP SQL database you created in [Create an SQL database resource](#_Create_an_SQL).
 
-- Install the version of Pega Platform that you built into your docker install image in [Build your Docker image from the pega-installer-ready](#_Build_your_Docker) into your Azure SQL database.
+- Install the version of Pega Platform that you built into your Docker install image in [Build your Docker image from the pega-installer-ready](#_Build_your_Docker) into your Azure SQL database.
 
 - Access the Pega Docker images you specify for your deployments.
 
@@ -242,18 +262,18 @@ To finalize these details, follow these steps:
 
 These steps walk you through connecting your local system to your GKE cluster;
 enabling the use of a browser-based Kubernetes dashboard you can use to monitor
-your deployment; and performing the helm commands required to complete your
+your deployment; and performing the Helm commands required to complete your
 deployment of Pega Platform on to your GKE environment.
 
-It's easy to confuse a helm install with a Pega Platform install, but they are
-separate processes. The helm install command uses helm to install your
-deployment as directed in the helm charts, one in the charts\\addons folder and
-one in the charts\\pega folder. In this document, you specify that the helm
+It's easy to confuse a Helm install with a Pega Platform install, but they are
+separate processes. The Helm install command uses Helm to install your
+deployment as directed in the Helm charts, one in the charts\\addons folder and
+one in the charts\\pega folder. In this document, you specify that the Helm
 chart always “deploys” by using the setting, actions.execute: “deploy”. For the
-following steps, you overwrite this function on your initial helm install by
+following steps, you overwrite this function on your initial Helm install by
 specifying “--set global.actions.execute:install-deploy”, which invokes an
-installation of Pega Platform using your installation docker image and then
-automatically followed by a deploy. In subsequent helm deployments, you should
+installation of Pega Platform using your installation Docker image and then
+automatically followed by a deploy. In subsequent deployments using Helm, you should
 not use the override argument, “--set global.actions.execute=”, since Pega
 Platform is already installed in your database.
 
@@ -350,7 +370,7 @@ A successful pegaaddon deployment returns details of deployment progress. For fu
 helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
-For subsequent Helm installs, use the command 'helm install mypega pega/pega --namespace mypega --values pega.yaml' to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command `helm install mypega pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
 
 A successful Pega deployment immediately returns details that show progress for your deployment.
 
