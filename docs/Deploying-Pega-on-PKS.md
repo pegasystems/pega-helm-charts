@@ -19,7 +19,7 @@ deployments.
 How the deployment works
 ------------------------
 
-Pega provides customized orchestration tools and docker images required to
+Pega provides customized orchestration tools and Docker images required to
 orchestrate a deployment in an PKS cluster you create for the deployment using
 the following stepped tasks:
 
@@ -31,7 +31,7 @@ the following stepped tasks:
 
 2. [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes) – request a PKS cluster form Pivotal, an SQL database, and a storage resource in an account such as Google Cloud Platform (GPC).
 
-3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your PKS details and use kubectl and helm to install and then deploy Pega Platform onto your PKS cluster.
+3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your PKS details and use kubectl and Helm to install and then deploy Pega Platform onto your PKS cluster.
 
 5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
@@ -55,7 +55,7 @@ By following the procedures in this document, you will create a deployment of Pe
 
     After you follow this document to its completion, you'll have a Pega Platform cluster with a single PostgreSQL Database instance and two clustered virtual machines (VMs).
 
-### Assumptions and Prerequisites
+### Assumptions and prerequisites
 
 This guide assumes:
 
@@ -80,9 +80,9 @@ document:
 
   - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
 
-  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from docker on your local system.
+  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker applcation on your local system.
 
-- Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the Helm documentation portal.
+- Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the [Helm documentation portal](https://helm.sh/docs/).
 
 - Kubectl –the kubernetes command line tool you must use to connect and to manage your Kubernetes resources.
 
@@ -129,7 +129,9 @@ In order to login to your demo cluster, you must have the following information:
 
 ### Create a database resource
 
-Create a PostgreSQL database in which to install Pega Platform. PKS deployments require you to install in an SQL database. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” helm chart with this information.
+Create a PostgreSQL database in which to install Pega Platform. PKS deployments require you to install in an SQL database. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” Helm chart with this information.
+
+To create a database resource using Google Cloud Platform:
 
 1. Use a browser to log onto <https://cloud.google.com/> and navigate to your
     **Console** in the upper right corner.
@@ -193,8 +195,8 @@ displays all of the SQL resources in your account, which includes your newly cre
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-In order to deploy Pega Platform using Helm, you must customize the “pega” helm
-chart that holds the specific settings for your deployment needs and then run a series of helm commands to complete the deployment.
+In order to deploy Pega Platform using Helm, you must customize the “pega” Helm
+chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation followed by a deployment will take about 90 minutes total, since it takes about an hour for Pega Platform to completely install in your postgres database.
 
@@ -210,7 +212,7 @@ To customize this file, you must download it from the repository to your local s
 
 - Access your GCP SQL database you created in [Create an SQL database resource](#_Create_an_SQL).
 
-- Install the version of Pega Platform that you built into your docker install image in [Build your Docker image from the pega-installer-ready](#_Build_your_Docker) into your Azure SQL database.
+- Install the version of Pega Platform that you built into your Docker install image in [Build your Docker image from the pega-installer-ready](#_Build_your_Docker) into your Azure SQL database.
 
 - Access the Pega Docker images you specify for your deployments.
 
@@ -218,7 +220,7 @@ To customize this file, you must download it from the repository to your local s
 
 To finalize these details, follow these steps:
 
-1. To download pega/pega Helm chat to the \<local filepath\>/pks-demo, enter:
+1. To download pega/pega Helm chart to the \<local filepath\>/pks-demo, enter:
 
 `$ helm inspect values pega/pega > pega.yaml`
 
@@ -235,7 +237,7 @@ To finalize these details, follow these steps:
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | username: "\<name of your database user\>" password: "\<password for your database user\>" For GCP PostgreSQL databases, the default user is “postgres”. |
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | This object maps the hostname of a registry to an object containing the “username” and “password” for that registry. For details, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | url: “<https://index.docker.io/v1/>” username: "\<DockerHub account username\>" password: "\< DockerHub account password\>"      |
-| docker.pega.image:       | Refer to the latest Page Platform deployment image on Dockerhub.  | Image: "pegasystems/pega:latest" Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>  |
+| docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | Image: "pegasystems/pega:latest" Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>  |
 | upgrade:    | Do not set for installations or deployments | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a hostname for the pega-web service of the DNS zone. | domain: "\<the hostname for your web service tier\>" You assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname must comply with your networking standards and be available as an external IP address. |
 | tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.   | domain: "\<the hostname for your stream service tier\>" Your stream tier hostname should comply with your networking standards           |
@@ -248,24 +250,24 @@ To finalize these details, follow these steps:
 
 These steps walk you through connecting your local system to your PKS cluster;
 enabling the use of a browser-based Kubernetes dashboard you can use to monitor
-your deployment; and performing the helm commands required to complete your
+your deployment; and performing the Helm commands required to complete your
 deployment of Pega Platform on to your PKS environment.
 
-It's easy to confuse a helm install with a Pega Platform install, but they are
-separate processes. The helm install command uses helm to install your
-deployment as directed in the helm charts, one in the charts\\addons folder and
-one in the charts\\pega folder. In this document, you specify that the helm
+It's easy to confuse a Helm install with a Pega Platform install, but they are
+separate processes. The Helm install command uses Helm to install your
+deployment as directed in the Helm charts, one in the charts\\addons folder and
+one in the charts\\pega folder. In this document, you specify that the Helm
 chart always “deploys” by using the setting, actions.execute: “deploy”. For the
-following steps, you overwrite this function on your initial helm install by
+following steps, you overwrite this function on your initial Helm install by
 specifying “--set global.actions.execute:install-deploy”, which invokes an
-installation of Pega Platform using your installation docker image and then
-automatically followed by a deploy. In subsequent helm deployments, you should
+installation of Pega Platform using your installation Docker image and then
+automatically followed by a deploy. In subsequent Helm deployments, you should
 not use the override argument, “--set global.actions.execute=”, since Pega
 Platform is already installed in your database.
 
 1. Do one of the following:
 
-- Open a Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Create a local folder to access all of the configuration file](#prepare-your-resources-45-minutes).
+- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Create a local folder to access all of the configuration file](#prepare-your-resources-45-minutes).
 
 `$ cd <local filepath>\pks-demo`
 
@@ -342,13 +344,13 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. To install the addons chart, which enables the deployment’s load balancer and disables the metric server and you havealready configured onyour local system, enter:
+12. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-A successful pegaaddon deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+The pegaddons namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
 
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
@@ -356,26 +358,26 @@ A successful pegaaddon deployment returns details of deployment progress. For fu
 helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
-For subsequent Helm installs, use the command 'helm install mypega pega/pega --namespace mypega --values pega.yaml' to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command `helm install mypega pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
 
 A successful Pega deployment immediately returns details that show progress for your deployment.
 
-14. Refresh the Kubernetes dashboard you opened in step 7; if you closed it, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
+14. Refresh the Kubernetes dashboard you opened in step 7. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
-    In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
+ 15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
 and click on the **Pods** view.
 
 ![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
 
-Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
+Note: A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour.
 
-A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour. To follow the progress of an installation, use the dashboard; for subsequent deployments, you will not need to do this.
+To follow the progress of an installation, use the dashboard. For subsequent deployments, you will not need to do this. Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
 
-15. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon located on the right side of that row.
+16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon located on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-16.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
+17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
@@ -394,9 +396,9 @@ your networking infrastructure standards.
 
 ### Logging in using the IP address
 
-To view the pega deployment components, enter:
+To view the Pega deployment components, enter:
 
-`$ kubectl get services --namespace pega`
+`$ kubectl get services --namespace mypega`
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
@@ -436,7 +438,7 @@ load balancer has assigned to the web tier.
 
 1. From your command prompt, review the IP addresses that are in the pega service
 
-`$ kubectl get services --namespace pega`
+`$ kubectl get services --namespace mypega`
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
