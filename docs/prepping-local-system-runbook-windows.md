@@ -360,7 +360,7 @@ If you have multiple associations with the Pega Community, the page requests you
 The **Pega Platform** card should appear near the top of the card list, below
 the list of all of the **Language packs for Pega Platform.**
 
-6. In the Pega Platform card, your mouse arror changes into a shopping cart icon, which you use to select **Pega Platform**.
+6. In the Pega Platform card, your mouse arrow changes into a shopping cart icon, which you use to select **Pega Platform**.
 
 The icon changes to a green check and a new cart item appears in the top right of the product list.
 
