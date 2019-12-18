@@ -282,7 +282,7 @@ the metrics-server for deployments to the following platforms:
 
 If you are deploying to a different platform you can skip this section.
 
-1. To download pega/addons Helm chat to the \<local filepath\>\\\<platform\>-demo, enter:
+1. To download pega/addons Helm chart to the \<local filepath\>\\\<platform\>-demo, enter:
 
 `$ helm inspect values pega/addons > addons.yaml`
 
@@ -360,7 +360,7 @@ If you have multiple associations with the Pega Community, the page requests you
 The **Pega Platform** card should appear near the top of the card list, below
 the list of all of the **Language packs for Pega Platform.**
 
-6. In the Pega Platform card, your mouse arror changes into a shopping cart icon, which you use to select **Pega Platform**.
+6. In the Pega Platform card, your mouse arrow changes into a shopping cart icon, which you use to select **Pega Platform**.
 
 The icon changes to a green check and a new cart item appears in the top right of the product list.
 
@@ -435,7 +435,7 @@ Pega Platform.
 
 `$ docker login -u \<username\> -p \<username-password\>`
 
-For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
+For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by using the Docker Desktop client running on your system.
 
 2. Change your directory to the top folder of your Pega distribution, \<pega-distribution-image\>.
 

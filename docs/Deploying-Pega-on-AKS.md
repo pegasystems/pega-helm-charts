@@ -548,7 +548,7 @@ your networking infrastructure standards.
 
 To view the Pega deployment components, enter:
 
-`$ kubectl get services --namespace pega`
+`$ kubectl get services --namespace mypega`
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
@@ -579,22 +579,20 @@ tier:
 When you set this to be "\<the hostname for your web service tier\>" as directed
 in [Update the Helm chart values](#update-the-helm-chart-values), you will
 manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name.
-
-In order to sign into Pega using "\<the hostname for your web service tier\>",
+address of the web tier domain name. In order to sign into Pega using "\<the hostname for your web service tier\>",
 you must assign the domain name with the same IP address that the deployment
 load balancer has assigned to the web tier.
 
-1. From your command prompt, review the IP addresses that are in the pega service
+1. From your command prompt, review the IP addresses that are in the mypega service
 
-`$ kubectl get services --namespace pega`
+`$ kubectl get services --namespace mypega`
 
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
+The mypega-web node is the only tier with an externally exposed IP address. Note the external IP address that the load-balancer gives to the web node: this is the IP address which in order to log into Pega Platform with your hostname.
 
 2. In a browser, login to Microsoft Azure Portal (https://portal.azure.com/)
     with your credentials.
 
-3.  Search for **DNS zones** and select it in the dropdown list.
+3. Search for **DNS zones** and select it in the dropdown list.
 
     You are brought to the DNS zones for your AKS cluster.
 
