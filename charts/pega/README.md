@@ -190,16 +190,30 @@ Example:
 nodeType: ["WebUser","bix"]
 ```
 
+### Requestor configuration
+
+Configuration related to Pega requestor settings is collected under `requestor` block.
+
+Configuration parameters:
+
+- `passivationTimeSec` - inactivity time after which requestor is passivated (persisted) and its resources reclaimed.
+
+Example:
+
+```yaml
+requestor:
+  passivationTimeSec: 900
+```
+
 ### service (*Optional*)
 
-Specify that the Kubernetes service block is expose to other Kubernetes run services, or externally to systems outside the environment.  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubenretes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
+Specify that the Kubernetes service block is expose to other Kubernetes run services, or externally to systems outside the environment.  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
 
 Configuration parameters:
 
 - `domain` - specify a domain on your network in which you create an ingress to the service.  If not specified, no ingress is created.
 - `port` and `targetPort` - specify values other than the web node defaults of `80` and `8080`, respectively, if required for your networking domain. You can use these settings for external access to the stream tier when required.
 - `serviceType` - specify the [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose.  The default value is `LoadBalancer`.
-- `alb_stickiness_lb_cookie_duration_seconds` - when deploying on Amazon EKS, configure alb cookie duration seconds equal to passivation time of requestors. By default this is `3660`, or just over one hour.
 
 Example:
 
@@ -235,6 +249,27 @@ Parameter           | Description    | Default value
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `700` which corresponds to 700% of 200m ) | `700`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
+
+### Volume claim template
+
+A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
+
+### Deployment strategy
+
+The `deploymentStrategy` can be used to optionally configure the [strategy](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#strategy) for any tiers deployed as a Kubernetes Deployment. This value will cannot be applied to StatefulSet deployed tiers which use the `volumeClaimTemplate` parameter.
+
+### Environment variables
+
+Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: MY_ENV_NAME
+          value: MY_ENV_VALUE
+```
 
 ### Pega configuration files
 
@@ -346,11 +381,28 @@ dds:
 
 Use the `pegasearch` section to configure a deployment of ElasticSearch for searching Rules and Work within Pega.  This deployment is used exclusively for Pega search, and is not the same ElasticSearch deployment used by the EFK stack or any other dedicated service such as Pega BI.
 
-Set the `pegasearch.image` location to a registry that can access the Pega search Docker image. The image is [available on DockerHub](https://hub.docker.com/r/pegasystems/search), and you may choose to mirror it in a private Docker repository.
+Parameter   | Description   | Default value
+---         | ---           | ---
+`image`   | Set the `pegasearch.image` location to a registry that can access the Pega search Docker image. The image is [available on DockerHub](https://hub.docker.com/r/pegasystems/search), and you may choose to mirror it in a private Docker repository. | `pegasystems/search:latest`
+`replicas` | Specify the desired replica count. | `1`
+`minimumMasterNodes` | To prevent data loss, you must configure the minimumMasterNodes setting so that each master-eligible node is set to the minimum number of master-eligible nodes that must be visible in order to form a cluster. Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.  For more information, see the ElasticSearch [important setting documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html) for more information. | `1`
+`podSecurityContext.runAsUser`   | ElasticSearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
+`set_vm_max_map_count`   | Elasticsearch requires `vm.max_map_count` to be configured to an appropriate value. This may be configured manually on your system and if so, you may bypass this privileged init container. For more information, see the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
+`set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
+
+Additional env settings supported by ElasticSearch may be specified in a `custom.env` block as shown in the example below.
 
 Example:
 
 ```yaml
 pegasearch:
   image: "pegasystems/search:8.3"
+  memLimit: "3Gi"
+  replicas: 1
+  minimumMasterNodes: 2
+  custom:
+    env:
+    - name: TZ
+      value: "EST5EDT"
 ```
+

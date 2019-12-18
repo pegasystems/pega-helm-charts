@@ -3,7 +3,7 @@
 # an external search URL which means we need to create one internally.
 {{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
 kind: StatefulSet
-apiVersion: apps/v1beta1
+apiVersion: apps/v1
 metadata:
   name: {{ template "searchName" . }}
   namespace: {{ .Release.Namespace }}
@@ -25,27 +25,30 @@ spec:
     spec:
       {{ if ne .Values.global.provider "openshift" }}
       securityContext:
-        fsGroup: 1000
+        fsGroup: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
       {{ end }}
       initContainers:
-      {{ if eq .Values.global.provider "openshift" }}
+        # Init containers
+      {{- if and (eq .Values.global.provider "openshift") (eq .Values.set_data_owner_on_startup true) }}
       - name: set-dir-owner
         image: busybox:1.31.0
-        command: ['sh', '-c', 'chown -R 1000:1000 /usr/share/elasticsearch/data']
+        command: ['sh', '-c', 'chown -R {{ .Values.podSecurityContext.runAsUser | default 1000 }}:{{ .Values.podSecurityContext.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
         volumeMounts:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
       {{ end }}
+      {{- if .Values.set_vm_max_map_count }}
       - name: set-max-map-count
         image: busybox:1.31.0
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
         securityContext:
           privileged: true
+      {{ end }}
       containers:
       - name: search
         image: {{ .Values.image }}
         securityContext:
-          runAsUser: 1000
+          runAsUser: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
         env:
         - name: HOST_LIST
           value: {{ template "searchName" . }}-transport
@@ -54,7 +57,16 @@ spec:
         - name: UNICAST_HOSTS
           value: {{ template "searchName" . }}-transport
         - name: NUMBER_OF_MASTERS
+        {{- if .Values.env }}
           value: "{{ .Values.env.MINIMUM_MASTER_NODES }}"
+        {{- else }}
+          value: {{ .Values.minimumMasterNodes | quote }}
+        {{- end }}
+{{- if .Values.custom }}
+{{- if .Values.custom.env }}
+{{ toYaml .Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
         resources:
           requests:
             cpu: "0.25"

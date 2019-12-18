@@ -232,7 +232,7 @@ To customize this file, you must download it from the repository to your local s
 
 To finalize these details, follow these steps:
 
-1. To download pega/pega Helm chart to the \<local filepath\>/gke-demo, enter:
+1. To download pega/pega Helm chat to the \<local filepath\>/gke-demo, enter:
 
 `$ helm inspect values pega/pega > pega.yaml`
 
@@ -249,7 +249,7 @@ To finalize these details, follow these steps:
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | username: "\<name of your database user\>" password: "\<password for your database user\>" For GCP PostgreSQL databases, the default user is “postgres”. |
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | This object maps the hostname of a registry to an object containing the “username” and “password” for that registry. For details, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | url: “<https://index.docker.io/v1/>” username: "\<DockerHub account username\>" password: "\< DockerHub account password\>"      |
-| docker.pega.image:       | Refer to the latest Page Platform deployment image on DockerHub.  | Image: "pegasystems/pega:latest" Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>  |
+| docker.pega.image:       | Refer to the latest Page Platform deployment image on Dockerhub.  | Image: "pegasystems/pega:latest" Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>  |
 | upgrade:    | Do not set for installations or deployments | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a hostname for the pega-web service of the DNS zone. | domain: "\<the hostname for your web service tier\>" You assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname must comply with your networking standards and be available as an external IP address. |
 | tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.   | domain: "\<the hostname for your stream service tier\>" Your stream tier hostname should comply with your networking standards           |
@@ -363,7 +363,6 @@ $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
 The pegaddons namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
-
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
 ```yaml
@@ -376,8 +375,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 14. Refresh the Kubernetes dashboard you opened in step 7. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
-15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
-and click on the **Pods** view.
+15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega** and click on the **Pods** view.
 
 ![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
 

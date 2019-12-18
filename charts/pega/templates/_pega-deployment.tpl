@@ -17,6 +17,10 @@ spec:
     matchLabels:
       app: {{ .name }}
 {{- if .node.deploymentStrategy }}
+{{- if (ne .kind "Deployment") }}
+  {{- $error := printf "tier[%s] may not specify a deploymentStrategy because it uses a volumeClaimTemplate which requires it be a StatefulSet" .name -}}
+  {{ required $error nil }}
+{{- end }}
   strategy:
 {{ toYaml .node.deploymentStrategy | indent 4 }}
 {{- end }}
@@ -78,6 +82,10 @@ spec:
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
+{{- if .node.requestor }}
+        - name: REQUESTOR_PASSIVATION_TIMEOUT
+          value: "{{ .node.requestor.passivationTimeSec }}"
+{{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
         # Additional custom env vars

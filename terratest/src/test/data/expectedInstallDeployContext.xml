@@ -28,4 +28,7 @@
   <Environment name="prconfig/database/databases/CustomerData/defaultSchema" value="{{ .Env.DATA_SCHEMA }}" type="java.lang.String" />
   {{ end }}
   <Environment name="prconfig/database/drivers" value="com.microsoft.sqlserver.jdbc.SQLServerDriver;oracle.jdbc.OracleDriver;org.postgresql.Driver;com.ibm.db2.jcc.DB2Driver" type="java.lang.String" />
+  {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
+  <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
+  {{ end }}
 </Context>

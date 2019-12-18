@@ -19,8 +19,7 @@ deployments.
 How the deployment works
 ------------------------
 
-Pega provides customized orchestration tools and Docker images required to
-orchestrate a deployment in an PKS cluster you create for the deployment using
+Pega provides customized orchestration tools and Docker images required to orchestrate a deployment in an PKS cluster you create for the deployment using
 the following stepped tasks:
 
 1. Prepare your local system using the appropriate instruction set:
@@ -33,7 +32,7 @@ the following stepped tasks:
 
 3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your PKS details and use kubectl and Helm to install and then deploy Pega Platform onto your PKS cluster.
 
-5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
+4. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
 You can review the Pega architecture overview to understand how Pega maps
 Kubernetes objects with Pega applications and services: [How Pega Platform and
@@ -268,7 +267,6 @@ Platform is already installed in your database.
 1. Do one of the following:
 
 - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Create a local folder to access all of the configuration file](#prepare-your-resources-45-minutes).
-
 `$ cd <local filepath>\pks-demo`
 
 - Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Create a local folder to access all of the configuration file](#prepare-your-resources-45-minutes).
@@ -350,6 +348,7 @@ namespace/pegaaddons created
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
+
 The pegaddons namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
 
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
@@ -364,7 +363,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 14. Refresh the Kubernetes dashboard you opened in step 7. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
- 15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
+15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
 and click on the **Pods** view.
 
 ![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)

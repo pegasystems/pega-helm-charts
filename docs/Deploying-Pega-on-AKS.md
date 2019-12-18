@@ -364,7 +364,7 @@ To customize this file, you must download it from the repository to your local s
 
 To finalize these details, follow these steps:
 
-1. To download pega/pega Helm chart to the \<local filepath>\aks-demo, enter:
+1. To download pega/pega Helm chat to the \<local filepath>\aks-demo, enter:
 
 `$ helm inspect values pega/pega > pega.yaml`
 
