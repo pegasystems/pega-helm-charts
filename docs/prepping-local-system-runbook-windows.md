@@ -282,7 +282,7 @@ the metrics-server for deployments to the following platforms:
 
 If you are deploying to a different platform you can skip this section.
 
-1. To download pega/addons Helm chat to the \<local filepath\>\\\<platform\>-demo, enter:
+1. To download pega/addons Helm chart to the \<local filepath\>\\\<platform\>-demo, enter:
 
 `$ helm inspect values pega/addons > addons.yaml`
 
