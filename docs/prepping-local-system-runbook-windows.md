@@ -435,7 +435,7 @@ Pega Platform.
 
 `$ docker login -u \<username\> -p \<username-password\>`
 
-For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by used the Docker Desktop client running on your system.
+For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by using the Docker Desktop client running on your system.
 
 2. Change your directory to the top folder of your Pega distribution, \<pega-distribution-image\>.
 
