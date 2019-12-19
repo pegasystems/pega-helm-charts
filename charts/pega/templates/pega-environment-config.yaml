@@ -12,8 +12,10 @@ data:
   JDBC_URL: {{ .Values.global.jdbc.url }}
   # Class name of the DB's JDBC driver
   JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
+{{- if .Values.global.jdbc.driverUri }}
   # URI that the JDBC driver can be downloaded from
   JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
+{{- end }}
 {{- if .Values.global.jdbc.connectionProperties }}
   # The connection properties that will be sent to our JDBC driver when establishing new connections
   JDBC_CONNECTION_PROPERTIES: {{ .Values.global.jdbc.connectionProperties }}
