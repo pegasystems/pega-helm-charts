@@ -8,7 +8,7 @@ metadata:
   namespace: {{ .root.Release.Namespace }}
 spec:
   scaleTargetRef:
-    apiVersion: extensions/v1beta1
+    apiVersion: apps/v1
     kind: Deployment
     name: {{ .deploymentName | quote }}
   {{- if .hpa.minReplicas }}

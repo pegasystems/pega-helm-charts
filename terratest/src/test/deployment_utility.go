@@ -365,9 +365,9 @@ func SplitAndVerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Op
 		if index >= 0 && index <= 1 {
 			helm.UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
 			if index == 0 {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "extensions/v1beta1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "apps/v1"})
 			} else {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "extensions/v1beta1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "apps/v1"})
 			}
 		}
 	}
