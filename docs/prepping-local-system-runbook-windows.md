@@ -42,6 +42,15 @@ You are ready to continue preparing your local system.
 Installing required applications for the deployment
 ---------------------------------------------------
 
+The entire deployment requires the following applications to be used a somee point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+- Helm
+- kubectl
+- Docker
+- unzip (or something equivalent to extract files from .zip archive files.)
+- az cli (only for AKS deployments)
+- pks cli (only for PKS deployments)
+- Google Cloud SDK and gcloud (only for GKe deployments)
+
 Some of the required applications are binary files that you download from the organization's download area; other applications can be installed by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
 Note: In order to use the docker command in the runbooks, you install the Docker application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
@@ -328,7 +337,7 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 - context.xml: add additional required data sources
 
-- prlog4j2.xml modify your logging configuration, if required
+- prlog4j2.xml: modify your logging configuration, if required
 
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
@@ -443,22 +452,24 @@ For details about logging into Docker from a secure password file using the `--p
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-You can list the folder content and see folders for Pega archives, Images, rules, and scripts.
+From this folwder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
 
 ![](media/152260ae774fe07d717f1b31b5560f25.png)
 
-4. Copy the following lines into the file to build your docker image using the public image on DockerHub that Pega provides to build install images, pegasystems/pega-installer-ready:
+4. Copy the following lines of instruction into the new text file:
 
 ```yaml
-  > FROM pegasystems/pega-installer-ready
-  > COPY scripts /opt/pega/kit/scripts
-  > COPY archives /opt/pega/kit/archives
-  > COPY rules /opt/pega/kit/rules
+> FROM pegasystems/pega-installer-ready
+> COPY scripts /opt/pega/kit/scripts
+> COPY archives /opt/pega/kit/archives
+> COPY rules /opt/pega/kit/rules
 ```
+ 
+ These instructions allow you to build your Docker image by taking the Pega public image, pega-install-ready image on DockerHub, and also  copying three folders from distribution image to build your installation image.
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-6. From your command prompt (Linux or PowerShell running with Administrator privileges), in your current directory, build your pega install docker image by entering:
+6. From your PowerShell running with Administrator privileges command prompt, in your current directory, build your pega install docker image by entering:
 
 `$ docker build -t pega-installer .`
 

@@ -6,7 +6,7 @@ About this document
 
 Use this set of procedures to deploy Pega Platform™ on an Azure Kubernetes
 Service (AKS) cluster set up in your Microsoft Azure account. It is designed for
-any level of user, from a System Administrator to a development engineer who's
+any level of user, from a System Administrator to a development engineer who is
 interested in learning how to install and deploy Pega Platform onto AKS.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the
@@ -24,15 +24,15 @@ the following stepped tasks:
 
 1. Prepare your local system using the appropriate instruction set:
 
-- [Prepare a local Linux system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
+    - [Prepare a local Linux system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
-- [Prepare a local Windows 10 system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
+    - [Prepare a local Windows 10 system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
 
 2. [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--45-minutes) – create an AKS cluster, an SQL database, and a storage resource in your Azure account.
 
-4. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your AKS details and use kubectl and Helm to install and then deploy Pega Platform onto your AKS cluster.
+3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your AKS details and use kubectl and Helm to install and then deploy Pega Platform onto your AKS cluster.
 
-5. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
+4. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
 You can review the Pega architecture overview to understand how Pega maps
 Kubernetes objects with Pega applications and services: [How Pega Platform and
@@ -59,7 +59,7 @@ sections:
     dashboard to help you see the status of your deployment and troubleshoot
     deployment and installation problems.
 
-    After you follow this document to its completion, you'll have a Pega
+    After you follow this document to its completion, you will have a Pega
     Platform cluster with a single Microsoft Azure SQL Database instance and two
     clustered virtual machines (VMs).
 
@@ -89,13 +89,13 @@ document:
 
   - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
 
-  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker applcation on your local system.
+  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker application on your local system.
 
 - A Pega Platform distribution kit downloaded and extracted on your local system.
 
 - Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the [Helm documentation portal](https://helm.sh/docs/).
 
-- Kubectl –the kubernetes command line tool you must use to connect and to manage your Kubernetes resources.
+- Kubectl –the Kubernetes command line tool you must use to connect and to manage your Kubernetes resources.
 
 Prepare your local system – 45 minutes
 --------------------------------------
@@ -113,17 +113,16 @@ resources.
 
 ### Create an AKS cluster
 
-Create an AKS cluster in your Azure account for your deployment. The deployment
-will place configuration files into your cluster during the deployment steps in
-the section [Deploy Pega Platform using the command
-line](#deploy-pega-platform-using-the-command-line). For now, you will create a
+In order to deploy Pega using a AKS cluster, you must create the cluster in an existing  project in your Microsfot Azure account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a
 simple cluster with two VMs with sufficient memory and CPU resources to support
 a deployment of Pega Platform that can perform under high workloads.
+
+To create your AKS cluster:
 
 1. In a browser, login to Microsoft Azure Portal (<https://portal.azure.com/>)
     with your credentials.
 
-2. Search for **kubernetes services** and select it in the dropdown list.
+2. Search for **Kubernetes services** and select it in the dropdown list.
 
 ![](media/aeba40691a7035ab1e87c8426764c488.png)
 
@@ -230,7 +229,7 @@ of the resources created for your AKS cluster in **Deployment details**:
 
 ### Create an SQL database resource
 
-AKS deployments require you to install in an SQL database. Create an SQL database in which to install Pega Platform. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” Helm chart with this information.
+AKS deployments require you to install Pega Platform software into an SQL database. Create an SQL database in which to install Pega Platform. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” Helm chart with this information.
 
 1. In a browser, login to Microsoft Azure Portal (https://portal.azure.com/)
     with your credentials.
@@ -382,40 +381,39 @@ To finalize these details, follow these steps:
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.           | username: "\<name of your database user\>" password: "\<password for your database user\>"     |
 | jdbc.rulesSchema: jdbc.dataSchema:       | Set the names of both your rules and the data schema to the values that Pega uses for these two schemas.         | rulesSchema: "rules" dataSchema: "data"      |
 | docker.registry.url: username: password: | This object maps the hostname of a registry to an object containing the “username” and “password” for that registry. For details, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | url: “<https://index.docker.io/v1/>” username: "\<DockerHub account username\>" password: "\< DockerHub account password\>"     |
-| docker.pega.image: | Refer to the latest Pega Platform deployment image on DockerHub. | Image: "pegasystems/pega:latest" Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>     |
-| tier.name: ”web” tier.service.domain:    | Set the hostname for the pega-web service of the DNS zone.  | domain: "\<the hostname for your web service tier\>" You will assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname should comply with your networking standards and be available as an external IP address.|
-| tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.  | domain: "\<the hostname for your stream service tier\>" Your stream tier hostname should comply with your networking standards |
-| installer.image:   | Specify the Docker image you built to install Pega Platform.   | Image: "\<your installation Docker image :your tag\>" You created this image in [Constructing your Docker image from the pega-installer-ready](#_Constructing_your_Docker)   |
+| docker.pega.image: | Refer to the latest Pega Platform deployment image on DockerHub. | Image: "pegasystems/pega:latest" -- Pega provides these images: <https://hub.docker.com/r/pegasystems/pega-ready/tags>     |
+| tier.name: ”web” tier.service.domain:    | Set the hostname for the pega-web service of the DNS zone.  | domain: "\<the hostname for your web service tier\>" -- You will assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname should comply with your networking standards and be available as an external IP address.|
+| tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.  | domain: "\<the hostname for your stream service tier\>" -- Your stream tier hostname should comply with your networking standards |
+| installer.image:   | Specify the Docker image you built to install Pega Platform.   | Image: "\<your installation Docker image :your tag\>" -- You created this image in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) or [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md)   |
 | installer. adminPassword: | Specify a password for your initial logon to Pega Platform. | adminPassword: "\<initial password\>" |
 
 3. Save the file.
 
 ### Deploy Pega Platform using the command line
 
-These steps walk you through connecting your local system to your AKS cluster;
-enabling the use of a browser-based Kubernetes dashboard you can use to monitor
-your deployment; and performing the Helm commands required to complete your
+These steps walk you through:
+
+- Connecting your local system to your AKS cluster.
+- Enabling the use of a browser-based Kubernetes dashboard you can use to monitor
+your deployment.
+- Performing the Helm commands required to complete your
 deployment of Pega Platform on to your AKS environment.
 
 It's easy to confuse a Helm install with a Pega Platform install, but they are
 separate processes. The Helm install command uses Helm to install your
 deployment as directed in the Helm charts, one in the charts\\addons folder and
-one in the charts\\pega folder. In this document, you specify that the Helm
-chart always “deploys” by using the setting, actions.execute: “deploy”. For the
-following steps, you overwrite this function on your initial Helm install by
-specifying “--set global.actions.execute:install-deploy”, which invokes an
-installation of Pega Platform using your installation Docker image and then
-automatically followed by a deploy. In subsequent Helm deployments, you should
-not use the override argument, “--set global.actions.execute=”, since Pega
-Platform is already installed in your database.
+one in the charts\\pega folder. 
 
-1. Do one of the following:
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
+automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
+Do one of the following:
+
+- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
 `$ cd <local filepath>\aks-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration file](#create-a-local-folder-to-access-all-of-the-configuration-files).
+- Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
 `$ cd /home/<local filepath>/aks-demo`
 
@@ -438,7 +436,7 @@ If you cannot log into your Azure home page or see that the Azure CLI recognizes
 
     You are brought to your Azure home page.
 
-1. In the **Recent resources** area, click your AKS cluster to review these
+5. In the **Recent resources** area, click your AKS cluster to review these
     settings:
 
 - Name: listed in the page header
@@ -452,7 +450,7 @@ $ az aks get-credentials --resource-group <resource-group-name> --name <cluster-
 Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube\config
 ```
 
-7.  Use the kubectl command to view the VM nodes created when you created the
+7. Use the kubectl command to view the VM nodes created when you created the
     AKS cluster:
 
 `$ kubectl get nodes`
@@ -460,7 +458,7 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 ![](media/3a59b1ecf9d827e0003d46880029cdd8.png)
 
 8. Establish a required cluster role binding setting so you can launch the
-    kubernetes dashboard.
+    Kubernetes dashboard.
 
 `$ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard`
 
@@ -471,7 +469,7 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 ![](media/81a7ae961cabc463381869e3bae5c722.png)
 
-You can now view your deployment details visually using the Kubernetes dashboard. You’ll use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
+You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
 
 In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
 
