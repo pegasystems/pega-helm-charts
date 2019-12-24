@@ -25,9 +25,9 @@ the following stepped tasks:
 
 1. Prepare your local system using the appropriate instruction set:
 
-    - [Prepare a local Linux system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
+    - [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
-     - [Prepare a local Windows 10 system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
+     - [Prepare a local Windows 10 system – 45 minutes](docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
 
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – request a GKE cluster form Pivotal, an SQL database, and a storage resource in an account such as Google Cloud Platform (GPC).
 
@@ -111,9 +111,9 @@ This document requires that you prepare a local Linux or Windows 10 system on
 which you can run commands with root or Administrator privileges. To prepare
 your system use the guide appropriate for your type of system:
 
-- [Preparing your local Linux system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-linux.md)
+- [Preparing your local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md)
 
-- [Preparing your local Windows 10 system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-windows.md)
+- [Preparing your local Windows 10 system – 45 minutes](docs/prepping-local-system-runbook-windows.md)
 
 After you have your local system prepared, you are ready to prepare your GKE resources.
 
@@ -150,23 +150,27 @@ To create your GKE cluster:
 
 4. Choose the **Standard cluster** template.
 
-5. Choose the version of the cluster by selecting one of the following:
+5. In the Standard cluster page, enter the following details:
 
-- Choose the release channel the cluster is enrolled in. Your cluster and node pools will be auto-upgraded within that channel.
-- Choose a specific GKE version. Auto-upgrade is enabled by default, and your cluster and its node pools will be auto-upgraded when its current version is selected for auto-upgrade.
-- Choose the default version. Auto-upgrade is enabled by default, and your cluster and its node pools will be auto-upgraded when its current version is selected for auto-upgrade.
+    - **Name** - this is the permanent name you use to refer to your GKE cluster.
 
-Using release channels is recommended. If you must specify a version, leaving auto-upgrade enabled is recommended.
+    - **Location type** - select **Zonal** or **Regional**.
 
-From the Zone drop-down menu, select the desired zone for your cluster control plane, such as us-central1-a.
+    - **Zone** - select an appropriate zone or region from the list.
 
-Configure your cluster as desired, then click Advanced options.
+    - **Master version** - select an appropriate version (The default version is most appropriate).
 
-From the Additional zone locations section, select additional zones in which you'd like the cluster to run.
+    - **Node pools: default-pool - Number of Nodes**:  enter "2"
 
-Click Save to exit the Advanced options overlay.
+    - **Node pools: default-pool - Machine configuration > Machine family**: select the "General-purpose" tab
 
-Click Create.
+    - **Node pools: default-pool - Machine configuration > Series**: select "N1"
+
+    - **Node pools: default-pool - Machine configuration > Machine type**: select "n1-highmem-2 2vCPU, 13 GB memory" (more costly, but can handle Pega Platform processing loads)
+
+    The remiaing fields can be left to their default values; however, if you have specific cluster requirements update the template with your changes before proceeding.
+
+6. Scroll to the bottom of the page and click **Create**.
 
 ### Create a database resource
 
@@ -274,7 +278,7 @@ To finalize these details, follow these steps:
 | upgrade:    | Do not set for installations or deployments | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a hostname for the pega-web service of the DNS zone. | domain: "\<the hostname for your web service tier\>" -- You assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname must comply with your networking standards and be available as an external IP address. |
 | tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.   | domain: "\<the hostname for your stream service tier\>" -- Your stream tier hostname should comply with your networking standards           |
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | Image: "\<your installation Docker image :your tag\>" -- You created this image in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) or [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md)   |
+| installer.image:        | Specify the Docker image you built to install Pega Platform. | Image: "\<your installation Docker image :your tag\>" -- You created this image in [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md) or [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)   |
 | installer. adminPassword:                | Specify a password for your initial logon to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
@@ -298,11 +302,11 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 Do one of the following:
 
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md).
 
 `$ cd <local filepath>\gke-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+- Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md).
 
 `$ cd /home/<local filepath>/gke-demo`
 
@@ -465,7 +469,7 @@ In order to sign into Pega using "\<the hostname for your web service tier\>",
 you must assign the domain name with the same IP address that the deployment
 load balancer has assigned to the web tier.
 
-1. From your command prompt, review the IP addresses that are in the mypega service
+1. From your command prompt, review the IP addresses that are in the my pega service
 
 `$ kubectl get services --namespace mypega`
 
