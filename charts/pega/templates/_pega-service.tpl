@@ -25,6 +25,7 @@ spec:
   - name: http
     port: {{ .port }}
     targetPort: {{ .targetPort }}
+  sessionAffinity: ClientIP
   selector:
     app: {{ .name }}
 ---
