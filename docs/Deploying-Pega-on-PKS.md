@@ -128,9 +128,11 @@ In order to login to your demo cluster, you must have the following information:
 
 ### Create a database resource
 
-PKS deployments require you to install Pega Platform software in an SQL database. Create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need to obtain the database name and the server which you are creating in this procedure so you can customize your “pega” Helm chart with this information.
+PKS deployments require you to install Pega Platform software in an SQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your “pega” Helm chart.
 
-To create a database resource using Google Cloud Platform:
+#### Create an SQL instance
+
+To begin, create an SQL instance that is available to your GKE cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
 
 1. Use a browser to log onto <https://cloud.google.com/> and navigate to your
     **Console** in the upper right corner.
@@ -187,6 +189,20 @@ deployment is complete, which can take up to 5 minutes. When complete, the GCP U
 displays all of the SQL resources in your account, which includes your newly created PostgreSQL database:
 
 ![cid:image007.png\@01D5A3B1.62812F70](media/9aa072ea703232c2f6651fe95854e8dc.62812f70)
+
+#### Create a database in your SQL instance
+
+You must create a PostSQL database in your new SQL instance into which you will install Pega Platform. Use the database editing tool of your choice to log into your SQL instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
+
+1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
+
+  You can find your access information and login credentials, by selecting the SQL instance in the GCP console.
+
+2. In the database editor tool, navigate to Databases and create a new database.
+
+  Pega does not require any additional configuration.
+
+With your SQL service IP address and your new database name, you are ready to continute to the next section.
 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
@@ -332,8 +348,8 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 11. Create namespaces for both your Pega deployment and the addons:
 
 ```yaml
-$ kubectl create namespace mypega
-namespace/mypega created
+$ kubectl create namespace mypega-pks-demo
+namespace/mypega-pks-demo created
 $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
@@ -344,25 +360,23 @@ namespace/pegaaddons created
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-
-The pegaddons namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
 
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
 ```yaml
-helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
+helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
-For subsequent Helm installs, use the command `helm install mypega pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command `helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo` to deploy Pega Platform and avoid another Pega Platform installation.
 
-A successful Pega deployment immediately returns details that show progress for your deployment.
+A successful Pega deployment immediately returns details that show progress for your `mypega-pks-demo` deployment.
 
 14. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
-15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
-and click on the **Pods** view.
+15. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-pks-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
 
-![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
+![](media/dashboard-mypega-pks-demo-install-initial.png)
 
 Note: A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -372,11 +386,11 @@ To follow the progress of an installation, use the dashboard. For subsequent dep
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
+17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-pks-demo` namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
-A successful deployment will not show errors across the various workloads. The **mypega** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
+A successful deployment will not show errors across the various workloads. The `mypega-pks-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
 
 ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
@@ -393,7 +407,7 @@ your networking infrastructure standards.
 
 To view the Pega deployment components, enter:
 
-`$ kubectl get services --namespace mypega`
+`$ kubectl get services --namespace mypega-pks-demo`
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
@@ -431,7 +445,7 @@ load balancer has assigned to the web tier.
 
 1. From your command prompt, review the IP addresses that are in the mypega service
 
-`$ kubectl get services --namespace mypega`
+`$ kubectl get services --namespace mypega-pks-demo`
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
