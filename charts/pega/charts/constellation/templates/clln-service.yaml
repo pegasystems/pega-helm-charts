@@ -4,10 +4,12 @@ metadata:
   name: constellation
   labels:
     app: constellation
+    # component: constellation
 spec:
   selector:
     # is this on the pod or the deployment?
     app: constellation
+    # component: constellation
   ports:
   - protocol: TCP
     port: 3000
