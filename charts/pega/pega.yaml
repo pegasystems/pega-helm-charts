@@ -22,7 +22,7 @@ global:
     #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
     #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
     #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
-    url: "jdbc:postgresql://10.224.133.25:38500/postgres"
+    url: "jdbc:postgresql://your-network-ip-here:38500/postgres"
     #   driverClass 	-- jdbc class.  Valid values are:
     #
     #   Oracle              oracle.jdbc.OracleDriver
@@ -68,7 +68,7 @@ global:
         # Without a load balancer, use a direct NodePort instead.
         serviceType: "NodePort"
       # Set resource consumption to minimal levels
-      replicas: 1
+      replicas: 2
       cpuRequest: 200m
       memRequest: "5Gi"
       cpuLimit: 2
