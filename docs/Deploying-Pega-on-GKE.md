@@ -305,10 +305,10 @@ To finalize these details, follow these steps:
 
 These steps walk you through:
 
-- Connecting your local system to your PKS cluster.
+- Connecting your local system to your GKE cluster.
 - Enabling the use of a browser-based Kubernetes dashboard you can use to monitor
 your deployment.
-- Performing the Helm commands required to complete your deployment of Pega Platform on to your PKS environment.
+- Performing the Helm commands required to complete your deployment of Pega Platform on to your GKE environment.
 
 It's easy to confuse a Helm install with a Pega Platform install, but they are
 separate processes. The Helm install command uses Helm to install your
@@ -337,7 +337,7 @@ If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>
 
 3. To use the gke CLI to view your all of your GKE cluster names and status of each, enter:
 
-`$ pks clusters`
+`$ gcloud clusters`
 
 Your cluster name is displayed in the **Name** field.
 
@@ -348,8 +348,6 @@ $ gke get-credentials <cluster-name>`
 Fetching credentials for cluster pega-platform.
 Context set for cluster pega-platform.
 ```
-
-If you need to use a Bearer Token Access Credentials instead of this credential file, see the Pivotal document, [Accessing Dashboard](https://docs.pivotal.io/pks/1-3/access-dashboard.html).
 
 5. To use the kubectl command to view the VM nodes, including cluster names and status, enter:
 
