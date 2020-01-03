@@ -40,4 +40,5 @@ data:
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  JAVA_OPTS: "-DNodeSettings=\"PEGA-UIENGINE/CONSTELLATIONSVCURL=http://$(CONSTELLATION_SERVICE_HOST):$(CONSTELLATION_PORT_3000_TCP_PORT)/prweb/constellation\""
 {{ end }}
