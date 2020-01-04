@@ -105,13 +105,7 @@ With the new project created, you can proceed with completing the preparation of
 Prepare your local system – 45 minutes
 --------------------------------------
 
-This document requires that you prepare a local Linux or Windows 10 system on
-which you can run commands with root or Administrator privileges. To prepare
-your system use the guide appropriate for your type of system:
-
-- [Preparing your local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md)
-
-- [Preparing your local Windows 10 system – 45 minutes](docs/prepping-local-system-runbook-windows.md)
+This document requires that you prepare a local Linux on which you can run commands with root or Administrator privileges. To prepare your system, see [Preparing your local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md).
 
 After you have your local system prepared, you are ready to prepare your GKE resources.
 
