@@ -27,8 +27,6 @@ the following stepped tasks:
 
     - [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
-     - [Prepare a local Windows 10 system – 45 minutes](docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
-
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – Create a GKE cluster and a Postgres database in an SQL instance in your Google Cloud Platform (GPC) account.
 
 3. [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes) – customize a configuration file with your GKE details and use kubectl and Helm to install and then deploy Pega Platform onto your GKE cluster.
