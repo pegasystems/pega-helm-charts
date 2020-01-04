@@ -175,28 +175,35 @@ To install the Google Cloud SDK:
 
 1. In your browser, log in to your Google user account.
 
-2. Download the [Google Cloud SDK installer](#https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCloudSDKInstaller.exe).
+2. Ensure that Python 2.7 is installed.
 
-3. Launch the **GoogleCloudSDKinstaller.exe** installer, follow the prompts, and accept the default options in the **Google Cloud SDK setup** wizard.
+3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](#https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
 
-4. After the installation has completed, click **Next**.
+3. Extract the Google SDK distribution archive file to your system.
 
-5. In the **Google Cloud SDK setup** wizard ensure that you select the following options among the available options:
+`tar zxvf [ARCHIVE_FILE] google-cloud-sdk`
 
-- Start Google Cloud SDK shell
-- Run `gcloud init`
+4. Use the install script to add Cloud SDK tools to your path.
+
+`./google-cloud-sdk/install.sh`
+
+5. Restart your terminal for the changes to take effect.
+
+6. In a Linux command prompt, initialize the Google Cloud SDK.
+
+`gcloud init`
 
 After the program initializes, you are prompted to log in.
 
-6. Log in using your Google user account by entering **Y**:
+7. Log in using your Google user account by entering **Y**:
 
 `To continue, you must log in. Would you like to log in (Y/n)? Y`
 
 You are redirected to a browser page on your system with a Google Cloud log in screen.
 
-7. In your browser, log in to your Google Cloud user account when prompted and click **Allow** to grant permission to access Google Cloud Platform resources.
+8. In your browser, log in to your Google Cloud user account when prompted and click **Allow** to grant permission to access Google Cloud Platform resources.
 
-8. Return to the Google Cloud SDK shell prompt and select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
+9. In your Linux command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
 
 ```yaml
 Pick cloud project to use:
@@ -221,18 +228,15 @@ This gcloud configuration is called [default]. You can create additional configu
 Run `gcloud topic configurations` to learn more.
 ```
 
-9. To list accounts whose credentials are stored on the local system:
+10. To list accounts whose credentials are stored on the local system:
 
 `gcloud auth list`
 
-10. To view information about your Cloud SDK installation and the active SDK configuration:
+11. To view information about your Cloud SDK installation and the active SDK configuration:
 
 `gcloud info`
 
-These instructions were sourced from the Google document, [Quickstart for Windows](#https://cloud.google.com/sdk/docs/quickstart-windows), which includes additional information.
-
-
-
+These instructions were sourced from the Google document, [Quickstart for Linux](#https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
 
 ### Installing Docker
 
