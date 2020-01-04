@@ -310,19 +310,32 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 `$ cd /home/<local filepath>/gke-demo`
 
-2. Use the GKE CLI to log into your account using the TBD?? and login credentials and skip SSL validation.
+2. Use the GKE CLI to ensure you are logged into your account.
 
-`$ gcloud `
+```yaml
+$ gcloud info
+Google Cloud SDK [274.x.y]
+...
+Account: [your Google account]
+Project: [your Google project]
 
-If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
+Current Properties:
+  [core]
+    project: [your Google project]
+    custom_ca_certs_file: [any files you used for SSL certification]
+    account: [your Google account]
+    disable_usage_reporting: [your response during authorization]
+  [compute]
+    zone: [your selected zone]
+```
 
-3. To use the gke CLI to view your all of your GKE cluster names and status of each, enter:
+3. View your all of your GKE cluster names and status of each, enter:
 
 `$ gcloud container clusters list`
 
 Your cluster name is displayed in the **Name** field.
 
-4. To use the gke CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
+4. Download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
 $ gcloud container clusters get-credentials <cluster-name> -z <zone-name>
@@ -332,7 +345,7 @@ kubeconfig entry generated for <cluster-name>.
 
 If your gcloud configuration includes the zone you chose for your cluster, you can skip adding the `-z <zone-name>` option to the command.
 
-5. To use the kubectl command to view the VM nodes, including cluster names and status, enter:
+5. View the nodes in your GKE cluster, including cluster names and status.
 
 ```yaml
 $ kubectl get nodes
@@ -347,7 +360,7 @@ gke-taz-gke-runbook-default-pool-7fd38759-qq4h   Ready    <none>   3d2h   v1.13.
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
 ```
 
-7. To ensure security, using this dashboard, generate a new secret for use as an access token for the Kubernetes dashboard.
+7. To ensure security using this dashboard, generate a new secret for use as an access token for the Kubernetes dashboard.
 
 ```yaml
 $ kubectl -n kube-system get secret
@@ -383,11 +396,10 @@ token:      <Unique encryption details>
 9. Establish a required cluster role binding setting so you can launch the Kubernetes dashboard.
 
 ```yaml
-$ kubectl create clusterrolebinding dashboard-admin -n kube-system
---clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
+$ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 ```
 
-10. To start the proxy server for the Kubernetes dashboard, enter:
+10. Start the proxy server for the Kubernetes dashboard.
 
 `$ kubectl proxy`
 
@@ -395,7 +407,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system
 
 <http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/>
 
-12. In the **Kubernetes Dashboard** sign in window, choose the appropriate sign in method:
+12. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
 
 - To use a cluster Kubeconfig access credential file: select **Kubeconfig**, navigate to your \<local filepath\>/.kube directory and select the config file. Click **SIGN IN**.
 
@@ -419,7 +431,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-15. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
+15. Install the addons chart, which you already updated during the prepping a local system for your deployment.
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -432,7 +444,7 @@ REVISION: 1
 
 The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
 
-16. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
+16. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart using the '--set global.actions.execute=install-deploy' option.
 
 ```yaml
 helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -448,7 +460,7 @@ For subsequent Helm installs, use the command `helm install mypega-gke-demo pega
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-gke-demo` deployment.
 
-17. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
+17. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt and relaunch the browser as directed in Step 10.
 
 18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
 
