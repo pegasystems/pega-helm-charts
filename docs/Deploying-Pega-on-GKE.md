@@ -189,15 +189,13 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
     b. In **Default user password**, enter a “postgres” user password.
 
-    c. Select an appropriate **Region** and **Zone** for your database server.
-
-  Select the same zone or region that you used to create your GKE cluster.
+    c. Select an appropriate **Region** and **Zone** for your database server. Select the same zone or region that you used to create your GKE cluster.
 
     d. In **Database version**, select **PostgreSQL 11**.
 
-    e. In **Configuration options \> Connectivity**, select **Public IP**, click
-    **+ Add Network**, enter a **Name** and **Network** of one or more IP
-    address to whitelist for this PostgreSQL database, and click **Done**.
+    e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
+    
+    As a best practice, you should add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to use the command `kubectl describe nodes | grep ExternalIP`.
 
 6. In **Configuration options \> Machine type and storage**:
 
