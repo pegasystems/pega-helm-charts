@@ -55,11 +55,7 @@ By following the procedures in this document, you will create a deployment of Pe
 
 ### Assumptions and Prerequisites
 
-This guide assumes:
-
-- You have a basic familiarity with running commands from a Windows 10 PowerShell with Administrator privileges or a Linux command prompt with root privileges.
-
-- You use opensource packaging tools on Windows or Linux to install applications onto your local system.
+This guide assumes that you use opensource packaging tools on a Linux distribution to install applications onto your local system.
 
 The following account and application versions are required for use in this
 document:
@@ -80,7 +76,7 @@ document:
 
   - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
 
-  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker application on your local system.
+  - The Docker application downloaded to your local system. Log into your DockerHub account from the Docker application on your local system.
 
 - Helm – install Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes yaml examples directly. For detailed usage, refer to the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -288,7 +284,7 @@ To finalize these details, follow these steps:
 | upgrade:    | Do not set for installations or deployments | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a hostname for the pega-web service of the DNS zone. | domain: "\<the hostname for your web service tier\>" -- You assign this hostname with an external IP address and log into Pega Platform using this hostname in the URL. Your web tier hostname must comply with your networking standards and be available as an external IP address. |
 | tier.name: ”stream” tier.service.domain: | Set the hostname for the pega-stream service of the DNS zone.   | domain: "\<the hostname for your stream service tier\>" -- Your stream tier hostname should comply with your networking standards           |
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | Image: "\<your installation Docker image :your tag\>" -- You created this image in [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md) or [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)   |
+| installer.image:        | Specify the Docker image you built to install Pega Platform. | Image: "\<your installation Docker image :your tag\>" -- You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)   |
 | installer. adminPassword:                | Specify a password for your initial logon to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
@@ -310,16 +306,9 @@ one in the charts\\pega folder.
 In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
-Do one of the following:
-
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your gke-demo folder that you created in [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md).
-
-`$ cd <local filepath>\gke-demo`
-
-- Open a Linux bash shell and change the location to the top folder of your gke-demo directory that you created in [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md).
+1. Open a Linux bash shell and change the location to the top folder of your gke-demo directory that you created in [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md).
 
 `$ cd /home/<local filepath>/gke-demo`
-
 
 2. Use the GKE CLI to log into your account using the TBD?? and login credentials and skip SSL validation.
 
@@ -417,17 +406,11 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system
 
     In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
 
-13. Do one of the following:
-
-- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your gke-demo folder.
-
-`$ cd <local filepath>\gke-demo`
-
-14. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
+13. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
 `$ cd /home/<local filepath>/gke-demo`
 
-15. Create namespaces for both your Pega deployment and the addons:
+14. Create namespaces for both your Pega deployment and the addons:
 
 ```yaml
 $ kubectl create namespace mypega-gke-demo
@@ -436,7 +419,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-16. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
+15. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -449,7 +432,7 @@ REVISION: 1
 
 The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
 
-17. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
+16. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
 ```yaml
 helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -465,9 +448,9 @@ For subsequent Helm installs, use the command `helm install mypega-gke-demo pega
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-gke-demo` deployment.
 
-14. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
+17. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
-15. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
+18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
 
 ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -475,11 +458,11 @@ Note: A deployment takes about 15 minutes for all of the resource configurations
 
 To follow the progress of an installation, use the dashboard. For subsequent deployments, you will not need to do this. Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
 
-16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon located on the right side of that row.
+19. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon located on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-17.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
+20.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
