@@ -120,13 +120,13 @@ In order to deploy Pega using a GKE cluster, you must create the cluster in an e
 multi-zonal cluster with two VMs with sufficient memory and CPU resources to support
 a deployment of Pega Platform that can perform under high workloads.
 
-You can create a multi-zonal cluster using gcloud or the Google Cloud Console. For steps to create the cluster using gcloud in the Google Cloud SDK, see the gcloud tab on the page [Creating a multi-zonal cluster]( https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-multi-zonal-cluster). The 
+You can create a multi-zonal cluster using gcloud or the Google Cloud Console. For steps to create the cluster using gcloud in the Google Cloud SDK, see the gcloud tab on the page [Creating a multi-zonal cluster]( https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-multi-zonal-cluster).
 
 In order to login to your demo cluster, you must have the following information:
 
 - The name of your GKE cluster
 
-- The login credentials: username and password
+- The login credentials for your Google account: username and password
 
 - Whether any SSL information is required to authenticate your login.
 
@@ -158,7 +158,7 @@ To create your GKE cluster:
 
     - **Node pools: default-pool - Machine configuration > Series**: select "N1"
 
-    - **Node pools: default-pool - Machine configuration > Machine type**: select "n1-highmem-2 2vCPU, 13 GB memory" (more costly, but can handle Pega Platform processing loads)
+    - **Node pools: default-pool - Machine configuration > Machine type**: For a minimum, select n1-highmem-4 (4 vCPU **Cores** and 26 GB **Memory**); however using n1-highmem-8 (8 vCPU **Cores** and 52 GB **Memory**) is ideal for deployments that will process heavier workloads.
 
     The remiaing fields can be left to their default values; however, if you have specific cluster requirements update the template with your changes before proceeding.
 
@@ -201,7 +201,7 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
 6. In **Configuration options \> Machine type and storage**:
 
-    - For **Machine type**, select n1-highmem-4 (4 vCPU **Cores** and 26 GB **Memory**).
+    - For **Machine type**, select n1-highmem-2 (2 vCPU **Cores** and 13 GB **Memory**).
 
     - For **Network throughput**, select **SSD (Recommended)**.
 
