@@ -399,8 +399,8 @@ From this folwder, you can list the folder content and see folders for Pega arch
 > COPY archives /opt/pega/kit/archives
 > COPY rules /opt/pega/kit/rules
 ```
- 
- These instructions allow you to build your Docker image by taking the Pega public image, pega-install-ready image on DockerHub, and also  copying three folders from distribution image to build your installation image.
+
+These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
