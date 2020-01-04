@@ -160,7 +160,7 @@ To create your GKE cluster:
 
     - **Node pools: default-pool - Machine configuration > Machine type**: For a minimum, select n1-highmem-4 (4 vCPU **Cores** and 26 GB **Memory**); however using n1-highmem-8 (8 vCPU **Cores** and 52 GB **Memory**) is ideal for deployments that will process heavier workloads.
 
-    The remiaing fields can be left to their default values; however, if you have specific cluster requirements update the template with your changes before proceeding.
+    The remaining fields can be left to their default values; however, if you have specific cluster requirements, update the template with your changes before proceeding.
 
 6. Scroll to the bottom of the page and click **Create**.
 
