@@ -199,6 +199,8 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
     c. Select an appropriate **Region** and **Zone** for your database server.
 
+  Select the same zone or region that you used to create your GKE cluster.
+
     d. In **Database version**, select **PostgreSQL 11**.
 
     e. In **Configuration options \> Connectivity**, select **Public IP**, click
