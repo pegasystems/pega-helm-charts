@@ -46,7 +46,7 @@ By following the procedures in this document, you will create a deployment of Pe
 
 - Instructions for requesting a demo PKS cluster with suitable resources to support a scalable dev/test environment for your Pega application.
 
-- Instructions for creating a GCP SQL Database that hosts Pega Platform data and rules in your GCP account.
+- Instructions for creating a GCP SQL Instance in your GCP account which will host the database cluster and PostgreSQL database into which you install Pega Platform data and rules.
 
 - Instructions for creating a Pega Platform installation Docker image you use to install and deploy Pega Platform onto your PKS cluster.
 
@@ -132,13 +132,11 @@ PKS deployments require you to install Pega Platform software in an SQL database
 
 #### Create an SQL instance
 
-To begin, create an SQL instance that is available to your GKE cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
+To begin, create an SQL Instance that is available to your PKS cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
 
-1. Use a browser to log onto <https://cloud.google.com/> and navigate to your
-    **Console** in the upper right corner.
+1. Use a browser to log onto <https://cloud.google.com/> and navigate to your **Console** in the upper right corner.
 
-2. In your **Google Cloud Platform** console, use the **Navigation Menu** to go
-    to **Storage** grouping and select **SQL**.
+2. In your **Google Cloud Platform** console, use the **Navigation Menu** to go to **Storage** grouping and select **SQL**.
 
 3. In the SQL page, click **+Create Instance**.
 
@@ -147,17 +145,15 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 5. In the **Create PostgreSQL instance** page, add details to the following
     required fields for this database server:
 
-    a. In **Instance ID**, enter a database server ID. (demo-runbook-sql1)
+    a. In **Instance ID**, enter a database server ID. (demo-runbook-sql1).
 
     b. In **Default user password**, enter a “postgres” user password.
 
-    c. Select an appropriate **Region** and **Zone** for your database server.
+    c. Select an appropriate **Region** and **Zone** for your database server. Cotact your Pivotal representative so you can select the same zone or region that Pivotal used to create your PKS demo cluster.
 
     d. In **Database version**, select **PostgreSQL 11**.
 
-    e. In **Configuration options \> Connectivity**, select **Public IP**, click
-    **+ Add Network**, enter a **Name** and **Network** of one or more IP
-    address to whitelist for this PostgreSQL database, and click **Done**.
+    e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
 
     For clusters that are provisioned by Pivotal: you can launch the Kubernetes dashboard to view the external IP address of the nodes in your cluster; to add that IP network to the database whitelist, enter the first three sets of number, and use 0/24 for the final set in this IP range. For example: 123.123.123.0/24.
 
@@ -167,20 +163,17 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
     - For **Network throughput**, select **SSD (Recommended)**.
 
-    - For **Storage capacity**, enter **20 GB** and select **Enable automatic
-    storage increases**.
+    - For **Storage capacity**, enter **20 GB** and select **Enable automatic storage increases**.
 
 7. Configure the remaining setting using the default values:
 
-    - For **Auto backups and high availability**, backups can be automated 1AM –
-    5AM in a single zone.
+    - For **Auto backups and high availability**, backups can be automated 1AM – 5AM in a single zone.
 
     - For **Flags**, no flags are required.
 
     - **For Maintenance**, any preference is supported.
 
-    - For **Labels**, no labels are required. Labels can help clarify billing
-    details for your PKS resources.
+    - For **Labels**, no labels are required. Labels can help clarify billing details for your PKS resources.
 
 8. Click **Create**.
 

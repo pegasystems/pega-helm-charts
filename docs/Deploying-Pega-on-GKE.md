@@ -23,9 +23,7 @@ Pega provides customized orchestration tools and Docker images required to
 orchestrate a deployment in a GKE cluster you create for the deployment using
 the following stepped tasks:
 
-1. Prepare your local system using the appropriate instruction set:
-
-    - [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
+1. Prepare your local system using [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – Create a GKE cluster and a Postgres database in an SQL instance in your Google Cloud Platform (GPC) account.
 
@@ -43,7 +41,7 @@ Document goals
 
 By following the procedures in this document, you will create a deployment of Pega Platform on which you can implement a scalable Pega application in an GKE cluster. This deployment can be used for a Pega Platform development environment. The procedures cover these required sections:
 
-- Instructions for requesting a demo GKE cluster with suitable resources to support a scalable dev/test environment for your Pega application.
+- Instructions for creating a GKE cluster with suitable resources to support a scalable dev/test environment for your Pega application.
 
 - Instructions for creating a GCP SQL Database that hosts Pega Platform data and rules in your GCP account.
 
@@ -62,11 +60,11 @@ document:
 
 - A GCP account with a payment method set up to pay for the GCP resources you create using this document. You should also have sufficient GCP account permissions and knowledge to:
 
-  - Create a Google Cloud Platform project.
+  - Access an existing Google Cloud Platform project in which your GKE resources.
 
-  - Create a PostgreSQL Database.
+  - Create an SQL Instance.
 
-  - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
+  - Select an appropriate location in which to deploy your database resource and GKE cluster; in general, the cluster and PostgreSQL database into which you install Pega Platform should be in the same location.
 
   You are responsible for any financial costs incurred for your GCP resources.
 
@@ -148,11 +146,11 @@ To create your GKE cluster:
 
     - **Master version** - select an appropriate version (The default version is most appropriate).
 
-    - **Node pools: default-pool - Number of Nodes**:  enter "2"
+    - **Node pools: default-pool - Number of Nodes**:  enter "2".
 
-    - **Node pools: default-pool - Machine configuration > Machine family**: select the "General-purpose" tab
+    - **Node pools: default-pool - Machine configuration > Machine family**: select the "General-purpose" tab.
 
-    - **Node pools: default-pool - Machine configuration > Series**: select "N1"
+    - **Node pools: default-pool - Machine configuration > Series**: select "N1".
 
     - **Node pools: default-pool - Machine configuration > Machine type**: For a minimum, select n1-highmem-4 (4 vCPU **Cores** and 26 GB **Memory**); however using n1-highmem-8 (8 vCPU **Cores** and 52 GB **Memory**) is ideal for deployments that will process heavier workloads.
 
@@ -416,7 +414,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
     You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the GKE resources. Note that the Kubernetes dashboard does not display your GKE cluster name or your resource name. This is expected behavior.
 
-    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
+    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux command prompt open and open a new one for the remaining steps.
 
 13. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
