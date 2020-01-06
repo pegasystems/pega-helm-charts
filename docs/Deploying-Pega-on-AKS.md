@@ -259,7 +259,7 @@ AKS deployments require you to install Pega Platform software into an SQL databa
     choose Gen5 compute hardware and a minimum of **4** vCores and **32 GB**
     storage.
 
-12. Click **Next: Networking \>**.
+12. Click **Next: Networking**.
 
 13. In the **Networking** tab page, add details to the following required fields
     for this database server:
@@ -273,7 +273,7 @@ AKS deployments require you to install Pega Platform software into an SQL databa
 16. In the **Firewall rules** area, for **Add current client IP address**,
     select **Yes**.
 
-17. Click **Next: Additional settings \>**.
+17. Click **Next: Additional settings**.
 
 18. In the **Additional settings** tab page, use the following settings for this
     database server:
@@ -407,7 +407,7 @@ one in the charts\\pega folder.
 In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
-Do one of the following:
+1. Do one of the following:
 
 - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
@@ -436,8 +436,7 @@ If you cannot log into your Azure home page or see that the Azure CLI recognizes
 
     You are brought to your Azure home page.
 
-5. In the **Recent resources** area, click your AKS cluster to review these
-    settings:
+5. In the **Recent resources** area, click your AKS cluster to review these settings:
 
 - Name: listed in the page header
 
@@ -471,7 +470,7 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
 
-In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
+In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell prompt open and open a new one for the remaining steps.
 
 10. Do one of the following:
 
@@ -498,7 +497,7 @@ namespace/pegaaddons created
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-The pegaddons namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` Namespace view.
 
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart, install the pega.yaml Helm chart:
 
@@ -527,20 +526,12 @@ To follow the progress of an installation, use the dashboard. For subsequent dep
 
 17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
 
-![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
-
 A successful deployment will not show errors across the various workloads. The **mypega** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
-
-![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you have completed your deployment, you must associate the hostname of the
-pega-web tier with the IP address that the deployment load balancer gave to the
-tier. This final step ensures that you can log onto Pega Platform using your
-hostname, on which you can independently manage security protocols that match
-your networking infrastructure standards.
+After you have completed your deployment, you must associate the hostname of the pega-web tier with the IP address that the deployment load balancer gave to the tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
 ### Logging in using the IP address
 
@@ -550,8 +541,7 @@ To view the Pega deployment components, enter:
 
 ![](media/f329e9f92feed8cb5959d91db246aa84.png)
 
-The pega-web tier external IP address and port number are displayed. Port 80 is
-used for http traffic, which means you can’t use https encryption when accessing
+The pega-web tier external IP address and port number are displayed. Port 80 is used for http traffic, which means you can’t use https encryption when accessing
 the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
 
 ### Logging in using the domain name of the web tier

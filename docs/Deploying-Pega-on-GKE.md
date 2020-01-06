@@ -31,9 +31,7 @@ the following stepped tasks:
 
 4. [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes) – configure your network connections in your DNS zone so you can log onto Pega Platform.
 
-You can review the Pega architecture overview to understand how Pega maps
-Kubernetes objects with Pega applications and services: [How Pega Platform and
-applications are deployed on
+You can review the Pega architecture overview to understand how Pega maps Kubernetes objects with Pega applications and services: [How Pega Platform and applications are deployed on
 Kubernetes](https://community.pega.com/knowledgebase/articles/cloud-choice/how-pega-platform-and-applications-are-deployed-kubernetes).
 
 Document goals
@@ -414,7 +412,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
     You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the GKE resources. Note that the Kubernetes dashboard does not display your GKE cluster name or your resource name. This is expected behavior.
 
-    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux command prompt open and open a new one for the remaining steps.
+    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux shell prompt open and open a new one for the remaining steps.
 
 13. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
@@ -440,7 +438,7 @@ STATUS: deployed
 REVISION: 1
 ```
 
-The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` Namespace view.
 
 16. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart using the '--set global.actions.execute=install-deploy' option.
 

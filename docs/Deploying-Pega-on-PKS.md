@@ -326,7 +326,7 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
     You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the PKS resources. Note that the Kubernetes dashboard does not display your PKS cluster name or your resource name. This is expected behavior.
 
-    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux command prompt open and open a new one for the remaining steps.
+    In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell prompt open and open a new one for the remaining steps.
 
 10. Do one of the following:
 
@@ -353,7 +353,7 @@ namespace/pegaaddons created
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the pegaaddons Namespace view.
+The `pegaddons` namespace contains the deployment’s load balancer and disables the metric server. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` Namespace view.
 
 13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database you specified in the Helm chart, install the pega.yaml Helm chart:
 
