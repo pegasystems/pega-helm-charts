@@ -4,7 +4,7 @@ Preparing your local Linux system – 45 minutes
 In order to deploy Pega Platform using a local Linux system on which you can run commands with
 Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
 
-Assumptions and Prerequisites
+Assumptions and prerequisites
 -----------------------------
 
 This guide assumes:
@@ -20,7 +20,7 @@ Creating a local folder to access all of the configuration files
 
 Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>/\<platform\>-demo directory when you must extract files to a folder or run commands from a folder.
 
-In order to stay consistent with the instructions, it is recommended that you create a directory called \<platform\>-demo on your local system in your /home directory. This way, you associate the generic \<local filepath\>/\<platform\>-demo references to the folder /home/\<*linux-username*\>/\<platform\>-demo that is specific to your local
+In order to stay consistent with the instructions, you can create a directory called \<platform\>-demo on your local system in your /home directory. This way, you associate the generic \<local filepath\>/\<platform\>-demo references to the folder /home/\<*linux-username*\>/\<platform\>-demo that is specific to your local
 system.
 
 To create this folder, open a Linux command prompt and enter:
@@ -44,12 +44,23 @@ You are ready to continue preparing your local system.
 Installing required applications for the deployment
 ---------------------------------------------------
 
+The entire deployment requires the following applications to be used a somee point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+- Helm
+- kubectl
+- Docker
+- unzip (or something equivalent to extract files from .zip archive files.)
+- az cli (only for AKS deployments)
+- pks cli (only for PKS deployments)
+- Google Cloud SDK and gcloud (only for GKE deployments)
+
 Some of the required applications are binary files that you download from the
-organization's download area; other applicaitons can be installed by using a Linux package manager. In order to use the docker command in the runbooks, you must have the docker application installed; however, you must install the applicaton directly from the docker website. For your convenience, the instructions available on the docker website are included in this document.
+organization's download area; other applications can be installed by using a Linux package manager. 
 
-### Installing unzip
+In order to use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the applicaton directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
-Install the unzip utility with a packaging tool such as apt.
+### Installing Unzip
+
+Install the Unzip utility with a packaging tool such as apt.
 
 `$ sudo apt install unzip`
 
@@ -61,7 +72,7 @@ Helm supports a variety of installation methods. To learn more, see https://helm
 
 Helm provides a script that you can download and then run to install the latest version:
 
-1. To download the helm installation script from their git repository, from
+1. To download the Helm installation script from their Git repository, from
     your home directory enter:
 
 `$ sudo curl
@@ -124,7 +135,7 @@ see <https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-
 
 ### For PKS only: installing the PKS CLI
 
-Install the PKS CLI binary file from the Pivotal support site as an executable that you as a super user with a single command with the command curl piped into your bash:
+Install the PKS CLI binary file from the Pivotal support site as an executable that you will run as a super user with a single command with the command curl piped into your bash:
 
 1. Use the browser of your choice to navigate to [Pivotal Network](https://network.pivotal.io/) and log in.
 
@@ -136,7 +147,7 @@ Install the PKS CLI binary file from the Pivotal support site as an executable t
 
 5. Click **PKS CLI - Linux** and in the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the downloaded Linux binary file.
 
-6. Rename the downloaded binary file to pks.
+6. Rename the downloaded binary file to "pks".
 
 7. On the command line, run the following command to make the PKS CLI binary executable:
 
@@ -152,13 +163,84 @@ These instructions were mostly sourced from the [Installing the PKS CLI](https:/
 
 Install the Azure CLI as a super user with a single command with the command curl piped into your bash:
 
-`$ curl -sL https://aka.ms/InstallAzureCLIDeb \| sudo bash`
+`$ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`
 
 For details, see the article, <https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-apt?view=azure-cli-latest>.
 
+### For GKE only: installing and initializing the Google Cloud SDK 
+
+In order to use the Google Cloud SDK for your deployment, you must install the software and then initialize its use by referencing the Google Cloud project in which you will deploy Pega Platform.
+
+To install the Google Cloud SDK:
+
+1. In your browser, log in to your Google user account.
+
+2. Ensure that Python 2.7 is installed.
+
+3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](#https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
+
+3. Extract the Google SDK distribution archive file to your system.
+
+`tar zxvf [ARCHIVE_FILE] google-cloud-sdk`
+
+4. Use the install script to add Cloud SDK tools to your path.
+
+`./google-cloud-sdk/install.sh`
+
+5. Restart your terminal for the changes to take effect.
+
+6. In a Linux command prompt, initialize the Google Cloud SDK.
+
+`gcloud init`
+
+After the program initializes, you are prompted to log in.
+
+7. Log in using your Google user account by entering **Y**:
+
+`To continue, you must log in. Would you like to log in (Y/n)? Y`
+
+You are redirected to a browser page on your system with a Google Cloud log in screen.
+
+8. In your browser, log in to your Google Cloud user account when prompted and click **Allow** to grant permission to access Google Cloud Platform resources.
+
+9. In your Linux command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
+
+```yaml
+Pick cloud project to use:
+ [1] [my-project-1]
+ [2] [my-project-2]
+ ...
+ Please enter your numeric choice or text value (must exactly match list item):
+```
+
+If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
+
+```yaml
+Your current project has been set to: [my-project-name].
+...
+Your Google Cloud SDK is configured and ready to use!
+
+* Commands that require authentication will use [my-account-name] by default
+* Commands will reference project `[my-project-name]` by default
+Run `gcloud help config` to learn how to change individual settings
+
+This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
+Run `gcloud topic configurations` to learn more.
+```
+
+10. To list accounts whose credentials are stored on the local system:
+
+`gcloud auth list`
+
+11. To view information about your Cloud SDK installation and the active SDK configuration:
+
+`gcloud info`
+
+These instructions were sourced from the Google document, [Quickstart for Linux](#https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
+
 ### Installing Docker
 
-For Linux command line users, you can follow these steps to install Docker CE for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+For Linux command line users, you can follow these steps to install Docker Community Eedition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
 
 **SET UP THE REPOSITORY**
 
@@ -190,7 +272,7 @@ uid Docker Release (CE deb) <docker@docker.com>
 sub 4096R/F273FCD8 2017-02-22
 ```
 
-5. Use the following command to set up the stable repository. You always need the stable repository, even if you want to install builds from the edge or test repositories as well. To add the edge or test repository, add the word edge or test (or both) after the word stable in the commands below.
+5. Use the following command to set up the stable repository. You always need the stable repository, even if you want to install builds from the edge or test repositories as well. To add the edge or test repository, add the word "edge" or "test" (or both) after the word stable in the commands below.
 
 `$ sudo add-apt-repository "deb [arch=amd64]
 https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
@@ -198,13 +280,14 @@ https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
 Note: Starting with Docker 17.06, stable releases are also pushed to the edge
 and test repositories.
 
+
 **INSTALL DOCKER CE**
 
 1. Update the apt package index.
 
 `$ sudo apt-get update`
 
-2. Install the latest version of Docker CE, or go to the next step to install a
+2. Install the latest version of Docker CE or go to the next step to install a
     specific version. Any existing installation of Docker is replaced.
 
 `$ sudo apt-get install docker-ce docker-ce-cli containerd.io`
@@ -223,11 +306,11 @@ Pega maintains a repository of Helm charts that are required to deploy Pega Plat
 
 - pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
-- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed, when you install the addons chart.
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment. The required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment, when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
 
-To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you'll focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
 
-To simplify the instruction, you can download the file to the \<platform\>-demo fold you have already created on your local system. 
+To simplify the instruction, you can download the file to the \<platform\>-demo folder you have already created on your local system. 
 
 1. To add the Pega repository to your Helm installation, enter:
 
@@ -242,7 +325,7 @@ pega/pega   1.2.0                           Pega installation on kubernetes
 pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
 ```
 
-These two charts in this repository, pega and pega, require customization for your deployment of Pega Platform.
+These two charts in this repository, pega and addons, require customization for your deployment of Pega Platform.
 
 Updating the Pega/addons Helm chart
 -----------------------------------
@@ -258,7 +341,7 @@ the metrics-server for deployments to the following platforms:
 
 If you are deploying to a different platform you can skip this section.
 
-1. To download pega/addons Helm chat to the \<local filepath\>/\<platform\>-demo, enter:
+1. To download pega/addons Helm chart to the \<local filepath\>/\<platform\>-demo, enter:
 
 `$ helm inspect values pega/addons > addons.yaml`
 
@@ -279,7 +362,7 @@ serviceType: **LoadBalancer**
 Note: Do not enclose the text in quotes.
 ```
 
-4. For GKE or PKS deployments, you must ensure that the Pega metrics server is disabled in the metrics-server section of this *addon* values.yaml file, since PKS deployments use the PKS metrics server
+4. For GKE or PKS deployments, you must ensure that the Pega metrics server is disabled in the metrics-server section of this *addon* values.yaml file, since PKS deployments use the PKS metrics server.
 
 ```yaml
 metrics-server:
@@ -296,16 +379,11 @@ enabled: **false**
 Add any known, customized settings for Pega to your deployment
 --------------------------------------------------------------
 
-The Pega deployment model supports advanced configurations to fit most existing
-client’s needs. If you are a Pega client and have known, required customizations
-for your deployment and you already use the following files to add your known
-customizations, you can copy those configurations into the configuration files
-Pega added for this purpose in the pega-helm-charts repository folder, \<local
-filepath\>/\<platform\>-demo/pega-helm-charts-master/charts/pega/config/deploy:
+The Pega deployment model supports advanced configurations to fit most existing clients' needs. If you are a Pega client and have known, required customizations for your deployment and you already use the following files to add your known customizations, you can copy those configurations into the configuration files Pega added for this purpose in the pega-helm-charts repository folder, \<local filepath\>/\<platform\>-demo/pega-helm-charts-master/charts/pega/config/deploy:
 
 - context.xml: add additional required data sources
 
-- prlog4j2.xml modify your logging configuration, if required
+- prlog4j2.xml: modify your logging configuration, if required
 
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
@@ -337,7 +415,7 @@ If you have multiple associations with the Pega Community, the page requests you
 The **Pega Platform** card should appear near the top of the card list, below
 the list of all of the **Language packs for Pega Platform.**
 
-6. In the Pega Platform card, use your mouse to activate the icon into a shopping cart and click the shopping cart.
+6. In the Pega Platform card, your mouse arrow changes into a shopping cart icon, which you use to select **Pega Platform**.
 
 The icon changes to a green check and a new cart item appears in the top right of the product list.
 
@@ -400,7 +478,7 @@ After you extract the archive, the files in the Pega Platform distribution image
 Prepare your Pega Platform installation Docker image
 ----------------------------------------------------
 
-As stated previously, you are required to have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the docker cli and docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
+As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the Docker cli and Docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 
 Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#_Downloading_Pega_Platform) and installed the required components on your local system listed in [Install required applications for the deployment](#_Install_required_applications).
 
@@ -418,26 +496,26 @@ For details about logging into Docker from a secure password file using the `--p
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-You can list the folder content and see folders for Pega archives, Images, rules, and scripts.
+From this folder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
 
-![](media/152260ae774fe07d717f1b31b5560f25.png)
-
-4. Copy the following lines into the file to build your docker image using the public image on DockerHub that Pega provides to build install images, pegasystems/pega-installer-ready:
+4. Copy the following lines of instruction into the new text file:
 
 ```yaml
-> FROM pegasystems/pega-installer-ready
-> COPY scripts /opt/pega/kit/scripts
-> COPY archives /opt/pega/kit/archives
-> COPY rules /opt/pega/kit/rules
+FROM pegasystems/pega-installer-ready
+COPY scripts /opt/pega/kit/scripts
+COPY archives /opt/pega/kit/archives
+COPY rules /opt/pega/kit/rules
 ```
+
+These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-6. From your command prompt (Linux or Powershell running with Administrator privileges), in your current directory, build your pega install docker image by entering:
+6. From your Linux command prompt, in your current directory, build your pega install Docker image by entering:
 
 `$ docker build -t pega-installer .`
 
-This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”. You can use the docker command to see that your new image exists in your Docker image inventory.
+This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”. You can use the Docker command to see that your new image exists in your Docker image inventory.
 
 7. Tag the local version of your new image, pega-installer, with your DockerHub ID:
 
@@ -449,7 +527,7 @@ This command uses your dockerfile to build a full Docker image with the name “
 
 10. In the Repositories view, click **Create Repository +**.
 
-11. Enter a Name that matches the docker image you just built.
+11. Enter a Name that matches the Docker image you just built.
 
 12. Provide a brief Description, that will help you remember the version of Pega
     with which you built this image, or any other useful information.
@@ -460,9 +538,9 @@ You should not maintain this image with Pega proprietary software as a viewable 
 
 14. Click **Create**.
 
-Free DockerHub accounts support the use of a single private repository, so you may have to delete an existing private repository in order to create a new one for your Pega docker installation image.
+Free DockerHub accounts support the use of a single private repository, so you may have to delete an existing private repository in order to create a new one for your Pega Docker installation image.
 
-15. From a Linux bash shell, use the docker command to push the new image to
+15. From a Linux bash shell, use the Docker command to push the new image to
     your new private repository:
 
 `$ docker push <your-dockerbug-ID>/pega-installer`

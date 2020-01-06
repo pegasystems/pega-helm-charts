@@ -31,16 +31,24 @@ Where \<platform\>-demo is:
 
 - EKS-demo - for the EKS runbook
 
-- GKE-demo - for the GKE runbook
-
 - PKS-demo - for the PKS runbook
 
 - Openshift-demo - for the Openshift runbook
+
+Currently there is no runbook for running on the Google Kubernetes Engine (GKE) using the Windows 10 Google SDK. To set up a system for a deployment on GKE, see [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md). 
 
 You are ready to continue preparing your local system.
 
 Installing required applications for the deployment
 ---------------------------------------------------
+
+The entire deployment requires the following applications to be used a somee point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+- Helm
+- kubectl
+- Docker
+- unzip (or something equivalent to extract files from .zip archive files.)
+- az cli (only for AKS deployments)
+- pks cli (only for PKS deployments)
 
 Some of the required applications are binary files that you download from the organization's download area; other applications can be installed by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
@@ -141,70 +149,6 @@ simply “pks”.
 `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
 
 Advanced users may add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-6/installing-pks-cli.html).
-
-### For GKE only: installing and initializing the Google Cloud SDK 
-
-In order to use the Google Cloud SDK for your deployment, you must install the software and then initialize its use by referencing the Google Cloud project in which you will deploy Pega Platform.
-
-To install the Google Cloud SDK:
-
-1. In your browser, log in to your Google user account.
-
-2. Download the [Google Cloud SDK installer](#https://dl.google.com/dl/cloudsdk/channels/rapid/GoogleCloudSDKInstaller.exe).
-
-3. Launch the **GoogleCloudSDKinstaller.exe** installer, follow the prompts, and accept the default options in the **Google Cloud SDK setup** wizard.
-
-4. After the installation has completed, click **Next**.
-
-5. In the **Google Cloud SDK setup** wizard ensure that you select the following options among the available options:
-
-- Start Google Cloud SDK shell
-- Run `gcloud init`
-
-After the program initializes, you are prompted to log in.
-
-6. Log in using your Google user account by entering **Y**:
-
-`To continue, you must log in. Would you like to log in (Y/n)? Y`
-
-You are redirected to a browser page on your system with a Google Cloud log in screen.
-
-7. In your browser, log in to your Google Cloud user account when prompted and click **Allow** to grant permission to access Google Cloud Platform resources.
-
-8. Return to the Google Cloud SDK shell prompt and select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
-
-```yaml
-Pick cloud project to use:
- [1] [my-project-1]
- [2] [my-project-2]
- ...
- Please enter your numeric choice or text value (must exactly match list item):
-```
-
-If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
-
-```yaml
-Your current project has been set to: [my-project-name].
-...
-Your Google Cloud SDK is configured and ready to use!
-
-* Commands that require authentication will use [my-account-name] by default
-* Commands will reference project `[my-project-name]` by default
-Run `gcloud help config` to learn how to change individual settings
-
-This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
-Run `gcloud topic configurations` to learn more.
-```
-
-9. To list accounts whose credentials are stored on the local system:
-
-`gcloud auth list`
-
-10. To view information about your Cloud SDK installation and the active SDK configuration:
-
-`gcloud info`
-
-These instructions were sourced from the Google document, [Quickstart for Windows](#https://cloud.google.com/sdk/docs/quickstart-windows), which includes additional information.
 
 ### Installing Docker Desktop on Windows 10
 
@@ -328,7 +272,7 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 - context.xml: add additional required data sources
 
-- prlog4j2.xml modify your logging configuration, if required
+- prlog4j2.xml: modify your logging configuration, if required
 
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
@@ -443,22 +387,24 @@ For details about logging into Docker from a secure password file using the `--p
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-You can list the folder content and see folders for Pega archives, Images, rules, and scripts.
+From this folwder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
 
 ![](media/152260ae774fe07d717f1b31b5560f25.png)
 
-4. Copy the following lines into the file to build your docker image using the public image on DockerHub that Pega provides to build install images, pegasystems/pega-installer-ready:
+4. Copy the following lines of instruction into the new text file:
 
 ```yaml
-  > FROM pegasystems/pega-installer-ready
-  > COPY scripts /opt/pega/kit/scripts
-  > COPY archives /opt/pega/kit/archives
-  > COPY rules /opt/pega/kit/rules
+FROM pegasystems/pega-installer-ready
+COPY scripts /opt/pega/kit/scripts
+COPY archives /opt/pega/kit/archives
+COPY rules /opt/pega/kit/rules
 ```
+
+These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-6. From your command prompt (Linux or PowerShell running with Administrator privileges), in your current directory, build your pega install docker image by entering:
+6. From your PowerShell running with Administrator privileges command prompt, in your current directory, build your pega install docker image by entering:
 
 `$ docker build -t pega-installer .`
 

@@ -12,9 +12,10 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Open-source Kubernetes (and [MiniKube for personal deployments](docs/RUNBOOK_MINIKUBE.md))
 * Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
 * Amazon Elastic Kubernetes Service (EKS)
-* Google Kubernetes Engine (GKE)
+* Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
 * Red Hat OpenShift
-* Pivotal Container Service (PKS)
+* Pivotal Container Service (PKS) - see the [PKS runbook](docs/Deploying-Pega-on-PKS.md)
+
 
 # Getting started
 
