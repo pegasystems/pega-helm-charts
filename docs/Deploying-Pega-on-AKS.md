@@ -113,7 +113,7 @@ resources.
 
 ### Create an AKS cluster
 
-In order to deploy Pega using a AKS cluster, you must create the cluster in an existing  project in your Microsfot Azure account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a
+In order to deploy Pega using a AKS cluster, you must create the cluster in an existing project in your Microsoft Azure account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a
 simple cluster with two VMs with sufficient memory and CPU resources to support
 a deployment of Pega Platform that can perform under high workloads.
 
