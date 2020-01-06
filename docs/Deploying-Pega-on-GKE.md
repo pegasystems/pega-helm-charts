@@ -458,7 +458,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 17. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt and relaunch the browser as directed in Step 10.
 
-18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
+18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
 ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
