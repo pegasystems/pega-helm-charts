@@ -43,7 +43,7 @@ By following the procedures in this document, you will create a deployment of Pe
 
 - Instructions for creating a GKE cluster with suitable resources to support a scalable dev/test environment for your Pega application.
 
-- Instructions for creating a GCP SQL Database that hosts Pega Platform data and rules in your GCP account.
+- Instructions for creating a GCP SQL Instance in your GCP account that contains a PostgreSQL database whichs hosts Pega Platform data and rules.
 
 - Instructions for creating a Pega Platform installation Docker image you use to install and deploy Pega Platform onto your GKE cluster.
 
