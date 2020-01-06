@@ -394,10 +394,10 @@ From this folwder, you can list the folder content and see folders for Pega arch
 4. Copy the following lines of instruction into the new text file:
 
 ```yaml
-> FROM pegasystems/pega-installer-ready
-> COPY scripts /opt/pega/kit/scripts
-> COPY archives /opt/pega/kit/archives
-> COPY rules /opt/pega/kit/rules
+FROM pegasystems/pega-installer-ready
+COPY scripts /opt/pega/kit/scripts
+COPY archives /opt/pega/kit/archives
+COPY rules /opt/pega/kit/rules
 ```
 
 These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.
