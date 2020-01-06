@@ -470,7 +470,7 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 You can now view your deployment details visually using the Kubernetes dashboard. You will use this dashboard to review the status of your deployment as you continue. At this point, with no deployment, you only see the AKS resources. Note that the Kubernetes dashboard does not display your AKS cluster name or your resource name. This is expected behavior.
 
-In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell prompt open and open a new one for the remaining steps.
+In order to continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open and open a new one for the remaining steps.
 
 10. Do one of the following:
 
