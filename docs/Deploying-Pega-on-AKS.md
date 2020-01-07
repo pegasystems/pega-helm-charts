@@ -404,7 +404,7 @@ separate processes. The Helm install command uses Helm to install your
 deployment as directed in the Helm charts, one in the charts\\addons folder and
 one in the charts\\pega folder. 
 
-In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tasks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
 1. Do one of the following:

@@ -187,7 +187,7 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
     e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
     
-    As a best practice, you should add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to use the command `kubectl describe nodes | grep ExternalIP`.
+    As a best practice, you should add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to view the nodes in your GKE cluster with kubectl and then use the `kubectl describe nodes | grep ExternalIP`.
 
 6. In **Configuration options \> Machine type and storage**:
 
@@ -299,7 +299,7 @@ separate processes. The Helm install command uses Helm to install your
 deployment as directed in the Helm charts, one in the charts\\addons folder and
 one in the charts\\pega folder. 
 
-In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tasks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
 1. Open a Linux bash shell and change the location to the top folder of your gke-demo directory that you created in [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md).
@@ -460,7 +460,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
-![](media/dashboard-mypega-pks-demo-install-initial.png)
+![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
 
 Note: A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -472,40 +472,12 @@ To follow the progress of an installation, use the dashboard. For subsequent dep
 
 20.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
-![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
-
 A successful deployment will not show errors across the various workloads. The `mypega-gke-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
-
-![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, you must associate the hostname of the
-pega-web tier with the IP address that the deployment load balancer gave to the
-tier. This final step ensures that you can log onto Pega Platform using your
-hostname, on which you can independently manage security protocols that match
-your networking infrastructure standards.
-
-### Logging in using the IP address
-
-To view the Pega deployment components, enter:
-
-`$ kubectl get services --namespace mypega-gke-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-The pega-web tier external IP address and port number are displayed. Port 80 is
-used for http traffic, which means you can’t use https encryption when access
-the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
-
-### Logging in using the domain name of the web tier
-
-You must manually set the IP address of the web tier domain name in order to log
-into Pega Platform domain name that is set during the deployment.
-
-The example of a domain name of the web tier used in this demo is
-**gke.web.dev.pega.io**, which you set in the values.yaml file here:
+After you complete your deployment, it is a best practice to associate the hostname of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The hostname of the pega-web tier ingress used in this demo is **gke.web.dev.pega.io**, is set in the pega.yaml file in the lines:
 
 ```yaml
 name: "web"
@@ -518,23 +490,17 @@ service:
 domain: "**gke.web.dev.pega.io**"
 ```
 
-When you set this to be "\<the hostname for your web service tier\>" as directed
-in [Update the Helm chart values](#update-the-helm-chart-values), you will
-manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name.
+In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-In order to sign into Pega using "\<the hostname for your web service tier\>",
-you must assign the domain name with the same IP address that the deployment
-load balancer has assigned to the web tier.
+You can view the networking endpoints associated with your GKE deployment, in your Google Cloud Platform console. Use the Navigation Menu to go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress hostname. Use the page filter to look at the pega-web resources in your cluster.
 
-1. From your command prompt, review the IP addresses that are in the my pega service
+![Initial view of pods during deploying](media/pega-web-networking.png)
 
-`$ kubectl get services --namespace mypega-gke-demo`
+To manually associate the hostname of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
 
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
+For CLoud DNS documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart).
 
-2. TBD.
-
+### Logging in using the domain name of the web tier
 With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
