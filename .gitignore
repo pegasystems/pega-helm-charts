@@ -2,7 +2,6 @@
 **/charts/*.tgz
 **/requirements.lock
 
-
 # Generated example yaml
 /build
 *.tar.gz
@@ -18,3 +17,6 @@
 # IntelliJ IDEA
 **/.idea
 **/*.iml
+
+# VS Code
+.vscode/*

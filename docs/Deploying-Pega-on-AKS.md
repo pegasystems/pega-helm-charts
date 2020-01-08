@@ -69,14 +69,13 @@ This guide assumes:
 
 - You have a basic familiarity with running commands from a Windows 10 PowerShell with Administrator privileges or a Linux command prompt with root privileges.
 
-- You use opensource packaging tools on Windows or Linux to install applications onto your local system.
+- You use open source packaging tools on Windows or Linux to install applications onto your local system.
 
-The following account and application versions are required for use in this
-document:
+The following account and application versions are required for use in this document:
 
 - A Microsoft Azure account with a payment method set up to pay for the Azure resources you create using this document. You should also have sufficient Microsoft Azure account permissions and knowledge to:
 
-  - Create an AKS service, a SQL Database, and a storage resource.
+  - Create an AKS service, an SQL Database, and a storage resource.
 
   - Select an appropriate Location in which to deploy Microsoft Azure resources;
     the document assumes your Location is US East.
@@ -113,9 +112,7 @@ resources.
 
 ### Create an AKS cluster
 
-In order to deploy Pega using a AKS cluster, you must create the cluster in an existing project in your Microsoft Azure account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a
-simple cluster with two VMs with sufficient memory and CPU resources to support
-a deployment of Pega Platform that can perform under high workloads.
+In order to deploy Pega using a AKS cluster, you must create the cluster in an existing project in your Microsoft Azure account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a simple cluster with two VMs with sufficient memory and CPU resources to support a deployment of Pega Platform that can perform under high workloads.
 
 To create your AKS cluster:
 
@@ -145,7 +142,7 @@ To create your AKS cluster:
 1. Select the default **Kubernetes version**. Pega requires that you select
     version 1.13.10 or later.
 
-1. For **DNS name prefix**, entire a prefix your organization requires or, if
+1. For **DNS name prefix**, enter a prefix your organization requires or, if
     not required, use the default, which Azure creates based on the **Kubernetes
     cluster name** you provided.
 
@@ -199,20 +196,20 @@ function.
 1. Click **Next: Monitoring**.
 
 1. In the **Monitoring** tab page, in **Azure Monitor**, accept the defaults to
-    **Enable container monitoring** and to use the default analytics workspace
+    **Enable container monitoring** to use the default analytics workspace
     to store monitoring data.
 
 1. Click **Next: Tags**.
 
 1. In the **Tags** tab page, add any tags with which you want to identify
-    resources such as owner, user, organization name using the **Name** and
+    resources such as owner, user, and organization name using the **Name** and
     **Value** tags.
 
    Tags can help clarify billing details for your AKS resources.
 
 1. Click **Next: Review + create**.
 
-   Azure runs a validation and when validated, your service is ready to create.
+   Azure runs a validation and when validated, your service is ready to be created.
 
 1. Check your configurations on the **Create and Review** tab.
 
@@ -287,7 +284,7 @@ AKS deployments require you to install Pega Platform software into an SQL databa
 1. Click **Next: Tags**.
 
 1. In the **Tags** tab page, add any tags with which you want to identify
-    resources such as owner, user, organization name using the **Name** and
+    resources such as owner, user, and organization name using the **Name** and
     **Value** tags.
 
 Tags can help clarify billing details for your AKS resources.
@@ -333,11 +330,9 @@ will use these names when you update your values Helm chart.
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-In order to deploy Pega Platform using Helm, you must customize the “pega” Helm
-chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
+In order to deploy Pega Platform using Helm, you must customize the “pega” Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
-An installation followed by a deployment will take about 90 minutes total, since
-it takes about an hour for Pega Platform to completely install in your SQL database.
+An installation followed by a deployment will take about 90 minutes total, since it takes about an hour for Pega Platform to completely install in your SQL database.
 
 ### Update the Helm chart values
 
@@ -413,7 +408,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 `$ cd <local filepath>\aks-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+- Open a Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
 `$ cd /home/<local filepath>/aks-demo`
 
@@ -491,7 +486,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
+12. To install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes), enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -554,14 +549,12 @@ The example of a domain name of the web tier used in this demo is
 
 ```yaml
 tier:
-   -name: "web"
-    # Enter the domain name to access web nodes via a load balancer.
-    # e.g. web.mypega.example.com
+  - name: "web"
 
     service:
-    # Enter the domain name to access web nodes via a load balancer.
-    #  e.g. web.mypega.example.com
-    domain: "**aks.web.dev.pega.io**"
+      # Enter the domain name to access web nodes via a load balancer.
+      #  e.g. web.mypega.example.com
+      domain: "**aks.web.dev.pega.io**"
 ```
 
 When you set this to be "\<the hostname for your web service tier\>" as directed
@@ -586,7 +579,7 @@ The mypega-web node is the only tier with an externally exposed IP address. Note
 
 ![](media/3c7f4a5c3c21c6577a4dbab5f5cfa79d.png)
 
-4. In the **Name** column, click on the **In the DNS zone** for your deployment.
+4. In the **Name** column, click on the DNS zone for your deployment.
 
 The DNS zone page displays.
 
