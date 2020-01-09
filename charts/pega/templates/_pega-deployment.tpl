@@ -146,6 +146,9 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
+{{- if (.root.Values.global.docker.pega.imagePullPolicy) }}
+      imagePullPolicy: {{ .root.Values.global.docker.pega.imagePullPolicy }}
+{{- end }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:

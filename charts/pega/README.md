@@ -110,11 +110,9 @@ jdbc:
 
 ## Docker
 
-Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the `url` of the image or use the default of pegasystems/pega.
+Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
-
-Note: the `imagePullPolicy` is always for all images in this deployment by default.
 
 Example:
 
@@ -124,6 +122,9 @@ docker:
     url: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  pega:
+    image: "pegasystems/pega"
+    imagePullPolicy: "Always"
 ```
 
 ## Tiers of a Pega deployment
