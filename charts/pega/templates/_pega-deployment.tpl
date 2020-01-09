@@ -67,6 +67,9 @@ spec:
         # The pega image, you may use the official pega distribution or you may extend
         # and host it yourself.  See the image documentation for more information.
         image: {{ .root.Values.global.docker.pega.image }}
+{{- if (.root.Values.global.docker.pega.imagePullPolicy) }}
+        imagePullPolicy: {{ .root.Values.global.docker.pega.imagePullPolicy }}
+{{- end }}
         # Pod (app instance) listens on this port
         ports:
         - containerPort: 8080
@@ -146,9 +149,6 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
-{{- if (.root.Values.global.docker.pega.imagePullPolicy) }}
-      imagePullPolicy: {{ .root.Values.global.docker.pega.imagePullPolicy }}
-{{- end }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:
