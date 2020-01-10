@@ -475,8 +475,8 @@ If it is not the right version number, you must complete a new request.
 
 After you extract the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
 
-Prepare your Pega Platform installation Docker image
-----------------------------------------------------
+Prepare your Pega Platform installation Docker image – 15 minutes
+-----------------------------------------------------------------
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the Docker cli and Docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 

@@ -487,15 +487,16 @@ tier:
 
 In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-You can view the networking endpoints associated with your GKE deployment, in your Google Cloud Platform console. Use the Navigation Menu to go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress hostname. Use the page filter to look at the pega-web resources in your cluster.
+You can view the networking endpoints associated with your GKE deployment by using the Google Cloud Platform console. Use the Navigation Menu to go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress hostname. Use the page filter to look at the pega-web resources in your cluster.
 
 ![Initial view of pods during deploying](media/pega-web-networking.png)
 
 To manually associate the hostname of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
 
-For CLoud DNS documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart).
+For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart).
 
 ### Logging in using the domain name of the web tier
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
+
+With the ingress hostname name associated with this IP address in your DNS service, you can log into Pega Platform with a browser using the URL: http://\<pega-web tier ingress hostname>/prweb.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)

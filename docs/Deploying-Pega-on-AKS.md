@@ -142,9 +142,7 @@ To create your AKS cluster:
 1. Select the default **Kubernetes version**. Pega requires that you select
     version 1.13.10 or later.
 
-1. For **DNS name prefix**, enter a prefix your organization requires or, if
-    not required, use the default, which Azure creates based on the **Kubernetes
-    cluster name** you provided.
+1. For **DNS name prefix**, enter a prefix your organization requires or, if not required, use the default, which Azure creates based on the **Kubernetes cluster name** you provided.
 
 1. In Primary node pool specify the size of your VMs for this service.
 
@@ -509,8 +507,6 @@ A successful Pega deployment immediately returns details that show progress for 
 15. In the dashboard, use the **Namespace** pulldown to change the view to **mypega**
 and click on the **Pods** view.
 
-![](media/055d24b4ac0c0dfcb9c68cec334ce42a.png)
-
 Note: A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour.
 
 To follow the progress of an installation, use the dashboard. For subsequent deployments, you will not need to do this. Initially, some of the resources are making requests to complete the configuration; therefore, you will see red warnings while the configuration is finishing. This is expected behavior.
@@ -526,26 +522,7 @@ A successful deployment will not show errors across the various workloads. The *
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you have completed your deployment, you must associate the hostname of the pega-web tier with the IP address that the deployment load balancer gave to the tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
-
-### Logging in using the IP address
-
-To view the Pega deployment components, enter:
-
-`$ kubectl get services --namespace mypega`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-The pega-web tier external IP address and port number are displayed. Port 80 is used for http traffic, which means you can’t use https encryption when accessing
-the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
-
-### Logging in using the domain name of the web tier
-
-You must manually set the IP address of the web tier domain name in order to log
-into Pega Platform domain name that is set during the deployment.
-
-The example of a domain name of the web tier used in this demo is
-**aks.web.dev.pega.io**, which you set in the values.yaml file here:
+After you complete your deployment, it is a best practice to associate the hostname of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The hostname of the pega-web tier ingress used in this demo is **aks.web.dev.pega.io**, is set in the pega.yaml file in the lines:
 
 ```yaml
 tier:
@@ -557,36 +534,31 @@ tier:
       domain: "**aks.web.dev.pega.io**"
 ```
 
-When you set this to be "\<the hostname for your web service tier\>" as directed
-in [Update the Helm chart values](#update-the-helm-chart-values), you will
-manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name. In order to sign into Pega using "\<the hostname for your web service tier\>",
-you must assign the domain name with the same IP address that the deployment
-load balancer has assigned to the web tier.
+In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-1. From your command prompt, review the IP addresses that are in the mypega service
+You can view the networking endpoint that is associated with your AKS deployment using the `kubectl` command.
 
 `$ kubectl get services --namespace mypega`
 
+The pega-web tier external endpoint (the IP address and port number) are displayed. Port 80 is used for http traffic, which means you can’t use https encryption when accessing the web-tier in a browser; instead, Pega recommends using the domain name you configured for the pega-web tier ingress.
+
+To manually associate the hostname of the pega-web tier ingress with the tier's external endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a AKS **DNS zone** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
+
 The mypega-web node is the only tier with an externally exposed IP address. Note the external IP address that the load-balancer gives to the web node: this is the IP address which in order to log into Pega Platform with your hostname.
 
-2. In a browser, login to Microsoft Azure Portal (https://portal.azure.com/)
+1. In a browser, login to Microsoft Azure Portal (https://portal.azure.com/)
     with your credentials.
 
-3. Search for **DNS zones** and select it in the dropdown list.
+2. Search for **DNS zones** and select it in the dropdown list.
 
-    You are brought to the DNS zones for your AKS cluster.
+    You are brought to the DNS zones for your Azure account.
 
 ![](media/3c7f4a5c3c21c6577a4dbab5f5cfa79d.png)
 
-4. In the **Name** column, click on the DNS zone for your deployment.
+3. In the **Name** column, click on the **DNS zone** for your deployment.
 
-The DNS zone page displays.
+4. To associate the IP address of the pega-web tier with domain name of the pega-web tier ingress that you configured during your deployment, add a **Record set** to your DNS zone for this hostname:
 
-5. To associate the IP address of the web tier (see step 1) with the domain name
-    you configured during your deployment, you must add a **Record set** to your
-    DNS zone for **"\<the hostname for your web service tier\>"**:
-      
     a. Click **+Record** set
 
     b.  In the **Name** field, enter **"\<the hostname for your web service
@@ -606,6 +578,6 @@ The DNS zone page displays.
 
 ![](media/ccb6329a621c6f11970e25531cfa1857.png)
 
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
+With the ingress hostname name associated with this IP address in your DNS service, you can log into Pega Platform with a browser using the URL: http://\<pega-web tier ingress hostname>/prweb.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)

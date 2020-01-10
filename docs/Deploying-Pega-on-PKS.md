@@ -388,31 +388,7 @@ A successful deployment will not show errors across the various workloads. The `
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, you must associate the hostname of the
-pega-web tier with the IP address that the deployment load balancer gave to the
-tier. This final step ensures that you can log onto Pega Platform using your
-hostname, on which you can independently manage security protocols that match
-your networking infrastructure standards.
-
-### Logging in using the IP address
-
-To view the Pega deployment components, enter:
-
-`$ kubectl get services --namespace mypega-pks-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-The pega-web tier external IP address and port number are displayed. Port 80 is
-used for http traffic, which means you can’t use https encryption when accessing
-the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
-
-### Logging in using the domain name of the web tier
-
-You must manually set the IP address of the web tier domain name in order to log
-into Pega Platform domain name that is set during the deployment.
-
-The example of a domain name of the web tier used in this demo is
-**pks.web.dev.pega.io**, which you set in the values.yaml file here:
+After you complete your deployment, it is a best practice to associate the hostname of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The hostname of the pega-web tier ingress used in this demo is **pks.web.dev.pega.io**, is set in the pega.yaml file in the lines:
 
 ```yaml
 tier:
@@ -424,23 +400,12 @@ tier:
       domain: "**pks.web.dev.pega.io**"
 ```
 
-When you set this to be "\<the hostname for your web service tier\>" as directed
-in [Update the Helm chart values](#update-the-helm-chart-values), you will
-manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name.
+In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-In order to sign into Pega using "\<the hostname for your web service tier\>",
-you must assign the domain name with the same IP address that the deployment
-load balancer has assigned to the web tier.
+To manually associate the hostname of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
 
-1. From your command prompt, review the IP addresses that are in the mypega service
+For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart). If not using the GCP **Cloud DNS**, for configuration details, see the documentation for your DNS lookup management system.
 
-`$ kubectl get services --namespace mypega-pks-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-2. TBD.
-
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
+With the ingress hostname name associated with this IP address in your DNS service, you can log into Pega Platform with a browser using the URL: http://\<pega-web tier ingress hostname>/prweb.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
