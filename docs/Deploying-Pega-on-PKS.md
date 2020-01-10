@@ -26,7 +26,7 @@ the following stepped tasks:
 
     - [Prepare a local Linux system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
-    - [Prepare a local Windows 10 system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
+    - [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
 
 2. [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes) – request a PKS cluster form Pivotal, an SQL database, and a storage resource in an account such as Google Cloud Platform (GPC).
 
@@ -60,10 +60,9 @@ This guide assumes:
 
 - You have a basic familiarity with running commands from a Windows 10 PowerShell with Administrator privileges or a Linux command prompt with root privileges.
 
-- You use opensource packaging tools on Windows or Linux to install applications onto your local system.
+- You use open source packaging tools on Windows or Linux to install applications onto your local system.
 
-The following account and application versions are required for use in this
-document:
+The following account and application versions are required for use in this document:
 
 - A GCP account with a payment method set up to pay for the GCP resources you create using this document. You should also have sufficient GCP account permissions and knowledge to:
 
@@ -92,9 +91,9 @@ This document requires that you prepare a local Linux or Windows 10 system on
 which you can run commands with root or Administrator privileges. To prepare
 your system use the guide appropriate for your type of system:
 
-- [Preparing your local Linux system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-linux.md)
+- [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md)
 
-- [Preparing your local Windows 10 system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-windows.md)
+- [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md)
 
 After you have your local system prepared, you are ready to prepare your PKS
 resources.
@@ -149,7 +148,7 @@ To begin, create an SQL Instance that is available to your PKS cluster. In this 
 
     b. In **Default user password**, enter a “postgres” user password.
 
-    c. Select an appropriate **Region** and **Zone** for your database server. Cotact your Pivotal representative so you can select the same zone or region that Pivotal used to create your PKS demo cluster.
+    c. Select an appropriate **Region** and **Zone** for your database server. Contact your Pivotal representative so you can select the same zone or region that Pivotal used to create your PKS demo cluster.
 
     d. In **Database version**, select **PostgreSQL 11**.
 
@@ -195,13 +194,12 @@ You must create a PostSQL database in your new SQL instance into which you will 
 
   Pega does not require any additional configuration.
 
-With your SQL service IP address and your new database name, you are ready to continute to the next section.
+With your SQL service IP address and your new database name, you are ready to continue to the next section.
 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-In order to deploy Pega Platform using Helm, you must customize the “pega” Helm
-chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
+In order to deploy Pega Platform using Helm, you must customize the “pega” Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation followed by a deployment will take about 90 minutes total, since it takes about an hour for Pega Platform to completely install in your PostgreSQL database.
 
@@ -265,7 +263,7 @@ separate processes. The Helm install command uses Helm to install your
 deployment as directed in the Helm charts, one in the charts\\addons folder and
 one in the charts\\pega folder. 
 
-In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tasks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
 1. Do one of the following:
@@ -347,7 +345,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. To install the addons chart, which you already updated during the prepping a local system for your deployment, enter:
+12. To install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes), enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -367,7 +365,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 14. Refresh the Kubernetes dashboard you opened in step 8. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the browser as directed in Step 10.
 
-15. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-pks-demo` and click on the **Pods** view. Initiallly, you can some pods have a red status, which means they are initializing:
+15. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-pks-demo` and click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
 ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -390,60 +388,24 @@ A successful deployment will not show errors across the various workloads. The `
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, you must associate the hostname of the
-pega-web tier with the IP address that the deployment load balancer gave to the
-tier. This final step ensures that you can log onto Pega Platform using your
-hostname, on which you can independently manage security protocols that match
-your networking infrastructure standards.
-
-### Logging in using the IP address
-
-To view the Pega deployment components, enter:
-
-`$ kubectl get services --namespace mypega-pks-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-The pega-web tier external IP address and port number are displayed. Port 80 is
-used for http traffic, which means you can’t use https encryption when accessing
-the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
-
-### Logging in using the domain name of the web tier
-
-You must manually set the IP address of the web tier domain name in order to log
-into Pega Platform domain name that is set during the deployment.
-
-The example of a domain name of the web tier used in this demo is
-**pks.web.dev.pega.io**, which you set in the values.yaml file here:
+After you complete your deployment, it is a best practice to associate the hostname of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The hostname of the pega-web tier ingress used in this demo is **pks.web.dev.pega.io**, is set in the pega.yaml file in the lines:
 
 ```yaml
-name: "web"
+tier:
+  - name: "web"
 
-# Enter the domain name to access web nodes via a load balancer.
-# e.g. web.mypega.example.com
-
-service:
-
-domain: "**PKS.web.dev.pega.io**"
+    service:
+      # Enter the domain name to access web nodes via a load balancer.
+      #  e.g. web.mypega.example.com
+      domain: "**pks.web.dev.pega.io**"
 ```
 
-When you set this to be "\<the hostname for your web service tier\>" as directed
-in [Update the Helm chart values](#update-the-helm-chart-values), you will
-manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name.
+In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-In order to sign into Pega using "\<the hostname for your web service tier\>",
-you must assign the domain name with the same IP address that the deployment
-load balancer has assigned to the web tier.
+To manually associate the hostname of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
 
-1. From your command prompt, review the IP addresses that are in the mypega service
+For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart). If not using the GCP **Cloud DNS**, for configuration details, see the documentation for your DNS lookup management system.
 
-`$ kubectl get services --namespace mypega-pks-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-2. TBD.
-
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
+With the ingress hostname name associated with this IP address in your DNS service, you can log into Pega Platform with a browser using the URL: http://\<pega-web tier ingress hostname>/prweb.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)

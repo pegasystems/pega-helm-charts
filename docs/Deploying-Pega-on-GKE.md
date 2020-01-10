@@ -23,7 +23,7 @@ Pega provides customized orchestration tools and Docker images required to
 orchestrate a deployment in a GKE cluster you create for the deployment using
 the following stepped tasks:
 
-1. Prepare your local system using [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
+1. Prepare your local system using [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – Create a GKE cluster and a Postgres database in an SQL instance in your Google Cloud Platform (GPC) account.
 
@@ -41,7 +41,7 @@ By following the procedures in this document, you will create a deployment of Pe
 
 - Instructions for creating a GKE cluster with suitable resources to support a scalable dev/test environment for your Pega application.
 
-- Instructions for creating a GCP SQL Instance in your GCP account that contains a PostgreSQL database whichs hosts Pega Platform data and rules.
+- Instructions for creating a GCP SQL Instance in your GCP account that contains a PostgreSQL database which hosts Pega Platform data and rules.
 
 - Instructions for creating a Pega Platform installation Docker image you use to install and deploy Pega Platform onto your GKE cluster.
 
@@ -51,18 +51,17 @@ By following the procedures in this document, you will create a deployment of Pe
 
 ### Assumptions and Prerequisites
 
-This guide assumes that you use opensource packaging tools on a Linux distribution to install applications onto your local system.
+This guide assumes that you use open source packaging tools on a Linux distribution to install applications onto your local system.
 
-The following account and application versions are required for use in this
-document:
+The following account and application versions are required for use in this document:
 
 - A GCP account with a payment method set up to pay for the GCP resources you create using this document. You should also have sufficient GCP account permissions and knowledge to:
 
-  - Access an existing Google Cloud Platform project in which your GKE resources.
+  - Access an existing Google Cloud Platform project for your GKE resources.
 
   - Create an SQL Instance.
 
-  - Select an appropriate location in which to deploy your database resource and GKE cluster; in general, the cluster and PostgreSQL database into which you install Pega Platform should be in the same location.
+  - Select an appropriate location to deploy your database resource and GKE cluster. The cluster and PostgreSQL database into which you install Pega Platform must be in the same location.
 
   You are responsible for any financial costs incurred for your GCP resources.
 
@@ -97,7 +96,7 @@ With the new project created, you can proceed with completing the preparation of
 Prepare your local system – 45 minutes
 --------------------------------------
 
-This document requires that you prepare a local Linux on which you can run commands with root or Administrator privileges. To prepare your system, see [Preparing your local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md).
+This document requires that you prepare a local Linux on which you can run commands with root or Administrator privileges. To prepare your system, see [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
 After you have your local system prepared, you are ready to prepare your GKE resources.
 
@@ -108,9 +107,7 @@ This section covers the details necessary to obtain your GKE credentials and con
 
 ### Creating a multi-zonal GKE cluster
 
-In order to deploy Pega using a GKE cluster, you must create the cluster in an existing  project in your Google Cloud account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a
-multi-zonal cluster with two VMs with sufficient memory and CPU resources to support
-a deployment of Pega Platform that can perform under high workloads.
+In order to deploy Pega using a GKE cluster, you must create the cluster in an existing  project in your Google Cloud account. The deployment will place the required configuration files into this cluster during the deployment steps in the section [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line). For now, you will create a multi-zonal cluster with two VMs with sufficient memory and CPU resources to support a deployment of Pega Platform that can perform under high workloads.
 
 You can create a multi-zonal cluster using gcloud or the Google Cloud Console. For steps to create the cluster using gcloud in the Google Cloud SDK, see the gcloud tab on the page [Creating a multi-zonal cluster]( https://cloud.google.com/kubernetes-engine/docs/how-to/creating-a-multi-zonal-cluster).
 
@@ -187,7 +184,7 @@ To begin, create an SQL instance that is available to your GKE cluster. In this 
 
     e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
     
-    As a best practice, you should add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to use the command `kubectl describe nodes | grep ExternalIP`.
+    As a best practice, you should add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to view the nodes in your GKE cluster with kubectl and then use the `kubectl describe nodes | grep ExternalIP`.
 
 6. In **Configuration options \> Machine type and storage**:
 
@@ -221,7 +218,7 @@ displays all of the SQL resources in your account, which includes your newly cre
 
 You must create a PostSQL database in your new SQL instance into which you will install Pega Platform. Use the database editing tool of your choice to log into your SQL instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
 
-1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
+1. Use a database editor tool, such as pgAdmin4, to log into your SQL instance.
 
   You can find your access information and login credentials, by selecting the SQL instance in the GCP console.
 
@@ -229,13 +226,12 @@ You must create a PostSQL database in your new SQL instance into which you will 
 
   Pega does not require any additional configuration.
 
-With your SQL service IP address and your new database name, you are ready to continute to the next section.
+With your SQL service IP address and your new database name, you are ready to continue to the next section.
 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-In order to deploy Pega Platform using Helm, you must customize the “pega” Helm
-chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
+In order to deploy Pega Platform using Helm, you must customize the “pega” Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation followed by a deployment will take about 90 minutes total, since it takes about an hour for Pega Platform to completely install in your PostgreSQL database.
 
@@ -299,7 +295,7 @@ separate processes. The Helm install command uses Helm to install your
 deployment as directed in the Helm charts, one in the charts\\addons folder and
 one in the charts\\pega folder. 
 
-In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tesks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tasks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
 automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
 
 1. Open a Linux bash shell and change the location to the top folder of your gke-demo directory that you created in [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md).
@@ -350,7 +346,7 @@ gke-taz-gke-runbook-default-pool-7fd38759-2dzk   Ready    <none>   3d2h   v1.13.
 gke-taz-gke-runbook-default-pool-7fd38759-qq4h   Ready    <none>   3d2h   v1.13.11-gke.14
 ```
 
-6. Install the Kubernetes dashobard by applying an available version on Github.
+6. Install the Kubernetes dashboard by applying an available version on Github.
 
 ```yaml
 $ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
@@ -369,7 +365,7 @@ kubernetes-dashboard-token-XYZ   kubernetes.io/service-account-token   3      3m
 ...
 ```
 
-8. Set one of the sevice-account secret tokens as the dasboard token.
+8. Set one of the service-account secret tokens as the dashboard token.
 
 ```yaml
 $ kubectl -n kube-system describe secrets kubernetes-dashboard-token-XYZ
@@ -427,7 +423,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-15. Install the addons chart, which you already updated during the prepping a local system for your deployment.
+15. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -460,7 +456,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 18. In the dashboard, use the **Namespace** pulldown to change the view to `mypega-gke-demo` and click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
-![](media/dashboard-mypega-pks-demo-install-initial.png)
+![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
 
 Note: A deployment takes about 15 minutes for all of the resource configurations to complete; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -472,69 +468,35 @@ To follow the progress of an installation, use the dashboard. For subsequent dep
 
 20.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
-![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
-
 A successful deployment will not show errors across the various workloads. The `mypega-gke-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment will have 100% complete **Workloads**.
-
-![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
 Logging into Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, you must associate the hostname of the
-pega-web tier with the IP address that the deployment load balancer gave to the
-tier. This final step ensures that you can log onto Pega Platform using your
-hostname, on which you can independently manage security protocols that match
-your networking infrastructure standards.
+After you complete your deployment, it is a best practice to associate the hostname of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The hostname of the pega-web tier ingress used in this demo is **gke.web.dev.pega.io**, is set in the pega.yaml file in the lines:
 
-### Logging in using the IP address
+```yaml
+tier:
+  - name: "web"
 
-To view the Pega deployment components, enter:
+    service:
+      # Enter the domain name to access web nodes via a load balancer.
+      #  e.g. web.mypega.example.com
+      domain: "**gke.web.dev.pega.io**"
+```
 
-`$ kubectl get services --namespace mypega-gke-demo`
+In order to sign into Pega Platform using this hostname, you must assign it with the same IP address that the deployment load balancer has assigned to the web tier. This final step ensures that you can log onto Pega Platform using your hostname, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
+You can view the networking endpoints associated with your GKE deployment by using the Google Cloud Platform console. Use the Navigation Menu to go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress hostname. Use the page filter to look at the pega-web resources in your cluster.
 
-The pega-web tier external IP address and port number are displayed. Port 80 is
-used for http traffic, which means you can’t use https encryption when access
-the web-tier in a browser; instead, Pega recommends using the domain name of the web tier.
+![Initial view of pods during deploying](media/pega-web-networking.png)
+
+To manually associate the hostname of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the hostname and add the IP address of the pega-web tier.
+
+For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart).
 
 ### Logging in using the domain name of the web tier
 
-You must manually set the IP address of the web tier domain name in order to log
-into Pega Platform domain name that is set during the deployment.
-
-The example of a domain name of the web tier used in this demo is
-**gke.web.dev.pega.io**, which you set in the values.yaml file here:
-
-```yaml
-name: "web"
-
-# Enter the domain name to access web nodes via a load balancer.
-# e.g. web.mypega.example.com
-
-service:
-
-domain: "**gke.web.dev.pega.io**"
-```
-
-When you set this to be "\<the hostname for your web service tier\>" as directed
-in [Update the Helm chart values](#update-the-helm-chart-values), you will
-manually associate "\<the hostname for your web service tier\>" with the IP
-address of the web tier domain name.
-
-In order to sign into Pega using "\<the hostname for your web service tier\>",
-you must assign the domain name with the same IP address that the deployment
-load balancer has assigned to the web tier.
-
-1. From your command prompt, review the IP addresses that are in the my pega service
-
-`$ kubectl get services --namespace mypega-gke-demo`
-
-![](media/f329e9f92feed8cb5959d91db246aa84.png)
-
-2. TBD.
-
-With the domain name set to this IP address, you can log into Pega Platform with a browser using the URL: http://\<the hostname for your web service tier>/prweb
+With the ingress hostname name associated with this IP address in your DNS service, you can log into Pega Platform with a browser using the URL: http://\<pega-web tier ingress hostname>/prweb.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)

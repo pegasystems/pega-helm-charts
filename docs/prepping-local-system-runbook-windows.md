@@ -10,14 +10,14 @@ This guide assumes:
 
 - You have a basic familiarity with running commands from a Windows 10 PowerShell with Administrator privileges.
 
-- You use the opensource packaging tool Chocolatey to install applications onto your Windows laptop. For more information, see [How Chocolatey Works](https://chocolatey.org/how-chocolatey-works).
+- You use the open source packaging tool Chocolatey to install applications onto your Windows laptop. For more information, see [How Chocolatey Works](https://chocolatey.org/how-chocolatey-works).
 
 - Basic familiarity with GitHub account with which you will download a Pega-managed GitHub repository containing configuration files and scripts that you use to install Pega Platform and then deploy it in the Kubernetes cluster.
 
 Creating a local folder to access all of the configuration files
 ----------------------------------------------------------------
 
-Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>\\\<platform>-demo folder when you must extract files to a folder or run commands from a foler.
+Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>\\\<platform>-demo folder when you must extract files to a folder or run commands from a folder.
 
 In order to stay consistent with the instructions, you can create a folder called \<platform\>-demo on your local system at the top level of your Windows user folder. This way, you associate the generic \<local filepath\>\\\<platform\>-demo references to the folder C:\\Users\\\<your username\>\\\<platform\>-demo that is specific to your local system.
 
@@ -42,7 +42,7 @@ You are ready to continue preparing your local system.
 Installing required applications for the deployment
 ---------------------------------------------------
 
-The entire deployment requires the following applications to be used a somee point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+The entire deployment requires the following applications to be used at some point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
 - Helm
 - kubectl
 - Docker
@@ -321,7 +321,7 @@ The icon changes to a green check and a new cart item appears in the top right o
 
 10. When the order is processed, a confirmation screen displays with details about your order.
 
-- You recieve an email with a link to the requested Pega Platform software within a few minutes. The email address used is associated with the organization you selected in this section.
+- You receive an email with a link to the requested Pega Platform software within a few minutes. The email address used is associated with the organization you selected in this section.
 
 ![](media/748ea91e3ff43cf4544ce2f4638e86bf.png)
 
@@ -387,7 +387,7 @@ For details about logging into Docker from a secure password file using the `--p
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-From this folwder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
+From this folder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
 
 ![](media/152260ae774fe07d717f1b31b5560f25.png)
 
@@ -435,7 +435,7 @@ Free DockerHub accounts support the use of a single private repository, so you m
 
 15.  From your PowerShell running with Administrator privileges, use the docker command to push the new image to your new private repository:
 
-`$ docker push <your-dockerbug-ID>/pega-installer`
+`$ docker push <your-dockerhub-ID>/pega-installer`
 
 After the command completes you will see your new image in your private
 repository, similar to the image below.

@@ -44,7 +44,7 @@ You are ready to continue preparing your local system.
 Installing required applications for the deployment
 ---------------------------------------------------
 
-The entire deployment requires the following applications to be used a somee point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+The entire deployment requires the following applications to be used at some point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
 - Helm
 - kubectl
 - Docker
@@ -56,7 +56,7 @@ The entire deployment requires the following applications to be used a somee poi
 Some of the required applications are binary files that you download from the
 organization's download area; other applications can be installed by using a Linux package manager. 
 
-In order to use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the applicaton directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
+In order to use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
 ### Installing Unzip
 
@@ -240,7 +240,7 @@ These instructions were sourced from the Google document, [Quickstart for Linux]
 
 ### Installing Docker
 
-For Linux command line users, you can follow these steps to install Docker Community Eedition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+For Linux command line users, you can follow these steps to install Docker Community Edition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
 
 **SET UP THE REPOSITORY**
 
@@ -475,8 +475,8 @@ If it is not the right version number, you must complete a new request.
 
 After you extract the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
 
-Prepare your Pega Platform installation Docker image
-----------------------------------------------------
+Prepare your Pega Platform installation Docker image – 15 minutes
+-----------------------------------------------------------------
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the Docker cli and Docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 
@@ -543,7 +543,7 @@ Free DockerHub accounts support the use of a single private repository, so you m
 15. From a Linux bash shell, use the Docker command to push the new image to
     your new private repository:
 
-`$ docker push <your-dockerbug-ID>/pega-installer`
+`$ docker push <your-dockerhub-ID>/pega-installer`
 
 After the command completes you will see your new image in your private repository, similar to the image below.
 
