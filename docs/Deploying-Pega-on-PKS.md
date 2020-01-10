@@ -26,7 +26,7 @@ the following stepped tasks:
 
     - [Prepare a local Linux system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
-    - [Prepare a local Windows 10 system – 45 minutes](#https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
+    - [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md) – install required applications and configuration files.
 
 2. [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes) – request a PKS cluster form Pivotal, an SQL database, and a storage resource in an account such as Google Cloud Platform (GPC).
 
@@ -91,9 +91,9 @@ This document requires that you prepare a local Linux or Windows 10 system on
 which you can run commands with root or Administrator privileges. To prepare
 your system use the guide appropriate for your type of system:
 
-- [Preparing your local Linux system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-linux.md)
+- [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md)
 
-- [Preparing your local Windows 10 system – 45 minutes](https://github.com/pega-helm-charts/tree/master/docs/prepping-local-system-runbook-windows.md)
+- [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md)
 
 After you have your local system prepared, you are ready to prepare your PKS
 resources.

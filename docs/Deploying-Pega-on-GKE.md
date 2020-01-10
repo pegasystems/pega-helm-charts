@@ -23,7 +23,7 @@ Pega provides customized orchestration tools and Docker images required to
 orchestrate a deployment in a GKE cluster you create for the deployment using
 the following stepped tasks:
 
-1. Prepare your local system using [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
+1. Prepare your local system using [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md) – install required applications and configuration files.
 
 2. [Prepare your GKE resources – 45 minutes](#prepare-your-resources--45-minutes) – Create a GKE cluster and a Postgres database in an SQL instance in your Google Cloud Platform (GPC) account.
 
@@ -96,7 +96,7 @@ With the new project created, you can proceed with completing the preparation of
 Prepare your local system – 45 minutes
 --------------------------------------
 
-This document requires that you prepare a local Linux on which you can run commands with root or Administrator privileges. To prepare your system, see [Preparing your local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md).
+This document requires that you prepare a local Linux on which you can run commands with root or Administrator privileges. To prepare your system, see [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
 After you have your local system prepared, you are ready to prepare your GKE resources.
 
