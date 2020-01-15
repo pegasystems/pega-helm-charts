@@ -6,8 +6,15 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
+{{- if .node.ingress }}
+{{- if .node.ingress.annotations }}
+    # Custom annotations
+{{ toYaml .node.ingress.annotations | indent 4 }}
+{{- end }}
+{{- else }}
     # Ingress class used is 'traefik'
     kubernetes.io/ingress.class: traefik
+{{- end }}
 spec:
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.

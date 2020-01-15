@@ -6,8 +6,12 @@ metadata:
   # Name of the service for
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-  {{- if and (ne .root.Values.global.provider "eks") (ne .root.Values.global.provider "openshift") }}
   annotations: 
+{{- if .node.service.annotations }}
+    # Custom annotations
+{{ toYaml .node.service.annotations | indent 4 }}
+{{- else }}
+  {{- if and (ne .root.Values.global.provider "eks") (ne .root.Values.global.provider "openshift") }}
     # Enable backend sticky sessions
     traefik.ingress.kubernetes.io/affinity: 'true'
     # Override the default wrr load balancer algorithm.
@@ -18,13 +22,14 @@ metadata:
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
   {{ end }}
+{{- end }}
 spec:
-  type: {{ .serviceType | default "LoadBalancer" }}
+  type: {{ .node.service.serviceType | default "LoadBalancer" }}
   # Specification of on which port the service is enabled
   ports:
   - name: http
-    port: {{ .port }}
-    targetPort: {{ .targetPort }}
+    port: {{ .node.service.port }}
+    targetPort: {{ .node.service.targetPort }}
   selector:
     app: {{ .name }}
 ---
