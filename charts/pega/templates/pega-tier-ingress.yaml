@@ -5,6 +5,8 @@
 {{ template "pega.openshift.ingress" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
 {{- else if and (eq $.Values.global.provider "eks") -}}
 {{ template "pega.eks.ingress" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
+{{- else if and (eq $.Values.global.provider "gke") -}}
+{{ template "pega.gke.ingress" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
 {{- else -}}
 {{ template "pega.k8s.ingress" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
 {{- end -}}
