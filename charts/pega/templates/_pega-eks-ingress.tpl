@@ -7,7 +7,7 @@ metadata:
   namespace: {{ .root.Release.Namespace }}
   annotations:
     # Ingress class used is 'alb'
-    kubernetes.io/ingress.class: alb
+    kubernetes.io/ingress.class: {{ include "ingressClass" . }}
     # specifies the ports that ALB used to listen on
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     # set the redirect action to redirect http traffic into https

@@ -4,6 +4,7 @@
 {{- define "pegaCredentialsSecret" }}pega-credentials-secret{{- end }}
 {{- define "pegaRegistrySecret" }}pega-registry-secret{{- end }}
 {{- define "deployConfig" -}}deploy-config{{- end -}}
+{{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
 {{- define "imagePullSecret" }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
@@ -14,6 +15,15 @@
     true
   {{- else -}}
     false
+  {{- end -}}
+{{- end }}
+
+# ingress class varies as Ingress Controllers are different for each cloud provider
+{{- define "ingressClass" }}
+  {{- if (eq .root.Values.global.provider "eks") -}}
+    alb
+  {{- else -}}
+    traefik
   {{- end -}}
 {{- end }}
 
@@ -144,7 +154,7 @@ livenessProbe:
   # Number of seconds after the container has started before liveness or readiness probes are initiated.
   initialDelaySeconds: 300
   # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
-  timeoutSeconds: 20
+  timeoutSeconds: 5
   # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
   periodSeconds: 10
   # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
@@ -167,7 +177,7 @@ readinessProbe:
   # Number of seconds after the container has started before liveness or readiness probes are initiated.
   initialDelaySeconds: 300
   # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
-  timeoutSeconds: 20
+  timeoutSeconds: 5
   # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
   periodSeconds: 10
   # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
