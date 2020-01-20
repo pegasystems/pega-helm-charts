@@ -6,7 +6,11 @@ metadata:
   # Name of the service for
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-  {{- if and (ne .root.Values.global.provider "eks") (ne .root.Values.global.provider "openshift") }}
+  {{- if (eq .root.Values.global.provider "gke") }}
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .port }}": "gke-affinity-session-backendconfig"}}'
+  {{- else if and (ne .root.Values.global.provider "eks") (ne .root.Values.global.provider "openshift") }}
   annotations: 
     # Enable backend sticky sessions
     traefik.ingress.kubernetes.io/affinity: 'true'
