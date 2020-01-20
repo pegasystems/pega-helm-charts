@@ -19,7 +19,7 @@ metadata:
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
-    beta.cloud.google.com/backend-config: '{"ports": {"{{ .port }}": "gke-affinity-session-backendconfig"}}'
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .port }}": "{{ template "pegaBackendConfig" }}"}}'
   {{ end }}
 spec:
   type: {{ .serviceType | default "LoadBalancer" }}
