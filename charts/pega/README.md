@@ -208,9 +208,9 @@ requestor:
   passivationTimeSec: 900
 ```
 
-### service (*Optional*)
+### service and ingress (*Optional*)
 
-Specify that the Kubernetes service block is expose to other Kubernetes run services, or externally to systems outside the environment.  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
+Specify the service block to expose a Pega tier to other Kubernetes run services, or externally to other systems .  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
 
 Configuration parameters:
 
@@ -227,6 +227,7 @@ service:
   targetPort: 1234
 ```
 
+Annotations to the service or ingress Kubernetes objects may be applied by setting `service.annotations` or `ingress.annotations` as required.  This is used for advanced load balancer or other ingress configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
 
 ### Managing Resources
 
