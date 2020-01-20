@@ -8,7 +8,7 @@ metadata:
 spec:
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
-  # To access the below service, along with {{ .node.domain }}, traefik http port also has to be provided in the URL.
+  # To access the below service, along with {{ .node.domain }}, http/https port also has to be provided in the URL.
   - host: {{ .node.service.domain }}
     http:
       paths:
