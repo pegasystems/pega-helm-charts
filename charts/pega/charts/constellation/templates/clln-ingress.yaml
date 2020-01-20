@@ -13,7 +13,3 @@ spec:
         backend:
           serviceName: constellation
           servicePort: 3000
-      - path: /prweb
-        backend:
-          serviceName: pega-minikube
-          servicePort: 80
