@@ -17,8 +17,7 @@ metadata:
     traefik.ingress.kubernetes.io/max-conn-amount: '10'
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
-	{{ end }}
-    {{- if (eq .root.Values.global.provider "gke") }}
+    {{- else if (eq .root.Values.global.provider "gke") }}
     cloud.google.com/neg: '{"ingress": true}'
     beta.cloud.google.com/backend-config: '{"ports": { "{{ .port }}":"{{ template "pegaBackendConfig" }}"}}'
     {{ end }}
