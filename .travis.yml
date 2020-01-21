@@ -31,15 +31,7 @@ script:
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
   - dep ensure
-  - go test deploy_test.go common_utility.go deployment_utility.go
-  - go test install_test.go common_utility.go installer_utility.go
-  - go test install_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test upgrade_test.go common_utility.go installer_utility.go
-  - go test upgrade_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test aks_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test eks_deploy_test.go common_utility.go deployment_utility.go
-  - go test openshift_test.go common_utility.go deployment_utility.go
-  - go test invalidAction_test.go
+  - go test
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
