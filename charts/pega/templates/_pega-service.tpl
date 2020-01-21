@@ -6,8 +6,7 @@ metadata:
   # Name of the service for
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-  annotations: 
-    {{- if (eq .root.Values.global.provider "k8s") }}
+  {{- if (eq .root.Values.global.provider "k8s") }}
     # Enable backend sticky sessions
     traefik.ingress.kubernetes.io/affinity: 'true'
     # Override the default wrr load balancer algorithm.
@@ -17,11 +16,11 @@ metadata:
     traefik.ingress.kubernetes.io/max-conn-amount: '10'
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
-	{{ end }}
-    {{- if (eq .root.Values.global.provider "gke") }}
+  {{- else if (eq .root.Values.global.provider "gke") }}
+  annotations:
     cloud.google.com/neg: '{"ingress": true}'
-    beta.cloud.google.com/backend-config: '{"ports": { "{{ .port }}":"{{ template "pegaBackendConfig" }}"}}'
-    {{ end }}
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .port }}": "{{ template "pegaBackendConfig" }}"}}'
+  {{ end }}
 spec:
   type: {{ .serviceType | default "LoadBalancer" }}
   # Specification of on which port the service is enabled
