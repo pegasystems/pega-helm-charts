@@ -1,0 +1,9 @@
+- Install Go plugin for IntelliJ
+- Go to settings (Ctrl + Alt + S)
+- Find option "Languages & Frameworks | Go | GOPATH"
+- In project GOPATH add {path to project}/terratest
+- Click "Ok"
+- IntelliJ will suggest you to run "dep ensure" after you close the settings. Run it and wait while it will be finished and IntelliJ reindex dependencies.
+- For run all tests you can
+    - create "Go test" configuration with package test kind and use "test" as a package
+    - Run any single test using standard IntelliJ interface
