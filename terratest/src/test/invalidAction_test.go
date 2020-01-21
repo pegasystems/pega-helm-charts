@@ -8,8 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const PegaHelmChartPath = "../../../charts/pega"
-
 // TestInvalidAction - Tests in valid action correctly rendering error
 func TestInvalidAction(t *testing.T) {
 	t.Parallel()
