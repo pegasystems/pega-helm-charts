@@ -143,7 +143,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
 
 	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
-	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(5))
 	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(10))
 	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
