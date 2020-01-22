@@ -7,6 +7,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   {{- if (eq .root.Values.global.provider "k8s") }}
+  annotations:
     # Enable backend sticky sessions
     traefik.ingress.kubernetes.io/affinity: 'true'
     # Override the default wrr load balancer algorithm.
