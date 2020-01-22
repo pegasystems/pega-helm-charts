@@ -86,7 +86,7 @@ spec:
         - name: NODE_TYPE
           value: {{ .nodeType }}
         - name: NODE_TIER
-          value: {{ .name }}
+          value: {{ .tierName }}
         - name: NODE_SETTINGS
           value: Pega-UIEngine/cloud/isNodeAgnosticAdminStudio=true;Pega-IntegrationEngine/EnableRequestorPools=false;
 {{- if .node.requestor }}
