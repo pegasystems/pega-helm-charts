@@ -85,6 +85,10 @@ spec:
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
+        - name: NODE_TIER
+          value: {{ .name }}
+        - name: NODE_SETTINGS
+          value: Pega-UIEngine/cloud/isNodeAgnosticAdminStudio=true;Pega-IntegrationEngine/EnableRequestorPools=false;
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
