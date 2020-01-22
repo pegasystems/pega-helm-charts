@@ -255,6 +255,8 @@ Parameter           | Description    | Default value
 `successThreshold`    | Minimum consecutive successes for the probe to be considered successful after having failed. | `1`
 `failureThreshold`    | When a Pod starts and the probe fails, Kubernetes will try *failureThreshold* times before giving up. | `3`
 
+Example:
+
 ```yaml
 tier:
   - name: my-tier
@@ -289,6 +291,8 @@ The `deploymentStrategy` can be used to optionally configure the [strategy](http
 ### Environment variables
 
 Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+Example:
 
 ```yaml
 tier:
