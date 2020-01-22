@@ -274,6 +274,8 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 		VerifyEKSIngress(t, ingressObj, expectedIngress)
 	} else if provider == "gke" {
 		VerifyGKEIngress(t, ingressObj, expectedIngress)
+	} else if provider == "aks" {
+		VerifyAKSIngress(t, ingressObj, expectedIngress)
 	} else {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
 	}
@@ -300,6 +302,13 @@ func VerifyGKEIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Backend.ServicePort)
 	require.Equal(t, 1, len(ingressObj.Spec.Rules))
 	require.Equal(t, 1, len(ingressObj.Spec.Rules[0].HTTP.Paths))
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
+}
+
+func VerifyAKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	require.Equal(t, "azure/application-gateway", ingressObj.Annotations["kubernetes.io/ingress.class"])
+	require.Equal(t, "true", ingressObj.Annotations["appgw.ingress.kubernetes.io/cookie-based-affinity"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }

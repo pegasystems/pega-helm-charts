@@ -13,7 +13,11 @@ metadata:
 {{- end }}
 {{- else }}
     # Ingress class used is 'traefik'
-    kubernetes.io/ingress.class: traefik
+    kubernetes.io/ingress.class: {{ include "ingressClass" . }}
+    {{- if (eq .root.Values.global.provider "aks") }}
+    # Ingress annotations for aks
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    {{ end }}
 {{- end }}
 spec:
   rules:

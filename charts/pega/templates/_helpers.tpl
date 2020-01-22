@@ -22,6 +22,8 @@
 {{- define "ingressClass" }}
   {{- if (eq .root.Values.global.provider "eks") -}}
     alb
+  {{- else if (eq .root.Values.global.provider "aks") -}}
+    azure/application-gateway
   {{- else -}}
     traefik
   {{- end -}}
