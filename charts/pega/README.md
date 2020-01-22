@@ -243,6 +243,30 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### Liveness and readiness probes
+
+[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) as a way to determine if an application is healthy.  They may be configured for liveness to determine if a Pod has entered a broken state, or for readiness to determine if the application is available to be exposed.  Probes may be configured for each tier independently.  If not explicitly configured, default probes will be used.  The following parameters may be used as part of a `livenessProbe` or `readinessProbe` configuration.
+
+Parameter           | Description    | Default value
+---                 | ---            | ---
+`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after having failed. | `1`
+`failureThreshold`    | When a Pod starts and the probe fails, Kubernetes will try *failureThreshold* times before giving up. | `3`
+
+```yaml
+tier:
+  - name: my-tier
+      livenessProbe:
+        initialDelaySeconds: 60
+        timeoutSeconds: 60
+        failureThreshold: 5
+      readinessProbe:
+        initialDelaySeconds: 400
+        failureThreshold: 30
+```
+
 ### Using a Kubernetes Horizontal Pod Autoscaler (HPA)
 
 You may configure an HPA to scale your tier on a specified metric.  Only tiers that do not use volume claims are scalable with an HPA. Set `hpa.enabled` to `true` in order to deploy an HPA for the tier. For more details, see the [Kubernetes HPA documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/). 
