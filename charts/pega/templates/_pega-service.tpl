@@ -22,7 +22,12 @@ metadata:
     beta.cloud.google.com/backend-config: '{"ports": {"{{ .port }}": "{{ template "pegaBackendConfig" }}"}}'
   {{ end }}
 spec:
-  type: {{ .serviceType | default "LoadBalancer" }}
+  type:
+  {{- if (eq .root.Values.global.provider "gke") -}}
+  {{ indent 1 "NodePort" }}
+  {{- else -}}
+  {{ indent 1 (.serviceType | default "LoadBalancer") }}
+  {{- end }}
   # Specification of on which port the service is enabled
   ports:
   - name: http
