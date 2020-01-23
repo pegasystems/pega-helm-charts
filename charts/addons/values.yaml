@@ -16,6 +16,11 @@ traefik:
     enabled: false
   rbac:
     enabled: true
+  # If Kubernetes namespace selection is defined and the (one) selected namespace is the release
+  # namespace, a Role and RoleBinding will be used in lieu of a ClusterRole and ClusterRoleBinding 
+  # kubernetes:
+  #   namespaces:
+  #   - default
   service:
     nodePorts:
       # NodePorts for traefik service.

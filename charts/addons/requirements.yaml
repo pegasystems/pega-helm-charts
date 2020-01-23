@@ -1,6 +1,6 @@
 dependencies:
 - name: traefik
-  version: "1.77.1"
+  version: "1.77.3"
   repository: https://kubernetes-charts.storage.googleapis.com
   condition: traefik.enabled
 - name: aws-alb-ingress-controller
