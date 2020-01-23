@@ -87,8 +87,6 @@ spec:
           value: {{ .nodeType }}
         - name: NODE_TIER
           value: {{ .tierName }}
-        - name: NODE_SETTINGS
-          value: Pega-UIEngine/cloud/isNodeAgnosticAdminStudio=true;Pega-IntegrationEngine/EnableRequestorPools=false;
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
