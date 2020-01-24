@@ -1,6 +1,7 @@
 dependencies:
 	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com
+	helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
 	helm repo list	
 	helm dependency update ./charts/pega/
 	helm dependency update ./charts/addons/ 
