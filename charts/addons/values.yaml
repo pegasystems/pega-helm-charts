@@ -134,7 +134,7 @@ ingress-azure:
     name: <APPLICATION_GATEWAY_NAME>
   # Authentication using which ingress controller authenticates with Azure Resource Manager
   armAuth:
-    # There are two ways to authenticate - Using AAD-Pod-Identity, which adds an additional deployment on the cluster.  
+    # There are two ways to authenticate - Using AAD-Pod-Identity, which adds an additional deployment on the cluster.
     # Instead, the alternate is to use Service Principal credentials.
     # For this, we create an Active Directory Service Principal and encode with base64
     #     az ad sp create-for-rbac --sdk-auth | base64 -w0
