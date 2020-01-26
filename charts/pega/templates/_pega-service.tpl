@@ -28,7 +28,12 @@ metadata:
   {{ end }}
 {{- end }}
 spec:
-  type: {{ .node.service.serviceType | default "LoadBalancer" }}
+  type:
+  {{- if (eq .root.Values.global.provider "gke") -}}
+  {{ indent 1 "NodePort" }}
+  {{- else -}}
+  {{ indent 1 (.node.service.serviceType | default "LoadBalancer") }}
+  {{- end }}
   # Specification of on which port the service is enabled
   ports:
   - name: http
