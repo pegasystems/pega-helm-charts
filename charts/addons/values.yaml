@@ -2,11 +2,12 @@
 # Configure Traefik for load balancing:
 #   If enabled: true, Traefik is deployed automatically.
 #   If enabled: false, Traefik is not deployed and load balancing must be configured manually.
-#   Pega recommends enabling Traefik on providers other than Openshift and eks.
+#   Pega recommends enabling Traefik for only k8s provider.
 #   On Openshift, Traefik is ignored and Pega uses Openshift's built-in load balancer.
 #   On eks it is recommended to use aws alb ingress controller.
+#   On AKS AGIC is being used.
 traefik:
-  enabled: true
+  enabled: false
   # Set any additional Traefik parameters. These values will be used by Traefik's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
   # Set traefik.serviceType to "LoadBalancer" on gke, aks, and pks
@@ -117,3 +118,30 @@ metrics-server:
 # Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
 # - --kubelet-insecure-tls
+
+# Set this to true to install application-gateway-ingress-controller. Follow below guidelines specific to each provider,
+# For AKS - set this to true.
+# EKS or GKE or K8s or Openshift - set this to false.
+ingress-azure:
+  enabled: false
+  # Config of the Application Gateway created
+  appgw:
+    # Subscription ID of your subscription to Azure
+    subscriptionId: <YOUR.SUBSCRIPTION_ID>
+    # Resource group in which Application Gateway is created
+    resourceGroup: <RESOURCE_GROUP_NAME>
+    # Name of the Application Gateway created
+    name: <APPLICATION_GATEWAY_NAME>
+  # Authentication using which ingress controller authenticates with Azure Resource Manager
+  armAuth:
+    # There are two ways to authenticate - Using AAD-Pod-Identity, which adds an additional deployment on the cluster.
+    # Instead, the alternate is to use Service Principal credentials.
+    # For this, we create an Active Directory Service Principal and encode with base64
+    #     az ad sp create-for-rbac --sdk-auth | base64 -w0
+    # Feed the JSON as part of 'secretJSON' field
+    type: servicePrincipal
+    secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+  rbac:
+    enabled: true
+  aksClusterConfiguration:
+    apiServerAddress: <API_SERVER_ADDRESS>

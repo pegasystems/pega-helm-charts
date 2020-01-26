@@ -22,6 +22,8 @@
 {{- define "ingressClass" }}
   {{- if (eq .root.Values.global.provider "eks") -}}
     alb
+  {{- else if (eq .root.Values.global.provider "aks") -}}
+    azure/application-gateway
   {{- else -}}
     traefik
   {{- end -}}
@@ -156,7 +158,7 @@ livenessProbe:
   # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
   timeoutSeconds: 20
   # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
-  periodSeconds: 10
+  periodSeconds: 20
   # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
   # Must be 1 for liveness. Minimum value is 1.
   successThreshold: 1
@@ -179,7 +181,7 @@ readinessProbe:
   # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
   timeoutSeconds: 20
   # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
-  periodSeconds: 10
+  periodSeconds: 20
   # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
   # Must be 1 for liveness. Minimum value is 1.
   successThreshold: 1
