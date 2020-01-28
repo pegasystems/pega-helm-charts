@@ -86,6 +86,10 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
+{{- if .node.nodeSettings }}
+        - name: NODE_SETTINGS
+          value: "{{ .node.nodeSettings }}"
+{{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
         # Additional custom env vars

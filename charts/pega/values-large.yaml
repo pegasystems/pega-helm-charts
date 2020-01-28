@@ -83,9 +83,10 @@ global:
         port: 80
         targetPort: 8080
 
+      paths: "YOUR_CONSTELLATION_PATH_HERE"
       replicas: 1
       javaOpts: ""
-
+      nodeSettings: "PEGA-UIENGINE/CONSTELLATIONSVCURL=/prweb/constellation"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 

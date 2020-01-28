@@ -14,9 +14,15 @@ spec:
   # To access the below service, along with {{ .node.domain }}, traefik http port also has to be provided in the URL.
   - host: {{ .node.service.domain }}
     http:
-      paths:
-      - backend:
+      paths: 
+      - path: {{ .paths }}     
+        backend:
+          serviceName: {{ .name }} 
+          servicePort: {{ .node.service.port }}
+      - path: /prweb
+        backend:
           serviceName: {{ .name }}
           servicePort: {{ .node.service.port }}
+    
 ---     
 {{- end }}
