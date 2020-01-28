@@ -18,17 +18,6 @@
   {{- end -}}
 {{- end }}
 
-# ingress class varies as Ingress Controllers are different for each cloud provider
-{{- define "ingressClass" }}
-  {{- if (eq .root.Values.global.provider "eks") -}}
-    alb
-  {{- else if (eq .root.Values.global.provider "aks") -}}
-    azure/application-gateway
-  {{- else -}}
-    traefik
-  {{- end -}}
-{{- end }}
-
 {{- define "performDeployment" }}
   {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true

@@ -1,4 +1,4 @@
-{{- define "pega.k8s.ingress" -}}
+{{- define "pega.aks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
 apiVersion: extensions/v1beta1
@@ -6,15 +6,10 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if .node.ingress }}
-{{- if .node.ingress.annotations }}
-    # Custom annotations
-{{ toYaml .node.ingress.annotations | indent 4 }}
-{{- end }}
-{{- else }}
-    # Ingress class used is 'traefik'
-    kubernetes.io/ingress.class: traefik
-{{- end }}
+    # Ingress class used is 'azure/application-gateway'
+    kubernetes.io/ingress.class: azure/application-gateway
+    # Ingress annotations for aks
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
 spec:
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
