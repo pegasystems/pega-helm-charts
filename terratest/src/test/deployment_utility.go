@@ -25,13 +25,6 @@ var rollingUpdatePtr = &rollingUpdate
 var terminationGracePeriodSeconds int64 = 300
 var terminationGracePeriodSecondsPtr = &terminationGracePeriodSeconds
 
-type pegaDeployment struct {
-	name               string
-	initContainers     []string
-	nodeType           string
-	passivationTimeout string
-}
-
 // VerifyPegaStandardTierDeployment - Verifies Pega standard tier deployment for values as provided in default values.yaml.
 // It ensures syntax of web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
 func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
@@ -96,7 +89,7 @@ func SplitAndVerifyPegaDeployments(t *testing.T, helmChartPath string, options *
 // VerifyDeployment - Performs common pega deployment/statefulset assertions with the values as provided in default values.yaml
 func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment, options *helm.Options) {
 	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
-	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
+	require.Equal(t, expectedSpec.deploymentName, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
 	require.Equal(t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
 	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
@@ -118,7 +111,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	var envIndex int32 = 0
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "NODE_TYPE")
 	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)
-	if expectedSpec.name == "pega-web" || expectedSpec.name == "pega-stream" {
+	if expectedSpec.deploymentName == "pega-web" || expectedSpec.deploymentName == "pega-stream" {
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "REQUESTOR_PASSIVATION_TIMEOUT")
 		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
@@ -175,11 +168,11 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment, options *helm.Options) {
 	require.Equal(t, deploymentObj.Spec.Replicas, replicasPtr)
 	require.Equal(t, deploymentObj.Spec.ProgressDeadlineSeconds, ProgressDeadlineSecondsPtr)
-	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Selector.MatchLabels["app"])
+	require.Equal(t, expectedDeployment.deploymentName, deploymentObj.Spec.Selector.MatchLabels["app"])
 	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxSurge, rollingUpdatePtr)
 	require.Equal(t, deploymentObj.Spec.Strategy.RollingUpdate.MaxUnavailable, rollingUpdatePtr)
 	require.Equal(t, deploymentObj.Spec.Strategy.Type, appsv1.DeploymentStrategyType("RollingUpdate"))
-	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Template.Labels["app"])
+	require.Equal(t, expectedDeployment.deploymentName, deploymentObj.Spec.Template.Labels["app"])
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options)
