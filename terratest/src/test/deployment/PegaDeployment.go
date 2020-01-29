@@ -1,6 +1,6 @@
-package testutility
+package deployment
 
-type pegaDeployment struct {
+type PegaDeployment struct {
 	deploymentName     string
 	initContainers     []string
 	nodeType           string

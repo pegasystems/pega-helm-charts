@@ -25,6 +25,13 @@ var rollingUpdatePtr = &rollingUpdate
 var terminationGracePeriodSeconds int64 = 300
 var terminationGracePeriodSecondsPtr = &terminationGracePeriodSeconds
 
+type pegaDeployment struct {
+	deploymentName     string
+	initContainers     []string
+	nodeType           string
+	passivationTimeout string
+}
+
 // VerifyPegaStandardTierDeployment - Verifies Pega standard tier deployment for values as provided in default values.yaml.
 // It ensures syntax of web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
 func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, options *helm.Options, initContainers []string) {
