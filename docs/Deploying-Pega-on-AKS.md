@@ -61,7 +61,7 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-Prepare your AKS resources – 45 minutes
+Prepare your AKS resources – 60 minutes
 -----------------------------------
 
 In order to deploy Pega Platform to an AKS environment, you must create the AKS resources that the deployment will use in your Azure account. This section covers the details necessary to create an  AKS cluster and an SQL database resource.
@@ -129,7 +129,7 @@ To deploy Pega using an AKS cluster, create the cluster in an existing project i
 10. In the **Networking** tab page, add details to the following required fields
     for this Kubernetes service:
 
-    a. Ensure that **HTTP application routing** is **Enabled**.
+    a. Ensure that **HTTP application routing** is **Disabled**.
 
     b. Ensure that **Networking configuration** is set to **Advanced**.
 
@@ -235,6 +235,87 @@ AKS deployments require you to install Pega Platform software in an SQL database
     A deployment progress page displays the status of your server creation until it is complete, which takes about 5 minutes. When complete, the Azure UI displays all of the resources created for your SQL database deployment details:
 
 ![](media/ec3afaa6f4e3e9224dec832be51c7dc5.png)
+
+### Creating an Application Gateway Resource
+
+AKS setup needs creation of an Application Gateway for creating load balancers.  After creating Application Gateway, make a note of Application Gateway name with which you created the resource to be used as part of editing Addons helm chart.
+
+1.  In a web browser, login to Microsoft Azure Portal (https://portal.azure.com/)
+with your credentials.
+
+2.  Search for **Application Gateway** and select it in the dropdown list.
+
+3.  Click **+Add**
+
+4.  On the **Create an Application Gateway** page, on the **Basics** tab page, add details to the following required fields :
+
+    a) Select the **Resource Group** in which you created your cluster
+    
+    b) In **Instance Details**, mention an unique name and choose an appropriate region.
+    
+    c) In **Configure virtual network**, Select the Virtual Network in which you created your cluster.  And select a different subnet from the one you selected for cluster.  
+    ***FYI, same subnet selection will throw you an error***
+        
+    d) Click **Next: Frontends.**
+
+5.  In **Frontends** tab page, add details :
+
+    a) Select **Public** as **Frontend IP address type**
+    
+    b) For **Public IP address**, click on **Create new** :
+    -  **Add a public IP address** pops up.  Select an unique name and click on **Ok**
+        
+    c) Click **Next : Backends**
+
+6.  In **Backends** tab page, add details :
+
+    a) Click on **Add a backend pool**
+    -  In **Add a backend pool** dialogue box, give an unique backend pool name
+    -  Mark **Add backend pool without targets** as **Yes**
+    
+    b) Click **Next : Configuration**
+
+7. Now, **Frontends** and **Backends** that we created in previous steps will be visble here.  Now, we need ot create **Routing rules** which consist of - Listener, Backend targets, HTTP setting
+
+8.  Click on **Add a rule**
+    
+    a)  In **Add a routing rule**  dialog, Give an unique **Rule name**
+    
+    b) Provide **Listener** configuration
+
+    -  Give an unique **Listener Name**
+    -  Select **Public** as **Frontend IP**
+    -  Select **HTTP** as **Protocol**
+    -  Give **80** as **Port**
+    -  Leave the rest of the settings as it is.
+    -  Click on **Backend targets** tab
+    
+    c) Provide **Backend targets** configuration
+    
+    -  Give **Backend Pool** as **Target type**
+    -  Select the backend pool that you created in Step 6 as **Backend Target**
+    -  For **HTTP Setting**, click on **Create new**
+    
+    d)  In **Add an HTTP Setting** dialog, provide the configuration
+    
+    -  Give an unique **HTTP Setting Name**
+    -  Select **HTTP** as **Backend Protocol**
+    -  Give **80** as **Backend port**
+    -  Leave rest of the settings as it is.
+    
+    e)  Click on **Next : Tags**
+
+9.  Add necessary tags as per your requirement.
+
+10.  Click on **Next : Review + Create**
+
+11.  A validation is run and you will get a **Validation Passed** message.
+
+12.  Click on **Create**
+
+A deployment progress page displays the status of your server creation until it is complete, which takes about 5 minutes. When complete, the Azure UI displays all of the resources created for your Application Gateway details:
+
+![](media/AppGateway_Deployment_Success.png)
 
 ### Locating your SQL database details
 
