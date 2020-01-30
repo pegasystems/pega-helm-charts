@@ -30,10 +30,13 @@ user.temp.dir=/opt/pega/temp
 ######################################################################################
 dass.filepath=/opt/pega/kit/scripts/upgrade_dass_settings.json
 
-pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
+# Load from filesystem if BYPASS_LOAD_ENGINE_CLASSES is set to true
 {{  if isTrue .Env.BYPASS_LOAD_ENGINE_CLASSES }}
 pega.engine.classpath=filesystem
 pega.codeset.version={{ .Env.PRDEPLOY_CODESET_VERSION }}
 {{ else }}
 pega.engine.classpath=database
-{{ end }}
+{{ if .Env.ENGINE_CODESET_VERSION }}
+pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
+{{ end -}}
+{{ end -}}
