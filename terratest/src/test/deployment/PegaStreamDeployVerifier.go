@@ -1,4 +1,4 @@
-package verifier
+package deployment
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -15,7 +15,7 @@ type PegaStreamDeployVerifier struct {
 func NewPegaStreamDeployVerifier(t *testing.T, helmOptions *helm.Options, initContainers []string, deployment *v1beta2.StatefulSet) *PegaStreamDeployVerifier {
 	v := &PegaStreamDeployVerifier{
 		StatefulSetVerifier: StatefulSetVerifier{
-			VerifierImpl:  *NewDeployVerifier(t, helmOptions, initContainers),
+			Verifier:      *NewDeployVerifier(t, helmOptions, initContainers),
 			k8sDeployment: deployment,
 		},
 	}
@@ -23,6 +23,7 @@ func NewPegaStreamDeployVerifier(t *testing.T, helmOptions *helm.Options, initCo
 	v._passivationTimeout = "900"
 	return v
 }
+
 func (p PegaStreamDeployVerifier) Verify() {
 	require.Equal(p.t, p.k8sDeployment.Spec.VolumeClaimTemplates[0].Name, "pega-stream")
 	require.Equal(p.t, p.k8sDeployment.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))

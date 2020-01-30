@@ -1,4 +1,4 @@
-package test
+package deployment
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -7,23 +7,21 @@ import (
 	"k8s.io/api/apps/v1beta2"
 	"path/filepath"
 	"strings"
-	. "test/deployment"
-	. "test/verifier"
+	"test"
 	"testing"
 )
 
-type PegaStandardDeploymentTest struct {
+type PegaDeploymentTest struct {
 	provider        string
 	action          string
-	verifiers       []VerifierImpl
 	t               *testing.T
 	_helmOptions    *helm.Options
 	_initContainers []string
 	_helmChartPath  string
 }
 
-func NewPegaStandardDeploymentTest(provider string, action string, initContainers []string, t *testing.T) *PegaStandardDeploymentTest {
-	d := &PegaStandardDeploymentTest{
+func NewPegaDeploymentTest(provider string, action string, initContainers []string, t *testing.T) *PegaDeploymentTest {
+	d := &PegaDeploymentTest{
 		provider:        provider,
 		action:          action,
 		_initContainers: initContainers,
@@ -31,7 +29,7 @@ func NewPegaStandardDeploymentTest(provider string, action string, initContainer
 	}
 	d.t.Parallel()
 
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	helmChartPath, err := filepath.Abs(test.PegaHelmChartPath)
 	d._helmChartPath = helmChartPath
 	require.NoError(d.t, err)
 
@@ -44,11 +42,11 @@ func NewPegaStandardDeploymentTest(provider string, action string, initContainer
 	return d
 }
 
-func (d *PegaStandardDeploymentTest) Run() {
+func (d *PegaDeploymentTest) Run() {
 	d.splitAndVerifyPegaDeployments()
 }
 
-func (d *PegaStandardDeploymentTest) splitAndVerifyPegaDeployments() {
+func (d *PegaDeploymentTest) splitAndVerifyPegaDeployments() {
 	deployment := helm.RenderTemplate(d.t, d._helmOptions, d._helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 	deploymentSlice := strings.Split(deployment, "---")
 
@@ -81,4 +79,8 @@ func (d *PegaStandardDeploymentTest) splitAndVerifyPegaDeployments() {
 		}
 	}
 	require.Equal(d.t, 3, processedDeployments, "Should process all deployments")
+}
+
+func (d *PegaDeploymentTest) setPodValidator(verifier PodValidator) {
+
 }

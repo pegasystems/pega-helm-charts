@@ -1,4 +1,4 @@
-package verifier
+package deployment
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"

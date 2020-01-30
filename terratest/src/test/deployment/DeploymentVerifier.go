@@ -1,14 +1,13 @@
-package verifier
+package deployment
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	k8sapps "k8s.io/api/apps/v1"
-	. "test/deployment"
 	"testing"
 )
 
 type DeploymentVerifier struct {
-	VerifierImpl
+	Verifier
 	k8sDeployment *k8sapps.Deployment
 }
 
@@ -19,6 +18,6 @@ func NewDeploymentVerifier(t *testing.T, helmOptions *helm.Options, initContaine
 	}
 	return &DeploymentVerifier{
 		k8sDeployment: deployment,
-		VerifierImpl:  verifierImpl,
+		Verifier:      verifierImpl,
 	}
 }
