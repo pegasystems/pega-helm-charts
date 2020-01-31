@@ -14,16 +14,16 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 1. Prepare your local system:
 
-    - To prepare a local Linux system, install required applications and configuration files - [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+    - To prepare a local Linux system, install required applications and configuration files - [Preparing your local Linux system – 45 minutes](prepping-local-system-runbook-linux.md).
 
     - To prepare a local Windows system, install required applications and configuration files -
-    [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+    [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
 2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--45-minutes).
 
 3.  Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
-4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes).
+4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging in to Pega Platform – 10 minutes](#logging-in-to-pega-platform--10-minutes).
 
 To understand how Pega maps Kubernetes objects with Pega applications and services, see [How Pega Platform and applications are deployed on Kubernetes](https://community.pega.com/knowledgebase/articles/cloud-choice/how-pega-platform-and-applications-are-deployed-kubernetes).
 
@@ -301,10 +301,10 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
 | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier hos tname should comply with your networking standards. </li></ul>|
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)</li></ul>|
+| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
-3. Save the file.
+1. Save the file.
 
 ### Deploy Pega Platform using the command line
 
@@ -315,15 +315,15 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 1. Do one of the following:
 
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Preparing your local Windows 10 system](prepping-local-system-runbook-windows.md).
 
 `$ cd <local filepath>\aks-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+- Open a Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Preparing your local Linux system](prepping-local-system-runbook-linux.md).
 
 `$ cd /home/<local filepath>/aks-demo`
 
-2. Use the Azure CLI to log into your account.
+1. Use the Azure CLI to log into your account.
 
 `$ az login`
 
@@ -373,15 +373,15 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 10. Do one of the following:
 
-- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Create a local folder to access all of the configuration files](#create-a-local-folder-to-access-all-of-the-configuration-files).
+- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Create a local folder to access all of the configuration files](prepping-local-system-runbook-windows.md#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
 `$ cd \<local filepath>\aks-demo`
 
-- Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration files](#create-a-local-folder-to-access-all-of-the-configuration-files).
+- Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration files](prepping-local-system-runbook-linux.md#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
 `$ cd /home/<local filepath>/aks-demo`
 
-11. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
+1.  Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
 
 ```yaml
 $ kubectl create namespace mypega
@@ -390,7 +390,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
+12. Install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--45-minutes).
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -483,6 +483,6 @@ The mypega-web node is the only tier with an externally exposed IP address. Note
 
 ![](media/ccb6329a621c6f11970e25531cfa1857.png)
 
-With the ingress host name name associated with this IP address in your DNS service, you can log in to Pega Platform with a web browser using the URL: http://\<pega-web tier ingress host name>/prweb.
+With the ingress host name name associated with this IP address in your DNS service, you can log in to Pega Platform with a web browser using the URL: `http://\<pega-web tier ingress host name>/prweb`.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
