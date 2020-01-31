@@ -287,7 +287,7 @@ These instructions require the Pega Platform distribution image to install the P
 
 ### Requesting access to a Pega Platform distribution
 
-1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community1.pega.com/digital-delivery) site.
+1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
 2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
     site with the credentials your Pega representative provided.

@@ -185,7 +185,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](http://doc-build02.rpega.com/docs-oxygen/procomhelpmain.htm#engine/node-classification/eng-node-types-client-managed-cloud-ref.htm)
+[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
 
 Example:
 

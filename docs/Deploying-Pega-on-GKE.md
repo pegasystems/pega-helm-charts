@@ -230,7 +230,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul><li>driverUri: "latest jar file available” </li><li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>||
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   |<ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For GCP PostgreSQL databases, the default user is “postgres”.</li></ul> |
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
-| docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
+| docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
@@ -344,7 +344,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
 11. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
-<http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/>
+`http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
 12. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
 
