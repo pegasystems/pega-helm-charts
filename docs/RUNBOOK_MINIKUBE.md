@@ -60,7 +60,7 @@ minikube ip can be fetched using command - ``` minikube ip``` and Pega service N
 Start minikube with at least 4 CPU’s and 10GB memory for complete pega deployment. As per the need increase the limits of minikube.
 
 ***Note***
-1. Use “values-minimal.yaml” to deploy pega which is available in the [pega chart](\pega-helm-charts\charts\pega) directory. 
+1. Use “values-minimal.yaml” to deploy pega which is available in the [pega chart](../charts/pega) directory. 
 
 	Example helm command to deploy
 	
