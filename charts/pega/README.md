@@ -251,7 +251,7 @@ Parameter           | Description    | Default value
 ---                 | ---            | ---
 `initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
 `timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
-`periodSeconds`       | How often (in seconds) to perform the probe. | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
 `successThreshold`    | Minimum consecutive successes for the probe to be considered successful after having failed. | `1`
 `failureThreshold`    | When a Pod starts and the probe fails, Kubernetes will try *failureThreshold* times before giving up. | `3`
 
@@ -262,7 +262,7 @@ tier:
   - name: my-tier
       livenessProbe:
         initialDelaySeconds: 60
-        timeoutSeconds: 60
+        timeoutSeconds: 30
         failureThreshold: 5
       readinessProbe:
         initialDelaySeconds: 400

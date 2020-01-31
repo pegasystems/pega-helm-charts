@@ -149,7 +149,7 @@ spec:
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $livenessProbe.periodSeconds | default 10 }}
+          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
         # ReadinessProbe: indicates whether the container is ready to service requests.
@@ -161,7 +161,7 @@ spec:
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
