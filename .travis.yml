@@ -21,7 +21,6 @@ script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
   - remark -i .remark_ignore -f -u validate-links .
-  - remark -i .remark_ignore -u lint-no-dead-urls .
   # Now load the helm dependencies
   - make dependencies
   # Run Helm lint
