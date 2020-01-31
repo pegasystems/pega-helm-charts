@@ -75,11 +75,11 @@ Helm provides a script that you can download and then run to install the latest 
 1. To download the Helm installation script from their Git repository, from
     your home directory enter:
 
-`$ sudo curl
+`$ curl
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
-get_helm.sh | bash`
+get_helm.sh`
 
-2. To update the permissions of the file to you can use it for installations,
+2. To update the permissions of the file so you can use it for installations,
     enter:
 
 `$ chmod 700 get_helm.sh`
