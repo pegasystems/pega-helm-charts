@@ -130,55 +130,6 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- end }}
 {{- end -}}
 
-{{- define "pega.health.probes" -}}
-# LivenessProbe: indicates whether the container is live, i.e. running.
-# If the LivenessProbe fails, the kubelet will kill the container and
-# the container will be subjected to its RestartPolicy.
-# The default state of Liveness before the initial delay is Success
-livenessProbe:
-  httpGet:
-    # Path that is pinged to check for liveness.
-    path: "/prweb/PRRestService/monitor/pingService/ping"
-    port: 8080
-    scheme: HTTP
-  # Number of seconds after the container has started before liveness or readiness probes are initiated.
-  initialDelaySeconds: 300
-  # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
-  timeoutSeconds: 20
-  # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
-  periodSeconds: 10
-  # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
-  # Must be 1 for liveness. Minimum value is 1.
-  successThreshold: 1
-  # When a Pod starts and the probe fails, Kubernetes will try failureThreshold times before giving up.
-  # Giving up in case of liveness probe means restarting the Pod. In case of readiness probe the
-  # Pod will be marked Unready. Defaults to 3. Minimum value is 1.
-  failureThreshold: 3
-# ReadinessProbe: indicates whether the container is ready to service requests.
-# If the ReadinessProbe fails, the endpoints controller will remove the
-# pod's IP address from the endpoints of all services that match the pod.
-# The default state of Readiness before the initial delay is Failure.
-readinessProbe:
-  httpGet:
-    # Path that is pinged to check for readiness.
-    path: "/prweb/PRRestService/monitor/pingService/ping"
-    port: 8080
-    scheme: HTTP
-  # Number of seconds after the container has started before liveness or readiness probes are initiated.
-  initialDelaySeconds: 300
-  # Number of seconds after which the probe times out. Defaults to 1 second. Minimum value is 1.
-  timeoutSeconds: 20
-  # How often (in seconds) to perform the probe. Default to 10 seconds. Minimum value is 1.
-  periodSeconds: 10
-  # Minimum consecutive successes for the probe to be considered successful after having failed. Defaults to 1.
-  # Must be 1 for liveness. Minimum value is 1.
-  successThreshold: 1
-  # When a Pod starts and the probe fails, Kubernetes will try failureThreshold times before giving up.
-  # Giving up in case of liveness probe means restarting the Pod. In case of readiness probe the
-  # Pod will be marked Unready. Defaults to 3. Minimum value is 1.
-  failureThreshold: 3
-{{- end }}
-
 # Evaluate background node types based on cassandra enabled or not(internally or externally)
 {{- define "evaluateBackgroundNodeTypes" }}
   {{- if  eq (include "cassandraEnabled" .) "true" -}}

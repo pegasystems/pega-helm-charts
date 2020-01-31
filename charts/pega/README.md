@@ -243,6 +243,32 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### Liveness and readiness probes
+
+[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
+
+Parameter           | Description    | Default value
+---                 | ---            | ---
+`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
+`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+      livenessProbe:
+        initialDelaySeconds: 60
+        timeoutSeconds: 30
+        failureThreshold: 5
+      readinessProbe:
+        initialDelaySeconds: 400
+        failureThreshold: 30
+```
+
 ### Using a Kubernetes Horizontal Pod Autoscaler (HPA)
 
 You may configure an HPA to scale your tier on a specified metric.  Only tiers that do not use volume claims are scalable with an HPA. Set `hpa.enabled` to `true` in order to deploy an HPA for the tier. For more details, see the [Kubernetes HPA documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/). 
@@ -265,6 +291,8 @@ The `deploymentStrategy` can be used to optionally configure the [strategy](http
 ### Environment variables
 
 Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+Example:
 
 ```yaml
 tier:
