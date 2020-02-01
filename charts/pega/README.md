@@ -151,7 +151,7 @@ stream        | Nodes that run an embedded deployment of Kafka and are exposed t
 
 #### Small deployment with a single tier
 
-To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-small.yaml](relative-link-here) configuration provides a starting point for this simple model.
+To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-minimal.yaml](./values-minimal.yaml) configuration provides a starting point for this simple model.
 
 Tier Name   | Description
 ---         | ---
@@ -159,7 +159,7 @@ pega        | One tier handles all foreground and background processing and is g
 
 #### Large deployment for production isolation of processing
 
-To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](relative-link-here) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
+To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](./values-large.yaml) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
 
 Tier Name   | Description
 ---         | ---
@@ -185,7 +185,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](http://doc-build02.rpega.com/docs-oxygen/procomhelpmain.htm#engine/node-classification/eng-node-types-client-managed-cloud-ref.htm)
+[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
 
 Example:
 
