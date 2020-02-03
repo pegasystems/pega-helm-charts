@@ -151,7 +151,7 @@ stream        | Nodes that run an embedded deployment of Kafka and are exposed t
 
 #### Small deployment with a single tier
 
-To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-small.yaml](relative-link-here) configuration provides a starting point for this simple model.
+To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-minimal.yaml](./values-minimal.yaml) configuration provides a starting point for this simple model.
 
 Tier Name   | Description
 ---         | ---
@@ -159,7 +159,7 @@ pega        | One tier handles all foreground and background processing and is g
 
 #### Large deployment for production isolation of processing
 
-To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](relative-link-here) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
+To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](./values-large.yaml) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
 
 Tier Name   | Description
 ---         | ---
@@ -185,7 +185,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](http://doc-build02.rpega.com/docs-oxygen/procomhelpmain.htm#engine/node-classification/eng-node-types-client-managed-cloud-ref.htm)
+[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
 
 Example:
 
@@ -243,6 +243,32 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### Liveness and readiness probes
+
+[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
+
+Parameter           | Description    | Default value
+---                 | ---            | ---
+`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
+`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+      livenessProbe:
+        initialDelaySeconds: 60
+        timeoutSeconds: 30
+        failureThreshold: 5
+      readinessProbe:
+        initialDelaySeconds: 400
+        failureThreshold: 30
+```
+
 ### Using a Kubernetes Horizontal Pod Autoscaler (HPA)
 
 You may configure an HPA to scale your tier on a specified metric.  Only tiers that do not use volume claims are scalable with an HPA. Set `hpa.enabled` to `true` in order to deploy an HPA for the tier. For more details, see the [Kubernetes HPA documentation](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/). 
@@ -265,6 +291,8 @@ The `deploymentStrategy` can be used to optionally configure the [strategy](http
 ### Environment variables
 
 Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+Example:
 
 ```yaml
 tier:

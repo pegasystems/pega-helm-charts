@@ -74,9 +74,9 @@ Helm provides a script that you can download and then run to install the latest 
 1. To download the Helm installation script from their Git repository, from
     your home directory enter:
 
-`$ sudo curl
+`$ curl
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
-get_helm.sh | bash`
+get_helm.sh`
 
 2. To update the permissions of the file to you can use it for installations, enter:
 
@@ -173,7 +173,7 @@ To install the Google Cloud SDK:
 
 2. Ensure that Python 2.7 is installed.
 
-3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](#https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
+3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
 
 3. Extract the Google SDK distribution archive file to your system.
 
@@ -232,7 +232,7 @@ Run `gcloud topic configurations` to learn more.
 
 `gcloud info`
 
-These instructions were sourced from the Google document, [Quickstart for Linux](#https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
+These instructions were sourced from the Google document, [Quickstart for Linux](https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
 
 ### Installing Docker
 
@@ -384,8 +384,8 @@ The Pega deployment model supports advanced configurations to fit most existing 
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
 
-Make these changes before you begin in the section, [Deploying Pega Platform
-using Helm charts – 30 minutes](#_Deploying_Pega_Platform).
+Make these changes before you begin deploying Pega Platform
+using Helm charts.
 
 Downloading a Pega Platform distribution to your local system
 -------------------------------------------------------------
@@ -394,7 +394,7 @@ These instructions require the Pega Platform distribution image to install the P
 
 ### Requesting access to a Pega Platform distribution
 
-1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community1.pega.com/digital-delivery) site.
+1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
 2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
     site with the credentials your Pega representative provided.
@@ -476,7 +476,7 @@ Prepare your Pega Platform installation Docker image – 15 minutes
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the Docker cli and Docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 
-Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#_Downloading_Pega_Platform) and installed the required components on your local system listed in [Install required applications for the deployment](#_Install_required_applications).
+Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#downloading-a-pega-platform-distribution-to-your-local-system) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
 Follow these steps to create a Docker image you can use to install or upgrade Pega Platform.
 
