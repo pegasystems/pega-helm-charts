@@ -51,6 +51,8 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
+- gcloud - the Google Cloud SDK command-line tool that you use to connect to your GKE cluster.
+
 Creating a Google Cloud Platform project - 5 minutes
 -----------------------------------------
 To deploy Pega Platform to a GKE cluster, you must create a Google Cloud project in which you will create your Kubernetes cluster resources.

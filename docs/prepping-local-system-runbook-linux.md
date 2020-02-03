@@ -1,62 +1,61 @@
 Preparing your local Linux system – 45 minutes
 =====================================================================
 
-In order to deploy Pega Platform using a local Linux system on which you can run commands with
-Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
+To deploy Pega Platform using a local Linux system on which you can run commands with administrator privileges, prepare your system with required applications and configuration files that you need for your deployment. By preparing your system, you can complete the deployment without having to pause to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
 
-Assumptions and prerequisites
------------------------------
+Before you begin
+----------------
 
-This guide assumes:
+To prepare a Linux system, it is assumed:
 
 - You have a basic familiarity with running commands from a Linux command prompt with and without root privileges.
 
 - You use a packaging tool to install application packages. For demonstration purposes, this document refers to the Ubuntu Advanced Packaging Tool (apt) commands that is available for use on Ubuntu Linux distributions.
 
-- Basic familiarity with GitHub account with which you will download a Pega-managed GitHub repository containing configuration files and scripts that you use to install Pega Platform and then deploy it in the Kubernetes cluster.
+- You have basic familiarity with a GitHub account with which you download a Pega-managed GitHub repository that contains configuration files and scripts that support installing Pega Platform and deploying it in the Kubernetes cluster.
 
 Creating a local folder to access all of the configuration files
 ----------------------------------------------------------------
 
-Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>/\<platform\>-demo directory when you must extract files to a folder or run commands from a folder.
+Deploying with Helm requires you to run commands from a specific folder on your local system. To ensure you use the correct filepath, these instructions always use the reference `<local filepath>/<platform>-demo` folder when you extract files to a folder or run commands from a folder.
 
-In order to stay consistent with the instructions, you can create a directory called \<platform\>-demo on your local system in your /home directory. This way, you associate the generic \<local filepath\>/\<platform\>-demo references to the folder /home/\<*linux-username*\>/\<platform\>-demo that is specific to your local
-system.
+To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your Windows user folder. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
 
 To create this folder, open a Linux command prompt and enter:
 
 `$ mkdir /home/<linux-username>/<platform>-demo`
 
-Where \<platform\>-demo is:
+Where `\<platform\>-demo` is:
 
-- AKS-demo - for the AKS runbook
+- For the AKS runbook, `AKS-demo`
 
-- EKS-demo - for the EKS runbook
+- For the EKS runbook, `EKS-demo`
 
-- GKE-demo - for the GKE runbook
+- For the GKS runbook, `GKS-demo`
 
-- PKS-demo - for the PKS runbook
+- For the PKS runbook, `PKS-demo`
 
-- Openshift-demo - for the Openshift runbook
+- For the Openshift runbook, `Openshift-demo`
 
 You are ready to continue preparing your local system.
 
 Installing required applications for the deployment
 ---------------------------------------------------
 
-The entire deployment requires the following applications to be used at some point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+The entire deployment requires the following applications to be used during the configuration process; therefore, you should prepare your local system with all of the applications before you start your deployment:
 - Helm
 - kubectl
 - Docker
-- unzip (or something equivalent to extract files from .zip archive files.)
+- unzip (or an equivalent to extract files from .zip archive files.)
 - az cli (only for AKS deployments)
+- AWS IAM Authenticator for Kubernetes (only for EKS deployments)
+- eksctl (only for EKS deployments)
 - pks cli (only for PKS deployments)
 - Google Cloud SDK and gcloud (only for GKE deployments)
 
-Some of the required applications are binary files that you download from the
-organization's download area; other applications can be installed by using a Linux package manager. 
+Some of the required applications are binary files that you download from the organization's download area; you can install other applications by using a Linux package manager.
 
-In order to use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
+To use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
 ### Installing Unzip
 
@@ -66,7 +65,7 @@ Install the Unzip utility with a packaging tool such as apt.
 
 ### Installing Helm
 
-Pega supports using Helm version 2.1 and later. The latest runbooks use version 3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the commands will differ slightly for Helm 2.x.
+Pega supports using Helm version 2.1 and later. The latest runbooks use version 3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the commands differ slightly for Helm 2.x.
 
 Helm supports a variety of installation methods. To learn more, see https://helm.sh/docs/intro/install/.
 
@@ -79,8 +78,7 @@ Helm provides a script that you can download and then run to install the latest 
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
 get_helm.sh | bash`
 
-2. To update the permissions of the file to you can use it for installations,
-    enter:
+2. To update the permissions of the file to you can use it for installations, enter:
 
 `$ chmod 700 get_helm.sh`
 
@@ -103,8 +101,7 @@ GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
 GoVersion:"go1.13.4"}
 ```
 
-For details about installation methods for previous Helm versions, see
-<https://v2.helm.sh/docs/using_helm/#installing-helm>.
+For additional information, see [Helm documentation](https://helm.sh/docs/); for details about installation methods for previous Helm versions, see <https://v2.helm.sh/docs/using_helm/#installing-helm>.
 
 ### Installing kubectl
 
@@ -130,8 +127,7 @@ This command downloads and parses the \`stable.txt\` in the repository, navigate
 
 `$ sudo mv ./kubectl /usr/local/bin/kubectl`
 
-For details about installing on Linux and other supported installation methods,
-see <https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux>.
+For details about installing on Linux and other supported installation methods, see [Install kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux).
 
 ### For PKS only: installing the PKS CLI
 
@@ -145,7 +141,7 @@ Install the PKS CLI binary file from the Pivotal support site as an executable t
 
 4. Click **PKS CLI - Linux** to display the **Release Download Files**.
 
-5. Click **PKS CLI - Linux** and in the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the downloaded Linux binary file.
+5. Click **PKS CLI - Linux** and in the **Save as** window, choose the `<local filepath>/<platform>-demo` folder to which you save the downloaded Linux binary file.
 
 6. Rename the downloaded binary file to "pks".
 

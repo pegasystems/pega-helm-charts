@@ -1,16 +1,16 @@
-Deploying Pega Platform on a PKS cluster
+Deploying Pega Platform on an Amazon EKS cluster
 ===============================
 
-Deploy Pega Platform™ on a Pivotal Container Service (PKS) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a PKS cluster.
+Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
 
-Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a PKS cluster without much experience in either PKS configurations or Pega Platform deployments.
+Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a EKS cluster without much experience in either EKS configurations or Pega Platform deployments.
 
-Create a deployment of Pega Platform on which you can implement a scalable Pega application in a PKS cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a PKS cluster with a PostgreSQL database instance and two clustered virtual machines (VMs).
+Create a deployment of Pega Platform on which you can implement a scalable Pega application in a EKS cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a EKS cluster with a Amazon RDS database instance and two clustered virtual machines (VMs).
 
 Deployment process overview
 ------------------------
 
-Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a PKS cluster that you create for the deployment:
+Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a EKS cluster that you create for the deployment:
 
 1. Prepare your local system:
 
@@ -19,9 +19,9 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-2. Request a PKS cluster form Pivotal and create an SQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
+2. Create an Amazn EKS cluster and create an Amazon RDS instance in your AWS account - [Prepare your Amazon EKS resources – 45 minutes](#prepare-your-resources--45-minutes).
 
-3. Customize a configuration file with your PKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your PKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
+3. Customize a configuration file with your Amazon EKS cluster details and use the command-line tools, AWS CLI, eksctl, kubectl and Helm, to install and then deploy Pega Platform onto your Amazon EKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
 4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes).
 
@@ -38,17 +38,17 @@ This guide assumes:
 
 The following account, resources, and application versions are required for use in this document:
 
-- A GCP account with a payment method set up to pay for the GCP resources you create and appropriate GCP account permissions and knowledge to:
+- An Amazon AWS account with a payment method set up to pay for the Amazon cluster and RDS resources you create and appropriate AWS account permissions and knowledge to:
 
-  - Create a PostgreSQL Database.
+  - Create an Amazon RDS database.
 
   - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
 
-  You are responsible for any financial costs incurred for your GCP resources.
+  You are responsible for any financial costs incurred for your AWS resources.
 
 - Pega Platform 8.3.1 or later.
 
-- Pega Docker images – your deployment requires the use of a custom Docker image to install Pega Platform into a database that is used by your PKS cluster. After you build your image, you must make it available in a private Docker registry. To build your own image from the base image that Pega provides, you must have:
+- Pega Docker images – your deployment requires the use of a custom Docker image to install Pega Platform into a database that is used by your Amazon EKS cluster. After you build your image, you must make it available in a private Docker registry. To build your own image from the base image that Pega provides, you must have:
 
   - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
 
@@ -58,40 +58,54 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-- PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
+- AWS IAM Authenticator for Kubernetes - the AWS command-line tool that you use to configure the required AWS CLI credentials for deploying your Amazon EKS cluster: access key, secret access key, AWS Region, and output format.
 
-Prepare your resources – 45 minutes
------------------------------------
+- eksctl - the Amazon EKS command-line tool that you use to create clusters on EKS.
 
-This section covers the details necessary to obtain your PKS credentials and
-configure the required PostgreSQL database in a GCP account. Pega supports
-creating a PostgreSQL database in any environment if the IP address of
-the database is available to your PKS cluster.
+Prepare your Amazon EKS resources – 45 minutes
+----------------------------------------------
 
-### Requesting a PKS cluster
+This section covers the details necessary to obtain your AWS credentials and configure the required Amazon RDS database in an AWS account. Pega supports creating a database resource in any environment if the IP address of the database is available to your Amazon EKS cluster.
 
-In many cases a Pega client can request a demo cluster from Pivotal running PKS
-1.5 or later. If your organization is already familiar with the Pivotal
-Container Service, you can create your own local PKS environment.
+### Creating an Amazon EKS cluster
+
+
+ you can create your own local Amazon EKS environment.
 
 At a minimum, your cluster should be provisioned with at least two worker nodes
 that have 32GB of RAM in order to support the typical processing loads in a Pega
 Platform deployment. Pivotal supports SSL authentication, which you can request
 if your organization requires it.
 
-In order to login to your demo cluster, you must have the following information:
+Create your Amazon EKS cluster and Worker nodes using eksctl.
 
-- The target IP address of your PKS API
+a.	Select your windows worker node AMI ID that you want to use with your cluster. See below link for options available. https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html
+b.	Save the text below to a file named cluster-spec.yaml. The configuration file is used to create a cluster and both Linux and Windows worker node groups. Even if you only want to run Windows workloads in your cluster, all Amazon EKS clusters must contain at least one Linux worker node. We recommend that you create at least two worker nodes in each node group for availability purposes. The only supported Kubernetes version is 1.14
 
-- The login credentials: username and password
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
 
-- Whether any SSL information is required to authenticate your login.
+metadata:
+  name: pega-prod
+  region: us-west-2
+  version: '1.14'
+
+nodeGroups:
+  - name: linux-ng
+    instanceType: m4.xlarge
+    minSize: 5
+
+c.	Create your Amazon EKS cluster and Windows and Linux worker nodes with the following command.
+eksctl create cluster -f cluster-spec.yaml
+
+ d.	Once cluster completion is complete, run below command to verify all the configured count of worker nodes have joined the cluster and are in Ready state.
 
 During deployment the required Kubernetes configuration file is copied into the cluster.
 
 ### Creating a database resource
 
-PKS deployments require you to install Pega Platform software in an PostgreSQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
+AMAZON EKS deployments require you to install Pega Platform software in an Amazon RDS instance that contains a PostgreSQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
 
 #### Creating an SQL instance
 

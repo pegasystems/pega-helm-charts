@@ -1,63 +1,65 @@
 Preparing your local Windows 10 system – 45 minutes
 ==========================================================================
 
-In order to deploy Pega Platform using a local Windows 10 system on which you can run commands with Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Windows application or prepare a configuration file that is required to complete the deployment.
+To deploy Pega Platform using a local Windows 10 system on which you can run commands with administrator privileges, prepare your system with required applications and configuration files that you need for your deployment. By preparing your system, you can complete the deployment without having to pause to install a Windows application or prepare a configuration file.
 
-Assumptions and prerequisites
------------------------------
+Before you begin
+----------------
 
-This guide assumes:
+To prepare a Wndows 10 system, it is assumed:
 
-- You have a basic familiarity with running commands from a Windows 10 PowerShell with Administrator privileges.
+- You have a basic familiarity with running commands from a Windows 10 PowerShell with administrator privileges.
 
 - You use the open source packaging tool Chocolatey to install applications onto your Windows laptop. For more information, see [How Chocolatey Works](https://chocolatey.org/how-chocolatey-works).
 
-- Basic familiarity with GitHub account with which you will download a Pega-managed GitHub repository containing configuration files and scripts that you use to install Pega Platform and then deploy it in the Kubernetes cluster.
+- You have basic familiarity with a GitHub account with which you download a Pega-managed GitHub repository that contains configuration files and scripts that support installing Pega Platform and deploying it in the Kubernetes cluster.
 
 Creating a local folder to access all of the configuration files
 ----------------------------------------------------------------
 
-Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>\\\<platform>-demo folder when you must extract files to a folder or run commands from a folder.
+Deploying with Helm requires you to run commands from a specific folder on your local system. To ensure you use the correct filepath, these instructions always use the reference `<local filepath>\<platform>-demo` folder when you extract files to a folder or run commands from a folder.
 
-In order to stay consistent with the instructions, you can create a folder called \<platform\>-demo on your local system at the top level of your Windows user folder. This way, you associate the generic \<local filepath\>\\\<platform\>-demo references to the folder C:\\Users\\\<your username\>\\\<platform\>-demo that is specific to your local system.
+To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your Windows user folder. This way, you associate the generic `<local filepath>\<platform>-demo` references to the folder `C:\\Users\\\<your username\>\\\<platform\>-demo` that is specific to your local system.
 
-For Windows users: To create this folder, open a Windows PowerShell command prompt with Administrator privileges and enter:
+To create this folder, open a Windows PowerShell command prompt with administrator privileges and enter:
 
 `$ mkdir C:\Users\<Windows-username><platform>-demo`
 
-Where \<platform\>-demo is:
+Where `<platform>-demo` is:
 
-- AKS-demo - for the AKS runbook
+- For the AKS runbook, `AKS-demo`
 
-- EKS-demo - for the EKS runbook
+- For the EKS runbook, `EKS-demo`
 
-- PKS-demo - for the PKS runbook
+- For the PKS runbook, `PKS-demo`
 
-- Openshift-demo - for the Openshift runbook
+- For the Openshift runbook, `Openshift-demo`
 
-Currently there is no runbook for running on the Google Kubernetes Engine (GKE) using the Windows 10 Google SDK. To set up a system for a deployment on GKE, see [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md). 
+Currently there is no runbook for running on the Google Kubernetes Engine (GKE) using the Windows 10 Google SDK. To set up a system for a deployment on GKE, see [Prepare a local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
 You are ready to continue preparing your local system.
 
 Installing required applications for the deployment
 ---------------------------------------------------
 
-The entire deployment requires the following applications to be used at some point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
+The entire deployment requires the following applications to be used during the configuration process; therefore, you should prepare your local system with all of the applications before you start your deployment:
 - Helm
 - kubectl
 - Docker
-- unzip (or something equivalent to extract files from .zip archive files.)
+- unzip (or an equivalent to extract files from .zip archive files.)
 - az cli (only for AKS deployments)
+- AWS IAM Authenticator for Kubernetes (only for EKS deployments)
+- eksctl (only for EKS deployments)
 - pks cli (only for PKS deployments)
 
-Some of the required applications are binary files that you download from the organization's download area; other applications can be installed by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
+Some of the required applications are binary files that you download from the organization's download area; you can install other applications by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
-Note: In order to use the docker command in the runbooks, you install the Docker application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
+Note: To use the docker command in the runbooks, you install the Docker application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
 To install Chocolatey, follow these steps which are sourced from the [Install
 Chocolatey](https://chocolatey.org/install) page.
 
-1. Open a Windows PowerShell command prompt with Administrator privileges.
+1. Open a Windows PowerShell command prompt with administrator privileges.
 
 2. To ensure your PowerShell commands run without restrictions enter:
 
@@ -79,72 +81,78 @@ required application.
 Pega supports using Helm version 2.1 and later and the Kubernetes Command Line
 Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
 kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm
-2.x, some of the commands will differ slightly for Helm 2.x.
+2.x, some of the commands differ slightly for Helm 2.x.
 
-The default Helm version available in Chocolatey is 3.0.x; the default version
-of kubernetes-cli is 1.17.x.
+The default Helm version available in Chocolatey is 3.0.x; the version of kubernetes-cli used in the runbooks is version 1.17.x.
 
-Enter the choco install command listed for each application into your PowerShell
-command prompt as shown:
+Enter the choco install command listed for each application into your PowerShell command prompt as shown:
 
-- To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the
-    PowerShell command prompt, enter:
+- To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the PowerShell command prompt, enter:
 
 `$ choco install kubernetes-helm`
 
-If, during the install process, you are prompted to run the script, reply with
-**Yes**.
+If a prompt to run the script appears, enter **Yes**.
 
-- To install [Kubernetes Command Line
-    Interface](https://chocolatey.org/packages/kubernetes-cli): in the
-    PowerShell command prompt, enter:
+For additional information, see [Helm documentation](https://helm.sh/docs/).
+
+- To install [Kubernetes Command Line Interface](https://chocolatey.org/packages/kubernetes-cli): in the PowerShell command prompt, enter:
 
 `$ choco install kubernetes-cli`
 
-If, during the install process, you are prompted to run the script, reply with
-**Yes**. The kubernetes-cli application includes the `kubectl` command.
+If a prompt to run the script appears, enter **Yes**. 
+
+The kubernetes-cli application includes the `kubectl` command.
+
+For details about installing on Windows 10 and supported installation methods, see [Install kubectl on Windows](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-windows).
+
+For Amazon EKS only: - To install [eksctl](https://chocolatey.org/packages/eksctl): in the PowerShell command prompt, enter:
+
+`$ choco install eksctl`
+
+If a prompt to run the script appears, enter **Yes**.
+
+For Amazon EKS only: - To install [AWS IAM Authenticator for Kubernetes](https://chocolatey.org/packages/aws-iam-authenticator#files): in the PowerShell command prompt, enter:
+
+`$ choco install aws-iam-authenticator`
+
+If a prompt to run the script appears, enter **Yes**. 
+
+Confirm the AWS CLI that comes withe the `AWS IAM Authenticator for Kubernetes` installation.
+
+```yaml
+$ aws --version
+aws-cli/1.16.272 Python/3.6.0 Windows/10 botocore/1.13.8
+```
+
+For additional AWS tool information, see [Install the AWS CLI version 1 on Windows](https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html).
 
 ### For AKS only: installing the Azure CLI
 
-Use a Windows PowerShell command prompt with Administrator
-privileges to install the Azure CLI by entering:
+To install the Azure CLI using a Windows PowerShell command prompt with administrator privileges, enter:
 
-`$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile
-.\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi
-/quiet'`
+`$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'`
 
-The prompt returns when the installation is complete.
+The prompt returns when the installation is completed.
 
-For details about installing the Azure CLI on a Windows system, see the article,
-<https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest>
+For details about installing the Azure CLI on a Windows system, see [Install Azure CLI on Windows](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest).
 
 ### For PKS only: installing the PKS CLI
 
-Install the PKS CLI binary executable file from the Pivotal support site that you will run with Windows Administrator permissions during the PKS deployment steps:
+Install the PKS CLI binary executable file from the Pivotal support site that you run with Windows administrator permissions during the PKS deployment steps:
 
-1. Use the browser of your choice to navigate to [Pivotal
-    Network](https://network.pivotal.io/) and log in.
+1. Use the browser of your choice to navigate to [Pivotal Network](https://network.pivotal.io/) and log in.
 
-2. Open the [Pivotal Container Service
-    (PKS)](https://network.pivotal.io/products/pivotal-container-service) page
-    and select release version **1.5.1** in the pulldown.
+2. Open the [Pivotal Container Service (PKS)](https://network.pivotal.io/products/pivotal-container-service) page and release version **1.5.1**.
 
 3. Click **PKS CLI – v1.5.1**.
 
-4. Click **PKS CLI - Windows** and for the EULA, click **AGREE**.
+4. Click **PKS CLI - Windows**.
 
-5. In the Windows explorer window, choose a folder in which to save the file,
-    pks-windows-amd64-1.5.1-build.xx.exe, change the filename to pks.exe, and click
-    **Save**.
+5. In the EULA tab, click **AGREE**.
 
-The binary, executable file is now called “pks.exe” and should be moved to any
-PowerShell PATH on your local computer so it can be run from the command line as
-simply “pks”.
+6. In the Windows explorer window, choose the `<platform>-demo` folder to save the `pks-windows-amd64-1.5.1-build.xx.exe` file, change the filename to `pks.exe`, and then click **Save**.
 
-6. Navigate to the local path folder where you saved this file, for instance
-    \<local filepath\>\\\<platform\>-demo.
-
-7. Add this executable file to the PATH on your local computer. Add the \<platform\>-demo folder to your environment path by running the following command:
+7. Add this executable file to the PATH on your local computer so you can run `pks` from the command-line by entering:
 
 `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
 
@@ -158,7 +166,7 @@ In order to build a docker installation image in the section, [Prepare your Pega
 
 Locate the executable file that downloads to your local system.
 
-2. Run the Docker for Windows Installer.exe installer using Administrator privileges.
+2. Run the Docker for Windows Installer.exe installer using administrator privileges.
 
 3. Follow the install wizard to accept the license, authorize the installer to
     make changes on your computer, and proceed with the install.
@@ -374,7 +382,7 @@ Pega provides this image as the primary content of the final Docker image you wi
 Follow these steps to create a Docker image you can use to install or upgrade
 Pega Platform.
 
-1. From your PowerShell running with Administrator privileges, ensure you are
+1. From your PowerShell running with administrator privileges, ensure you are
     logged into your DockerHub account:
 
 `$ docker login -u \<username\> -p \<username-password\>`
@@ -405,7 +413,7 @@ These instructions direct a docker build function to use the Pega public Docker 
 
 5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
-6. From your PowerShell running with Administrator privileges command prompt, in your current directory, build your pega install docker image by entering:
+6. From your PowerShell running with administrator privileges command prompt, in your current directory, build your pega install docker image by entering:
 
 `$ docker build -t pega-installer .`
 
@@ -434,7 +442,7 @@ You should not maintain this image with Pega proprietary software as a viewable 
 
 Free DockerHub accounts support the use of a single private repository, so you may have to delete an existing private repository in order to create a new one for your Pega docker installation image.
 
-15.  From your PowerShell running with Administrator privileges, use the docker command to push the new image to your new private repository:
+15.  From your PowerShell running with administrator privileges, use the docker command to push the new image to your new private repository:
 
 `$ docker push <your-dockerhub-ID>/pega-installer`
 

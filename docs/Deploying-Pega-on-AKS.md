@@ -61,6 +61,8 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
+- AKS CLI - the AKS command-line tool that you use to log into and communicate with your AKS cluster.
+
 Prepare your AKS resources – 45 minutes
 -----------------------------------
 
