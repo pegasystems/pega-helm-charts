@@ -15,7 +15,7 @@ var volumeDefaultMode int32 = 420
 var volumeDefaultModePtr = &volumeDefaultMode
 
 type Verifier struct {
-	PegaDeployment
+	o                       PegaDeploymentTestOptions
 	k8sInformationExtractor K8sInformationExtractor
 	t                       *testing.T
 	podVerifier             PodVerifierImpl
@@ -26,6 +26,7 @@ type Verifier struct {
 }
 
 func NewDeployVerifier(t *testing.T, helmOptions *helm.Options, initContainers []string) *Verifier {
+
 	return &Verifier{
 		t:               t,
 		podVerifier:     PodVerifierImpl{t: t},
@@ -48,20 +49,22 @@ func (v *Verifier) getDeploymentMetadata() DeploymentMetadata {
 
 type PodValidator interface {
 	verifyPod(v Verifier)
-	verifyPodEnvironment(pod *k8score.PodSpec, v Verifier)
+	verifyPodEnvironment(t *testing.T, pod *k8score.PodSpec, v Verifier)
+	specificContainerEnvironmentValidation(t *testing.T, pod *k8score.PodSpec, options *helm.Options)
 }
 type PodVerifierImpl struct {
-	t *testing.T
+	PodValidator
 }
 
 func (p *PodVerifierImpl) verifyPod(v Verifier) {
+	t := v.t
 	pod := v.getPod()
-	require.Equal(p.t, pod.Volumes[0].Name, "pega-volume-config")
-	require.Equal(p.t, v.getDeploymentMetadata().Name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
-	require.Equal(p.t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
-	require.Equal(p.t, pod.Volumes[1].Name, "pega-volume-credentials")
-	require.Equal(p.t, pod.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
-	require.Equal(p.t, pod.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
+	require.Equal(t, v.getDeploymentMetadata().Name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
+	require.Equal(t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
+	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
+	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
 
 	actualInitContainers := pod.InitContainers
 	count := len(actualInitContainers)
@@ -72,46 +75,46 @@ func (p *PodVerifierImpl) verifyPod(v Verifier) {
 	p.verifyInitContinerData(pod, v._helmOptions)
 	p.verifyPodEnvironment(pod, v)
 
-	require.Equal(p.t, v._initContainers, actualInitContainerNames)
-	require.Equal(p.t, pod.Containers[0].Name, "pega-web-tomcat")
-	require.Equal(p.t, pod.Containers[0].Image, "pegasystems/pega")
-	require.Equal(p.t, pod.Containers[0].Ports[0].Name, "pega-web-port")
-	require.Equal(p.t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
+	require.Equal(t, v._initContainers, actualInitContainerNames)
+	require.Equal(t, pod.Containers[0].Name, "pega-web-tomcat")
+	require.Equal(t, pod.Containers[0].Image, "pegasystems/pega")
+	require.Equal(t, pod.Containers[0].Ports[0].Name, "pega-web-port")
+	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
 
-	require.Equal(p.t, "2", pod.Containers[0].Resources.Limits.Cpu().String())
-	require.Equal(p.t, "8Gi", pod.Containers[0].Resources.Limits.Memory().String())
-	require.Equal(p.t, "200m", pod.Containers[0].Resources.Requests.Cpu().String())
-	require.Equal(p.t, "6Gi", pod.Containers[0].Resources.Requests.Memory().String())
+	require.Equal(t, "2", pod.Containers[0].Resources.Limits.Cpu().String())
+	require.Equal(t, "8Gi", pod.Containers[0].Resources.Limits.Memory().String())
+	require.Equal(t, "200m", pod.Containers[0].Resources.Requests.Cpu().String())
+	require.Equal(t, "6Gi", pod.Containers[0].Resources.Requests.Memory().String())
 
-	require.Equal(p.t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
-	require.Equal(p.t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
 
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(20))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.HTTPGet.Port, intstr.FromInt(8080))
-	require.Equal(p.t, pod.Containers[0].LivenessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
+	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
+	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Port, intstr.FromInt(8080))
+	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
 
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(20))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromInt(8080))
-	require.Equal(p.t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromInt(8080))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
 
-	require.Equal(p.t, pod.ImagePullSecrets[0].Name, "pega-registry-secret")
-	require.Equal(p.t, pod.RestartPolicy, k8score.RestartPolicy("Always"))
-	require.Equal(p.t, pod.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
-	require.Equal(p.t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
-	require.Equal(p.t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(p.t, pod.Volumes[0].Name, "pega-volume-config")
-	require.Equal(p.t, pod.Volumes[1].Name, "pega-volume-credentials")
-	require.Equal(p.t, pod.Volumes[1].Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, pod.ImagePullSecrets[0].Name, "pega-registry-secret")
+	require.Equal(t, pod.RestartPolicy, k8score.RestartPolicy("Always"))
+	require.Equal(t, pod.TerminationGracePeriodSeconds, terminationGracePeriodSecondsPtr)
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
+	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
+	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
+	require.Equal(t, pod.Volumes[1].Secret.SecretName, "pega-credentials-secret")
 }
 
 func (p *PodVerifierImpl) verifyPodEnvironment(pod *k8score.PodSpec, v Verifier) {

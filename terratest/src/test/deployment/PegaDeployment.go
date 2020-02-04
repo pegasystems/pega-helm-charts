@@ -1,6 +1,6 @@
 package deployment
 
-type PegaDeployment struct {
+type PegaDeploymentTestOptions struct {
 	deploymentName     string
 	initContainers     []string
 	nodeType           string
