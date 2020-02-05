@@ -1,71 +1,55 @@
 package addons
 
 import (
-	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"path/filepath"
+	"test/testhelpers"
 	"testing"
 )
 
 func TestShouldNotContainTraefikIfDisabled(t *testing.T) {
-	t.Parallel()
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "false",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range traefikResources {
-		require.False(t, helmChart.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
 func TestTraefikShouldContainAllResources(t *testing.T) {
-	t.Parallel()
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "true",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range traefikResources {
-		require.True(t, helmChart.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
 func Test_shouldBeLoadBalancer(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-	require.NoError(t, err)
-
-	helmChartParser := NewHelmConfigParser(t, &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.serviceType": "LoadBalancer",
-		},
-	}, helmChartPath)
+		}),
+	)
 
 	var service *v1.Service
-	helmChartParser.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Service",
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "Service",
 	}, &service)
 
 	serviceType := service.Spec.Type
@@ -73,20 +57,17 @@ func Test_shouldBeLoadBalancer(t *testing.T) {
 }
 
 func Test_shouldBeNodePort(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-	require.NoError(t, err)
-
-	helmChartParser := NewHelmConfigParser(t, &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.serviceType": "NodePort",
-		},
-	}, helmChartPath)
+		}),
+	)
 
 	var service *v1.Service
-	helmChartParser.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Service",
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "Service",
 	}, &service)
 
 	serviceType := service.Spec.Type
@@ -108,9 +89,9 @@ func Test_hasRoleWhenRbacEnabled(t *testing.T) {
 
 	helmChart := NewHelmConfigParser(t, options, helmChartPath)
 
-	require.True(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "ClusterRole",
+	require.True(t, helmChart.Contains(SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "ClusterRole",
 	}))
 
 	require.True(t, helmChart.contains(SearchResourceOption{
@@ -138,8 +119,8 @@ func Test_noRoleWhenRbacDisabled(t *testing.T) {
 	helmChart := NewHelmConfigParser(t, options, helmChartPath)
 
 	require.False(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "ClusterRole",
+		Name: "release-name-traefik",
+		Kind: "ClusterRole",
 	}))
 }
 
@@ -206,8 +187,8 @@ func Test_checkResourceRequests(t *testing.T) {
 
 	var deployment v12.Deployment
 	helmChart.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Deployment",
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	}, &deployment)
 
 	require.Equal(t, "300m", deployment.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
@@ -230,8 +211,8 @@ func Test_checkResourceLimits(t *testing.T) {
 
 	var deployment v12.Deployment
 	helmChart.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Deployment",
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	}, &deployment)
 
 	require.Equal(t, "600m", deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
@@ -292,15 +273,15 @@ var traefikResources = []SearchResourceOption{
 		kind: "Deployment",
 	},
 	{
-		name: "release-name-traefik",
-		kind: "Service",
+		Name: "release-name-traefik",
+		Kind: "Service",
 	},
 	{
-		name: "release-name-traefik-test",
-		kind: "Pod",
+		Name: "release-name-traefik-test",
+		Kind: "Pod",
 	},
 	{
-		name: "release-name-traefik-test",
-		kind: "ConfigMap",
+		Name: "release-name-traefik-test",
+		Kind: "ConfigMap",
 	},
 }

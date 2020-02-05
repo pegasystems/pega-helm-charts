@@ -1,111 +1,93 @@
 package addons
 
 import (
-	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"path/filepath"
+	"test/testhelpers"
 	"testing"
 )
 
 func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
-	t.Parallel()
-
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-	require.NoError(t, err)
-
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "false",
-		},
-	}
-
-	helmChartParser := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range metricServerResources {
-		require.False(t, helmChartParser.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
 func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
-	t.Parallel()
-
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-	require.NoError(t, err)
-
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "true",
-		},
-	}
-
-	helmChartParser := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range metricServerResources {
-		require.True(t, helmChartParser.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
 func Test_shouldContainCommandArgs(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-	require.NoError(t, err)
-
-	helmChartParser := NewHelmConfigParser(t, &helm.Options{}, helmChartPath)
+	helmChartParser := testhelpers.NewHelmConfigParser(testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{}))
 
 	var deployment *v1.Deployment
-	helmChartParser.find(SearchResourceOption{
-		name: "release-name-metrics-server",
-		kind: "Deployment",
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-metrics-server",
+		Kind: "Deployment",
 	}, &deployment)
 
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
 }
 
-var metricServerResources = []SearchResourceOption{
+var metricServerResources = []testhelpers.SearchResourceOption{
 	{
-		name: "release-name-metrics-server",
-		kind: "ServiceAccount",
+		Name: "release-name-metrics-server",
+		Kind: "ServiceAccount",
 	},
 	{
-		name: "system:metrics-server-aggregated-reader",
-		kind: "ClusterRole",
+		Name: "system:metrics-server-aggregated-reader",
+		Kind: "ClusterRole",
 	},
 	{
-		name: "system:release-name-metrics-server",
-		kind: "ClusterRole",
+		Name: "system:release-name-metrics-server",
+		Kind: "ClusterRole",
 	},
 	{
-		name: "release-name-metrics-server:system:auth-delegator",
-		kind: "ClusterRoleBinding",
+		Name: "release-name-metrics-server:system:auth-delegator",
+		Kind: "ClusterRoleBinding",
 	},
 	{
-		name: "system:release-name-metrics-server",
-		kind: "ClusterRoleBinding",
+		Name: "system:release-name-metrics-server",
+		Kind: "ClusterRoleBinding",
 	},
 	{
-		name: "release-name-metrics-server-auth-reader",
-		kind: "RoleBinding",
+		Name: "release-name-metrics-server-auth-reader",
+		Kind: "RoleBinding",
 	},
 	{
-		name: "release-name-metrics-server",
-		kind: "Service",
+		Name: "release-name-metrics-server",
+		Kind: "Service",
 	},
 	{
-		name: "release-name-metrics-server-test",
-		kind: "Pod",
+		Name: "release-name-metrics-server-test",
+		Kind: "Pod",
 	},
 	{
-		name: "release-name-metrics-server",
-		kind: "Deployment",
+		Name: "release-name-metrics-server",
+		Kind: "Deployment",
 	},
 	{
-		name: "v1beta1.metrics.k8s.io",
-		kind: "APIService",
+		Name: "v1beta1.metrics.k8s.io",
+		Kind: "APIService",
 	},
 }

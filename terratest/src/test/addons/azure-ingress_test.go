@@ -1,77 +1,64 @@
 package addons
 
 import (
-	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
-	"path/filepath"
+	"test/testhelpers"
 	"testing"
 )
 
 func TestShouldNotContainAzureIngressIfDisabled(t *testing.T) {
-	t.Parallel()
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled": "false",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range azureIngressResources {
-		require.False(t, helmChart.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
 func TestAzureIngressShouldContainAllResources(t *testing.T) {
-	t.Parallel()
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled": "true",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	for _, i := range azureIngressResources {
-		require.True(t, helmChart.contains(SearchResourceOption{
-			name: i.name,
-			kind: i.kind,
+		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
 		}))
 	}
 }
 
-var azureIngressResources = []SearchResourceOption{
+var azureIngressResources = []testhelpers.SearchResourceOption{
 	{
-		name: "networking-appgw-k8s-azure-service-principal",
-		kind: "Secret",
+		Name: "networking-appgw-k8s-azure-service-principal",
+		Kind: "Secret",
 	},
 	{
-		name: "release-name-cm-ingress-azure",
-		kind: "ConfigMap",
+		Name: "release-name-cm-ingress-azure",
+		Kind: "ConfigMap",
 	},
 	{
-		name: "release-name-sa-ingress-azure",
-		kind: "ServiceAccount",
+		Name: "release-name-sa-ingress-azure",
+		Kind: "ServiceAccount",
 	},
 	{
-		name: "release-name-ingress-azure",
-		kind: "ClusterRole",
+		Name: "release-name-ingress-azure",
+		Kind: "ClusterRole",
 	},
 	{
-		name: "release-name-ingress-azure",
-		kind: "ClusterRoleBinding",
+		Name: "release-name-ingress-azure",
+		Kind: "ClusterRoleBinding",
 	},
 	{
-		name: "release-name-ingress-azure",
-		kind: "Deployment",
+		Name: "release-name-ingress-azure",
+		Kind: "Deployment",
 	},
 }
