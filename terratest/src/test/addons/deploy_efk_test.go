@@ -14,7 +14,9 @@ func TestShouldNotContainDeploy_EFKIfDisabled(t *testing.T) {
 	require.NoError(t, err)
 	options := &helm.Options{
 		SetValues: map[string]string{
-			"deploy_efk": "false",
+			"elasticsearch.enabled":         "false",
+			"kibana.enabled":                "false",
+			"fluentd-elasticsearch.enabled": "false",
 		},
 	}
 
@@ -34,7 +36,9 @@ func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
 	require.NoError(t, err)
 	options := &helm.Options{
 		SetValues: map[string]string{
-			"deploy_efk": "true",
+			"elasticsearch.enabled":         "true",
+			"kibana.enabled":                "true",
+			"fluentd-elasticsearch.enabled": "true",
 		},
 	}
 	helmChart := NewHelmConfigParser(t, options, helmChartPath)
