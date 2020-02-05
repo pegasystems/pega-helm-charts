@@ -3,6 +3,7 @@ package addons
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
+	v1 "k8s.io/api/core/v1"
 	"path/filepath"
 	"testing"
 )
@@ -49,6 +50,46 @@ func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
 			kind: i.kind,
 		}))
 	}
+}
+
+func Test_shouldBeElasticSearchUrlForKibana(t *testing.T) {
+	helmChartPath, err := filepath.Abs(helmChartRelativePath)
+	require.NoError(t, err)
+
+	helmChartParser := NewHelmConfigParser(t, &helm.Options{
+		SetValues: map[string]string{
+			"kibana.enabled": "true",
+			"kibana.files.kibana.yml.elasticsearch.url": "http://elastic-search-client:9200",
+		},
+	}, helmChartPath)
+
+	var configmap *v1.ConfigMap
+	helmChartParser.find(SearchResourceOption{
+		name: "release-name-kibana",
+		kind: "ConfigMap",
+	}, &configmap)
+
+	require.Contains(t, configmap.Data["kibana.yml"], "http://elastic-search-client:9200")
+}
+func Test_shouldBeServiceExternalPortForKibana(t *testing.T) {
+	helmChartPath, err := filepath.Abs(helmChartRelativePath)
+	require.NoError(t, err)
+
+	helmChartParser := NewHelmConfigParser(t, &helm.Options{
+		SetValues: map[string]string{
+			"kibana.enabled":              "true",
+			"kibana.service.externalPort": "80",
+		},
+	}, helmChartPath)
+
+	var service *v1.Service
+	helmChartParser.find(SearchResourceOption{
+		name: "release-name-kibana",
+		kind: "Service",
+	}, &service)
+
+	//require.Contains(t, configmap.Data["kibana.yml"], "http://elastic-search-client:9200")
+	require.Equal(t, int32(80), service.Spec.Ports[0].Port)
 }
 
 var deployEfkResources = []SearchResourceOption{
