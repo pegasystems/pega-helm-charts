@@ -4,19 +4,19 @@ import (
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"test/testhelpers"
+	th "test/testhelpers"
 	"testing"
 )
 
 func TestShouldNotContainTraefikIfDisabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "false",
 		}),
 	)
 
 	for _, i := range traefikResources {
-		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(th.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -24,14 +24,14 @@ func TestShouldNotContainTraefikIfDisabled(t *testing.T) {
 }
 
 func TestTraefikShouldContainAllResources(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "true",
 		}),
 	)
 
 	for _, i := range traefikResources {
-		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(th.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -39,15 +39,15 @@ func TestTraefikShouldContainAllResources(t *testing.T) {
 }
 
 func Test_shouldBeLoadBalancer(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.serviceType": "LoadBalancer",
 		}),
 	)
 
 	var service *v1.Service
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "Service",
 	}, &service)
@@ -57,15 +57,15 @@ func Test_shouldBeLoadBalancer(t *testing.T) {
 }
 
 func Test_shouldBeNodePort(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.serviceType": "NodePort",
 		}),
 	)
 
 	var service *v1.Service
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "Service",
 	}, &service)
@@ -77,75 +77,60 @@ func Test_shouldBeNodePort(t *testing.T) {
 }
 
 func Test_hasRoleWhenRbacEnabled(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":      "true",
 			"traefik.rbac.enabled": "true",
-		},
-	}
+		}),
+	)
 
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
-
-	require.True(t, helmChart.Contains(SearchResourceOption{
+	require.True(t, helmChartParser.Contains(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "ClusterRole",
 	}))
 
-	require.True(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "ServiceAccount",
+	require.True(t, helmChartParser.Contains(th.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "ServiceAccount",
 	}))
 
-	require.True(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "ClusterRoleBinding",
+	require.True(t, helmChartParser.Contains(th.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "ClusterRoleBinding",
 	}))
 }
 
 func Test_noRoleWhenRbacDisabled(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":      "true",
 			"traefik.rbac.enabled": "false",
-		},
-	}
+		}),
+	)
 
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
-
-	require.False(t, helmChart.contains(SearchResourceOption{
+	require.False(t, helmChartParser.Contains(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "ClusterRole",
 	}))
 }
 
 func Test_hasSecretWhenSSLEnabled(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.ssl.enabled": "true",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	var deployment v12.Deployment
-	helmChart.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Deployment",
+	helmChartParser.Find(th.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	}, &deployment)
 
-	require.True(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik-default-cert",
-		kind: "Secret",
+	require.True(t, helmChartParser.Contains(th.SearchResourceOption{
+		Name: "release-name-traefik-default-cert",
+		Kind: "Secret",
 	}))
 
 	require.Equal(t, "ssl", deployment.Spec.Template.Spec.Volumes[1].Name)
@@ -153,40 +138,30 @@ func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 }
 
 func Test_hasNoSecretWhenSSLEnabled(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
 			"traefik.ssl.enabled": "false",
-		},
-	}
+		}),
+	)
 
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
-
-	require.False(t, helmChart.contains(SearchResourceOption{
-		name: "release-name-traefik-default-cert",
-		kind: "Secret",
+	require.False(t, helmChartParser.Contains(th.SearchResourceOption{
+		Name: "release-name-traefik-default-cert",
+		Kind: "Secret",
 	}))
 }
 
 func Test_checkResourceRequests(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":                   "true",
 			"traefik.resources.requests.cpu":    "300m",
 			"traefik.resources.requests.memory": "300Mi",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	var deployment v12.Deployment
-	helmChart.find(SearchResourceOption{
+	helmChartParser.Find(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "Deployment",
 	}, &deployment)
@@ -196,21 +171,16 @@ func Test_checkResourceRequests(t *testing.T) {
 }
 
 func Test_checkResourceLimits(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":                 "true",
 			"traefik.resources.limits.cpu":    "600m",
 			"traefik.resources.limits.memory": "600Mi",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	var deployment v12.Deployment
-	helmChart.find(SearchResourceOption{
+	helmChartParser.Find(th.SearchResourceOption{
 		Name: "release-name-traefik",
 		Kind: "Deployment",
 	}, &deployment)
@@ -220,21 +190,16 @@ func Test_checkResourceLimits(t *testing.T) {
 }
 
 func Test_checkDefaultResourceRequests(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "true",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	var deployment v12.Deployment
-	helmChart.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Deployment",
+	helmChartParser.Find(th.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	}, &deployment)
 
 	require.Equal(t, "200m", deployment.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
@@ -242,35 +207,30 @@ func Test_checkDefaultResourceRequests(t *testing.T) {
 }
 
 func Test_checkDefaultResourceLimits(t *testing.T) {
-	helmChartPath, err := filepath.Abs(helmChartRelativePath)
-
-	require.NoError(t, err)
-	options := &helm.Options{
-		SetValues: map[string]string{
+	helmChartParser := th.NewHelmConfigParser(
+		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "true",
-		},
-	}
-
-	helmChart := NewHelmConfigParser(t, options, helmChartPath)
+		}),
+	)
 
 	var deployment v12.Deployment
-	helmChart.find(SearchResourceOption{
-		name: "release-name-traefik",
-		kind: "Deployment",
+	helmChartParser.Find(th.SearchResourceOption{
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	}, &deployment)
 
 	require.Equal(t, "500m", deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
 	require.Equal(t, "500Mi", deployment.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
 }
 
-var traefikResources = []SearchResourceOption{
+var traefikResources = []th.SearchResourceOption{
 	{
-		name: "release-name-traefik",
-		kind: "ConfigMap",
+		Name: "release-name-traefik",
+		Kind: "ConfigMap",
 	},
 	{
-		name: "release-name-traefik",
-		kind: "Deployment",
+		Name: "release-name-traefik",
+		Kind: "Deployment",
 	},
 	{
 		Name: "release-name-traefik",
