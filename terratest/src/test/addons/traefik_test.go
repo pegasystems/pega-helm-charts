@@ -47,14 +47,39 @@ func TestTraefikShouldContainAllResources(t *testing.T) {
 			kind: i.kind,
 		}))
 	}
+}
 
-	//var deployment appsv1.Deployment
-
-	//
-	//deploymentSlice := strings.Split(deployment, "---")
-	//var traefikEnabled
-
-	//func VerifyTraefikEnabled (t testing.T, helmChartPath string, options helm.Options){
-	//	traefik :=
-	//	}
+var traefikResources = []SearchResourceOption{
+	{
+		name: "release-name-traefik",
+		kind: "ConfigMap",
+	},
+	{
+		name: "release-name-traefik",
+		kind: "ServiceAccount",
+	},
+	{
+		name: "release-name-traefik",
+		kind: "ClusterRole",
+	},
+	{
+		name: "release-name-traefik",
+		kind: "Deployment",
+	},
+	{
+		name: "release-name-traefik",
+		kind: "ClusterRoleBinding",
+	},
+	{
+		name: "release-name-traefik",
+		kind: "Service",
+	},
+	{
+		name: "release-name-traefik-test",
+		kind: "Pod",
+	},
+	{
+		name: "release-name-traefik-test",
+		kind: "ConfigMap",
+	},
 }

@@ -32,6 +32,8 @@ script:
   - cd terratest/src/test
   - dep ensure
   - go test
+  - cd addons
+  - go test
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
