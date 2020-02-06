@@ -237,7 +237,7 @@ Annotations to the service or ingress Kubernetes objects may be applied by setti
 TAZ>>updated section to support TLS  -->
 ### service
 
-Specify the ports for access to the web or stream tier.
+Specify the port and targetPort to access the web node (default port numbers are `80` and `8080`) or stream node (default port numbers are `7003`), if required for your networking domain.
 
 ### ingress
 
