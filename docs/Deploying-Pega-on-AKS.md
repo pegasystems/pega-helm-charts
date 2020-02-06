@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
-2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--45-minutes).
+2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--60-minutes).
 
 3.  Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -475,7 +475,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. Install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--45-minutes).
+12. Install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--60-minutes).
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
