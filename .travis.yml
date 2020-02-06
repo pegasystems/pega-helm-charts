@@ -12,6 +12,7 @@ install:
   - helm init --client-only
   # Install YamlLint
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
+  - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
   - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
   - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
@@ -19,6 +20,7 @@ install:
 script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+  - remark -i .remark_ignore -f -u validate-links .
   # Now load the helm dependencies
   - make dependencies
   # Run Helm lint

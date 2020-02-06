@@ -144,7 +144,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
@@ -153,7 +153,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")

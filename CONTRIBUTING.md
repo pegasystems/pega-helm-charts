@@ -37,4 +37,4 @@
 # Additional Resources
 
 * [General GitHub documentation](https://help.github.com/)
-* [GitHub pull request documentation](https://help.github.com/send-pull-requests/)
+* [GitHub pull request documentation](https://help.github.com/en/github/collaborating-with-issues-and-pull-requests/about-pull-requests)
