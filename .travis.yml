@@ -45,59 +45,61 @@ jobs:
       - go test
       - cd $TRAVIS_BUILD_DIR
       - chmod 777 before_deploy.sh
-
-before_deploy:
-  - ./before_deploy.sh
-  - make examples
-deploy:
-  - provider: releases
-    api_key:
-      secure: >
-        GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
-        EawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnza
-        XJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXh
-        CO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1H
-        ml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39R
-        FcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql
-        0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT
-        /wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGW
-        JeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O
-        6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8
-        ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74g
-        AG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt
-        3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
-        a/rvc6hM6quXSmlAwA0U=
-    file:
-      - pega-kubernetes-example.tar.gz
-      - pega-openshift-example.tar.gz
-      - pega-azure-aks-example.tar.gz
-      - pega-aws-eks-example.tar.gz
-      - pega-google-gke-example.tar.gz
-      - pega-pivotal-pks-example.tar.gz
-    skip_cleanup: true
-    on:
-      repo: pegasystems/pega-helm-charts
-      tags: true
-  - provider: bintray
-    file: descriptor.json
-    user: bintrayautomation
-    key:
-      secure: >
-        M1CPmmjJ1OI2luWFRW9Aqregj3b4rQLSnP4ROurkHkewB+HwoZ+
-        QHAQ4JJD0B+br2AddaGKgN1rdzYpyvg0Cl7ZhWnMb96bE+lVbmD
-        zYnUc+Iwd8/PWXNoaFuB5sn5LPVESe8H/ZLdP0IyMbBknBDgdNg
-        KpD9XqH7/UrrNT9jvZSpGFAcMCwLVFiQ1auusnSLOYVr611Jadp
-        NZarx7QgPLBtlit+cfi/vEGy7GyYTtFzSbM86gBnm1kViSVM4w1
-        bE4cFs+14KVNiNiwpSzFzK/gBncqQVTz6yaD3bV48Cla5sz3/sD
-        kh3If7pUhcmMYyy9BPk35176TWTHKcqATv/5GxDvQpgaBMlyl0D
-        hwhb2d++ZZ6V+kYYj+Uf4m4NaxGV6WNrUnW+IPw9qlBWFHnw17u
-        80HU5GapXXNedUi2CjzrH25A0Y6DHqfZubDBXJh31RfWKz0r58b
-        LSGLYxdl96purfLUCeSrsKkZAWS59EmpXiR/f+zSbNmlpG+ryVB
-        sQIPG+cwdPSVUdGBGVp3QzEjVze6gABSQ/2GaMeRterjzBypi8a
-        b4vbIyxY905deoMAwcQHUcvybpNJfRcaowToK0BnMNhy8pn26KY
-        ct3oGLVxQe6rlGbQNZrFePSCyNd/ZfYlkWDcLh/j0OH0gdspHTd
-        Dfsy8dgS8QzvgNsNKRHk=
-    skip_cleanup: true
-    on:
-      all_branches: true
-      tags: true 
+    - stage: before_deploy
+      script:
+      - ./before_deploy.sh
+      - make examples
+    - stage: deploy
+      script: skip
+      deploy:
+        - provider: releases
+          api_key:
+            secure: >
+              GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
+              EawtYSu0WLh815qGmuxgVjMbvvkAvtbBXanKH+BheRl1cQjYnza
+              XJlL+Oa/xxzCqz1n4txqtDMR7l/loqrMTzCRe2bZ806z3+uXpXh
+              CO12+LwvMDJAAddDkX+2wRE240/1f/0lVlZ2lNzgBitC63jAf1H
+              ml3/KrgHsTYvNB5M6qKn8C24DcC6PMe012K3hL0O+F+er9Mb39R
+              FcSLTjF/6AiLvpK4oDAg8sBgciXVq0FPhCXvjbINGB/AY7jM5Ql
+              0A6ngngZjsjefn+NbtZ3aK230h2m0XM+dN7FJCbtRQeqvczcwRT
+              /wpDimpzFR0rf/NdXV4G+UZYI6a3bjqKYP5IPN8BbzVo8KzlbGW
+              JeJLV40gW7EbdyT57R2dNp46I17c1KL8atQH97n3yv9d9ZaC87O
+              6tOohLmue7L3lKxPDpY60VFna5BjJwvrhW4gvsd11Ko4c39FSu8
+              ogBSZ6E1EOlmVZDX+cBjuw4dGihcrHqWW5V3k2X/ksAKb+4A74g
+              AG8pCr/ifPEj9kTWb71IIF5RHkD6JqeGJdKaWFHDpWlYhKNTLRt
+              3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
+              a/rvc6hM6quXSmlAwA0U=
+          file:
+            - pega-kubernetes-example.tar.gz
+            - pega-openshift-example.tar.gz
+            - pega-azure-aks-example.tar.gz
+            - pega-aws-eks-example.tar.gz
+            - pega-google-gke-example.tar.gz
+            - pega-pivotal-pks-example.tar.gz
+          skip_cleanup: true
+          on:
+            repo: pegasystems/pega-helm-charts
+            tags: true
+        - provider: bintray
+          file: descriptor.json
+          user: bintrayautomation
+          key:
+            secure: >
+              M1CPmmjJ1OI2luWFRW9Aqregj3b4rQLSnP4ROurkHkewB+HwoZ+
+              QHAQ4JJD0B+br2AddaGKgN1rdzYpyvg0Cl7ZhWnMb96bE+lVbmD
+              zYnUc+Iwd8/PWXNoaFuB5sn5LPVESe8H/ZLdP0IyMbBknBDgdNg
+              KpD9XqH7/UrrNT9jvZSpGFAcMCwLVFiQ1auusnSLOYVr611Jadp
+              NZarx7QgPLBtlit+cfi/vEGy7GyYTtFzSbM86gBnm1kViSVM4w1
+              bE4cFs+14KVNiNiwpSzFzK/gBncqQVTz6yaD3bV48Cla5sz3/sD
+              kh3If7pUhcmMYyy9BPk35176TWTHKcqATv/5GxDvQpgaBMlyl0D
+              hwhb2d++ZZ6V+kYYj+Uf4m4NaxGV6WNrUnW+IPw9qlBWFHnw17u
+              80HU5GapXXNedUi2CjzrH25A0Y6DHqfZubDBXJh31RfWKz0r58b
+              LSGLYxdl96purfLUCeSrsKkZAWS59EmpXiR/f+zSbNmlpG+ryVB
+              sQIPG+cwdPSVUdGBGVp3QzEjVze6gABSQ/2GaMeRterjzBypi8a
+              b4vbIyxY905deoMAwcQHUcvybpNJfRcaowToK0BnMNhy8pn26KY
+              ct3oGLVxQe6rlGbQNZrFePSCyNd/ZfYlkWDcLh/j0OH0gdspHTd
+              Dfsy8dgS8QzvgNsNKRHk=
+          skip_cleanup: true
+          on:
+            all_branches: true
+            tags: true
