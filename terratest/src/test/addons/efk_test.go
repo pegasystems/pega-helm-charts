@@ -5,13 +5,13 @@ import (
 	"k8s.io/api/apps/v1beta2"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/api/extensions/v1beta1"
-	"test/testhelpers"
+	"test/common"
 	"testing"
 )
 
 func TestShouldNotContainDeploy_EFKIfDisabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"elasticsearch.enabled":         "false",
 			"kibana.enabled":                "false",
 			"fluentd-elasticsearch.enabled": "false",
@@ -19,15 +19,15 @@ func TestShouldNotContainDeploy_EFKIfDisabled(t *testing.T) {
 	)
 
 	for _, i := range deployEfkResources {
-		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
 	}
 }
 func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"elasticsearch.enabled":         "true",
 			"kibana.enabled":                "true",
 			"fluentd-elasticsearch.enabled": "true",
@@ -35,7 +35,7 @@ func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
 	)
 
 	for _, i := range deployEfkResources {
-		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -43,27 +43,27 @@ func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
 }
 
 func Test_shouldBeFullnameOverrideForElasticsearch(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"elasticsearch.enabled": "true",
 		}),
 	)
-	require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+	require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 		Name: "elastic-search",
 		Kind: "ConfigMap",
 	}))
 }
 
 func Test_shouldBeElasticSearchUrlForKibana(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"kibana.enabled": "true",
 			"kibana.files.kibana.yml.elasticsearch.url": "http://elastic-search-client:9200",
 		}),
 	)
 
 	var configmap *v1.ConfigMap
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-kibana",
 		Kind: "ConfigMap",
 	}, &configmap)
@@ -71,15 +71,15 @@ func Test_shouldBeElasticSearchUrlForKibana(t *testing.T) {
 	require.Contains(t, configmap.Data["kibana.yml"], "http://elastic-search-client:9200")
 }
 func Test_shouldBeServiceExternalPortForKibana(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"kibana.enabled":              "true",
 			"kibana.service.externalPort": "80",
 		}),
 	)
 
 	var service *v1.Service
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-kibana",
 		Kind: "Service",
 	}, &service)
@@ -88,36 +88,36 @@ func Test_shouldBeServiceExternalPortForKibana(t *testing.T) {
 }
 
 func Test_shouldBeIngressEnabledForKibana(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"kibana.enabled":         "true",
 			"kibana.ingress.enabled": "true",
 		}),
 	)
 
-	require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+	require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 		Name: "release-name-kibana",
 		Kind: "Ingress",
 	}))
 }
 
 func Test_shouldBeIngressDisabledForKibana(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"kibana.enabled":         "true",
 			"kibana.ingress.enabled": "false",
 		}),
 	)
 
-	require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+	require.False(t, helmChartParser.Contains(common.SearchResourceOption{
 		Name: "release-name-kibana",
 		Kind: "Ingress",
 	}))
 }
 
 func Test_shouldBeHostForIngressKibana(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"kibana.enabled":         "true",
 			"kibana.ingress.enabled": "true",
 			"kibana.ingress.hosts":   "{YOUR_WEB.KIBANA.EXAMPLE.COM}",
@@ -125,7 +125,7 @@ func Test_shouldBeHostForIngressKibana(t *testing.T) {
 	)
 
 	var ingress *v1beta1.Ingress
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-kibana",
 		Kind: "Ingress",
 	}, &ingress)
@@ -134,15 +134,15 @@ func Test_shouldBeHostForIngressKibana(t *testing.T) {
 
 }
 func Test_shouldBeHostForElasticsearch(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"fluentd-elasticsearch.enabled": "true",
 			"elasticsearch.host":            "elastic-search-client",
 		}),
 	)
 
 	var daemon *v1beta2.DaemonSet
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-fluentd-elasticsearch",
 		Kind: "DaemonSet",
 	}, &daemon)
@@ -151,15 +151,15 @@ func Test_shouldBeHostForElasticsearch(t *testing.T) {
 }
 
 func Test_shouldBeBufferChunkLimitForElasticsearch(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"fluentd-elasticsearch.enabled":    "true",
 			"elasticsearch.buffer_chunk_limit": "250M",
 		}),
 	)
 
 	var daemon *v1beta2.DaemonSet
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-fluentd-elasticsearch",
 		Kind: "DaemonSet",
 	}, &daemon)
@@ -168,15 +168,15 @@ func Test_shouldBeBufferChunkLimitForElasticsearch(t *testing.T) {
 }
 
 func Test_shouldBeBufferQueueLimitForElasticsearch(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"fluentd-elasticsearch.enabled":    "true",
 			"elasticsearch.buffer_queue_limit": "30",
 		}),
 	)
 
 	var daemon *v1beta2.DaemonSet
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-fluentd-elasticsearch",
 		Kind: "DaemonSet",
 	}, &daemon)
@@ -184,7 +184,7 @@ func Test_shouldBeBufferQueueLimitForElasticsearch(t *testing.T) {
 	require.Equal(t, "30", daemon.Spec.Template.Spec.Containers[0].Env[5].Value)
 }
 
-var deployEfkResources = []testhelpers.SearchResourceOption{
+var deployEfkResources = []common.SearchResourceOption{
 	{
 		Name: "release-name-kibana",
 		Kind: "ConfigMap",

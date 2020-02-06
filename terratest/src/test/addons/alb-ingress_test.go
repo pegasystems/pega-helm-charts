@@ -3,19 +3,19 @@ package addons
 import (
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"test/testhelpers"
+	"test/common"
 	"testing"
 )
 
 func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled": "false",
 		}),
 	)
 
 	for _, i := range albIngressResources {
-		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -23,14 +23,14 @@ func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
 }
 
 func TestAlbIngressShouldContainAllResources(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled": "true",
 		}),
 	)
 
 	for _, i := range albIngressResources {
-		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -38,8 +38,8 @@ func TestAlbIngressShouldContainAllResources(t *testing.T) {
 }
 
 func Test_checkSetAwsRegion(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":               "true",
 			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "false",
 			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
@@ -47,7 +47,7 @@ func Test_checkSetAwsRegion(t *testing.T) {
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -56,8 +56,8 @@ func Test_checkSetAwsRegion(t *testing.T) {
 }
 
 func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":               "true",
 			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "true",
 			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
@@ -65,7 +65,7 @@ func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -74,8 +74,8 @@ func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
 }
 
 func Test_checkSetAwsVpcID(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":              "true",
 			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "false",
 			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
@@ -83,7 +83,7 @@ func Test_checkSetAwsVpcID(t *testing.T) {
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -92,8 +92,8 @@ func Test_checkSetAwsVpcID(t *testing.T) {
 }
 
 func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":              "true",
 			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "true",
 			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
@@ -101,7 +101,7 @@ func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -110,15 +110,15 @@ func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
 }
 
 func Test_checkSetClusterName(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":     "true",
 			"aws-alb-ingress-controller.clusterName": "YOUR_EKS_CLUSTER_NAME",
 		}),
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -127,8 +127,8 @@ func Test_checkSetClusterName(t *testing.T) {
 }
 
 func Test_checkSetAccessKey(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"aws-alb-ingress-controller.enabled":                        "true",
 			"aws-alb-ingress-controller.extraEnv.AWS_ACCESS_KEY_ID":     "YOUR_AWS_ACCESS_KEY_ID",
 			"aws-alb-ingress-controller.extraEnv.AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
@@ -136,7 +136,7 @@ func Test_checkSetAccessKey(t *testing.T) {
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "Deployment",
 	}, &deployment)
@@ -147,7 +147,7 @@ func Test_checkSetAccessKey(t *testing.T) {
 	require.Equal(t, "YOUR_AWS_SECRET_ACCESS_KEY", deployment.Spec.Template.Spec.Containers[0].Env[1].Value)
 }
 
-var albIngressResources = []testhelpers.SearchResourceOption{
+var albIngressResources = []common.SearchResourceOption{
 	{
 		Name: "release-name-aws-alb-ingress-controller",
 		Kind: "ServiceAccount",

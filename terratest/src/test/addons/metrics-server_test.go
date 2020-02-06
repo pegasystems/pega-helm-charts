@@ -3,19 +3,19 @@ package addons
 import (
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"test/testhelpers"
+	"test/common"
 	"testing"
 )
 
 func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "false",
 		}),
 	)
 
 	for _, i := range metricServerResources {
-		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -23,14 +23,14 @@ func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
 }
 
 func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "true",
 		}),
 	)
 
 	for _, i := range metricServerResources {
-		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -38,10 +38,10 @@ func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
 }
 
 func Test_shouldContainCommandArgs(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{}))
+	helmChartParser := common.NewHelmConfigParser(common.NewHelmTest(t, helmChartRelativePath, map[string]string{}))
 
 	var deployment *v1.Deployment
-	helmChartParser.Find(testhelpers.SearchResourceOption{
+	helmChartParser.Find(common.SearchResourceOption{
 		Name: "release-name-metrics-server",
 		Kind: "Deployment",
 	}, &deployment)
@@ -49,7 +49,7 @@ func Test_shouldContainCommandArgs(t *testing.T) {
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
 }
 
-var metricServerResources = []testhelpers.SearchResourceOption{
+var metricServerResources = []common.SearchResourceOption{
 	{
 		Name: "release-name-metrics-server",
 		Kind: "ServiceAccount",

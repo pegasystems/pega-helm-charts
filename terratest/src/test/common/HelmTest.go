@@ -1,4 +1,4 @@
-package testhelpers
+package common
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"

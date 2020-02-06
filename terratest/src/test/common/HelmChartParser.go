@@ -1,9 +1,9 @@
-package testhelpers
+package common
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"strings"
-	"test"
+	"test/pega"
 	"testing"
 )
 
@@ -19,7 +19,7 @@ func NewHelmConfigParser(helmTest *HelmTest) *HelmChartParser {
 }
 
 func (p *HelmChartParser) Find(searchOptions SearchResourceOption, resource interface{}) {
-	var d test.DeploymentMetadata
+	var d pega.DeploymentMetadata
 	for _, slice := range p.SlicedResource {
 		helm.UnmarshalK8SYaml(p.T, slice, &d)
 		if (searchOptions.Kind != "" && searchOptions.Kind == d.Kind) && (searchOptions.Name != "" && searchOptions.Name == d.Name) {
@@ -31,7 +31,7 @@ func (p *HelmChartParser) Find(searchOptions SearchResourceOption, resource inte
 	p.T.FailNow()
 }
 func (p *HelmChartParser) Contains(searchOptions SearchResourceOption) bool {
-	var d test.DeploymentMetadata
+	var d pega.DeploymentMetadata
 	for _, slice := range p.SlicedResource {
 		helm.UnmarshalK8SYaml(p.T, slice, &d)
 		if (searchOptions.Kind != "" && searchOptions.Kind == d.Kind) && (searchOptions.Name != "" && searchOptions.Name == d.Name) {

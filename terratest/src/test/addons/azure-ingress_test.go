@@ -4,19 +4,19 @@ import (
 	b64 "encoding/base64"
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/core/v1"
-	"test/testhelpers"
+	"test/common"
 	"testing"
 )
 
 func TestShouldNotContainAzureIngressIfDisabled(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled": "false",
 		}),
 	)
 
 	for _, i := range azureIngressResources {
-		require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -24,14 +24,14 @@ func TestShouldNotContainAzureIngressIfDisabled(t *testing.T) {
 }
 
 func TestAzureIngressShouldContainAllResources(t *testing.T) {
-	helmChartParser := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled": "true",
 		}),
 	)
 
 	for _, i := range azureIngressResources {
-		require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -39,8 +39,8 @@ func TestAzureIngressShouldContainAllResources(t *testing.T) {
 }
 
 func TestSetValuesForAppGW(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled":              "true",
 			"ingress-azure.appgw.subscriptionId": "<YOUR.SUBSCRIPTION_ID>",
 			"ingress-azure.appgw.resourceGroup":  "<RESOURCE_GROUP_NAME>",
@@ -49,7 +49,7 @@ func TestSetValuesForAppGW(t *testing.T) {
 	)
 
 	var configMap *v1.ConfigMap
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "release-name-cm-ingress-azure",
 		Kind: "ConfigMap",
 	}, &configMap)
@@ -61,8 +61,8 @@ func TestSetValuesForAppGW(t *testing.T) {
 }
 
 func TestSetValuesForArmAuth(t *testing.T) {
-	helmChart := testhelpers.NewHelmConfigParser(
-		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChart := common.NewHelmConfigParser(
+		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"ingress-azure.enabled":            "true",
 			"ingress-azure.armAuth.type":       "servicePrincipal",
 			"ingress-azure.armAuth.secretJSON": b64.StdEncoding.EncodeToString([]byte("<SECRET_JSON_CREATED_USING_ABOVE_COMMAND>")),
@@ -70,7 +70,7 @@ func TestSetValuesForArmAuth(t *testing.T) {
 	)
 
 	var secret *v1.Secret
-	helmChart.Find(testhelpers.SearchResourceOption{
+	helmChart.Find(common.SearchResourceOption{
 		Name: "networking-appgw-k8s-azure-service-principal",
 		Kind: "Secret",
 	}, &secret)
@@ -78,7 +78,7 @@ func TestSetValuesForArmAuth(t *testing.T) {
 	require.Equal(t, "<SECRET_JSON_CREATED_USING_ABOVE_COMMAND>", string(secret.Data["armAuth.json"]))
 }
 
-var azureIngressResources = []testhelpers.SearchResourceOption{
+var azureIngressResources = []common.SearchResourceOption{
 	{
 		Name: "networking-appgw-k8s-azure-service-principal",
 		Kind: "Secret",
