@@ -20,27 +20,32 @@ Example for a kubernetes environment:
 ```yaml
 provider: "k8s"
 ```
-<!--
-## Actions
 
+## Actions
+<!-- After upgrades are documented in runbooks, use this paragraph
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install or upgrade a Pega system.
 
 For additional, required installation or upgrade parameters, see the [Installer section](#installer-settings).
+-->
+Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system.
+
+For additional, required installation parameters, see the [Installer section](#installer-settings).
 
 Value             | Action
 ---               | ---
 deploy            | Start the Pega containers using an existing Pega database installation.
 install           | Install Pega Platform into your database without deploying.
 install-deploy    | Install Pega Platform into your database and then deploy.
-upgrade           | Upgrade the Pega Platform installation in your database.
-upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
 
+<!--upgrade           | Upgrade the Pega Platform installation in your database.
+upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
+-->
 Example:
 
 ```yaml
 action: "deploy"
 ```
--->
+
 ## JDBC Configuration
 
 Use the `jdbc` section  of the values file to specify how to connect to the Pega database. *Pega must be installed to this database before deploying on Kubernetes*.  
@@ -231,20 +236,19 @@ Annotations to the service or ingress Kubernetes objects may be applied by setti
 
 TAZ>>updated section to support TLS  -->
 ### service
-<!--
-Karthik - please provide guidance. I'm not how todescribe the port and targetPort...this was missing in original readme write up. 
--->
+
+Specify the ports for access to the web or stream tier.
 
 ### ingress
 
-Specify load balancer configuration settings for the deployment. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods.
+Specify load balancer configuration settings for the web or stream tiers in the deployment. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods.
 
 Provider  | Manage SSL certificate with secret | alternative method
 ---       |---                                 |---
-AKS       | Required                           | none
-EKS       | Required                           | none
-PKS       | Required                           | none
-GKE       | Supported                          | pre-shared SSL certificate or GKE-managed certificate - see examples for details
+AKS       | Required                           | None
+EKS       | Not supported                      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
+PKS       | Required                           | None
+GKE       | Supported                          | <ul><li>Supports creating pre-shared certificates using gcloud.</li><li>Supports using GKE-managed certificate and reserving a static IP address for use by the GKE-managed certificate hostname.</li><li>See examples for details.</li>
 
 #### Managing your deployment certificates using a Kubernetes secret
 
@@ -272,7 +276,7 @@ Configure the following parameters in pega.yaml chart as appropriate for the dep
 
 - `domain` - specify a domain on your network in which you create an ingress to the load balancer.
 - `tls.enabled`- specify the use of HTTPS for ingress connectivity. By default, Pega Platform deployments support the use of HTTPS connectivity.
-- `tls.secretName` - specify the secret you created in which you store your SSL certificate for your deployment. AKS, EKS, PKS require the use of a secret for certificate management. GKE supports the use of secret; however, to use a GKE pre-shared SSL certificate or GKE managed certificate, leave this field blank.
+- `tls.secretName` - specify the secret you created in which you store your SSL certificate for your deployment. AKS and PKS require the use of a secret for certificate management. GKE supports the use of secret; however, to use a GKE pre-shared SSL certificate or GKE managed certificate, leave this field blank.
 - `tls.useManagedCertificate` - set to true to use a GKE managed certificate; otherwise use the `false` default value, .
 - `tls.ssl_annotation` - depending on your provider or type of certificate you are using use the appropriate annotation:
   - For `EKS` - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>
@@ -280,16 +284,51 @@ Configure the following parameters in pega.yaml chart as appropriate for the dep
   - For `GKE-managed certificate` using static IP for load balancer: - use kubernetes.io/ingress.global-static-ip-name: \<*global-static-ip-name*\>
 
 Example:
-<!--
-```yaml
-TBD...Karthik - please provide 3 Pega YAML examples for GKE, ok? These should be generice but map out examples for 
-Example 1: Managing SSL certificates using a secrets file. Deployments in AKS, EKS, and PKS clusters all require the use of this method. 
-Example 2: For GKE only: Managing Pre-shared SSL certificates as an object in GCP project.
-Example 3: For GKE only: GKE-Managed SSL certificates.
 
+```yaml
+Example 1: Managing SSL certificates using a secrets file. Deployments in AKS and PKS clusters require the use of this method:
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName: web-domain-certificate
+          useManagedCertificate: false
+          ssl_annotation:
+
+Example 2: For GKE only: Managing Pre-shared SSL certificates as an object in GCP project.
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+             ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+
+Example 3: For GKE only: GKE-Managed SSL certificates.
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+             ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+             kubernetes.io/ingress.global-static-ip-name: web-ip-address
+
+Example 4: For EKS only: Manage certificate using Amazon Certification Manager and use ssl_annotation.
+ingress:
+  ingress:
+        domain: "stream.dev.pega.io"
+        tls:
+          enabled: true
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+             alb.ingress.kubernetes.io/certificate-arn:<certificate-arn>
 ```
--->
-Annotations to the service or ingress Kubernetes objects may be applied by setting `service.annotations` or `ingress.annotations` as required.  This is used for advanced load balancer or other ingress configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+
+REVIEWERS: may I remove this existing statement now? Annotations to the service or ingress Kubernetes objects may be applied by setting `service.annotations` or `ingress.annotations` as required.  This is used for advanced load balancer or other ingress configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
 
 ### Managing Resources
 
