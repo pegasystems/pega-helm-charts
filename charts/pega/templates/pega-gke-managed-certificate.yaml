@@ -1,0 +1,9 @@
+{{- if (eq .Values.global.provider "gke") }}
+{{- range $index, $dep := .Values.global.tier }}
+{{- if ($dep.ingress) }}
+{{- if (eq ($dep.ingress.tls.useManagedCertificate) true) }}
+{{ template "gkemanagedcertificate" dict "name" (printf "managed-certificate-%s" $dep.name) "domain" $dep.ingress.domain }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}

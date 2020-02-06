@@ -12,7 +12,7 @@ metadata:
     haproxy.router.openshift.io/balance: roundrobin
 spec:
   # Host on which you can reach mentioned service.
-  host: {{ .node.service.domain }}
+  host: {{ .node.ingress.domain }}
   to:
     kind: Service
     # Name of the service associated with the route
