@@ -34,6 +34,13 @@
   {{- end -}}
 {{- end }}
 
+{{- define "tlssecretsnippet" }}
+  tls:
+   - hosts:
+     - {{ .node.ingress.domain }}
+     secretName: {{ .node.ingress.tls.secretName }}
+{{- end }}
+
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true
@@ -204,4 +211,14 @@ readinessProbe:
   {{- end -}}
 
   {{- add $passivationTime $passivationDelay -}}
+{{- end -}}
+
+{{- define "gkemanagedcertificate" }}
+apiVersion: networking.gke.io/v1beta1
+kind: ManagedCertificate
+metadata:
+  name: {{ .name }}
+spec:
+  domains:
+    - {{ .domain }}
 {{- end -}}
