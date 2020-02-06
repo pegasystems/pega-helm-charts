@@ -8,7 +8,7 @@ import (
 	"testing"
 )
 
-func TestShouldNotContainTraefikIfDisabled(t *testing.T) {
+func Test_shouldNotContainTraefikResourcesWhenDisabled(t *testing.T) {
 	helmChartParser := th.NewHelmConfigParser(
 		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "false",
@@ -23,7 +23,7 @@ func TestShouldNotContainTraefikIfDisabled(t *testing.T) {
 	}
 }
 
-func TestTraefikShouldContainAllResources(t *testing.T) {
+func Test_shouldContainTraefikResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := th.NewHelmConfigParser(
 		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled": "true",
@@ -38,7 +38,7 @@ func TestTraefikShouldContainAllResources(t *testing.T) {
 	}
 }
 
-func Test_shouldBeLoadBalancer(t *testing.T) {
+func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 	helmChartParser := th.NewHelmConfigParser(
 		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
@@ -56,7 +56,7 @@ func Test_shouldBeLoadBalancer(t *testing.T) {
 	require.Equal(t, "LoadBalancer", string(serviceType))
 }
 
-func Test_shouldBeNodePort(t *testing.T) {
+func Test_shouldBeAbleToSetUpServiceTypeAsNodePort(t *testing.T) {
 	helmChartParser := th.NewHelmConfigParser(
 		th.NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"traefik.enabled":     "true",
