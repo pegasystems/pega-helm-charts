@@ -11,7 +11,9 @@ metadata:
   {{- if (eq .node.ingress.tls.useManagedCertificate true) }}
     networking.gke.io/managed-certificates: managed-certificate-{{ .node.name }}
   {{ end }}
+    {{- if (.node.ingress.tls.ssl_annotation) -}}
     {{ toYaml .node.ingress.tls.ssl_annotation }}
+    {{- end -}}
   {{ end }}
 spec:
 {{- if (eq .node.ingress.tls.enabled true) }}

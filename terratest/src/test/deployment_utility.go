@@ -298,7 +298,7 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 }
 
 func VerifyGKEIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Empty(t, ingressObj.Annotations)
+	require.Equal(t, "false", ingressObj.Annotations["kubernetes.io/ingress.allow-http"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Backend.ServicePort)
 	require.Equal(t, 1, len(ingressObj.Spec.Rules))
@@ -316,7 +316,7 @@ func VerifyAKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 
 // VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
 func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
+	require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
