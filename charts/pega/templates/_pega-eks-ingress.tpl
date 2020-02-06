@@ -13,7 +13,9 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
     # set the redirect action to redirect http traffic into https
     alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+    {{- if (.node.ingress.tls.ssl_annotation) -}}
     {{ toYaml .node.ingress.tls.ssl_annotation }}
+    {{- end }}
     {{- else }}
     # specifies the ports that ALB used to listen on
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'

@@ -144,7 +144,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
@@ -153,7 +153,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(20))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
@@ -298,7 +298,7 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 }
 
 func VerifyGKEIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Empty(t, ingressObj.Annotations)
+	require.Equal(t, "false", ingressObj.Annotations["kubernetes.io/ingress.allow-http"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Backend.ServicePort)
 	require.Equal(t, 1, len(ingressObj.Spec.Rules))
@@ -316,7 +316,7 @@ func VerifyAKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 
 // VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
 func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
+	require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
