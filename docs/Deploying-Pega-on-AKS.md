@@ -238,80 +238,84 @@ AKS deployments require you to install Pega Platform software in an SQL database
 
 ### Creating an Application Gateway Resource
 
-AKS setup needs creation of an Application Gateway for creating load balancers.  After creating Application Gateway, make a note of Application Gateway name with which you created the resource to be used as part of editing Addons helm chart.
+Create an Application Gateway for the deployment load balancer.  After creating theApplication Gateway, note the Application Gateway name with which you created the resource. You must add this name to the Addons helm chart you configured in [your local Linux system](prepping-local-system-runbook-linux.md) or  [your local Windows 10 system](prepping-local-system-runbook-windows.md).
 
-1.  In a web browser, login to Microsoft Azure Portal (https://portal.azure.com/)
+1. In a web browser, log in to Microsoft Azure Portal (https://portal.azure.com/)
 with your credentials.
 
-2.  Search for **Application Gateway** and select it in the dropdown list.
+2. Search for **Application Gateway** and select it in the dropdown list.
 
-3.  Click **+Add**
+3. Click **+Add**.
 
-4.  On the **Create an Application Gateway** page, on the **Basics** tab page, add details to the following required fields :
+4. On the **Create an Application Gateway** page, on the **Basics** tab page, add details to the following required fields:
 
-    a) Select the **Resource Group** in which you created your cluster
-    
-    b) In **Instance Details**, mention an unique name and choose an appropriate region.
-    
-    c) In **Configure virtual network**, Select the Virtual Network in which you created your cluster.  And select a different subnet from the one you selected for cluster.  
-    ***FYI, same subnet selection will throw you an error***
-        
-    d) Click **Next: Frontends.**
+   a. Select the **Resource Group** in which you created your cluster.
 
-5.  In **Frontends** tab page, add details :
+   b. In **Instance Details**, enter an unique name and choose an appropriate region.
 
-    a) Select **Public** as **Frontend IP address type**
-    
-    b) For **Public IP address**, click on **Create new** :
-    -  **Add a public IP address** pops up.  Select an unique name and click on **Ok**
-        
-    c) Click **Next : Backends**
+   c. In **Configure virtual network**, select the Virtual Network in which you created your cluster, then select a different subnet from the one you selected for cluster.
 
-6.  In **Backends** tab page, add details :
+   `Note: Select the same subnet is not supported and results in an error.`
 
-    a) Click on **Add a backend pool**
-    -  In **Add a backend pool** dialogue box, give an unique backend pool name
-    -  Mark **Add backend pool without targets** as **Yes**
-    
-    b) Click **Next : Configuration**
+   d. Click **Next: Frontends.**
 
-7. Now, **Frontends** and **Backends** that we created in previous steps will be visble here.  Now, we need ot create **Routing rules** which consist of - Listener, Backend targets, HTTP setting
+5. In **Frontends** tab page, add details:
 
-8.  Click on **Add a rule**
-    
-    a)  In **Add a routing rule**  dialog, Give an unique **Rule name**
-    
-    b) Provide **Listener** configuration
+   a. For **Frontend IP address type**, select **Public**.
 
-    -  Give an unique **Listener Name**
-    -  Select **Public** as **Frontend IP**
-    -  Select **HTTP** as **Protocol**
-    -  Give **80** as **Port**
-    -  Leave the rest of the settings as it is.
-    -  Click on **Backend targets** tab
-    
-    c) Provide **Backend targets** configuration
-    
-    -  Give **Backend Pool** as **Target type**
-    -  Select the backend pool that you created in Step 6 as **Backend Target**
-    -  For **HTTP Setting**, click on **Create new**
-    
-    d)  In **Add an HTTP Setting** dialog, provide the configuration
-    
-    -  Give an unique **HTTP Setting Name**
-    -  Select **HTTP** as **Backend Protocol**
-    -  Give **80** as **Backend port**
-    -  Leave rest of the settings as it is.
-    
-    e)  Click on **Next : Tags**
+   b. In **Public IP address**, click on **Create new**:
 
-9.  Add necessary tags as per your requirement.
+    The **Add a public IP address** option opens.
 
-10.  Click on **Next : Review + Create**
+   c. Select an unique name and click **Ok**.
 
-11.  A validation is run and you will get a **Validation Passed** message.
+   d. Click **Next : Backends**.
 
-12.  Click on **Create**
+6. In **Backends** tab page, add details:
+
+   a. Click **Add a backend pool** and do the following:
+
+    - In the **Add a backend pool** dialogue box, enter a unique \<*backend pool name*\>.
+
+    - In **Add backend pool without targets** select **Yes**.
+
+   b. Click **Next : Configuration**.
+
+With the Frontends and Backends configurations complete, create Routing rules that include - Listener, Backend targets, and an HTTP setting.
+
+7. Click on **Add a rule**.
+
+   a. In **Add a routing rule**  dialog, enter a unique **Rule name**.
+
+   b. Configure **Listener** settings.
+
+   - Enter a unique **Listener Name**.
+   - For **Frontend IP**, select **Public**.
+   - For **Protocol**, select **HTTP**.
+   - For as **Port**, enter **80**.
+   - Leave the remaining settings at the default value.
+   - Click the **Backend targets** tab.
+
+   c. Configure **Backend targets** settings.
+
+   - For **Backend Pool**, select **Target type**.
+   - For **Backend Target**, select the backend pool that you created in Step 6.
+   - For **HTTP Setting**, click **Create new**.
+
+   d.  Configure **Add an HTTP Setting**.
+
+   - Enter an unique **HTTP Setting Name**.
+   - For **Backend Protocol**, select **HTTP**.
+   - For **Backend port**, enter Give **80**.
+   - Leave the remaining settings at the default value.
+
+8. Click **Next : Tags**.
+
+9. Add any necessary, required tags.
+
+10. Click **Next : Review + Create**.
+
+11. Click **Create**.
 
 A deployment progress page displays the status of your server creation until it is complete, which takes about 5 minutes. When complete, the Azure UI displays all of the resources created for your Application Gateway details:
 
