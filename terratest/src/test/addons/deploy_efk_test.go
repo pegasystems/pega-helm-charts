@@ -2,7 +2,9 @@ package addons
 
 import (
 	"github.com/stretchr/testify/require"
+	"k8s.io/api/apps/v1beta2"
 	v1 "k8s.io/api/core/v1"
+	"k8s.io/api/extensions/v1beta1"
 	"test/testhelpers"
 	"testing"
 )
@@ -40,6 +42,18 @@ func TestShouldDeploy_EFKContainAllResourcesIfEnabled(t *testing.T) {
 	}
 }
 
+func Test_shouldBeFullnameOverrideForElasticsearch(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"elasticsearch.enabled": "true",
+		}),
+	)
+	require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		Name: "elastic-search",
+		Kind: "ConfigMap",
+	}))
+}
+
 func Test_shouldBeElasticSearchUrlForKibana(t *testing.T) {
 	helmChartParser := testhelpers.NewHelmConfigParser(
 		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
@@ -70,8 +84,104 @@ func Test_shouldBeServiceExternalPortForKibana(t *testing.T) {
 		Kind: "Service",
 	}, &service)
 
-	//require.Contains(t, configmap.Data["kibana.yml"], "http://elastic-search-client:9200")
 	require.Equal(t, int32(80), service.Spec.Ports[0].Port)
+}
+
+func Test_shouldBeIngressEnabledForKibana(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"kibana.enabled":         "true",
+			"kibana.ingress.enabled": "true",
+		}),
+	)
+
+	require.True(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		Name: "release-name-kibana",
+		Kind: "Ingress",
+	}))
+}
+
+func Test_shouldBeIngressDisabledForKibana(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"kibana.enabled":         "true",
+			"kibana.ingress.enabled": "false",
+		}),
+	)
+
+	require.False(t, helmChartParser.Contains(testhelpers.SearchResourceOption{
+		Name: "release-name-kibana",
+		Kind: "Ingress",
+	}))
+}
+
+func Test_shouldBeHostForIngressKibana(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"kibana.enabled":         "true",
+			"kibana.ingress.enabled": "true",
+			"kibana.ingress.hosts":   "{YOUR_WEB.KIBANA.EXAMPLE.COM}",
+		}),
+	)
+
+	var ingress *v1beta1.Ingress
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-kibana",
+		Kind: "Ingress",
+	}, &ingress)
+
+	require.Contains(t, ingress.Spec.Rules[0].Host, "YOUR_WEB.KIBANA.EXAMPLE.COM")
+
+}
+func Test_shouldBeHostForElasticsearch(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"fluentd-elasticsearch.enabled": "true",
+			"elasticsearch.host":            "elastic-search-client",
+		}),
+	)
+
+	var daemon *v1beta2.DaemonSet
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-fluentd-elasticsearch",
+		Kind: "DaemonSet",
+	}, &daemon)
+
+	require.Equal(t, "elastic-search-client", daemon.Spec.Template.Spec.Containers[0].Env[1].Value)
+}
+
+func Test_shouldBeBufferChunkLimitForElasticsearch(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"fluentd-elasticsearch.enabled":    "true",
+			"elasticsearch.buffer_chunk_limit": "250M",
+		}),
+	)
+
+	var daemon *v1beta2.DaemonSet
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-fluentd-elasticsearch",
+		Kind: "DaemonSet",
+	}, &daemon)
+
+	require.Equal(t, "250M", daemon.Spec.Template.Spec.Containers[0].Env[4].Value)
+}
+
+func Test_shouldBeBufferQueueLimitForElasticsearch(t *testing.T) {
+	helmChartParser := testhelpers.NewHelmConfigParser(
+		testhelpers.NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"fluentd-elasticsearch.enabled":    "true",
+			"elasticsearch.buffer_queue_limit": "30",
+		}),
+	)
+
+	var daemon *v1beta2.DaemonSet
+	helmChartParser.Find(testhelpers.SearchResourceOption{
+		Name: "release-name-fluentd-elasticsearch",
+		Kind: "DaemonSet",
+	}, &daemon)
+
+	require.Equal(t, "30", daemon.Spec.Template.Spec.Containers[0].Env[5].Value)
 }
 
 var deployEfkResources = []testhelpers.SearchResourceOption{
@@ -86,10 +196,6 @@ var deployEfkResources = []testhelpers.SearchResourceOption{
 	{
 		Name: "release-name-kibana",
 		Kind: "Deployment",
-	},
-	{
-		Name: "release-name-kibana",
-		Kind: "Ingress",
 	},
 	{
 		Name: "elastic-search",
