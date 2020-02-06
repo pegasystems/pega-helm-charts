@@ -61,7 +61,7 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-Prepare your AKS resources – 45 minutes
+Prepare your AKS resources – 60 minutes
 -----------------------------------
 
 In order to deploy Pega Platform to an AKS environment, you must create the AKS resources that the deployment will use in your Azure account. This section covers the details necessary to create an  AKS cluster and an SQL database resource.
@@ -129,7 +129,7 @@ To deploy Pega using an AKS cluster, create the cluster in an existing project i
 10. In the **Networking** tab page, add details to the following required fields
     for this Kubernetes service:
 
-    a. Ensure that **HTTP application routing** is **Enabled**.
+    a. Ensure that **HTTP application routing** is **Disabled**.
 
     b. Ensure that **Networking configuration** is set to **Advanced**.
 
@@ -236,6 +236,91 @@ AKS deployments require you to install Pega Platform software in an SQL database
 
 ![](media/ec3afaa6f4e3e9224dec832be51c7dc5.png)
 
+### Creating an Application Gateway Resource
+
+Create an Application Gateway for the deployment load balancer.  After creating theApplication Gateway, note the Application Gateway name with which you created the resource. You must add this name to the Addons helm chart you configured in [your local Linux system](prepping-local-system-runbook-linux.md) or  [your local Windows 10 system](prepping-local-system-runbook-windows.md).
+
+1. In a web browser, log in to Microsoft Azure Portal (https://portal.azure.com/)
+with your credentials.
+
+2. Search for **Application Gateway** and select it in the dropdown list.
+
+3. Click **+Add**.
+
+4. On the **Create an Application Gateway** page, on the **Basics** tab page, add details to the following required fields:
+
+   a. Select the **Resource Group** in which you created your cluster.
+
+   b. In **Instance Details**, enter an unique name and choose an appropriate region.
+
+   c. In **Configure virtual network**, select the Virtual Network in which you created your cluster, then select a different subnet from the one you selected for cluster.
+
+   `Note: Select the same subnet is not supported and results in an error.`
+
+   d. Click **Next: Frontends.**
+
+5. In **Frontends** tab page, add details:
+
+   a. For **Frontend IP address type**, select **Public**.
+
+   b. In **Public IP address**, click on **Create new**:
+
+    The **Add a public IP address** option opens.
+
+   c. Select an unique name and click **Ok**.
+
+   d. Click **Next : Backends**.
+
+6. In **Backends** tab page, add details:
+
+   a. Click **Add a backend pool** and do the following:
+
+    - In the **Add a backend pool** dialogue box, enter a unique \<*backend pool name*\>.
+
+    - In **Add backend pool without targets** select **Yes**.
+
+   b. Click **Next : Configuration**.
+
+With the Frontends and Backends configurations complete, create Routing rules that include - Listener, Backend targets, and an HTTP setting.
+
+7. Click on **Add a rule**.
+
+   a. In **Add a routing rule**  dialog, enter a unique **Rule name**.
+
+   b. Configure **Listener** settings.
+
+   - Enter a unique **Listener Name**.
+   - For **Frontend IP**, select **Public**.
+   - For **Protocol**, select **HTTP**.
+   - For as **Port**, enter **80**.
+   - Leave the remaining settings at the default value.
+   - Click the **Backend targets** tab.
+
+   c. Configure **Backend targets** settings.
+
+   - For **Backend Pool**, select **Target type**.
+   - For **Backend Target**, select the backend pool that you created in Step 6.
+   - For **HTTP Setting**, click **Create new**.
+
+   d.  Configure **Add an HTTP Setting**.
+
+   - Enter an unique **HTTP Setting Name**.
+   - For **Backend Protocol**, select **HTTP**.
+   - For **Backend port**, enter Give **80**.
+   - Leave the remaining settings at the default value.
+
+8. Click **Next : Tags**.
+
+9. Add any necessary, required tags.
+
+10. Click **Next : Review + Create**.
+
+11. Click **Create**.
+
+A deployment progress page displays the status of your server creation until it is complete, which takes about 5 minutes. When complete, the Azure UI displays all of the resources created for your Application Gateway details:
+
+![](media/AppGateway_Deployment_Success.png)
+
 ### Locating your SQL database details
 
 After you finalize your SQL database configuration and you are ready to deploy, locate the the SQL Server name for
@@ -299,8 +384,8 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-| tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
-| tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier hos tname should comply with your networking standards. </li></ul>|
+| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
+| tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier hos tname should comply with your networking standards. </li></ul>|
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
