@@ -4,42 +4,50 @@ env:
     - HELM_URL=https://storage.googleapis.com/kubernetes-helm
     - HELM_TGZ=helm-v2.14.0-linux-amd64.tar.gz
     - YAMLLINT_VERSION=1.15.0
-install:
-  # Install Helm
-  - wget -q ${HELM_URL}/${HELM_TGZ}
-  - tar xzfv ${HELM_TGZ}
-  - PATH=`pwd`/linux-amd64/:$PATH
-  - helm init --client-only
-  # Install YamlLint
-  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
-  - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
-  # Install Go
-  - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
-  - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
-  - export  PATH=$PATH:/usr/local/go/bin
-script:
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
-  - remark -i .remark_ignore -f -u validate-links .
-  # Now load the helm dependencies
-  - make dependencies
-  # Run Helm lint
-  - helm lint ./charts/pega  
-  - helm lint ./charts/addons
-  # Run GO helm unit tests
-  - mkdir $TRAVIS_BUILD_DIR/terratest/bin
-  - export GOPATH=$TRAVIS_BUILD_DIR/terratest
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
-  - cd terratest/src/test
-  - dep ensure
-  - go test
-  - cd addons
-  - go test
-  - cd $TRAVIS_BUILD_DIR
-  - chmod 777 before_deploy.sh
+jobs:
+  include:
+    - stage: install
+    - script:
+        # Install Helm
+      - wget -q ${HELM_URL}/${HELM_TGZ}
+      - tar xzfv ${HELM_TGZ}
+      - PATH=`pwd`/linux-amd64/:$PATH
+      - helm init --client-only
+      # Install YamlLint
+      - sudo pip install yamllint=="${YAMLLINT_VERSION}"
+      - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+      # Install Go
+      - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
+      - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
+      - export  PATH=$PATH:/usr/local/go/bin
+      - make dependencies
+    - stage: test
+    - script:
+      - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
+      - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+      name: yamllint
+    - script:
+      - remark -i .remark_ignore -f -u validate-links .
+      name: remark
+      # Now load the helm dependencies
+      # Run Helm lint
+      - helm lint ./charts/pega
+      - helm lint ./charts/addons
+      # Run GO helm unit tests
+      - mkdir $TRAVIS_BUILD_DIR/terratest/bin
+      - export GOPATH=$TRAVIS_BUILD_DIR/terratest
+      - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
+      - cd terratest/src/test
+      - dep ensure
+      - go test
+      - cd addons
+      - go test
+      - cd $TRAVIS_BUILD_DIR
+      - chmod 777 before_deploy.sh
+
 before_deploy:
-  - ./before_deploy.sh  
+  - ./before_deploy.sh
   - make examples
 deploy:
   - provider: releases
