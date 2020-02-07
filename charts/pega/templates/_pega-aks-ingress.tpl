@@ -10,18 +10,20 @@ metadata:
     kubernetes.io/ingress.class: azure/application-gateway
     # Ingress annotations for aks
     appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
-    {{- if (eq .node.ingress.tls.enabled true) }}
+    {{ if ( include "ingressTlsEnabled" . ) }}
     # HTTP to HTTPS Redirect
     appgw.ingress.kubernetes.io/ssl-redirect: "true"
     {{ end }}
 spec:
-{{- if (eq .node.ingress.tls.enabled true) }}
+{{ if ( include "ingressTlsEnabled" . ) }}
+{{- if .node.ingress.tls.secretName }}
 {{ include "tlssecretsnippet" . }}
+{{ end }}
 {{ end }}
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
   # To access the below service, along with {{ .node.domain }}, traefik http port also has to be provided in the URL.
-  - host: {{ .node.ingress.domain }}
+  - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
       - backend:

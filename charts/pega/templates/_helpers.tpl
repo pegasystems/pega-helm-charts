@@ -37,7 +37,7 @@
 {{- define "tlssecretsnippet" }}
   tls:
    - hosts:
-     - {{ .node.ingress.domain }}
+     - {{ template "domainName" dict "node" .node }}
      secretName: {{ .node.ingress.tls.secretName }}
 {{- end }}
 
@@ -173,3 +173,30 @@ spec:
   domains:
     - {{ .domain }}
 {{- end -}}
+
+{{- define "domainName" }}
+  {{- if .node.ingress -}}
+  {{- if .node.ingress.domain -}}
+    {{ .node.ingress.domain }}
+  {{- end -}}
+  {{- else if .node.service.domain -}}
+    {{ .node.service.domain }}
+  {{- end -}}
+{{- end }}
+
+{{- define "eksHttpsAnnotationSnippet" }}
+    # specifies the ports that ALB used to listen on
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS": 443}]'
+    # set the redirect action to redirect http traffic into https
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+{{- end }}
+
+{{- define "ingressTlsEnabled" }}
+{{- if (.node.ingress) }}
+{{- if (.node.ingress.tls) }}
+{{- if (eq .node.ingress.tls.enabled true) }}
+true
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
