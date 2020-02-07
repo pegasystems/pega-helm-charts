@@ -11,7 +11,7 @@ traefik:
   # Set any additional Traefik parameters. These values will be used by Traefik's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
   # Set traefik.serviceType to "LoadBalancer" on gke, aks, and pks
-  serviceType: NodePort
+  serviceType: LoadBalancer
   # If enabled is set to "true", ssl will be enabled for traefik
   ssl:
     enabled: false
@@ -41,12 +41,12 @@ aws-alb-ingress-controller:
   ## Resources created by the ALB Ingress controller will be prefixed with this string
   clusterName: "YOUR_EKS_CLUSTER_NAME"
   ## Auto Discover awsRegion from ec2metadata, set this to true and omit awsRegion when ec2metadata is available.
-  autoDiscoverAwsRegion: true
+  autoDiscoverAwsRegion: false
   ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsRegion != true
   awsRegion: "YOUR_EKS_CLUSTER_REGION"
   ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
-  autoDiscoverAwsVpcID: true
+  autoDiscoverAwsVpcID: false
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
   awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
@@ -61,7 +61,7 @@ aws-alb-ingress-controller:
 
 # Replace false with true to deploy EFK.
 # Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
-deploy_efk: &deploy_efk false
+deploy_efk: &deploy_efk true
 
 elasticsearch:
   enabled: *deploy_efk
@@ -105,7 +105,7 @@ metrics-server:
   # Set this to true to install metrics-server. Follow below guidelines specific to each provider,
   # open-source Kubernetes, Openshift & EKS - mandatory to set this to true if any tier as hpa.enabled is true
   # GKE or AKS - set this to false since metrics-server is installed in the cluster by default.
-  enabled: true
+  enabled: false
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
   args:
@@ -123,7 +123,7 @@ metrics-server:
 # For AKS - set this to true.
 # EKS or GKE or K8s or Openshift - set this to false.
 ingress-azure:
-  enabled: false
+  enabled: true
   # Config of the Application Gateway created
   appgw:
     # Subscription ID of your subscription to Azure
@@ -143,5 +143,3 @@ ingress-azure:
     secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
   rbac:
     enabled: true
-  aksClusterConfiguration:
-    apiServerAddress: <API_SERVER_ADDRESS>
