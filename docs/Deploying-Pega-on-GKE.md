@@ -116,9 +116,11 @@ To use the Google Cloud Console:
 
     h. **Node pools: default-pool - Machine configuration > Machine type** - select n1-highmem-4 (4 vCPU **Cores** and 26 GB **Memory**) for a minimum deployment; however using n1-highmem-8 (8 vCPU **Cores** and 52 GB **Memory**) is suitable for deployments that will process heavier workloads.
 
+6. In **Additional features**, select **Enable Kubernetes dashboard**.
+
     The remaining fields can be left to their default values; however, if you have specific cluster requirements, update the template with your changes before proceeding.
 
-6. Scroll to the bottom of the page and click **Create**.
+7. Scroll to the bottom of the page and click **Create**.
 
 ### Creating a database resource
 
@@ -233,12 +235,12 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
+| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
-1. Save the file.
+3. Save the file.
 
 ### Deploy Pega Platform using the command line
 
@@ -251,7 +253,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 `$ cd /home/<local filepath>/gke-demo`
 
-2. Use the gcloud command to ensure you are logged into your account.
+2. To use the gcloud command to ensure you are logged into your account, enter:
 
 ```yaml
 $ gcloud info
@@ -270,11 +272,11 @@ Current Properties:
     zone: [your selected zone]
 ```
 
-3. View the status of all of your GKE clusters and verify the name of the cluster for the Pega Platform deployment.
+3. To view the status of all of your GKE clusters and verify the name of the cluster for the Pega Platform deployment, enter:
 
 `$ gcloud container clusters list`
 
-4. Download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory.
+4. To download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
     If your gcloud configuration includes the zone you chose for your cluster, you can skip adding the `-z <zone-name>` option to the command.
 
@@ -284,7 +286,7 @@ Fetching cluster endpoint and auth data.
 kubeconfig entry generated for <cluster-name>.
 ```
 
-5. View the nodes in your GKE cluster, including cluster names and status.
+5. To view the nodes in your GKE cluster, including cluster names and status, enter:
 
 ```yaml
 $ kubectl get nodes
@@ -293,60 +295,21 @@ gke-demo-default-pool-abc   Ready    <none>   3d2h   v1.13.11-gke.14
 gke-demo-default-pool-def   Ready    <none>   3d2h   v1.13.11-gke.14
 ```
 
-6. Install the Kubernetes dashboard by applying an available version on Github.
-
-```yaml
-$ kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v1.10.1/src/deploy/recommended/kubernetes-dashboard.yaml
-```
-
-7. To ensure security while using this dashboard, generate a new secret for use as an access token for the Kubernetes dashboard.
-
-```yaml
-$ kubectl -n kube-system get secret
-NAME                               TYPE                                  DATA   AGE
-...
-kubernetes-dashboard-certs         Opaque                                0      3m48s
-kubernetes-dashboard-csrf          Opaque                                1      3m47s
-kubernetes-dashboard-key-holder    Opaque                                2      3m47s
-kubernetes-dashboard-token-XYZ   kubernetes.io/service-account-token   3      3m48s
-...
-```
-
-8. Set one of the service-account secret tokens as the dashboard token.
-
-```yaml
-$ kubectl -n kube-system describe secrets kubernetes-dashboard-token-XYZ
-Name:         kubernetes-dashboard-token-XYZ
-Namespace:    kubernetes-dashboard
-Labels:       <none>
-Annotations:  kubernetes.io/service-account.name: kubernetes-dashboard
-              kubernetes.io/service-account.uid: <unique ID>
-
-Type:  kubernetes.io/service-account-token
-
-Data
-====
-ca.crt:     1115 bytes
-namespace:  20 bytes
-token:      <Unique encryption details>
-
-```
-
-9. Establish a required cluster role binding setting so that you can launch the Kubernetes dashboard.
+6. To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
 
 ```yaml
 $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 ```
 
-10. Start the proxy server for the Kubernetes dashboard.
+7. To start the proxy server for the Kubernetes dashboard, enter:
 
 `$ kubectl proxy`
 
-11. To access the Dashboard UI, open a web browser and navigate to the following URL:
+8. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
 `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
-12. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
+9. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
 
 - To use a cluster Kubeconfig access credential file: select **Kubeconfig**, navigate to your \<local filepath\>/.kube directory and select the config file. Click **SIGN IN**.
 
@@ -357,11 +320,11 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this  Linux shell open.
 
 
-13. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
+10. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
 `$ cd /home/<local filepath>/gke-demo`
 
-14. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
+11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
 ```yaml
 $ kubectl create namespace mypega-gke-demo
@@ -370,7 +333,64 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-15. Install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes).
+12. (Optional:) To support HTTPS connectivity with Pega Platform, do one of the following:
+
+- To support HTTPS connectivity with Pega Platform using a secret:
+
+  a. To must pass the appropriate certificate you created, enter:
+
+`kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
+
+For HTTPS support using a secrets file, ensure that you make the following changes in the pega.yaml file for the exposed tiers in your deployment:
+
+```yaml
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName: web-domain-certificate
+          useManagedCertificate: false
+          ssl_annotation:
+```
+
+    b. To ensure the certificate is working in the cluster, enter:
+
+`kubectl get secrets --namespace <namespace-name>`
+
+-  To support HTTPS connectivity with Pega Platform using a pre-shared certificate, you must upload the pre-shared certificate your Google Cloud project and update the pega.yaml file appropriately.
+
+   To upload the appropriate certificate your Google Cloud project, enter:
+
+`gcloud compute ssl-certificates create test-ingress-1 --certificate [FIRST_CERT_FILE] --private-key [FIRST_KEY_FILE]`
+
+For HTTPS support using a pre-shared certificate, ensure that you make the following changes in the pega.yaml file for the exposed tiers in your deployment:
+
+```yaml
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+             ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+```
+
+- To support HTTPS connectivity with Pega Platform, you configure a managed SSL certificate and associate it with the ingress by making the following changes in the pega.yaml file for the exposed tiers in your deployment:
+
+```yaml
+ingress:
+        domain: "web.dev.pega.io"
+        tls:
+          enabled: true
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+             ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+             kubernetes.io/ingress.global-static-ip-name: web-ip-address
+```
+
+13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -383,7 +403,7 @@ REVISION: 1
 
 The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-16. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
+14. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```yaml
 helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -399,9 +419,9 @@ For subsequent Helm installs, use the command `helm install mypega-gke-demo pega
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-gke-demo` deployment.
 
-17. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
+15. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
 
-18. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
+16. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
 ![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -409,11 +429,11 @@ A successful Pega deployment immediately returns details that show progress for 
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-19. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+17. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-20.  To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
+18. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
 A successful deployment does not show errors across the various workloads. The `mypega-pks-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
