@@ -25,11 +25,11 @@ provider: "k8s"
 <!-- After upgrades are documented in runbooks, use this paragraph
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install or upgrade a Pega system.
 
-For additional, required installation or upgrade parameters, see the [Installer section](#installer-settings).
+For additional, required installation or upgrade parameters, see the [Installer section](#install).
 -->
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system.
 
-For additional, required installation parameters, see the [Installer section](#installer-settings).
+For additional, required installation parameters, see the [Installer section](#install).
 
 Value             | Action
 ---               | ---
