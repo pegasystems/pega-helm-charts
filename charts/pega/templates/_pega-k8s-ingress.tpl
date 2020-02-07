@@ -14,7 +14,7 @@ metadata:
     kubernetes.io/ingress.class: traefik
 {{- end }}
 spec:
-{{- if (eq .node.ingress.tls.enabled true) }}
+{{ if ( include "ingressTlsEnabled" . ) }}
 {{- if .node.ingress.tls.secretName }}
 {{ include "tlssecretsnippet" . }}
 {{ end }}
@@ -22,7 +22,7 @@ spec:
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
   # To access the below service, along with {{ .node.domain }}, traefik http port also has to be provided in the URL.
-  - host: {{ .node.ingress.domain }}
+  - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
       - backend:

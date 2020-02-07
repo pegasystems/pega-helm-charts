@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
