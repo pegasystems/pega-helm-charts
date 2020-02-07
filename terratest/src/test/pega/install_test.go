@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"io/ioutil"
@@ -11,7 +11,7 @@ import (
 	k8sbatch "k8s.io/api/batch/v1"
 )
 
-const dbConfFileLocation = "../../../charts/pega/charts/installer/config"
+const dbConfFileLocation = PegaHelmChartPath + "/charts/installer/config"
 
 // set action execute to install
 var installTestOptions = &helm.Options{

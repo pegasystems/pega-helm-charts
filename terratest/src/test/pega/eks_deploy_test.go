@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -8,16 +8,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// TestOpenshiftPegaTierDeployment - Test case to verify the standard pega tier deployment in Openshift.
+// TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
 // Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
-func TestOpenshiftPegaTierDeployment(t *testing.T) {
+func TestPegaStandardTierDeployment(t *testing.T) {
 	// set action execute to install
 	var options = &helm.Options{
 		SetValues: map[string]string{
+			"global.provider":        "eks",
 			"global.actions.execute": "deploy",
-			"global.provider":        "openshift",
 		},
 	}
+
 	t.Parallel()
 	// Path to the helm chart we will test
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)

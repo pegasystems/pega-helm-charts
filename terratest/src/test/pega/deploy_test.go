@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -10,11 +10,11 @@ import (
 
 // TestPegaStandardTierDeployment - Test case to verify the standard pega tier deployment.
 // Standard tier deployment includes web deployment, batch deployment, stream statefulset, search service, hpa, rolling update, web services, ingresses and config maps
-func TestPegaStandardTierDeployment(t *testing.T) {
+func TestPegaStandardTierDeployment2(t *testing.T) {
 	// set action execute to install
 	var options = &helm.Options{
 		SetValues: map[string]string{
-			"global.provider":        "eks",
+			"global.provider":        "k8s",
 			"global.actions.execute": "deploy",
 		},
 	}
