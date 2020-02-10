@@ -88,7 +88,11 @@ ingress-azure:
     secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
   rbac:
     enabled: true
+```
 
+### Google (GCLB)
+
+If deploying on GKE, you can use Google Cloud Load Balancer to route your traffic.  In the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`).  All other GCLB configurations are automatic.
 
 ## Aggregated logging
 

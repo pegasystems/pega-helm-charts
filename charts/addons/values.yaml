@@ -1,17 +1,10 @@
 ---
-# Load balancer parameters
+# Traefik load balancer parameters
 # Pega deployments support the use of Traefik as the default load balancer; however, by default, 
 # Pega Platform deployments assume clients will use the load balancing tools featured in the
-# Kubernetes environment of the deployment. For each environment the default load balancer is listed:
-# Openshift: Openshift built-in load balancer.
-# EKS: AWS alb ingress controller, which works without further configuration.
-# AKS: Application Gateway - configure an Ingress Controller (AGIC) in AKS to use it.
-# GKE: Google Cloud Load Balancer (GCLB), which works without further configuration.
-# Pega recommends enabling Traefik for PKS and k8s provider.
-# To override the use of the default load balancer in AKS or GKE, you enable Traefik by setting the
-# parameter traefik.enabled: true.
-# When traefik.enabled: false (the default) the deployment ignores the remaining Traefik parameters and 
-# the deployment uses the load balancer tools featured Kubernetes environment of the deployment.
+# Kubernetes environment of the deployment. For more information, see the readme:
+# https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
+# Set traefik.enabled: true to deploy Traefik using the parameters specified below. 
 traefik:
   enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
@@ -39,9 +32,8 @@ traefik:
       cpu: 500m
       # Enter the memory limit for Traefik
       memory: 500Mi
-# Set this to true to install aws-alb-ingress-controller. Follow below guidelines specific to each provider,
-# For EKS - set this to true.
-# For GKE, AKS, PKS, k8s, or Openshift - set this to false.
+
+# When deploying on AWS EKS, set this to true to install aws-alb-ingress-controller.
 aws-alb-ingress-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
@@ -126,9 +118,7 @@ metrics-server:
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
 # - --kubelet-insecure-tls
 
-# Add required parameters for an application-gateway-ingress-controller tool for an AKS deployment and follow the guidelines specific to each provider,
-# For AKS - set this to true.
-# EKS, GKE, PKS, k8s, or Openshift - set this to false.
+# When deploying on Azure AKS, set ingress-azure.enabled to true to install the application-gateway-ingress-controller.
 ingress-azure:
   enabled: true
   # Add required details about the Application Gateway you created.
@@ -139,13 +129,13 @@ ingress-azure:
     resourceGroup: <RESOURCE_GROUP_NAME>
     # Name of the Application Gateway you created.
     name: <APPLICATION_GATEWAY_NAME>
-  # Authentication using which ingress controller authenticates with Azure Resource Manager
+  # Authentication using which ingress controller authenticates with Azure Resource Manager.
   armAuth:
     # There are two supported authentication methods:
-    # Use AAD-Pod-Identity, which adds an additional deployment on the cluster.
-    # Use Service Principal credentials: create an Active Directory Service Principal and encode with base64
-    # az ad sp create-for-rbac --sdk-auth | base64 -w0
-    # Enter the JSON into the 'secretJSON' field
+    # 1. Use AAD-Pod-Identity, which adds an additional deployment on the cluster.
+    # 2. Use Service Principal credentials to create an Active Directory Service Principal and encode 
+    #    with base64 using the below command and add the result to the `secretJSON` field.
+    #    > az ad sp create-for-rbac --sdk-auth | base64 -w0
     type: servicePrincipal
     secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
   rbac:
