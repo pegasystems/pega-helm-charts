@@ -65,7 +65,7 @@ global:
         targetPort: 8080
         # Without a load balancer, use a direct NodePort instead.
         serviceType: "NodePort"
-        
+
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com

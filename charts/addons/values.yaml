@@ -1,10 +1,10 @@
 ---
 # Traefik load balancer parameters
-# Pega deployments support the use of Traefik as the default load balancer; however, by default, 
+# Pega deployments support the use of Traefik as the default load balancer; however, by default,
 # Pega Platform deployments assume clients will use the load balancing tools featured in the
 # Kubernetes environment of the deployment. For more information, see the readme:
 # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
-# Set traefik.enabled: true to deploy Traefik using the parameters specified below. 
+# Set traefik.enabled: true to deploy Traefik using the parameters specified below.
 traefik:
   enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
@@ -85,24 +85,24 @@ kibana:
   service:
     externalPort: 80
   ingress:
-  # If enabled is set to "true", an ingress is created to access kibana.
+    # If enabled is set to "true", an ingress is created to access kibana.
     enabled: true
-  # Enter the domain name to access kibana via a load balancer.
+    # Enter the domain name to access kibana via a load balancer.
     hosts:
       - "YOUR_WEB.KIBANA.EXAMPLE.COM"
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
- # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
- # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+  # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
   elasticsearch:
     host: elastic-search-client
     buffer_chunk_limit: 250M
     buffer_queue_limit: 30
 
- # Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
- # EKS, open-source Kubernetes, Openshift - set this to true.
- # GKE or AKS - set this to false and use the native metrics-server in the cluster.
+# Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
+# EKS, open-source Kubernetes, Openshift - set this to true.
+# GKE or AKS - set this to false and use the native metrics-server in the cluster.
 metrics-server:
   enabled: false
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
@@ -133,7 +133,7 @@ ingress-azure:
   armAuth:
     # There are two supported authentication methods:
     # 1. Use AAD-Pod-Identity, which adds an additional deployment on the cluster.
-    # 2. Use Service Principal credentials to create an Active Directory Service Principal and encode 
+    # 2. Use Service Principal credentials to create an Active Directory Service Principal and encode
     #    with base64 using the below command and add the result to the `secretJSON` field.
     #    > az ad sp create-for-rbac --sdk-auth | base64 -w0
     type: servicePrincipal
