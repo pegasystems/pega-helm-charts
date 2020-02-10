@@ -207,7 +207,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 3. Save the file.
 
-### Deploy Pega Platform using the command line
+### Deploying Pega Platform using the command line
 
 A Helm installation and a Pega Platform installation are separate processes. The Helm install command uses Helm to install your deployment as directed in the Helm charts, one in the **charts\\addons** folder and one in the **charts\\pega** folder.
 
