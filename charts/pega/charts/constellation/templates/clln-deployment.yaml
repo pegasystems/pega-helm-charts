@@ -4,15 +4,18 @@ metadata:
   name: constellation
   labels:
     app: constellation
+    # component: constellation
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: constellation
+      # component: constellation
   template:
     metadata:
       labels:
         app: constellation
+        # component: constellation
     spec:
       imagePullSecrets:
       - name: regcred

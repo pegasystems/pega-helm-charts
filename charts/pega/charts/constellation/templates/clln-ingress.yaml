@@ -2,11 +2,14 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: constellation
+  annotations:
+    # Ingress class used is 'traefik'
+    kubernetes.io/ingress.class: traefik
 spec:
   rules:
   - http:
       paths:
-      - path: /
+      - path: /prweb/constellation
         backend:
           serviceName: constellation
           servicePort: 3000
