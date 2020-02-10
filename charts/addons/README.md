@@ -4,18 +4,20 @@ The addons chart installs a collection of supporting services and tools required
 
 ## Load balancer
 
+Pega Platform deployments by default assume that clients will use the load balancing tools featured in the Kubernetes environment of the deployment. The table below lists the default load balancer for each environment. Pega supports specifying the use of Traefik as a load balancer for deployments in GKE and AKS environments if you would prefer it; in these cases, use the Addon Helm chart to override the defaults. 
+
 Environment                               | Suggested load balancer
 ---                                       | ---
 Open-source Kubernetes                    | Traefik
 Red Hat Openshift                         | HAProxy (Using the `roundrobin` load balancer strategy)
 Amazon Elastic Kubernetes Service (EKS)   | Amazon Load Balancer (ALB)
-Google Kubernetes Engine (GKE)            | Traefik
+Google Kubernetes Engine (GKE)            | Google Cloud Load Balancer (GCLB)
 Pivotal Container Service (PKS)           | Traefik
-Microsoft Azure Kubernetes Service (AKS)  | Traefik
+Microsoft Azure Kubernetes Service (AKS)  | Application Gateway Ingress Controller (AGIC)
 
 ### Traefik
 
-Deploying Pega Infinity with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/helm/charts/blob/master/stable/traefik/values.yaml).
+Deploying Pega Platform with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/helm/charts/blob/master/stable/traefik/values.yaml).
 
 Example:
 
@@ -42,7 +44,7 @@ traefik:
 
 ### Amazon ALB
 
-If deploying on Amazon Elastic Kubernetes Service (EKS), you can use the native Amazon Load Balancer (ALB). Set `traefik.enabled` to `false` and `aws-alb-ingress-controller.enabled` to `true`.
+If deploying on EKS, you can use the native Amazon Load Balancer (ALB). In the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`) and enable ALB (set `aws-alb-ingress-controller.enabled` to `true`)
 
 Configuration   | Usage
 ---             | ---
@@ -67,6 +69,26 @@ aws-alb-ingress-controller:
     AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
     AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 ```
+
+### Azure AGIC
+
+If deploying on AKS, you can use an Azure Application Gateway for the deployment load balancer. After you create the Application Gateway and an ingress controller, in the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`) and enable AGIC (set `ingress-azure.enabled` to `true`).
+
+Example:
+
+```yaml
+ingress-azure:
+  enabled: true
+    appgw:
+      subscriptionId: <YOUR.SUBSCRIPTION_ID>
+      resourceGroup: <RESOURCE_GROUP_NAME>
+      name: <APPLICATION_GATEWAY_NAME>
+    armAuth:
+    type: servicePrincipal
+    secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+  rbac:
+    enabled: true
+
 
 ## Aggregated logging
 

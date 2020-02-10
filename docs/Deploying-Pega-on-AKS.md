@@ -238,7 +238,7 @@ AKS deployments require you to install Pega Platform software in an SQL database
 
 ### Creating an Application Gateway Resource
 
-Create an Application Gateway for the deployment load balancer.  After creating theApplication Gateway, note the Application Gateway name with which you created the resource. You must add this name to the Addons helm chart you configured in [your local Linux system](prepping-local-system-runbook-linux.md) or  [your local Windows 10 system](prepping-local-system-runbook-windows.md).
+Create an Application Gateway for the deployment load balancer.  After creating the Application Gateway, note the name and resource group in which you created the Application Gateway. You must add these details to the Addons helm chart you configured in [your local Linux system](prepping-local-system-runbook-linux.md) or  [your local Windows 10 system](prepping-local-system-runbook-windows.md).
 
 1. In a web browser, log in to Microsoft Azure Portal (https://portal.azure.com/)
 with your credentials.

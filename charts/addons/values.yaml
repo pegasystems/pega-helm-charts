@@ -1,41 +1,47 @@
 ---
-# Configure Traefik for load balancing:
-#   If enabled: true, Traefik is deployed automatically.
-#   If enabled: false, Traefik is not deployed and load balancing must be configured manually.
-#   Pega recommends enabling Traefik for only k8s provider.
-#   On Openshift, Traefik is ignored and Pega uses Openshift's built-in load balancer.
-#   On eks it is recommended to use aws alb ingress controller.
-#   On AKS AGIC is being used.
+# Load balancer parameters
+# Pega deployments support the use of Traefik as the default load balancer; however, by default, 
+# Pega Platform deployments assume clients will use the load balancing tools featured in the
+# Kubernetes environment of the deployment. For each environment the default load balancer is listed:
+# Openshift: Openshift built-in load balancer.
+# EKS: AWS alb ingress controller, which works without further configuration.
+# AKS: Application Gateway - configure an Ingress Controller (AGIC) in AKS to use it.
+# GKE: Google Cloud Load Balancer (GCLB), which works without further configuration.
+# Pega recommends enabling Traefik for PKS and k8s provider.
+# To override the use of the default load balancer in AKS or GKE, you enable Traefik by setting the
+# parameter traefik.enabled: true.
+# When traefik.enabled: false (the default) the deployment ignores the remaining Traefik parameters and 
+# the deployment uses the load balancer tools featured Kubernetes environment of the deployment.
 traefik:
   enabled: false
-  # Set any additional Traefik parameters. These values will be used by Traefik's helm chart.
+  # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
-  # Set traefik.serviceType to "LoadBalancer" on gke, aks, and pks
+  # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
   serviceType: LoadBalancer
-  # If enabled is set to "true", ssl will be enabled for traefik
+  # If enabled is set to "true", ssl will be enabled for Traefik
   ssl:
     enabled: false
   rbac:
     enabled: true
   service:
     nodePorts:
-      # NodePorts for traefik service.
+      # NodePorts for Traefik service.
       http: 30080
       https: 30443
   resources:
     requests:
-      # Enter the CPU Request for traefik
+      # Enter the CPU Request for Traefik
       cpu: 200m
-      # Enter the memory request for traefik
+      # Enter the memory request for Traefik
       memory: 200Mi
     limits:
-      # Enter the CPU Limit for traefik
+      # Enter the CPU Limit for Traefik
       cpu: 500m
-      # Enter the memory limit for traefik
+      # Enter the memory limit for Traefik
       memory: 500Mi
 # Set this to true to install aws-alb-ingress-controller. Follow below guidelines specific to each provider,
 # For EKS - set this to true.
-# GKE or AKS or K8s or Openshift - set this to false and enable traefik.
+# For GKE, AKS, PKS, k8s, or Openshift - set this to false.
 aws-alb-ingress-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
@@ -53,11 +59,12 @@ aws-alb-ingress-controller:
   extraEnv:
     AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
     AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+
 # Configure EFK stack for logging:
-#   For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
-#   Pega recommends deploying EFK only on k8s
-#   On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
-#   On EKS, see https://eksworkshop.com/logging/
+# For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
+# Pega recommends deploying EFK only on k8s
+# On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
+# On EKS, see https://eksworkshop.com/logging/
 
 # Replace false with true to deploy EFK.
 # Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
@@ -86,25 +93,25 @@ kibana:
   service:
     externalPort: 80
   ingress:
-    # If enabled is set to "true", an ingress is created to access kibana.
+  # If enabled is set to "true", an ingress is created to access kibana.
     enabled: true
-    # Enter the domain name to access kibana via a load balancer.
+  # Enter the domain name to access kibana via a load balancer.
     hosts:
       - "YOUR_WEB.KIBANA.EXAMPLE.COM"
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
-  # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+ # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
+ # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
   elasticsearch:
     host: elastic-search-client
     buffer_chunk_limit: 250M
     buffer_queue_limit: 30
 
+ # Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
+ # EKS, open-source Kubernetes, Openshift - set this to true.
+ # GKE or AKS - set this to false and use the native metrics-server in the cluster.
 metrics-server:
-  # Set this to true to install metrics-server. Follow below guidelines specific to each provider,
-  # open-source Kubernetes, Openshift & EKS - mandatory to set this to true if any tier as hpa.enabled is true
-  # GKE or AKS - set this to false since metrics-server is installed in the cluster by default.
   enabled: false
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
@@ -119,26 +126,26 @@ metrics-server:
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
 # - --kubelet-insecure-tls
 
-# Set this to true to install application-gateway-ingress-controller. Follow below guidelines specific to each provider,
+# Add required parameters for an application-gateway-ingress-controller tool for an AKS deployment and follow the guidelines specific to each provider,
 # For AKS - set this to true.
-# EKS or GKE or K8s or Openshift - set this to false.
+# EKS, GKE, PKS, k8s, or Openshift - set this to false.
 ingress-azure:
   enabled: true
-  # Config of the Application Gateway created
+  # Add required details about the Application Gateway you created.
   appgw:
-    # Subscription ID of your subscription to Azure
+    # Subscription ID of your Azure subscription.
     subscriptionId: <YOUR.SUBSCRIPTION_ID>
-    # Resource group in which Application Gateway is created
+    # Resource group in which you created the Application Gateway.
     resourceGroup: <RESOURCE_GROUP_NAME>
-    # Name of the Application Gateway created
+    # Name of the Application Gateway you created.
     name: <APPLICATION_GATEWAY_NAME>
   # Authentication using which ingress controller authenticates with Azure Resource Manager
   armAuth:
-    # There are two ways to authenticate - Using AAD-Pod-Identity, which adds an additional deployment on the cluster.
-    # Instead, the alternate is to use Service Principal credentials.
-    # For this, we create an Active Directory Service Principal and encode with base64
-    #     az ad sp create-for-rbac --sdk-auth | base64 -w0
-    # Feed the JSON as part of 'secretJSON' field
+    # There are two supported authentication methods:
+    # Use AAD-Pod-Identity, which adds an additional deployment on the cluster.
+    # Use Service Principal credentials: create an Active Directory Service Principal and encode with base64
+    # az ad sp create-for-rbac --sdk-auth | base64 -w0
+    # Enter the JSON into the 'secretJSON' field
     type: servicePrincipal
     secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
   rbac:
