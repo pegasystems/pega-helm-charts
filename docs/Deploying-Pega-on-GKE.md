@@ -236,7 +236,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
-| tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the entire tier.name: ”stream” tier.ingress.domain: section from the pega.yaml file.</li></ul>|
+| tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
@@ -337,7 +337,7 @@ namespace/pegaaddons created
 
 - To support HTTPS connectivity with Pega Platform using a secret:
 
-  a. To must pass the appropriate certificate you created, enter:
+To must pass the appropriate certificate you created, enter:
 
 `kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
 
@@ -345,17 +345,12 @@ For HTTPS support using a secrets file, ensure that you make the following chang
 
 ```yaml
 ingress:
-        domain: "web.dev.pega.io"
-        tls:
-          enabled: true
-          secretName: web-domain-certificate
-          useManagedCertificate: false
-          ssl_annotation:
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    secretName: web-domain-certificate
+    useManagedCertificate: false
 ```
-
-    b. To ensure the certificate is working in the cluster, enter:
-
-`kubectl get secrets --namespace <namespace-name>`
 
 -  To support HTTPS connectivity with Pega Platform using a pre-shared certificate, you must upload the pre-shared certificate your Google Cloud project and update the pega.yaml file appropriately.
 
@@ -391,7 +386,7 @@ ingress:
              kubernetes.io/ingress.global-static-ip-name: web-ip-address
 ```
 
-13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
+1.  To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
