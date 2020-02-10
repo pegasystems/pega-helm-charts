@@ -59,14 +59,18 @@ global:
   tier:
     - name: "minikube"
       nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+
       service:
-        # Enter the domain name to access web nodes via a load balancer.
-        #  e.g. web.mypega.example.com
-        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
         port: 80
         targetPort: 8080
         # Without a load balancer, use a direct NodePort instead.
         serviceType: "NodePort"
+        
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+
       # Set resource consumption to minimal levels
       replicas: 1
       cpuRequest: 200m
