@@ -378,7 +378,7 @@ ingress:
 
 - To support HTTPS connectivity with Pega Platform, you configure a managed SSL certificate and associate it with the ingress by making the following changes in the pega.yaml file for the exposed tiers in your deployment:
 
-Note: Using a static IP address is not mandatory; if you do not use it, remove teh annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
+Note: Using a static IP address is not mandatory; if you do not use it, remove the annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
 
 ```yaml
 ingress:
