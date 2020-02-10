@@ -304,7 +304,7 @@ ingress:
 
 In addition to Kubernetes secrets, on GCP you may manage your SSL certificates in GKE with two alternative methods. For more information, see the [Google Cloud documentation on SSL certificate management](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).
 
-- `Pre-shared certificate`- add the certificate to your Google Cloud project and specify the appropriate ssl annotation in the ingress section.
+- *Pre-shared certificate* - add the certificate to your Google Cloud project and specify the appropriate ssl annotation in the ingress section.
 
 Example:
 
@@ -318,7 +318,7 @@ ingress:
       ingress.gcp.kubernetes.io/pre-shared-cert: webCert
 ```
 
-- `Google-managed certificate` - Pega Platform deployments can automatically generate a GKE managed certificate when you specify the appropriate SSL annotation in the ingress section. Using a static IP address is not mandatory; if you do not use it, remove the annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
+- *Google-managed certificate* - Pega Platform deployments can automatically generate a GKE managed certificate when you specify the appropriate SSL annotation in the ingress section. Using a static IP address is not mandatory; if you do not use it, remove the annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
 
 Example:
 
@@ -334,7 +334,7 @@ ingress:
 
 ### Managing Resources
 
-You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources] for more information about how Kubernetes manages resources.
+You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
 Parameter       | Description    | Default value
 ---             | ---       | ---

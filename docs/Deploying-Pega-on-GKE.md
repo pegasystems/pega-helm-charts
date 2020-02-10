@@ -362,13 +362,11 @@ For HTTPS support using a pre-shared certificate, ensure that you make the follo
 
 ```yaml
 ingress:
-        domain: "web.dev.pega.io"
-        tls:
-          enabled: true
-          secretName:
-          useManagedCertificate: false
-          ssl_annotation:
-             ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    useManagedCertificate: false
+    ssl_annotation: ingress.gcp.kubernetes.io/pre-shared-cert: webCert
 ```
 
 - To support HTTPS connectivity with Pega Platform, you configure a managed SSL certificate and associate it with the ingress by making the following changes in the pega.yaml file for the exposed tiers in your deployment:
@@ -377,18 +375,16 @@ Note: Using a static IP address is not mandatory; if you do not use it, remove t
 
 ```yaml
 ingress:
-        domain: "web.dev.pega.io"
-        tls:
-          enabled: true
-          secretName:
-          useManagedCertificate: true
-          ssl_annotation:
-             kubernetes.io/ingress.global-static-ip-name: web-ip-address
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    useManagedCertificate: true
+    ssl_annotation: kubernetes.io/ingress.global-static-ip-name: web-ip-address
 ```
 
 1.  To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
-```yaml
+```bash
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 NAME: addons
 LAST DEPLOYED: Fri Jan  3 18:58:28 2020
@@ -401,7 +397,7 @@ The `pegaddons` namespace contains the deployment’s load balancer and the metr
 
 14. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
-```yaml
+```bash
 helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
 NAME: mypega-gke-demo
 LAST DEPLOYED: Fri Jan  3 19:00:19 2020
