@@ -47,7 +47,7 @@ The following account, resources, and application versions are required for use 
 
   - The Docker application downloaded to your local system. Log into your DockerHub account from the Docker application on your local system.
 
-- Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
+- Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes Yaml examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
@@ -235,7 +235,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
+| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. Pega supports specifying certificates for an ingress using the same methods GKE supports. Note that if you configure both secrets and pre-shared certificates on the ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates. For details, see [Using multiple SSL certificates in HTTP(s) load balancing with Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).  | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
@@ -255,7 +255,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 2. To use the gcloud command to ensure you are logged into your account, enter:
 
-```yaml
+```bash
 $ gcloud info
 Google Cloud SDK [274.x.y]
 ...
@@ -280,7 +280,7 @@ Current Properties:
 
     If your gcloud configuration includes the zone you chose for your cluster, you can skip adding the `-z <zone-name>` option to the command.
 
-```yaml
+```bash
 $ gcloud container clusters get-credentials <cluster-name> -z <zone-name>
 Fetching cluster endpoint and auth data.
 kubeconfig entry generated for <cluster-name>.
@@ -288,7 +288,7 @@ kubeconfig entry generated for <cluster-name>.
 
 5. To view the nodes in your GKE cluster, including cluster names and status, enter:
 
-```yaml
+```bash
 $ kubectl get nodes
 NAME                                             STATUS   ROLES    AGE    VERSION
 gke-demo-default-pool-abc   Ready    <none>   3d2h   v1.13.11-gke.14
@@ -297,7 +297,7 @@ gke-demo-default-pool-def   Ready    <none>   3d2h   v1.13.11-gke.14
 
 6. To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
 
-```yaml
+```bash
 $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
 ```
 
@@ -326,22 +326,22 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
 11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
-```yaml
+```bash
 $ kubectl create namespace mypega-gke-demo
 namespace/mypega-gke-demo created
 $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. (Optional:) To support HTTPS connectivity with Pega Platform, do one of the following:
+12. (Optional:) To support HTTPS connectivity with Pega Platform, you can specify certificates by using the following three methods:
 
-- To support HTTPS connectivity with Pega Platform using a secret:
+- Kubernetes secret - To pass the appropriate certificate to the ingress using a Kubernetes secret, enter:
 
-To must pass the appropriate certificate you created, enter:
+`kubectl create secret tls <secret-name> --cert \<platform>-demo\<cert.crt-file> --key \<platform>-demo\<private.key-file> --namespace <namespace-name>`
 
-`kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
+For each certificate you manage with a Kubernetes secret, ensure you associate each ingress with a unique certificate and a private key. If you configure multiple certificates, GCP recognizes the first certificate in the list as the primary certificate. If you associate both secrets and pre-shared certificates to an ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates.
 
-For HTTPS support using a secrets file, ensure that you make the following changes in the pega.yaml file for the exposed tiers in your deployment:
+To use a secrets file, make the following changes in the pega.yaml file for the exposed tiers in your deployment:
 
 ```yaml
 ingress:
@@ -352,13 +352,13 @@ ingress:
     useManagedCertificate: false
 ```
 
--  To support HTTPS connectivity with Pega Platform using a pre-shared certificate, you must upload the pre-shared certificate your Google Cloud project and update the pega.yaml file appropriately.
+- Pre-shared certificates which you have uploaded to your Google Cloud project - To upload the appropriate certificates your Google Cloud project, enter:
 
-   To upload the appropriate certificate your Google Cloud project, enter:
+`gcloud compute ssl-certificates create demo-ingress --certificate \<platform>-demo\<cert.crt-file> --private-key \<platform>-demo\<private.key-file>`
 
-`gcloud compute ssl-certificates create test-ingress-1 --certificate [FIRST_CERT_FILE] --private-key [FIRST_KEY_FILE]`
+For each pre-shared certificate you add to your Google Cloud project, ensure you associate each ingress with a unique certificate and a private key. If you configure multiple pre-shared certificates in your GCP project, GCP recognizes the first certificate in the list as the primary certificate. If you associate both secrets and pre-shared certificates to an ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates.
 
-For HTTPS support using a pre-shared certificate, ensure that you make the following changes in the pega.yaml file for the exposed tiers in your deployment:
+To use the pre-shared certificate, make the following changes in the pega.yaml file for the exposed tiers in your deployment:
 
 ```yaml
 ingress:
@@ -366,12 +366,12 @@ ingress:
   tls:
     enabled: true
     useManagedCertificate: false
-    ssl_annotation: ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+    ssl_annotation: ingress.gcp.kubernetes.io/pre-shared-cert: demo-ingress
 ```
 
-- To support HTTPS connectivity with Pega Platform, you configure a managed SSL certificate and associate it with the ingress by making the following changes in the pega.yaml file for the exposed tiers in your deployment:
+- Google-managed SSL certificate. Make the following changes in the pega.yaml file for the exposed tiers in your deployment:
 
-Note: Using a static IP address is not mandatory; if you do not use it, remove the annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
+Note: Using a static IP address is not mandatory; if you do not use one, remove the ssl_annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using the ssl_annotation.
 
 ```yaml
 ingress:
@@ -382,7 +382,7 @@ ingress:
     ssl_annotation: kubernetes.io/ingress.global-static-ip-name: web-ip-address
 ```
 
-1.  To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
+13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
 ```bash
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml

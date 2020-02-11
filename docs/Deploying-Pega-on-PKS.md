@@ -285,7 +285,7 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
 11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
-```yaml
+```bash
 $ kubectl create namespace mypega-pks-demo
 namespace/mypega-pks-demo created
 $ kubectl create namespace pegaaddons
@@ -304,7 +304,7 @@ For HTTPS support, you must set `tier.ingress.tls.enabled:true` and then referen
 
 14. To install the addons chart, which you updated in [Preparing your local system](#prepare-your-resources--45-minutes), enter:
 
-```yaml
+```bash
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
@@ -312,7 +312,7 @@ The `pegaddons` namespace contains the deployment’s load balancer and the metr
 
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
-```yaml
+```bash
 helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
 ```
 

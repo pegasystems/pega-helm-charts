@@ -431,7 +431,7 @@ If you cannot log into your Azure home page or see that the Azure CLI does not r
 
 6. To prepare your environment using the Azure CLI, enter:
 
-```yaml
+```bash
 $ az aks get-credentials --resource-group <resource-group-name> --name <cluster-name>
 Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube\config
 ```
@@ -468,7 +468,7 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
-```yaml
+```bash
 $ kubectl create namespace mypega
 namespace/mypega created
 $ kubectl create namespace pegaaddons
@@ -487,7 +487,7 @@ For HTTPS support, you must set `tier.ingress.tls.enabled:true` and then referen
 
 14. To install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--60-minutes), enter:
 
-```yaml
+```bash
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
@@ -495,7 +495,7 @@ The `pegaddons` namespace contains the deployment’s load balancer and the metr
 
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
-```yaml
+```bash
 helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
