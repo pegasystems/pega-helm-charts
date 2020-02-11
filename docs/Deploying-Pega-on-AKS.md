@@ -255,7 +255,7 @@ with your credentials.
 
    c. In **Configure virtual network**, select the Virtual Network in which you created your cluster, then select a different subnet from the one you selected for cluster.
 
-   `Note: Select the same subnet is not supported and results in an error.`
+   `Note: Selecting the same subnet in this field is not supported and results in an error.`
 
    d. Click **Next: Frontends.**
 
