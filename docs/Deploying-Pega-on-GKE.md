@@ -289,10 +289,10 @@ kubeconfig entry generated for <cluster-name>.
 5. To view the nodes in your GKE cluster, including cluster names and status, enter:
 
 ```bash
-$ kubectl get nodes
-NAME                                             STATUS   ROLES    AGE    VERSION
-gke-demo-default-pool-abc   Ready    <none>   3d2h   v1.13.11-gke.14
-gke-demo-default-pool-def   Ready    <none>   3d2h   v1.13.11-gke.14
+    $ kubectl get nodes
+    NAME                                             STATUS   ROLES    AGE    VERSION
+    gke-demo-default-pool-abc   Ready    <none>   3d2h   v1.13.11-gke.14
+    gke-demo-default-pool-def   Ready    <none>   3d2h   v1.13.11-gke.14
 ```
 
 6. To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
@@ -303,11 +303,11 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
 7. To start the proxy server for the Kubernetes dashboard, enter:
 
-`$ kubectl proxy`
+    `$ kubectl proxy`
 
 8. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
-`http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
+    `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
 9. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
 
@@ -322,22 +322,22 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
 10. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
-`$ cd /home/<local filepath>/gke-demo`
+    `$ cd /home/<local filepath>/gke-demo`
 
 11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
 ```bash
-$ kubectl create namespace mypega-gke-demo
-namespace/mypega-gke-demo created
-$ kubectl create namespace pegaaddons
-namespace/pegaaddons created
+    $ kubectl create namespace mypega-gke-demo
+    namespace/mypega-gke-demo created
+    $ kubectl create namespace pegaaddons
+    namespace/pegaaddons created
 ```
 
 12. (Optional:) To support HTTPS connectivity with Pega Platform, you can specify certificates by using the following three methods:
 
 - Kubernetes secret - To pass the appropriate certificate to the ingress using a Kubernetes secret, enter:
 
-`kubectl create secret tls <secret-name> --cert \<platform>-demo\<cert.crt-file> --key \<platform>-demo\<private.key-file> --namespace <namespace-name>`
+    `$ kubectl create secret tls <secret-name> --cert \<platform>-demo\<cert.crt-file> --key \<platform>-demo\<private.key-file> --namespace <namespace-name>`
 
 For each certificate you manage with a Kubernetes secret, ensure you associate each ingress with a unique certificate and a private key. If you configure multiple certificates, GCP recognizes the first certificate in the list as the primary certificate. If you associate both secrets and pre-shared certificates to an ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates.
 
@@ -348,13 +348,13 @@ ingress:
   domain: "web.dev.pega.io"
   tls:
     enabled: true
-    secretName: web-domain-certificate
+    secretName: <secret-name>
     useManagedCertificate: false
 ```
 
 - Pre-shared certificates which you have uploaded to your Google Cloud project - To upload the appropriate certificates your Google Cloud project, enter:
 
-`gcloud compute ssl-certificates create demo-ingress --certificate \<platform>-demo\<cert.crt-file> --private-key \<platform>-demo\<private.key-file>`
+    `$ gcloud compute ssl-certificates create demo-ingress --certificate \<platform>-demo\<cert.crt-file> --private-key \<platform>-demo\<private.key-file>`
 
 For each pre-shared certificate you add to your Google Cloud project, ensure you associate each ingress with a unique certificate and a private key. If you configure multiple pre-shared certificates in your GCP project, GCP recognizes the first certificate in the list as the primary certificate. If you associate both secrets and pre-shared certificates to an ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates.
 
@@ -385,12 +385,12 @@ ingress:
 13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
 ```bash
-$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
-NAME: addons
-LAST DEPLOYED: Fri Jan  3 18:58:28 2020
-NAMESPACE: pegaaddons
-STATUS: deployed
-REVISION: 1
+    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+    NAME: addons
+    LAST DEPLOYED: Fri Jan  3 18:58:28 2020
+    NAMESPACE: pegaaddons
+    STATUS: deployed
+    REVISION: 1
 ```
 
 The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
@@ -398,13 +398,13 @@ The `pegaddons` namespace contains the deployment’s load balancer and the metr
 14. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
-helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
-NAME: mypega-gke-demo
-LAST DEPLOYED: Fri Jan  3 19:00:19 2020
-NAMESPACE: mypega-gke-demo
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
+    $ helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
+    NAME: mypega-gke-demo
+    LAST DEPLOYED: Fri Jan  3 19:00:19 2020
+    NAMESPACE: mypega-gke-demo
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
 ```
 
 For subsequent Helm installs, use the command `helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo` to deploy Pega Platform and avoid another Pega Platform installation.

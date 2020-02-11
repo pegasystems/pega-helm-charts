@@ -406,11 +406,11 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 - Open a Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Preparing your local Linux system](prepping-local-system-runbook-linux.md).
 
-`$ cd /home/<local filepath>/aks-demo`
+    `$ cd /home/<local filepath>/aks-demo`
 
 2. To use the Azure CLI to log into your account, enter:
 
-`$ az login`
+    `$ az login`
 
 A new web browser window opens, which prompts you to log into your Azure account.
 
@@ -438,17 +438,17 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 7. To use the kubectl command to view the VM nodes created when you created the AKS cluster, enter:
 
-`$ kubectl get nodes`
+    `$ kubectl get nodes`
 
 ![](media/3a59b1ecf9d827e0003d46880029cdd8.png)
 
 8. To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
 
-`$ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard`
+    `$ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard`
 
 9. To launch the Kubernetes dashboard to view your AKS resources before you deploy Pega Platform by replacing the names specific to your AKS cluster, enter:
 
-`$ az aks browse --resource-group <resource-group-name> --name <cluster-name>`
+    `$ az aks browse --resource-group <resource-group-name> --name <cluster-name>`
 
 ![](media/81a7ae961cabc463381869e3bae5c722.png)
 
@@ -460,35 +460,44 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
 - Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your aks-demo folder that you created in [Create a local folder to access all of the configuration files](prepping-local-system-runbook-windows.md#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
-`$ cd \<local filepath>\aks-demo`
+    `$ cd \<local filepath>\aks-demo`
 
 - Open a new Linux bash shell and change the location to the top folder of your aks-demo directory that you created in [Create a local folder to access all of the configuration files](prepping-local-system-runbook-linux.md#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
-`$ cd /home/<local filepath>/aks-demo`
+    `$ cd /home/<local filepath>/aks-demo`
 
 11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
 ```bash
-$ kubectl create namespace mypega
-namespace/mypega created
-$ kubectl create namespace pegaaddons
-namespace/pegaaddons created
+    $ kubectl create namespace mypega
+    namespace/mypega created
+    $ kubectl create namespace pegaaddons
+    namespace/pegaaddons created
 ```
 
-12. (Optional: To support HTTPS connectivity with Pega Platform) To pass the appropriate SSL certificate you created using a secret, enter:
+12. (Optional: To support HTTPS connectivity with Pega Platform) To pass the appropriate certificate to the ingress using a Kubernetes secret, enter:
 
-`kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
+    `$ kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
 
-For HTTPS support, you must set `tier.ingress.tls.enabled:true` and then reference this secret in the pega.yaml file in the `tier.ingress.tls.secretName` parameter for the exposed "web" or "stream" nodes in your deployment.
+To use a secrets file, make the following changes in the pega.yaml file for the exposed tiers in your deployment:
+
+```yaml
+ingress:
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    secretName: <secret-name>
+    useManagedCertificate: false
+```
 
 13. To ensure the certificate is working in the cluster, enter:
 
-`kubectl get secrets --namespace <namespace-name>`
+    `$ kubectl get secrets --namespace <namespace-name>`
 
 14. To install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--60-minutes), enter:
 
 ```bash
-$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
 The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
@@ -496,7 +505,7 @@ The `pegaddons` namespace contains the deployment’s load balancer and the metr
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
-helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
+    $ helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
 For subsequent Helm installs, use the command `helm install mypega pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
