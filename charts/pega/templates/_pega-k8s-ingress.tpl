@@ -15,14 +15,14 @@ spec:
   - host: {{ .node.service.domain }}
     http:
       paths: 
-      - path: {{ .paths }}     
+      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true)}}
+      - path: /prweb/constellation     
         backend:
+          serviceName: constellation
+          servicePort: 3000
+      {{ end }}
+      - backend: 
           serviceName: {{ .name }} 
           servicePort: {{ .node.service.port }}
-      - path: /prweb
-        backend:
-          serviceName: {{ .name }}
-          servicePort: {{ .node.service.port }}
-    
 ---     
 {{- end }}
