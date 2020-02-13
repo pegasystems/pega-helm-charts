@@ -33,8 +33,10 @@ script:
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
   - dep ensure
-  - go test test/pega
-  - go test test/addons
+  # grep -v command.go:158 - hack for filter unnecessary logs. 
+  # It's needed because of lack ability to disable debug output in terratest for helm chart
+  - go test test/pega | grep -v command.go:158
+  - go test test/addons | grep -v command.go:158
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
