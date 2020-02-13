@@ -38,6 +38,4 @@ data:
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
-  # Pass constellation URL as a Dynamic System Setting property of Pega Infinity.
-  # NODE_SETTINGS: "PEGA-UIENGINE/CONSTELLATIONSVCURL=/prweb/constellation"
 {{ end }}

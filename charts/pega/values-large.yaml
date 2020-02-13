@@ -83,10 +83,11 @@ global:
         port: 80
         targetPort: 8080
 
-      paths: "YOUR_CONSTELLATION_PATH_HERE"
+
       replicas: 1
-      javaOpts: ""
+      # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
       nodeSettings: "PEGA-UIENGINE/CONSTELLATIONSVCURL=/prweb/constellation"
+      javaOpts: ""
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 

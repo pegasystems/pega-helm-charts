@@ -1,3 +1,5 @@
+#Deploy only when the constellation flag has been enabled in the values yaml.
+{{ if and .Values.enabled (eq .Values.enabled true) }}
 apiVersion: v1
 kind: Service
 metadata:
@@ -17,3 +19,4 @@ spec:
   type: NodePort
   #externalIPs:
   #  - 3.216.78.82
+{{ end }}

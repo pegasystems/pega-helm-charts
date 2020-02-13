@@ -86,7 +86,7 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
-{{- if .node.nodeSettings }}
+{{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: NODE_SETTINGS
           value: "{{ .node.nodeSettings }}"
 {{- end }}

@@ -15,7 +15,7 @@ spec:
   - host: {{ .node.service.domain }}
     http:
       paths: 
-      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true)}}
+      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) (eq .node.nodeType "WebUser") }}
       - path: /prweb/constellation     
         backend:
           serviceName: constellation

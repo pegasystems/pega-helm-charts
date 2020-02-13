@@ -89,6 +89,8 @@ global:
       memRequest: "6Gi"
       cpuLimit: 2
       memLimit: "8Gi"
+      # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
+      nodeSettings: "PEGA-UIENGINE/CONSTELLATIONSVCURL=/prweb/constellation"
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "7168m"
