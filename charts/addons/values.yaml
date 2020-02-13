@@ -104,7 +104,7 @@ metrics-server:
   # Set this to true to install metrics-server. Follow below guidelines specific to each provider,
   # open-source Kubernetes, Openshift & EKS - mandatory to set this to true if any tier as hpa.enabled is true
   # GKE or AKS - set this to false since metrics-server is installed in the cluster by default.
-  enabled: false
+  enabled: true
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
   # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
   args:
