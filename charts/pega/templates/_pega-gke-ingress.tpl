@@ -10,7 +10,7 @@ metadata:
   {{ if (eq .node.ingress.tls.enabled true) }}
   annotations:
     kubernetes.io/ingress.allow-http: "false"
-  {{ if (eq .node.ingress.tls.useManagedCertificate true) }}
+  {{ if (.node.ingress.tls.useManagedCertificate) }}
     networking.gke.io/managed-certificates: managed-certificate-{{ .node.name }}
   {{ end }}
   {{ if (.node.ingress.tls.ssl_annotation) }}
