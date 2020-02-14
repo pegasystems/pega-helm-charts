@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"path/filepath"
@@ -7,8 +7,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 )
-
-const PegaHelmChartPath = "../../../charts/pega"
 
 // TestInvalidAction - Tests in valid action correctly rendering error
 func TestInvalidAction(t *testing.T) {

@@ -13,7 +13,7 @@ metadata:
     haproxy.router.openshift.io/timeout: 2m
 spec:
   # Host on which you can reach mentioned service.
-  host: {{ .node.service.domain }}
+  host: {{ template "domainName" dict "node" .node }}
   to:
     kind: Service
     # Name of the service associated with the route
