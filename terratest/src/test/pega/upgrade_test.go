@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"testing"
@@ -8,9 +8,6 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	k8sbatch "k8s.io/api/batch/v1"
 )
-
-// Path to the helm chart we will test
-const pegaHelmChartPath = "../../../charts/pega"
 
 // set action execute to install
 var options = &helm.Options{
@@ -23,7 +20,7 @@ var options = &helm.Options{
 
 // VerifyUpgradeActionShouldNotRenderDeployments - Tests all the skipped templates for action upgrade. These templates not supposed to be rendered for upgrade action.
 func VerifyUpgradeActionSkippedTemplates(t *testing.T) {
-	output := helm.RenderTemplate(t, options, pegaHelmChartPath, []string{
+	output := helm.RenderTemplate(t, options, PegaHelmChartPath, []string{
 		"templates/pega-action-validate.yaml",
 		"charts/installer/templates/pega-installer-role.yaml",
 		"templates/pega-environment-config.yaml",
@@ -48,7 +45,7 @@ func VerifyUpgradeActionSkippedTemplates(t *testing.T) {
 // VerifyUpgradeActionInstallJob - Tests upgrade job yaml rendered with the values as provided in default values.yaml
 func VerifyUpgradeActionInstallJob(t *testing.T) {
 	var upgradeJobObj k8sbatch.Job
-	var upgradeSlice = ReturnJobSlices(t, pegaHelmChartPath, options)
+	var upgradeSlice = ReturnJobSlices(t, PegaHelmChartPath, options)
 	helm.UnmarshalK8SYaml(t, upgradeSlice[1], &upgradeJobObj)
 	VerifyPegaJob(t, options, &upgradeJobObj, pegaJob{"pega-db-upgrade", []string{}, "pega-upgrade-environment-config"})
 }
@@ -57,8 +54,8 @@ func VerifyUpgradeActionInstallJob(t *testing.T) {
 func TestUpgradeActions(t *testing.T) {
 	VerifyUpgradeActionSkippedTemplates(t)
 	VerifyUpgradeActionInstallJob(t)
-	VerifyUpgradeEnvConfig(t, options, pegaHelmChartPath)
-	VerfiyRegistrySecret(t, pegaHelmChartPath, options)
-	VerifyCredentialsSecret(t, pegaHelmChartPath, options)
-	VerifyInstallerConfigMaps(t, options, pegaHelmChartPath)
+	VerifyUpgradeEnvConfig(t, options, PegaHelmChartPath)
+	VerfiyRegistrySecret(t, PegaHelmChartPath, options)
+	VerifyCredentialsSecret(t, PegaHelmChartPath, options)
+	VerifyInstallerConfigMaps(t, options, PegaHelmChartPath)
 }

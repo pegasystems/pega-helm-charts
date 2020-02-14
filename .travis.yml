@@ -33,15 +33,11 @@ script:
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
   - dep ensure
-  - go test deploy_test.go common_utility.go deployment_utility.go
-  - go test install_test.go common_utility.go installer_utility.go
-  - go test install_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test upgrade_test.go common_utility.go installer_utility.go
-  - go test upgrade_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test aks_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test eks_deploy_test.go common_utility.go deployment_utility.go
-  - go test openshift_test.go common_utility.go deployment_utility.go
-  - go test invalidAction_test.go
+  # grep -v command.go:158 - hack for filter unnecessary logs. 
+  # It's needed because of lack ability to disable debug output in terratest for helm chart
+  #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
+  - go test test/pega | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
+  - go test test/addons | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:

@@ -10,6 +10,22 @@
   version = "v0.46.3"
 
 [[projects]]
+  digest = "1:c0952fb3cf9506cff577b4edf4458889570dcbd2902a7b90a1fd96bfbb97ccd8"
+  name = "github.com/PuerkitoBio/purell"
+  packages = ["."]
+  pruneopts = ""
+  revision = "44968752391892e1b0d0b821ee79e9a85fa13049"
+  version = "v1.1.1"
+
+[[projects]]
+  branch = "master"
+  digest = "1:331a419049c2be691e5ba1d24342fc77c7e767a80c666a18fd8a9f7b82419c1c"
+  name = "github.com/PuerkitoBio/urlesc"
+  packages = ["."]
+  pruneopts = ""
+  revision = "de5bf2ad457846296e2031421a34e2568e304e35"
+
+[[projects]]
   digest = "1:22638c997ebbea4c106a0ea7457f62395cfe6be66fad93c1c98a79f985655e07"
   name = "github.com/aws/aws-sdk-go"
   packages = [
@@ -112,6 +128,17 @@
   revision = "6480d4af844c189cf5dd913db24ddd339d3a4f85"
 
 [[projects]]
+  digest = "1:03a98f5067540d81c4a163b21279c4ce5f158b78e9409921110635d2d7cb603d"
+  name = "github.com/emicklei/go-restful"
+  packages = [
+    ".",
+    "log",
+  ]
+  pruneopts = ""
+  revision = "99f05a26a0a1c71e664ebe6a76d29b2c80333056"
+  version = "v2.11.1"
+
+[[projects]]
   digest = "1:b13707423743d41665fd23f0c36b2f37bb49c30e94adb813319c44188a51ba22"
   name = "github.com/ghodss/yaml"
   packages = ["."]
@@ -126,6 +153,38 @@
   packages = ["."]
   pruneopts = ""
   revision = "d98b870cc4e05f1545532a80e9909be8216095b6"
+
+[[projects]]
+  digest = "1:47688961daa2895c860642608d671822b7b53fed1e3e3e2d46506f01dcddaae3"
+  name = "github.com/go-openapi/jsonpointer"
+  packages = ["."]
+  pruneopts = ""
+  revision = "ed123515f087412cd7ef02e49b0b0a5e6a79a360"
+  version = "v0.19.3"
+
+[[projects]]
+  digest = "1:69c513ad15614075cbb474bc636fbb901aa3e9273a6da3d583df76fa62ec83d3"
+  name = "github.com/go-openapi/jsonreference"
+  packages = ["."]
+  pruneopts = ""
+  revision = "82f31475a8f7a12bc26962f6e26ceade8ea6f66a"
+  version = "v0.19.3"
+
+[[projects]]
+  digest = "1:e06e05a14a9ef6d2efe6f558daa3015780dd298a794c73593be48bda250dc703"
+  name = "github.com/go-openapi/spec"
+  packages = ["."]
+  pruneopts = ""
+  revision = "772572fd19ebcc983369e53bfaed4bde2077fe0c"
+  version = "v0.19.5"
+
+[[projects]]
+  digest = "1:0491ae08e62617f50df181a7be17e57d091212df8aa1656b672698c36222cade"
+  name = "github.com/go-openapi/swag"
+  packages = ["."]
+  pruneopts = ""
+  revision = "8a84ec635f1b280a7062edeab609f0667a053248"
+  version = "v0.19.6"
 
 [[projects]]
   digest = "1:e692d16fdfbddb94e9e4886aaf6c08bdbae5cb4ac80651445de9181b371c6e46"
@@ -277,6 +336,18 @@
   pruneopts = ""
   revision = "27518f6661eba504be5a7a9a9f6d9460d892ade3"
   version = "v1.1.7"
+
+[[projects]]
+  digest = "1:263db331ad7732d9d1e45003031dd3d6295c0c4be232f99596dde34fa51e3df9"
+  name = "github.com/mailru/easyjson"
+  packages = [
+    "buffer",
+    "jlexer",
+    "jwriter",
+  ]
+  pruneopts = ""
+  revision = "1b2b06f5f209fea48ff5922d8bfb2b9ed5d8f00b"
+  version = "v0.7.0"
 
 [[projects]]
   digest = "1:6dbb0eb72090871f2e58d1e37973fe3cb8c0f45f49459398d3fc740cb30e13bd"
@@ -460,6 +531,7 @@
     "unicode/cldr",
     "unicode/norm",
     "unicode/rangetable",
+    "width",
   ]
   pruneopts = ""
   revision = "342b2e1fbaa52c93f31447ad2c6abc048c63e475"
@@ -665,6 +737,25 @@
   revision = "386e588352a49a5c8dc7632348278569d4f57419"
 
 [[projects]]
+  digest = "1:700e189a56a6247e50fe547c746648966309837e9fc3877270f178b6afedd168"
+  name = "k8s.io/ingress-gce"
+  packages = [
+    "pkg/apis/backendconfig",
+    "pkg/apis/backendconfig/v1beta1",
+  ]
+  pruneopts = ""
+  revision = "e4201e49ca197573e2a319cbb9fbb595ded31a31"
+  version = "v1.8.0"
+
+[[projects]]
+  branch = "master"
+  digest = "1:8cfc784e07fcfb5d366d1c334b68e535955fa9b8dcde6fe2f5de52e84f47f6ee"
+  name = "k8s.io/kube-openapi"
+  packages = ["pkg/common"]
+  pruneopts = ""
+  revision = "bf4fb3bd569c8c84504d856598edbc66c10d8744"
+
+[[projects]]
   digest = "1:7984928b646fbf09508938db5e464ec828cc3ae8afb75f8ac99cdaad658da418"
   name = "k8s.io/kubernetes"
   packages = [
@@ -688,8 +779,11 @@
     "k8s.io/api/core/v1",
     "k8s.io/api/extensions/v1beta1",
     "k8s.io/api/rbac/v1",
+    "k8s.io/apimachinery/pkg/apis/meta/v1",
     "k8s.io/apimachinery/pkg/util/intstr",
+    "k8s.io/ingress-gce/pkg/apis/backendconfig/v1beta1",
     "k8s.io/kubernetes/pkg/apis/autoscaling",
+    "k8s.io/kubernetes/pkg/apis/core",
   ]
   solver-name = "gps-cdcl"
   solver-version = 1

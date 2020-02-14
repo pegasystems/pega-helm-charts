@@ -200,14 +200,14 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-| tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
-| tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
+| tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
+| tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>Your stream tier hostname should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
-1. Save the file.
+3. Save the file.
 
-### Deploy Pega Platform using the command line
+### Deploying Pega Platform using the command line
 
 A Helm installation and a Pega Platform installation are separate processes. The Helm install command uses Helm to install your deployment as directed in the Helm charts, one in the **charts\\addons** folder and one in the **charts\\pega** folder.
 
@@ -218,50 +218,50 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-`$ cd <local filepath>\pks-demo`
+    `$ cd <local filepath>\pks-demo`
 
 - Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
-`$ cd /home/<local filepath>/pks-demo`
+    `$ cd /home/<local filepath>/pks-demo`
 
-2. Use the PKS CLI to log into your account using the Pivotal-provided API and login credentials and skip SSL validation.
+2. To use the PKS CLI to log into your account using the Pivotal-provided API and login credentials and skip SSL validation, enter:
 
-`$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
+    `$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
 
 If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
 
-3. View the status of all of your PKS clusters and verify the name of the cluster for the Pega Platform deployment.
+3. To view the status of all of your PKS clusters and verify the name of the cluster for the Pega Platform deployment, enter:
 
-`$ pks clusters`
+    `$ pks clusters`
 
 Your cluster name is displayed in the **Name** field.
 
-4. To use the PKS CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory.
+4. To use the PKS CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-$ pks get-credentials <cluster-name>`
-Fetching credentials for cluster pega-platform.
-Context set for cluster pega-platform.
+    $ pks get-credentials <cluster-name>`
+    Fetching credentials for cluster pega-platform.
+    Context set for cluster pega-platform.
 ```
 
 If you need to use a Bearer Token Access Credentials instead of this credential file, see the Pivotal document, [Accessing Dashboard](https://docs.pivotal.io/pks/1-3/access-dashboard.html).
 
-5. To use the kubectl command to view the VM nodes, including cluster names and status.
+5. To use the kubectl command to view the VM nodes, including cluster names and status, enter:
 
-`$ kubectl get nodes`
+    `$ kubectl get nodes`
 
-6. Establish a required cluster role binding setting so that you can launch the Kubernetes dashboard.
+6. To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
 
 `$ kubectl create clusterrolebinding dashboard-admin -n kube-system
 --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard`
 
-7. Start the proxy server for the Kubernetes dashboard.
+7. To start the proxy server for the Kubernetes dashboard, enter:
 
-`$ kubectl proxy`
+    `$ kubectl proxy`
 
 8. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
-`http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
+    `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
 9. In the **Kubernetes Dashboard** sign in window, choose the appropriate sign in method:
 
@@ -277,42 +277,61 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
 - Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder.
 
-`$ cd <local filepath>\pks-demo`
+    `$ cd <local filepath>\pks-demo`
 
 - Open a new Linux bash shell and change the location to the top folder of your pks-demo directory.
 
-`$ cd /home/<local filepath>/pks-demo`
+    `$ cd /home/<local filepath>/pks-demo`
 
-11. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
+11. To create namespaces in preparation for the pega.yaml and addons.yaml deployments, enter:
 
-```yaml
-$ kubectl create namespace mypega-pks-demo
-namespace/mypega-pks-demo created
-$ kubectl create namespace pegaaddons
-namespace/pegaaddons created
+```bash
+    $ kubectl create namespace mypega-pks-demo
+    namespace/mypega-pks-demo created
+    $ kubectl create namespace pegaaddons
+    namespace/pegaaddons created
 ```
 
-1.  Install the addons chart, which you updated in [Preparing your local system](#prepare-your-resources--45-minutes).
+12. (Optional: To support HTTPS connectivity with Pega Platform) To pass the appropriate certificate to the ingress using a Kubernetes secret, enter:
+
+    `$ kubectl create secret tls <secret-name> --cert <cert.crt-file> --key <private.key-file> --namespace <namespace-name>`
+
+    To use a secrets file, make the following changes in the pega.yaml file for the exposed tiers in your deployment:
 
 ```yaml
-$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+ingress:
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    secretName: <secret-name>
+    useManagedCertificate: false
+```
+
+13. To ensure the certificate is working in the cluster, enter:
+
+    `$ kubectl get secrets --namespace <namespace-name>`
+
+14. To install the addons chart, which you updated in [Preparing your local system](#prepare-your-resources--45-minutes), enter:
+
+```bash
+    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
 The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-13. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
+15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
-```yaml
-helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
+```bash
+    $ helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
 For subsequent Helm installs, use the command `helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo` to deploy Pega Platform and avoid another Pega Platform installation.
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-pks-demo` deployment.
 
-14. Refresh the Kubernetes dashboard that you opened in step 8. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 7, and relaunch the web browser as directed in Step 8.
+16. Refresh the Kubernetes dashboard that you opened in step 8. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 7, and relaunch the web browser as directed in Step 8.
 
-15. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
+17. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
 ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -320,11 +339,11 @@ A successful Pega deployment immediately returns details that show progress for 
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+18. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-pks-demo` namespace pods.
+19. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-pks-demo` namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
