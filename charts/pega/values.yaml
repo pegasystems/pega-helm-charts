@@ -90,7 +90,7 @@ global:
         domain: "YOUR_WEB_NODE_DOMAIN"
         tls:
           # Enable TLS encryption
-          enabled: false
+          enabled: true
           # secretName:
           # useManagedCertificate: false
           # ssl_annotation:
