@@ -91,9 +91,9 @@ global:
         tls:
           # Enable TLS encryption
           enabled: false
-          #secretName:
-          #useManagedCertificate: false
-          #ssl_annotation:
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       replicas: 1
       javaOpts: ""
@@ -142,15 +142,14 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
-      # Uncomment to expose the stream service for external access
-      #service:
-      #  port: 7003
-      #  targetPort: 7003
-      #
-      #ingress:
-      #  # Enter the domain name to access web nodes via a load balancer.
-      #  #  e.g. web.mypega.example.com
-      #  domain: "YOUR_STREAM_NODE_DOMAIN"
+      service:
+        port: 7003
+        targetPort: 7003
+
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_STREAM_NODE_DOMAIN"
 
       replicas: 2
       cpuRequest: 200m
