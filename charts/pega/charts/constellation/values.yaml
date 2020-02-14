@@ -1,12 +1,12 @@
 ---
 # Parameters for Constellation operation:
-#   Docker repos and tag for image
+# Docker repos and tag for image
 # dockerRepos: local/constellationui/service:v2
 # dockerRepos: meshbincam.pega.com:7000/constellationui/service
 dockerRepos: YOUR_IMAGE_HERE
-#   Url (protocol+host) for Infinity cluster - used for REST calls
-#infinityUrl: http://1.2.3.4:5678/prweb/
+# Url (protocol+host) for Infinity cluster - used for REST calls
+# infinityUrl: http://1.2.3.4:5678/prweb/
 infinityUrl: YOUR_WEB_NODE_DOMAIN:30080/prweb/
-#   log level : error, warn, info, debug.  use error for production
+# log level : error, warn, info, debug.  use error for production
 logLevel: info
 enabled: false
