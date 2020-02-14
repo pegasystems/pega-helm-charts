@@ -38,7 +38,9 @@ func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
 }
 
 func Test_shouldContainCommandArgs(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(common.NewHelmTest(t, helmChartRelativePath, map[string]string{}))
+	helmChartParser := common.NewHelmConfigParser(common.NewHelmTest(t, helmChartRelativePath, map[string]string{
+		"metrics-server.enabled": "true",
+	}))
 
 	var deployment *v1.Deployment
 	helmChartParser.Find(common.SearchResourceOption{
