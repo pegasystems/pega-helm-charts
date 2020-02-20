@@ -10,9 +10,10 @@ metadata:
     # leastconn: The endpoint with the lowest number of connections receives the request.
     # source: The source IP address is hashed and divided by the total weight of the running servers to designate which server will receive the request.
     haproxy.router.openshift.io/balance: roundrobin
+    haproxy.router.openshift.io/timeout: 2m
 spec:
   # Host on which you can reach mentioned service.
-  host: {{ .node.service.domain }}
+  host: {{ template "domainName" dict "node" .node }}
   to:
     kind: Service
     # Name of the service associated with the route

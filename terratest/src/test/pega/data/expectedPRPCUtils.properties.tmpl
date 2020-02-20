@@ -29,7 +29,9 @@ user.temp.dir=/opt/pega/temp
 ############################### SETTINGS FOR CHANGING DYNAMIC SYSTEM SETTINGS ########
 ######################################################################################
 dass.filepath=/opt/pega/kit/scripts/upgrade_dass_settings.json
-# Load from filesystem if BYPASS_LOAD_ENGINE_CLASSES is set to true
+
+# Load from filesystem if BYPASS_LOAD_ENGINE_CLASSES is true
+>>>>>>> d2b08c547fa10ff2a5ecbed43ddbc3a9c3dc3bc0:terratest/src/test/pega/data/expectedPRPCUtils.properties.tmpl
 {{  if isTrue .Env.BYPASS_LOAD_ENGINE_CLASSES }}
 pega.engine.classpath=filesystem
 pega.codeset.version={{ .Env.PRDEPLOY_CODESET_VERSION }}
@@ -39,3 +41,4 @@ pega.engine.classpath=database
 pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
 {{ end -}}
 {{ end -}}
+>>>>>>> d2b08c547fa10ff2a5ecbed43ddbc3a9c3dc3bc0:terratest/src/test/pega/data/expectedPRPCUtils.properties.tmpl

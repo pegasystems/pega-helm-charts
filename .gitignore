@@ -1,7 +1,7 @@
 # Helm stuff
 **/charts/*.tgz
 **/requirements.lock
-
+**/Chart.lock
 
 # Generated example yaml
 /build
@@ -18,3 +18,6 @@
 # IntelliJ IDEA
 **/.idea
 **/*.iml
+
+# VS Code
+.vscode/*

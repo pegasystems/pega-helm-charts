@@ -1,0 +1,13 @@
+{{- if (eq .Values.global.provider "gke") }}
+apiVersion: cloud.google.com/v1beta1
+kind: BackendConfig
+metadata:
+  name: {{ template "pegaBackendConfig" }}
+spec:
+  timeoutSec: 40
+  connectionDraining:
+    drainingTimeoutSec: 60
+  sessionAffinity:
+    affinityType: "GENERATED_COOKIE"
+    affinityCookieTtlSec: {{ template "lbSessionCookieStickiness" }}
+{{ end }}

@@ -47,6 +47,9 @@ spec:
       containers:
       - name: search
         image: {{ .Values.image }}
+{{- if ( .Values.imagePullPolicy ) }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+{{- end }}
         securityContext:
           runAsUser: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
         env:

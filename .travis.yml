@@ -12,6 +12,7 @@ install:
   - helm init --client-only
   # Install YamlLint
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
+  - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
   - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
   - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
@@ -19,6 +20,7 @@ install:
 script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
   - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+  - remark -i .remark_ignore -f -u validate-links .
   # Now load the helm dependencies
   - make dependencies
   # Run Helm lint
@@ -31,15 +33,11 @@ script:
   - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
   - cd terratest/src/test
   - dep ensure
-  - go test deploy_test.go common_utility.go deployment_utility.go
-  - go test install_test.go common_utility.go installer_utility.go
-  - go test install_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test upgrade_test.go common_utility.go installer_utility.go
-  - go test upgrade_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test aks_deploy_test.go common_utility.go deployment_utility.go installer_utility.go
-  - go test eks_deploy_test.go common_utility.go deployment_utility.go
-  - go test openshift_test.go common_utility.go deployment_utility.go
-  - go test invalidAction_test.go
+  # grep -v command.go:158 - hack for filter unnecessary logs. 
+  # It's needed because of lack ability to disable debug output in terratest for helm chart
+  #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
+  - go test test/pega | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
+  - go test test/addons | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
