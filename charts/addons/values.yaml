@@ -18,7 +18,8 @@ traefik:
     enabled: true
   # If Kubernetes namespace selection is defined and the (one) selected namespace is the release
   # namespace, a Role and RoleBinding will be used in lieu of a ClusterRole and ClusterRoleBinding. 
-  # Use it to have isolated traefik deployment for each Pega deployment in a namespace. Only single namepsace value can be provided.
+  # Use it to have isolated traefik deployment for each Pega deployment in a namespace. 
+  # Only single namepsace value can be provided.
   # kubernetes:
   #   namespaces:
   #   - default
