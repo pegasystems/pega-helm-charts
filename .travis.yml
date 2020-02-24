@@ -7,7 +7,7 @@ env:
 install:
   # Install Helm
   - wget -q ${HELM_URL}/${HELM_TGZ}
-  - tar xzfv ${HELM_TGZ}
+  - tar xzf ${HELM_TGZ}
   - PATH=`pwd`/linux-amd64/:$PATH
   - helm init --client-only
   # Install YamlLint
@@ -15,7 +15,7 @@ install:
   - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
   - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
-  - sudo tar -C /usr/local -xvzf go1.7.3.linux-amd64.tar.gz
+  - sudo tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
   - export  PATH=$PATH:/usr/local/go/bin
 script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
