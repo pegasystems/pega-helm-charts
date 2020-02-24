@@ -172,6 +172,7 @@ metadata:
 spec:
   domains:
     - {{ .domain }}
+---
 {{- end -}}
 
 {{- define "domainName" }}
