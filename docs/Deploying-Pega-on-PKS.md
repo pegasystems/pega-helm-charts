@@ -1,7 +1,7 @@
 Deploying Pega Platform on a PKS cluster
 ===============================
 
-Deploy Pega Platform™ on a Pivotal Container Service (PKS) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a PKS cluster.
+Deploy Pega Platform™ on a Pivotal Container Service (PKS) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). If your PKS cluster is deployed on a different cloud, the database steps may be different. These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a PKS cluster.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a PKS cluster without much experience in either PKS configurations or Pega Platform deployments.
 
@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-2. Request a PKS cluster form Pivotal and create an SQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
+2. Verify access to your PKS cluster and create an SQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
 
 3. Customize a configuration file with your PKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your PKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -66,18 +66,11 @@ configure the required PostgreSQL database in a GCP account. Pega supports
 creating a PostgreSQL database in any environment if the IP address of
 the database is available to your PKS cluster.
 
-### Requesting a PKS cluster
+### Accessing a PKS cluster
 
-In many cases a Pega client can request a demo cluster from Pivotal running PKS
-1.5 or later. If your organization is already familiar with the Pivotal
-Container Service, you can create your own local PKS environment.
+Access to a Pivotal PKS cluster is required to deploy using PKS. At a minimum, your cluster should be provisioned with at least two worker nodes that have 32GB of RAM in order to support the typical processing loads in a Pega Platform deployment. Pivotal supports SSL authentication, which you can request if your organization requires it.
 
-At a minimum, your cluster should be provisioned with at least two worker nodes
-that have 32GB of RAM in order to support the typical processing loads in a Pega
-Platform deployment. Pivotal supports SSL authentication, which you can request
-if your organization requires it.
-
-In order to login to your demo cluster, you must have the following information:
+In order to login to your cluster, you must have the following information:
 
 - The target IP address of your PKS API
 
@@ -110,13 +103,13 @@ To begin, create an SQL Instance that is available to your PKS cluster. In this 
 
     b. In **Default user password**, enter a “postgres” user password.
 
-    c. Select an appropriate **Region** and **Zone** for your database server. Contact your Pivotal representative so you can select the same zone or region that Pivotal used to create your PKS demo cluster.
+    c. Select an appropriate **Region** and **Zone** for your database server, which must be in the same zone or region as your PKS cluster.
 
     d. In **Database version**, select **PostgreSQL 11**.
 
     e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
 
-    For clusters that are provisioned by Pivotal: you can launch the Kubernetes dashboard to view the external IP address of the nodes in your cluster; to add that IP network to the database whitelist, enter the first three sets of number,and use 0/24 for the final set in this IP range. For example: 123.123.123.0/24.
+    You can launch the Kubernetes dashboard to view the external IP address of the nodes in your cluster; to add that IP network to the database whitelist, enter the first three sets of number,and use 0/24 for the final set in this IP range. For example: 123.123.123.0/24.
 
 6. In **Configuration options \> Machine type and storage**:
 
@@ -224,7 +217,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
     `$ cd /home/<local filepath>/pks-demo`
 
-2. To use the PKS CLI to log into your account using the Pivotal-provided API and login credentials and skip SSL validation, enter:
+2. To use the PKS CLI to log into your account using the PKS API and login credentials and skip SSL validation, enter:
 
     `$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
 
