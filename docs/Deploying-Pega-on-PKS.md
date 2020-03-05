@@ -103,7 +103,7 @@ To begin, create an SQL Instance that is available to your PKS cluster. In this 
 
     b. In **Default user password**, enter a “postgres” user password.
 
-    c. Select an appropriate **Region** and **Zone** for your database server. This must be the same zone or region that as your PKS cluster.
+    c. Select an appropriate **Region** and **Zone** for your database server, which must be in the same zone or region as your PKS cluster.
 
     d. In **Database version**, select **PostgreSQL 11**.
 
