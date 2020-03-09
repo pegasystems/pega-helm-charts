@@ -12,9 +12,10 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Open-source Kubernetes (and [MiniKube for personal deployments](docs/RUNBOOK_MINIKUBE.md))
 * Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
 * Amazon Elastic Kubernetes Service (EKS)
-* Google Kubernetes Engine (GKE)
+* Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
 * Red Hat OpenShift
-* Pivotal Container Service (PKS)
+* Pivotal Container Service (PKS) - see the [PKS runbook](docs/Deploying-Pega-on-PKS.md)
+
 
 # Getting started
 
@@ -68,7 +69,7 @@ $ kubectl create namespace pegaaddons
 6. To install the addons chart, run the following helm command after configuring your values.yaml file (if applicable for your environment). 
 
 ```bash
-$ helm install mypega pega/addons --namespace pegaaddons --values addons.yaml
+$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
 7. Now you can deploy Pega using the Helm chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace.  

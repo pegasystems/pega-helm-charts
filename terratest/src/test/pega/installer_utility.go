@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"path/filepath"
@@ -164,9 +164,15 @@ func VerifyInstallerRole(t *testing.T, options *helm.Options, pegaHelmChartPath 
 	deployRole := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-role.yaml"})
 	var deployRoleObj k8srbac.Role
 	helm.UnmarshalK8SYaml(t, deployRole, &deployRoleObj)
-	require.Equal(t, deployRoleObj.Rules[0].APIGroups, []string{"", "batch", "extensions", "apps"})
-	require.Equal(t, deployRoleObj.Rules[0].Resources, []string{"jobs", "deployments", "statefulsets"})
+	require.Equal(t, deployRoleObj.Rules[0].APIGroups, []string{"apps"})
+	require.Equal(t, deployRoleObj.Rules[0].Resources, []string{"deployments", "statefulsets"})
 	require.Equal(t, deployRoleObj.Rules[0].Verbs, []string{"get", "watch", "list"})
+	require.Equal(t, deployRoleObj.Rules[1].APIGroups, []string{"batch"})
+	require.Equal(t, deployRoleObj.Rules[1].Resources, []string{"jobs"})
+	require.Equal(t, deployRoleObj.Rules[1].Verbs, []string{"get", "watch", "list"})
+	require.Equal(t, deployRoleObj.Rules[2].APIGroups, []string{"extensions"})
+	require.Equal(t, deployRoleObj.Rules[2].Resources, []string{"deployments"})
+	require.Equal(t, deployRoleObj.Rules[2].Verbs, []string{"get", "watch", "list"})
 }
 
 // VerifyInstallerConfigMaps - Tests Installer configuration rendered with the values as provided in default values.yaml

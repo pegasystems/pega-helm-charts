@@ -6,13 +6,23 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
+{{- if .node.ingress.annotations }}
+    # Custom annotations
+{{ toYaml .node.ingress.annotations | indent 4 }}
+{{- else }}
     # Ingress class used is 'traefik'
     kubernetes.io/ingress.class: traefik
+{{- end }}
 spec:
+{{ if ( include "ingressTlsEnabled" . ) }}
+{{- if .node.ingress.tls.secretName }}
+{{ include "tlssecretsnippet" . }}
+{{ end }}
+{{ end }}
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
   # To access the below service, along with {{ .node.domain }}, traefik http port also has to be provided in the URL.
-  - host: {{ .node.service.domain }}
+  - host: {{ template "domainName" dict "node" .node }}
     http:
       paths: 
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) (eq .node.nodeType "WebUser") }}

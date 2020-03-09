@@ -77,11 +77,29 @@ global:
         passivationTimeSec: 900
 
       service:
+        # For help configuring the service block, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
+        port: 80
+        targetPort: 8080
+
+      ingress:
+        # For help configuring the ingress block, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
+
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
-        port: 80
-        targetPort: 8080
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          secretName:
+          # For GKE Managed Certificate, mention true if Google Managed Certificate has to be created and annotation specified
+          useManagedCertificate: false
+          # Provide appropriate certificate annotations for EKS or GKE
+          # For EKS, use alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
+          # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
+          # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
+          ssl_annotation:
 
 
       replicas: 1
@@ -133,11 +151,24 @@ global:
         passivationTimeSec: 900
 
       service:
-        # Enter the domain name to access stream nodes via a load balancer.
-        #  e.g. stream.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
         port: 7003
         targetPort: 7003
+
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_STREAM_NODE_DOMAIN"
+        tls:
+          enabled: true
+          # Give the name of the secret that contains certificate information - works for GKE, AKS and K8S
+          secretName:
+          # For GKE Managed Certificate, mention true if Google Managed Certificate has to be created and annotation specified
+          useManagedCertificate: false
+          # Provide appropriate certificate annotations for EKS or GKE
+          # For EKS, use alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
+          # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
+          # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
+          ssl_annotation:
 
       replicas: 2
       javaOpts: ""

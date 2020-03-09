@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"fmt"
@@ -160,7 +160,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].LivenessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].LivenessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(10))
+	require.Equal(t, pod.Containers[0].LivenessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].LivenessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].LivenessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].LivenessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
@@ -169,7 +169,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(300))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(20))
-	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(10))
+	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.SuccessThreshold, int32(1))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.FailureThreshold, int32(3))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/prweb/PRRestService/monitor/pingService/ping")
@@ -240,13 +240,18 @@ func SplitAndVerifyPegaServices(t *testing.T, helmChartPath string, options *hel
 // VerifyPegaService - Performs Pega Service assertions with the values as provided in default values.yaml
 func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices, options *helm.Options) {
 	provider := options.SetValues["global.provider"]
-	if !(provider == "openshift" || provider == "eks") {
+	if provider == "k8s" {
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/affinity"], "true")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/load-balancer-method"], "drr")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
+		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
+	} else if provider == "gke" {
+		require.Equal(t, `{"ingress": true}`, serviceObj.Annotations["cloud.google.com/neg"])
+		var expectedBackendConfig = fmt.Sprintf(`{"ports": {"%d": "pega-backend-config"}}`, expectedService.Port)
+		require.Equal(t, expectedBackendConfig, serviceObj.Annotations["beta.cloud.google.com/backend-config"])
+		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("NodePort"))
 	}
-	require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
 	require.Equal(t, serviceObj.Spec.Selector["app"], expectedService.Name)
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, expectedService.Port)
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, expectedService.TargetPort)
@@ -284,6 +289,10 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 	provider := options.SetValues["global.provider"]
 	if provider == "eks" {
 		VerifyEKSIngress(t, ingressObj, expectedIngress)
+	} else if provider == "gke" {
+		VerifyGKEIngress(t, ingressObj, expectedIngress)
+	} else if provider == "aks" {
+		VerifyAKSIngress(t, ingressObj, expectedIngress)
 	} else if provider != "eks" && options.SetValues["constellation.enabled"] == "false" {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
 	} else if options.SetValues["constellation.enabled"] == "true" {
@@ -308,9 +317,26 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[1].HTTP.Paths[0].Backend.ServicePort)
 }
 
+func VerifyGKEIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	require.Equal(t, "false", ingressObj.Annotations["kubernetes.io/ingress.allow-http"])
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Backend.ServicePort)
+	require.Equal(t, 1, len(ingressObj.Spec.Rules))
+	require.Equal(t, 1, len(ingressObj.Spec.Rules[0].HTTP.Paths))
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
+}
+
+func VerifyAKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	require.Equal(t, "azure/application-gateway", ingressObj.Annotations["kubernetes.io/ingress.class"])
+	require.Equal(t, "true", ingressObj.Annotations["appgw.ingress.kubernetes.io/cookie-based-affinity"])
+	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
+}
+
 // VerifyPegaIngress - Performs Pega Ingress assertions with the values as provided in default values.yaml
 func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	require.Equal(t, ingressObj.Annotations["kubernetes.io/ingress.class"], "traefik")
+	require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
 	require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
@@ -412,9 +438,9 @@ func SplitAndVerifyPegaHPAs(t *testing.T, helmChartPath string, options *helm.Op
 		if index >= 0 && index <= 1 {
 			helm.UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
 			if index == 0 {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "extensions/v1beta1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "apps/v1"})
 			} else {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "extensions/v1beta1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "apps/v1"})
 			}
 		}
 	}

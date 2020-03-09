@@ -76,11 +76,24 @@ global:
         passivationTimeSec: 900
 
       service:
+        # For help configuring the service block, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
+        port: 80
+        targetPort: 8080
+
+      ingress:
+        # For help configuring the ingress block including TLS, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
+
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
-        port: 80
-        targetPort: 8080
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       replicas: 1
       # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
@@ -131,11 +144,19 @@ global:
         passivationTimeSec: 900
 
       service:
-        # Enter the domain name to access stream nodes via a load balancer.
-        #  e.g. stream.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
         port: 7003
         targetPort: 7003
+
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_STREAM_NODE_DOMAIN"
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       replicas: 2
       cpuRequest: 200m
@@ -180,6 +201,7 @@ dds:
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
+  replicas: 1
 
 # Pega Installer settings
 installer:
