@@ -20,27 +20,32 @@ Example for a kubernetes environment:
 ```yaml
 provider: "k8s"
 ```
-<!--
-## Actions
 
+## Actions
+<!-- After upgrades are documented in runbooks, use this paragraph
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install or upgrade a Pega system.
 
-For additional, required installation or upgrade parameters, see the [Installer section](#installer-settings).
+For additional, required installation or upgrade parameters, see the [Installer section](#install).
+-->
+Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system.
+
+For additional, required installation parameters, see the [Installer section](#install).
 
 Value             | Action
 ---               | ---
 deploy            | Start the Pega containers using an existing Pega database installation.
 install           | Install Pega Platform into your database without deploying.
 install-deploy    | Install Pega Platform into your database and then deploy.
-upgrade           | Upgrade the Pega Platform installation in your database.
-upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
 
+<!--upgrade           | Upgrade the Pega Platform installation in your database.
+upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
+-->
 Example:
 
 ```yaml
 action: "deploy"
 ```
--->
+
 ## JDBC Configuration
 
 Use the `jdbc` section  of the values file to specify how to connect to the Pega database. *Pega must be installed to this database before deploying on Kubernetes*.  
@@ -151,7 +156,7 @@ stream        | Nodes that run an embedded deployment of Kafka and are exposed t
 
 #### Small deployment with a single tier
 
-To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-small.yaml](relative-link-here) configuration provides a starting point for this simple model.
+To get started running a personal deployment of Pega on kubernetes, you can handle all processing on a single tier.  This configuration provides the most resource utilization efficiency when the characteristics of a production deployment are not necessary.  The [values-minimal.yaml](./values-minimal.yaml) configuration provides a starting point for this simple model.
 
 Tier Name   | Description
 ---         | ---
@@ -159,7 +164,7 @@ pega        | One tier handles all foreground and background processing and is g
 
 #### Large deployment for production isolation of processing
 
-To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](relative-link-here) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
+To run a larger scale Pega deployment in production, you can split additional processing out to dedicated tiers.  The [values-large.yaml](./values-large.yaml) configuration provides an example of a multi-tier deployment that Pega recommends as a good starting point for larger deployments.
 
 Tier Name   | Description
 ---         | ---
@@ -185,7 +190,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](http://doc-build02.rpega.com/docs-oxygen/procomhelpmain.htm#engine/node-classification/eng-node-types-client-managed-cloud-ref.htm)
+[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
 
 Example:
 
@@ -208,30 +213,128 @@ requestor:
   passivationTimeSec: 900
 ```
 
-### service and ingress (*Optional*)
+### service
 
-Specify the service block to expose a Pega tier to other Kubernetes run services, or externally to other systems .  The name of the service will be based on the tier's name, so if your tier is `"web"`, your service name will be `"pega-web"`.  If you omit `service`, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service/]).
+Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
 
 Configuration parameters:
 
-- `domain` - specify a domain on your network in which you create an ingress to the service.  If not specified, no ingress is created.
-- `port` and `targetPort` - specify values other than the web node defaults of `80` and `8080`, respectively, if required for your networking domain. You can use these settings for external access to the stream tier when required.
-- `serviceType` - specify the [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose.  The default value is `LoadBalancer`.
+Parameter | Description                       | Default value
+---       | ---                               | ---
+`port`    | The port of the tier to be exposed to the cluster. For HTTP this is generally `80`. | `80`
+`targetPort`    | The target port of the container to expose. The Pega container exposes web traffic on port `8080`. | `8080`
+`serviceType`    | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose. | `LoadBalancer`
+`annotations` | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations. | *n/a*
 
 Example:
 
 ```yaml
 service:
-  domain: "tier.example.com"
   port: 1234
   targetPort: 1234
+  serviceType: LoadBalancer
 ```
 
-Annotations to the service or ingress Kubernetes objects may be applied by setting `service.annotations` or `ingress.annotations` as required.  This is used for advanced load balancer or other ingress configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+### ingress
+
+Specify the `ingress` yaml block to expose a Pega tier to access from outside Kubernetes. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+
+Parameter | Description
+---       | ---
+`domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
+`tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
+`tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
+`tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
+`tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
+`annotations` | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+
+Depending on your provider or type of certificate you are using use the appropriate annotation:
+  - For `EKS` - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>
+
+#### Provider support for SSL certificate management
+
+Provider  | Kubernetes Secrets | Cloud SSL management service
+---       | ---                | ---
+AKS       | Supported          | None
+EKS       | Not supported      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
+PKS       | Supported          | None
+GKE       | Supported          | [Pre-shared or Google-managed certificates](#managing-certificates-in-google-cloud)
+
+#### Managing certificates using Kubernetes secrets
+
+In order to manage the SSL certificate using a secret, do the following:
+
+1. Create the SSL certificate and import it into the environment using the certificate management tools of your choice.
+
+2. Create the secret and add the certificate to the secret file.
+
+3. Add the secret name to the pega.yaml file.
+
+4. Pass the secret to the cluster you created in your environment before you begin the Pega Platform deployment.
+
+Example:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  tls:
+    enabled: true
+    secretName: web-domain-certificate
+    useManagedCertificate: false
+```
+
+#### Managing certificates in AWS
+
+Instead of Kubernetes secrets, on AWS you must manage your SSL certificates with ACM (AWS certificate manager). Using the ARN of your certificate, you configure the `ssl_annotation` in your Helm chart.
+
+Example:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  tls:
+    enabled: true
+    secretName:
+    useManagedCertificate: false
+    ssl_annotation:
+      alb.ingress.kubernetes.io/certificate-arn:<certificate-arn>
+```
+
+#### Managing certificates in Google Cloud
+
+In addition to Kubernetes secrets, on GCP you may manage your SSL certificates in GKE with two alternative methods. For more information, see the [Google Cloud documentation on SSL certificate management](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).
+
+- *Pre-shared certificate* - add the certificate to your Google Cloud project and specify the appropriate ssl annotation in the ingress section.
+
+Example:
+
+```yaml
+ingress:
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    useManagedCertificate: false
+    ssl_annotation:
+      ingress.gcp.kubernetes.io/pre-shared-cert: webCert
+```
+
+- *Google-managed certificate* - Pega Platform deployments can automatically generate a GKE managed certificate when you specify the appropriate SSL annotation in the ingress section. Using a static IP address is not mandatory; if you do not use it, remove the annotation. To use a static IP address, you must create the static IP address during the cluster configuration, then add it using this annotation in the pega.yaml.
+
+Example:
+
+```yaml
+ingress:
+  domain: "web.dev.pega.io"
+  tls:
+    enabled: true
+    useManagedCertificate: true
+    ssl_annotation:
+      kubernetes.io/ingress.global-static-ip-name: web-ip-address
+```
 
 ### Managing Resources
 
-You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources] for more information about how Kubernetes manages resources.
+You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
 Parameter       | Description    | Default value
 ---             | ---       | ---
@@ -242,6 +345,32 @@ Parameter       | Description    | Default value
 `memLimit`      | Memory limit for pods in the current tier. | `8Gi`
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
+
+### Liveness and readiness probes
+
+[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
+
+Parameter           | Description    | Default value
+---                 | ---            | ---
+`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
+`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+      livenessProbe:
+        initialDelaySeconds: 60
+        timeoutSeconds: 30
+        failureThreshold: 5
+      readinessProbe:
+        initialDelaySeconds: 400
+        failureThreshold: 30
+```
 
 ### Using a Kubernetes Horizontal Pod Autoscaler (HPA)
 
@@ -265,6 +394,8 @@ The `deploymentStrategy` can be used to optionally configure the [strategy](http
 ### Environment variables
 
 Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+
+Example:
 
 ```yaml
 tier:

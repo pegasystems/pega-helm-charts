@@ -23,9 +23,9 @@ In order to stay consistent with the instructions, you can create a folder calle
 
 For Windows users: To create this folder, open a Windows PowerShell command prompt with Administrator privileges and enter:
 
-`$ mkdir C:\Users\<Windows-username><platform>-demo`
+    `$ mkdir C:\Users\<Windows-username><platform>-demo`
 
-Where \<platform\>-demo is:
+    Where \<platform\>-demo is:
 
 - AKS-demo - for the AKS runbook
 
@@ -35,7 +35,7 @@ Where \<platform\>-demo is:
 
 - Openshift-demo - for the Openshift runbook
 
-Currently there is no runbook for running on the Google Kubernetes Engine (GKE) using the Windows 10 Google SDK. To set up a system for a deployment on GKE, see [Prepare a local Linux system – 45 minutes](docs/prepping-local-system-runbook-linux.md). 
+Currently there is no runbook for running on the Google Kubernetes Engine (GKE) using the Windows 10 Google SDK. To set up a system for a deployment on GKE, see [Prepare a local Linux system – 45 minutes](prepping-local-system-runbook-linux.md). 
 
 You are ready to continue preparing your local system.
 
@@ -61,57 +61,43 @@ Chocolatey](https://chocolatey.org/install) page.
 
 2. To ensure your PowerShell commands run without restrictions enter:
 
-`$ Get-ExecutionPolicy`
+    `$ Get-ExecutionPolicy`
 
 3. To install Chocolatey and appropriate security scripts that it uses to
     ensure safety when you install applications using the Chocolatey
     application, enter:
 
-`$ Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object
-System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
+    `$ Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-ObjectSystem.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))`
 
-The command returns messaging describing useful details and indicating a
-successful installation. You are ready to use Chocolatey to install each
-required application.
+    The command returns messaging describing useful details and indicating a successful installation. You are ready to use Chocolatey to install each required application.
 
 ### Installing Helm and the kubernetes CLI commands:
 
-Pega supports using Helm version 2.1 and later and the Kubernetes Command Line
-Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
-kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm
-2.x, some of the commands will differ slightly for Helm 2.x.
+Pega supports using Helm version 2.1 and later and the Kubernetes Command Line Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm 2.x, some of the commands will differ slightly for Helm 2.x.
 
-The default Helm version available in Chocolatey is 3.0.x; the default version
-of kubernetes-cli is 1.17.x.
+The default Helm version available in Chocolatey is 3.0.x; the default version of kubernetes-cli is 1.17.x.
 
-Enter the choco install command listed for each application into your PowerShell
-command prompt as shown:
+Enter the choco install command listed for each application into your PowerShell command prompt as shown:
 
-- To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the
-    PowerShell command prompt, enter:
+- To install [Helm](https://chocolatey.org/packages/kubernetes-helm): in the PowerShell command prompt, enter:
 
-`$ choco install kubernetes-helm`
+    `$ choco install kubernetes-helm`
 
-If, during the install process, you are prompted to run the script, reply with
-**Yes**.
+    If, during the install process, you are prompted to run the script, reply with **Yes**.
 
 - To install [Kubernetes Command Line
     Interface](https://chocolatey.org/packages/kubernetes-cli): in the
     PowerShell command prompt, enter:
 
-`$ choco install kubernetes-cli`
+    `$ choco install kubernetes-cli`
 
-If, during the install process, you are prompted to run the script, reply with
-**Yes**. The kubernetes-cli application includes the `kubectl` command.
+    If, during the install process, you are prompted to run the script, reply with **Yes**. The kubernetes-cli application includes the `kubectl` command.
 
 ### For AKS only: installing the Azure CLI
 
-Use a Windows PowerShell command prompt with Administrator
-privileges to install the Azure CLI by entering:
+Use a Windows PowerShell command prompt with Administrator privileges to install the Azure CLI by entering:
 
-`$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile
-.\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi
-/quiet'`
+`$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile.AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'`
 
 The prompt returns when the installation is complete.
 
@@ -146,13 +132,13 @@ simply “pks”.
 
 7. Add this executable file to the PATH on your local computer. Add the \<platform\>-demo folder to your environment path by running the following command:
 
-`$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
+    `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
 
-Advanced users may add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-6/installing-pks-cli.html).
+    Advanced users may add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-6/installing-pks-cli.html).
 
 ### Installing Docker Desktop on Windows 10
 
-In order to build a docker installation image in the section, [Prepare your Pega Platform installation Docker image – 15 minutes](#_Prepare_your_Pega_1), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system.
+In order to build a docker installation image in the section, [Prepare your Pega Platform installation Docker image – 15 minutes](#prepare-your-pega-platform-installation-docker-image--15-minutes), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system.
 
 1. Download the installer (Docker for Windows Installer.exe) from [download.docker.com](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe).
 
@@ -199,11 +185,11 @@ To customize these files, you must download them from the repository to your loc
 
 1. To add the Pega repository to your Helm installation, enter:
 
-`$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
 
 2. To verify the new repository, you can search it by entering:
 
-```yaml
+```bash
   $ helm search repo pega
   NAME        CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega   1.2.0                           Pega installation on kubernetes
@@ -228,7 +214,7 @@ If you are deploying to a different platform you can skip this section.
 
 1. To download pega/addons Helm chart to the \<local filepath\>\\\<platform\>-demo, enter:
 
-`$ helm inspect values pega/addons > addons.yaml`
+    `$ helm inspect values pega/addons > addons.yaml`
 
 2. Open the addons.yaml file from this folder in a text editor.
 
@@ -277,8 +263,49 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
 
-Make these changes before you begin in the section, [Deploying Pega Platform
-using Helm charts – 30 minutes](#_Deploying_Pega_Platform).
+Make these changes before you begin deploying Pega Platform using Helm charts.
+
+Creating SSL certificates for HTTPS load balancer on a Kubernetes ingress
+-----------------------------------
+
+When you configure an HTTPS load balancer through a Kubernetes ingress, you can configure the load balancer to present authentication certificates to the client. After you generate your certificates and corresponding private keys using any SSL Certificate creation tool, you pass the certificates and private keys to your Kubernetes ingress using the method supported for the specific environment. For Pega support details, see the [Addons Helm chart](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/addons). 
+
+Use the generation method best suited to your company standards. The following steps create one or more certificates and private keys for a hostname using a manually verified domain.
+
+1. Navigate to the certificate generator, such as [SSL For Free](https://www.sslforfree.com/).
+
+2. Enter your hostname for which you are creating a certificate and click **Create FreeSSL Certificate**.
+
+3. To validate the certificate manually, click **Manual Verification (DNS)**.
+
+   The **Manually Verify Domain (DNS)** option displays.
+
+4. Click **Manually Verify Domain**.
+
+   The **Update DNS Records** screen displays a name/host record, an associated verification value.
+
+5. Using the DNS lookup management system of your choice, associate the generated name/host record with the verification value. For instance:
+
+```java
+Name          :   _acme-challenge.demotest.dev.pega.io
+Type          :   TXT
+TTL (Seconds) :   1
+Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
+```
+
+With the hostname associated with the verification value, wait several minutes to ensure the configuration is established.
+
+6. Click the link for name/host record.
+
+   A new page displays the status of the connection.
+
+7. When successful, you will see that the link returned the correct value and you can generate the SSL certificate files.
+
+   If it is not successful, you may have to wait longer for the DNS lookup to correctly associate the verification value with the hostname; if it continues to not work, you may need to update your DNS settings.
+
+8. In the main page of **SSL for Free**, click **Download All SSL Certificate Files** and save the certificate file and private key file in the \<platform\>-demo folder you have already created on your local system.
+
+You will manage these certificates in the environment to which you deploy Pega Platform. For environment-specific details, see the **Deploying Pega Platform using the command line** section in the runbook for that environment.
 
 Downloading a Pega Platform distribution to your local system
 -------------------------------------------------------------
@@ -287,7 +314,7 @@ These instructions require the Pega Platform distribution image to install the P
 
 ### Requesting access to a Pega Platform distribution
 
-1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community1.pega.com/digital-delivery) site.
+1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
 2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
     site with the credentials your Pega representative provided.
@@ -358,7 +385,7 @@ If it is not the right version number, you must complete a new request.
 
 9. In Windows PowerShell, change folders to the \<localfilepath\>\\\<platform\>-demo folder, where you saved the Pega Platform distribution zip and extract your files to create a new distribution image folder on your local system:
 
-`$ Expand-Archive .\<pega-distribution-image>.zip`
+    `$ Expand-Archive .\<pega-distribution-image>.zip`
 
 ![C:\\Users\\aciut\\AppData\\Local\\Temp\\SNAGHTML2318748.PNG](media/1edabbc855175f2bdca62f8a529d8c88.png)
 
@@ -369,21 +396,20 @@ Prepare your Pega Platform installation Docker image – 15 minutes
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [Pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the docker cli and docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 
-Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#_Downloading_Pega_Platform) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
+Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#downloading-a-pega-platform-distribution-to-your-local-system) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
 Follow these steps to create a Docker image you can use to install or upgrade
 Pega Platform.
 
-1. From your PowerShell running with Administrator privileges, ensure you are
-    logged into your DockerHub account:
+1. From your PowerShell running with Administrator privileges, ensure you are logged into your DockerHub account:
 
-`$ docker login -u \<username\> -p \<username-password\>`
+    `$ docker login -u \<username\> -p \<username-password\>`
 
-For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by using the Docker Desktop client running on your system.
+    For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>. From Windows, you can also ensure you are logged by using the Docker Desktop client running on your system.
 
 2. Change your directory to the top folder of your Pega distribution, \<pega-distribution-image\>.
 
-`$ cd .\<pega-distribution-image>`
+    `$ cd .\<pega-distribution-image>`
 
 3. Create a text file with the text editor of your choice in the \<local filepath\>\\\<platform\>-demo\\\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
 
@@ -407,13 +433,13 @@ These instructions direct a docker build function to use the Pega public Docker 
 
 6. From your PowerShell running with Administrator privileges command prompt, in your current directory, build your pega install docker image by entering:
 
-`$ docker build -t pega-installer .`
+    `$ docker build -t pega-installer .`
 
-This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”. You can use the docker command to see that your new image exists in your Docker image inventory.
+    This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”. You can use the docker command to see that your new image exists in your Docker image inventory.
 
 7. Tag the local version of your new image, pega-installer, with your DockerHub ID:
 
-`$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
+    `$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
 
 8. Create a private repository on your [DockerHub](https://hub.docker.com/) account that is tagged as a private repository.
 
@@ -436,7 +462,7 @@ Free DockerHub accounts support the use of a single private repository, so you m
 
 15.  From your PowerShell running with Administrator privileges, use the docker command to push the new image to your new private repository:
 
-`$ docker push <your-dockerhub-ID>/pega-installer`
+    `$ docker push <your-dockerhub-ID>/pega-installer`
 
 After the command completes you will see your new image in your private
 repository, similar to the image below.

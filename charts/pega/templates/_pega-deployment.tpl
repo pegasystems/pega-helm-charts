@@ -30,6 +30,7 @@ spec:
         app: {{ .name }}
       annotations:
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
+        revision: "{{ .root.Release.Revision }}"
     spec:
       volumes:
       # Volume used to mount config files.
@@ -96,6 +97,9 @@ spec:
 {{- end }}
 {{- end }}
 {{ include "pega.jvmconfig" (dict "node" .node) | indent 8 }}
+        # Tier of the Pega node
+        - name: NODE_TIER
+          value: {{ .tierName }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" }}
@@ -140,7 +144,30 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
-{{ include "pega.health.probes" .root | indent 8 }}
+        # LivenessProbe: indicates whether the container is live, i.e. running.
+        {{- $livenessProbe := .node.livenessProbe }}
+        livenessProbe:
+          httpGet:
+            path: "/prweb/PRRestService/monitor/pingService/ping"
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
+          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
+          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
+          successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
+        # ReadinessProbe: indicates whether the container is ready to service requests.
+        {{- $readinessProbe := .node.readinessProbe }}
+        readinessProbe:
+          httpGet:
+            path: "/prweb/PRRestService/monitor/pingService/ping"
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 20 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
+          successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always
       # Amount of time in which container has to gracefully shutdown.

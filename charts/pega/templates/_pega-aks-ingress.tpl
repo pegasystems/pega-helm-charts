@@ -1,4 +1,4 @@
-{{- define "pega.k8s.ingress" -}}
+{{- define "pega.aks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
 apiVersion: extensions/v1beta1
@@ -6,13 +6,14 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if .node.ingress.annotations }}
-    # Custom annotations
-{{ toYaml .node.ingress.annotations | indent 4 }}
-{{- else }}
-    # Ingress class used is 'traefik'
-    kubernetes.io/ingress.class: traefik
-{{- end }}
+    # Ingress class used is 'azure/application-gateway'
+    kubernetes.io/ingress.class: azure/application-gateway
+    # Ingress annotations for aks
+    appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    {{ if ( include "ingressTlsEnabled" . ) }}
+    # HTTP to HTTPS Redirect
+    appgw.ingress.kubernetes.io/ssl-redirect: "true"
+    {{ end }}
 spec:
 {{ if ( include "ingressTlsEnabled" . ) }}
 {{- if .node.ingress.tls.secretName }}
