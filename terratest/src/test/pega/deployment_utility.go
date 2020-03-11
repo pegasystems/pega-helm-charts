@@ -295,6 +295,10 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 		VerifyAKSIngress(t, ingressObj, expectedIngress)
 	} else if provider != "eks" && options.SetValues["constellation.enabled"] == "false" {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
+	} else if provider != "aks" && options.SetValues["constellation.enabled"] == "false" {
+		VerifyAKSIngress(t, ingressObj, expectedIngress)
+	} else if provider != "gke" && options.SetValues["constellation.enabled"] == "false" {
+		VerifyGKEIngress(t, ingressObj, expectedIngress)
 	} else if options.SetValues["constellation.enabled"] == "true" {
 		VerifyK8SIngressWithConstellationEnabled(t, ingressObj, expectedIngress)
 	} else {
