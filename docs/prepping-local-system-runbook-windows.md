@@ -218,14 +218,17 @@ These two charts in this /charts/pega folder of the pega-helm-charts repository,
 Updating the Pega addons Helm chart
 -----------------------------------
 
-Update this Helm chart in order to enable the Traefik load balancer and disable
-the metrics-server for deployments to the following platforms:
+Update this Helm chart in order to enable configure the use of a load balancer and the metrics-server for deployments to the following platforms:
 
-- AKS
+- AKS - configure the use of an Application Gateway Ingress Controller (AGIC) by leaving Traefik disabled and configuring the `ingress-azure` section with your Azure deployment details. You must disable the Pega metric server to ensure your deployment uses the Azure-supplied metrics server.
 
-- PKS
+- PKS - configure the use of Traefik by enabling the `traefik` section. You must disable the Pega metric server to ensure your deployment uses the Pivotal-supplied metrics server.
 
-- GKE
+- GKE - configure the use of an Google Cloud Load Balancer (GCLB) by leaving Traefik disabled; when you choose a GKE deployment in the pega.yaml file, the Helm charts appropriately configure the deployment load balancer. You must disable the Pega metric server to ensure your deployment uses the GKE-supplied metrics server.
+
+- EKS - configure the use of an Amazon Load Balancer (ALB) by leaving Traefik disabled and configuring the `ws-alb-ingress-controller` section with your EKS deployment details. You must disable the Pega metric server to ensure your deployment uses the EKS-supplied metrics server.
+
+- Openshift - configure the use of Traefik by enabling the `traefik` section. You must disable the Pega metric server to ensure your deployment uses the Openshift-supplied metrics server.
 
 If you are deploying to a different platform you can skip this section.
 
@@ -235,34 +238,11 @@ If you are deploying to a different platform you can skip this section.
 
 2. Open the addons.yaml file from this folder in a text editor.
 
-3. In the traefik configuration area, ensure the following two settings are
-    configured to use Traefik for your deployment load-balancer:
+3. In the traefik configuration area, ensure the settings are appropriately configured to use the load balancer for the type of environment to which you are installing:
 
-```yaml
-  traefik:
-  enabled: **true**
 
-  # Set any additional Traefik parameters. These values will be used by Traefik's Helm chart.
-  # See https://github.com/Helm/charts/blob/master/stable/traefik/values.yaml
-  # Set traefik.serviceType to "LoadBalancer" on gke, PKS, and pks
-  serviceType: **LoadBalancer**
 
-  Note: Do not enclose the text in quotes.
-```
-
-4. For GKE or PKS deployments, you must ensure that the Pega metrics server is disabled in the metrics-server section of this *addon* values.yaml file, since PKS deployments use the PKS metrics server
-
-```yaml
-metrics-server:
-
-# Set this to true to install metrics-server. Follow below guidelines specific to each provider,
-# open-source Kubernetes, Openshift & EKS - mandatory to set this to true if any tier as hpa.enabled is true
-# GKE or PKS - set this to false since metrics-server is installed in the cluster by default.
-
-enabled: **false**
-```
-
-5. Save the file.
+3. Save the file.
 
 Add any known, customized settings for Pega to your deployment
 --------------------------------------------------------------
