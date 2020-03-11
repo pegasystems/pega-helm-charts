@@ -25,11 +25,7 @@ To create this folder, open a Windows PowerShell command prompt with administrat
 
     `$ mkdir C:\Users\<Windows-username><platform>-demo`
 
-<<<<<<< HEAD
 Where `<platform>-demo` is:
-=======
-    Where \<platform\>-demo is:
->>>>>>> upstream/master
 
 - For the AKS runbook, `AKS-demo`
 
@@ -79,18 +75,10 @@ Chocolatey](https://chocolatey.org/install) page.
 
 ### Installing Helm and the kubernetes CLI commands:
 
-<<<<<<< HEAD
-Pega supports using Helm version 2.1 and later and the Kubernetes Command Line
-Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
-kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm
-2.x, some of the commands differ slightly for Helm 2.x.
+Pega supports using Helm version 2.1 and later and the Kubernetes Command Line Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
+kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm 2.x, some of the commands differ slightly for Helm 2.x.
 
 The default Helm version available in Chocolatey is 3.0.x; the version of kubernetes-cli used in the runbooks is version 1.17.x.
-=======
-Pega supports using Helm version 2.1 and later and the Kubernetes Command Line Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm 2.x, some of the commands will differ slightly for Helm 2.x.
-
-The default Helm version available in Chocolatey is 3.0.x; the default version of kubernetes-cli is 1.17.x.
->>>>>>> upstream/master
 
 Enter the choco install command listed for each application into your PowerShell command prompt as shown:
 
@@ -98,11 +86,7 @@ Enter the choco install command listed for each application into your PowerShell
 
     `$ choco install kubernetes-helm`
 
-<<<<<<< HEAD
 If a prompt to run the script appears, enter **Yes**.
-=======
-    If, during the install process, you are prompted to run the script, reply with **Yes**.
->>>>>>> upstream/master
 
 For additional information, see [Helm documentation](https://helm.sh/docs/).
 
@@ -110,7 +94,6 @@ For additional information, see [Helm documentation](https://helm.sh/docs/).
 
     `$ choco install kubernetes-cli`
 
-<<<<<<< HEAD
 If a prompt to run the script appears, enter **Yes**. 
 
 The kubernetes-cli application includes the `kubectl` command.
@@ -143,15 +126,6 @@ For additional AWS tool information, see [Install the AWS CLI version 1 on Windo
 To install the Azure CLI using a Windows PowerShell command prompt with administrator privileges, enter:
 
 `$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\\AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'`
-=======
-    If, during the install process, you are prompted to run the script, reply with **Yes**. The kubernetes-cli application includes the `kubectl` command.
-
-### For AKS only: installing the Azure CLI
-
-Use a Windows PowerShell command prompt with Administrator privileges to install the Azure CLI by entering:
-
-`$ Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile.AzureCLI.msi; Start-Process msiexec.exe -Wait -ArgumentList '/I AzureCLI.msi /quiet'`
->>>>>>> upstream/master
 
 The prompt returns when the installation is completed.
 
@@ -444,12 +418,7 @@ Pega provides this image as the primary content of the final Docker image you wi
 Follow these steps to create a Docker image you can use to install or upgrade
 Pega Platform.
 
-<<<<<<< HEAD
-1. From your PowerShell running with administrator privileges, ensure you are
-    logged into your DockerHub account:
-=======
-1. From your PowerShell running with Administrator privileges, ensure you are logged into your DockerHub account:
->>>>>>> upstream/master
+1. From your PowerShell running with administrator privileges, ensure you are logged into your DockerHub account:
 
     `$ docker login -u \<username\> -p \<username-password\>`
 
