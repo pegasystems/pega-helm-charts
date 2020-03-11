@@ -6,18 +6,17 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if .node.ingress }}
-{{- if .node.ingress.annotations }}
+{{- $ingress := .node.ingress }}
+{{- if $ingress.annotations }}
     # Custom annotations
-{{ toYaml .node.ingress.annotations | indent 4 }}
-{{- end }}
+{{ toYaml $ingress.annotations | indent 4 }}
 {{- else }}
     # Ingress class used is 'traefik'
     kubernetes.io/ingress.class: traefik
 {{- end }}
 spec:
 {{ if ( include "ingressTlsEnabled" . ) }}
-{{- if .node.ingress.tls.secretName }}
+{{- if $ingress.tls.secretName }}
 {{ include "tlssecretsnippet" . }}
 {{ end }}
 {{ end }}
