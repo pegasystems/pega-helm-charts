@@ -1,4 +1,4 @@
-package test
+package pega
 
 import (
 	"path/filepath"
@@ -15,7 +15,7 @@ var options = &helm.Options{
 	SetValues: map[string]string{
 		"global.provider":        "k8s",
 		"global.actions.execute": "deploy",
-		"constellation.enabled": "true",
+		"constellation.enabled":  "true",
 	},
 }
 
