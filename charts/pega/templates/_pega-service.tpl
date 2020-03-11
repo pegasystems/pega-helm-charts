@@ -7,6 +7,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
 {{- if .node.service.annotations }}
+  annotations: 
     # Custom annotations
 {{ toYaml .node.service.annotations | indent 4 }}
 {{- else }}
