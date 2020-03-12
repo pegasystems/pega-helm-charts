@@ -195,9 +195,9 @@ Use the provided example addons.yaml file to configure the use of a the Traefik 
 
 2. Review the settings for this file. The example addons file is configured to automatically deploy EFK for log aggregation. 
 
-  - To use the default EFK settings, you must set a domain name to access kibana from your load balancer using the `hosts: "YOUR_WEB.KIBANA.EXAMPLE.COM"` parameter.
+  - To use the default EFK settings, you must set a domain name to access kibana from your load balancer using the `kibana.hosts: "YOUR_WEB.KIBANA.EXAMPLE.COM"` parameter.
 
-  - If your PKS deployment already has log aggregation capabilities conifigured, you must disable EFK deploy by setting the `deploy_efk: &deploy_efk false` parameter.
+  - If your PKS deployment already has log aggregation capabilities configured, you must disable EFK deploy by setting the `deploy_efk: &deploy_efk false` parameter.
 
 ### Add any known, customized addons settings for Pega to your deployment
 

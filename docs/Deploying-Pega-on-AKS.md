@@ -378,7 +378,7 @@ These two charts in this /charts/pega folder of the pega-helm-charts repository,
 
 Use the provided example addons.yaml file to configure the use of an Application Gateway Ingress Controller (AGIC).
 
-1. Download the example pega/addons [addons.yaml](./resources/addons-pks.yaml) the \<local filepath\>/pks-demo.
+1. Download the example pega/addons [addons.yaml](./resources/addons-aks.yaml) the \<local filepath\>/pks-demo.
 
    This example addons file already specifies the use of an Application Gateway Ingress Controller (AGIC). You must complete the configuration with details from your AKS environment before you can deploy Pega Platform into your environment.
 
