@@ -87,8 +87,7 @@ spec:
         - name: NODE_TYPE
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_ROOT
-          value: "{{ .root.Values.global.appContextRoot | default "prweb" }}"
-
+          value: "{{ template "pega.applicationRootContext" . }}"
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
@@ -151,7 +150,7 @@ spec:
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
           httpGet:
-            path: "/{{ .root.Values.global.appContextRoot | default "prweb" }}/PRRestService/monitor/pingService/ping"
+            path: "/{{ template "pega.applicationRootContext" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
@@ -163,7 +162,7 @@ spec:
         {{- $readinessProbe := .node.readinessProbe }}
         readinessProbe:
           httpGet:
-            path: "/{{ .root.Values.global.appContextRoot | default "prweb" }}/PRRestService/monitor/pingService/ping"
+            path: "/{{ template "pega.applicationRootContext" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}

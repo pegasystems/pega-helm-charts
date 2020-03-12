@@ -201,3 +201,13 @@ true
 {{- end }}
 {{- end }}
 {{- end }}
+
+# Determine application root context to use in pega tomcat nodes
+{{- define "pega.applicationRootContext" -}}
+  {{- if .root.Values.global.docker.pega.appContextRoot -}}
+    {{- .root.Values.global.docker.pega.appContextRoot -}}
+  {{- else -}}
+    prweb
+  {{- end -}}
+{{- end }}
+
