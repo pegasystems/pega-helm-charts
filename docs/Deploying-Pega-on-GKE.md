@@ -230,19 +230,13 @@ These two charts in this /charts/pega folder of the pega-helm-charts repository,
 
 ### Updating the addons.yaml Helm chart values
 
-Update this Helm chart in order to enable configure the use of a load balancer and the metrics-server for deployments to configure the use of an Google Cloud Load Balancer (GCLB) by leaving Traefik disabled; when you choose a GKE deployment in the pega.yaml file, the Helm charts appropriately configure the deployment load balancer. You must disable the Pega metric server to ensure your deployment uses the GKE-supplied metrics server.
+Use the provided example addons.yaml file to configure the use of a Google Cloud Load Balancer (GCLB).
 
-1. To download pega/addons Helm chart to the \<local filepath\>\\\<platform\>-demo, enter:
+1. Download the example pega/addons [addons.yaml](./resources/addons-gke.yaml) the \<local filepath\>/gke-demo.
 
-    `$ helm inspect values pega/addons > addons.yaml`
+   This example addons file disables the basic addons functionality so your deployment will use the required Kubernetes resources that are native to your GKE environment, including the Google Cloud Load Balancer (GCLB), Google Cloud Operations suite for log aggregation, and a metrics server.
 
-2. Open the addons.yaml file from this folder in a text editor.
-
-3. In the ??? configuration area, ensure the settings are appropriately configured to use the load balancer for the type of environment to which you are installing:
-
-
-
-4. Save the file.
+   When you install the addons namespace, you will specify this example file for the configuration details.
 
 ### Add any known, customized settings for Pega to your deployment
 
@@ -279,7 +273,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/gke-demo, enter:
 
-`$ helm inspect values pega/pega > pega.yaml`
+`$ helm inspect values pega/pega > /home/<local filepath>/gke-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your GKE requirements:
 
@@ -446,7 +440,7 @@ ingress:
 13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
 
 ```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values addons-gke.yaml
     NAME: addons
     LAST DEPLOYED: Fri Jan  3 18:58:28 2020
     NAMESPACE: pegaaddons

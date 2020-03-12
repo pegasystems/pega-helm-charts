@@ -234,7 +234,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml to the \<local filepath\>/pks-demo, enter:
 
-`$ helm inspect values pega/pega > pega.yaml`
+`$ helm inspect values pega/pega > /home/<local filepath>/pks-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your PKS requirements:
 
@@ -365,7 +365,12 @@ ingress:
 14. To install the addons chart, which you updated in [Preparing your local system](#prepare-your-resources--45-minutes), enter:
 
 ```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values ./addons-pks.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values addons-pks.yaml
+    NAME: addons
+    LAST DEPLOYED: Fri Jan  3 18:58:28 2020
+    NAMESPACE: pegaaddons
+    STATUS: deployed
+    REVISION: 1
 ```
 
 A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
@@ -374,6 +379,12 @@ A successful pegaaddons deployment returns details of deployment progress. For f
 
 ```bash
     $ helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
+    NAME: mypega-pks-demo
+    LAST DEPLOYED: Fri Jan  3 19:00:19 2020
+    NAMESPACE: mypega-pks-demo
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
 ```
 
 For subsequent Helm installs, use the command `helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo` to deploy Pega Platform and avoid another Pega Platform installation.

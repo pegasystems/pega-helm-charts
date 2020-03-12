@@ -378,7 +378,7 @@ These two charts in this /charts/pega folder of the pega-helm-charts repository,
 
 Use the provided example addons.yaml file to configure the use of an Application Gateway Ingress Controller (AGIC).
 
-1. Download the example pega/addons [addons.yaml](./resources/addons-aks.yaml) the \<local filepath\>/pks-demo.
+1. Download the example pega/addons [addons.yaml](./resources/addons-aks.yaml) to the \<local filepath\>/aks-demo.
 
    This example addons file already specifies the use of an Application Gateway Ingress Controller (AGIC). You must complete the configuration with details from your AKS environment before you can deploy Pega Platform into your environment.
 
@@ -437,7 +437,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 
-`$ helm inspect values pega/pega > pega.yaml`
+`$ helm inspect values pega/pega > /home/<local filepath>/aks-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your AKS requirements:
 
@@ -567,7 +567,12 @@ ingress:
 14. To install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--60-minutes), enter:
 
 ```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values ./addons-aks.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values addons-aks.yaml
+    NAME: addons
+    LAST DEPLOYED: Fri Jan  3 18:58:28 2020
+    NAMESPACE: pegaaddons
+    STATUS: deployed
+    REVISION: 1
 ```
 
 A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
@@ -575,16 +580,22 @@ A successful pegaaddons deployment returns details of deployment progress. For f
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
-    $ helm install mypega pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
+    $ helm install mypega-aks-demo pega/pega --namespace mypega --values pega.yaml --set global.actions.execute=install-deploy
+    NAME: mypega-aks-demo
+    LAST DEPLOYED: Fri Jan  3 19:00:19 2020
+    NAMESPACE: mypega-aks-demo
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
 ```
 
-For subsequent Helm installs, use the command `helm install mypega pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command `helm install mypega-aks-demo pega/pega --namespace mypega --values pega.yaml` to deploy Pega Platform and avoid another Pega Platform installation.
 
 A successful Pega deployment immediately returns details that show progress for your deployment.
 
 16. Refresh the Kubernetes dashboard that you opened in step 9. If you closed the dashboard, open a new command prompt running as Administrator and relaunch the web browser as directed in Step 9.
 
-17. In the dashboard, in **Namespace** select the **mypega** view and then click on the **Pods** view.
+17. In the dashboard, in **Namespace** select the **mypega-aks-demo** view and then click on the **Pods** view.
 
     Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -594,9 +605,9 @@ A successful Pega deployment immediately returns details that show progress for 
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-19. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega** namespace pods.
+19. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the **mypega-aks-demo** namespace pods.
 
-    A successful deployment does not show errors across the various workloads. The **mypega** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
+    A successful deployment does not show errors across the various workloads. The **mypega-aks-demo** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
 Logging in to Pega Platform – 10 minutes
 ---------------------------------------
@@ -617,7 +628,7 @@ To log in to Pega Platform with this host name, assign the host name with the sa
 
 You can view the networking endpoint that is associated with your AKS deployment using the `kubectl` command.
 
-`$ kubectl get services --namespace mypega`
+`$ kubectl get services --namespace mypega-aks-demo`
 
 The pega-web tier external endpoint (the IP address and port number) are displayed. Port 80 is used for HTTP traffic, which means that you cannot use HTTPS encryption to access the web-tier in a web browser; instead, use the domain name that you configured for the pega-web tier ingress.
 
@@ -640,8 +651,7 @@ The mypega-web node is the only tier with an externally exposed IP address. Note
 
     a. Click **+Record** set
 
-    b.  In the **Name** field, enter **"\<the host name for your web service
-    tier\>"**.
+    b.  In the **Name** field, enter **"\<the host name for your web service tier\>"**.
 
     c.  In the **Type** field, select **A**.
 
