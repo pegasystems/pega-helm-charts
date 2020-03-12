@@ -24,17 +24,15 @@ ingress-azure:
   rbac:
     enabled: true
 
-# Traefik load balancer parameters
-# Pega deployments support the use of Traefik as the default load balancer; however, by default,
-# Pega Platform deployments assume clients will use the load balancing tools featured in the
-# Kubernetes environment of the deployment. For more information, see the readme:
-# https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
-# Set traefik.enabled: true to deploy Traefik using the parameters specified below.
+# The following parameters are not used in Azure AKS environments so they are set to false. Enable any of them if your deployment requires the use of one.
+
 traefik:
   enabled: false
 
-# When deploying on AWS EKS, set this to true to install aws-alb-ingress-controller.
 aws-alb-ingress-controller:
+  enabled: false
+
+metrics-server:
   enabled: false
 
 deploy_efk: &deploy_efk false
@@ -47,6 +45,3 @@ kibana:
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
-
-metrics-server:
-  enabled: false
