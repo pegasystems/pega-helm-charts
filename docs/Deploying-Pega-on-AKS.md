@@ -348,6 +348,76 @@ To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that h
 
 An installation with deployment will take about 90 minutes total, because a Pega Platform installation in your PostgreSQL database takes up to an hour.
 
+Adding the Pega configuration files to your Helm installation on your local system
+----------------------------------------------------------------------------------
+
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
+
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+
+1. To add the Pega repository to your Helm installation, enter:
+
+    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+
+2. To verify the new repository, you can search it by entering:
+
+```bash
+  $ helm search repo pega
+  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega   1.2.0                           Pega installation on kubernetes
+  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+```
+
+These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
+
+### Updating the addons.yaml Helm chart values
+
+Use the provided example addons.yaml file to configure the use of an Application Gateway Ingress Controller (AGIC).
+
+1. Download the example pega/addons [addons.yaml](./resources/addons-pks.yaml) the \<local filepath\>/pks-demo.
+
+   This example addons file already specifies the use of an Application Gateway Ingress Controller (AGIC). You must complete the configuration with details from your AKS environment before you can deploy Pega Platform into your environment.
+
+   When you install the addons namespace, you will specify this example file for the configuration details.
+
+2. Use a text editor to open the addons-aks.yaml file and update the following parameters in the chart based on your AKS requirements:
+
+  - Specify your Azure subscription ID with the `appgw.subscriptionId: <YOUR.SUBSCRIPTION_ID>` parameter.
+
+  - Specify the Azure resource group in which you created the Application Gateway with the `appgw.resourceGroup: <RESOURCE_GROUP_NAME>` parameter.
+
+  - Specify the name of the Application Gateway with the `appgw.name: <APPLICATION-GATEWAY-NAME>` parameter.
+
+  - To restrict all Ingresses to be exposed over a private IP address, set the `appgw.usePrivateIP: true` parameter; to allow other ingresses, set the `appgw.usePrivateIP: false` parameter.
+
+  - To configure authentication, REVIEWERS: need to complete this section
+  , set the `armAuth.type: servicePrincipal` parameter and set the `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>` parameter.
+
+  - To configure Role-Based Access Control (RBAC) to match the RBAC setting in your environment, REVIEWERS: please review, set the `rbac.enabled: true` parameter.
+
+3. Save the file.
+
+### Add any known, customized settings for Pega to your deployment
+
+The Pega deployment model supports advanced configurations to fit most existing
+clients' needs. If you are a Pega client and have known, required customizations
+for your deployment and you already use the following files to add your known
+customizations, you can copy those configurations into the configuration files
+Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts) repository folder, pega-helm-charts/charts/pega/config/deploy:
+
+- context.xml: add additional required data sources
+
+- prlog4j2.xml: modify your logging configuration, if required
+
+- prconfig.xml: adjust the standard Pega Platform configuration with known,
+    required settings
+
+Make these changes before you begin deploying Pega Platform using Helm charts.
+
 ### Updating the pega.yaml Helm chart values
 
 To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \gke-demo folder you have already created on your local system. 
@@ -389,7 +459,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
-1. Save the file.
+3. Save the file.
 
 ### Deploying Pega Platform using the command line
 
@@ -497,10 +567,10 @@ ingress:
 14. To install the addons chart, which you updated in [Preparing your AKS resources](#prepare-your-aks-resources--60-minutes), enter:
 
 ```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values ./addons-aks.yaml
 ```
 
-The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
+A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 

@@ -29,11 +29,6 @@ traefik:
       # Enter the memory limit for Traefik
       memory: 500Mi
 
-# The following parameters are not used in Pivotal PKS environments so they are set to false. Enable any of them if your deployment requires the use of one.
-
-aws-alb-ingress-controller:
-  enabled: false
-
 # Configure EFK stack for logging in Pivotal PKS environments:
 # For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
 # Pega recommends deploying EFK only on k8s
@@ -80,23 +75,13 @@ fluentd-elasticsearch:
     buffer_chunk_limit: 250M
     buffer_queue_limit: 30
 
-# Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
-# EKS, open-source Kubernetes, Openshift - set this to true.
-# GKE or AKS - set this to false and use the native metrics-server in the cluster.
+# The following parameters are not used in Pivotal PKS environments so they are set to false. Enable any of them if your deployment requires the use of one.
+
+aws-alb-ingress-controller:
+  enabled: false
+
 metrics-server:
   enabled: false
-  # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
-  args:
-    - --logtostderr
-# The order in which to consider different Kubelet node address types when connecting to Kubelet.
-# Uncomment below arguemnt if host names are not resolvable from metrics server pod.
-# This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-# - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-# Uncomment below arguemnt to skip verifying Kubelet CA certificates.
-# Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
-# This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-# - --kubelet-insecure-tls
 
 ingress-azure:
   enabled: false

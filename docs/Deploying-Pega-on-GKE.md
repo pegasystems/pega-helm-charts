@@ -202,6 +202,65 @@ To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that h
 
 An installation with deployment will take about 90 minutes total, because a Pega Platform installation in your PostgreSQL database takes up to an hour.
 
+Adding the Pega configuration files to your Helm installation on your local system
+----------------------------------------------------------------------------------
+
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
+
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+
+1. To add the Pega repository to your Helm installation, enter:
+
+    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+
+2. To verify the new repository, you can search it by entering:
+
+```bash
+  $ helm search repo pega
+  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega   1.2.0                           Pega installation on kubernetes
+  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+```
+
+These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
+
+### Updating the addons.yaml Helm chart values
+
+Update this Helm chart in order to enable configure the use of a load balancer and the metrics-server for deployments to configure the use of an Google Cloud Load Balancer (GCLB) by leaving Traefik disabled; when you choose a GKE deployment in the pega.yaml file, the Helm charts appropriately configure the deployment load balancer. You must disable the Pega metric server to ensure your deployment uses the GKE-supplied metrics server.
+
+1. To download pega/addons Helm chart to the \<local filepath\>\\\<platform\>-demo, enter:
+
+    `$ helm inspect values pega/addons > addons.yaml`
+
+2. Open the addons.yaml file from this folder in a text editor.
+
+3. In the ??? configuration area, ensure the settings are appropriately configured to use the load balancer for the type of environment to which you are installing:
+
+
+
+4. Save the file.
+
+### Add any known, customized settings for Pega to your deployment
+
+The Pega deployment model supports advanced configurations to fit most existing
+clients' needs. If you are a Pega client and have known, required customizations
+for your deployment and you already use the following files to add your known
+customizations, you can copy those configurations into the configuration files
+Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts) repository folder, pega-helm-charts/charts/pega/config/deploy:
+
+- context.xml: add additional required data sources
+
+- prlog4j2.xml: modify your logging configuration, if required
+
+- prconfig.xml: adjust the standard Pega Platform configuration with known,
+    required settings
+
+Make these changes before you begin deploying Pega Platform using Helm charts.
+
 ### Updating the pega.yaml Helm chart values
 
 To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \gke-demo folder you have already created on your local system. 

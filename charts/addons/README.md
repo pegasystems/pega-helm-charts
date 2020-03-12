@@ -101,7 +101,7 @@ Environment                               | Suggested logging tools
 Open-source Kubernetes                    | EFK
 Red Hat Openshift                         | Built-in EFK
 Amazon Elastic Kubernetes Service (EKS)   | Built-in EFK
-Google Kubernetes Engine (GKE)            | Stackdriver
+Google Kubernetes Engine (GKE)            | Google Cloud Operations
 Pivotal Container Service (PKS)           | EFK
 Microsoft Azure Kubernetes Service (AKS)  | Azure Monitor
 

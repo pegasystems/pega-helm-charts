@@ -5,11 +5,11 @@ ingress-azure:
   # Add required details about the Application Gateway you created.
   appgw:
     # Subscription ID of your Azure subscription.
-    subscriptionId: <YOUR.SUBSCRIPTION_ID>
+    subscriptionId: <YOUR-SUBSCRIPTION-ID>
     # Resource group in which you created the Application Gateway.
-    resourceGroup: <RESOURCE_GROUP_NAME>
+    resourceGroup: <RESOURCE-GROUP-NAME>
     # Name of the Application Gateway you created.
-    name: <APPLICATION_GATEWAY_NAME>
+    name: <APPLICATION-GATEWAY-NAME>
     # To restrict all Ingresses to be exposed over a private IP address.
     usePrivateIP: true
   # Authentication using which ingress controller authenticates with Azure Resource Manager.
