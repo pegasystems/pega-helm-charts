@@ -189,8 +189,6 @@ After you log in, the docker CLI is available from a Windows PowerShell command
 prompt. These instructions were mostly sourced from the article,
 <https://docs.docker.com/v17.09/docker-for-windows/install/>.
 
->>HELM WAS HERE
-
 Creating SSL certificates for HTTPS load balancer on a Kubernetes ingress
 -----------------------------------
 

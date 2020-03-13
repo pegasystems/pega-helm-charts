@@ -380,24 +380,21 @@ Use the provided example addons.yaml file to configure the use of an Application
 
 1. Download the example pega/addons [addons.yaml](./resources/addons-aks.yaml) to the \<local filepath\>/aks-demo.
 
-   This example addons file already specifies the use of an Application Gateway Ingress Controller (AGIC). You must complete the configuration with details from your AKS environment before you can deploy Pega Platform into your environment.
-
-   When you install the addons namespace, you will specify this example file for the configuration details.
+   This example addons file specifies the use of an Application Gateway Ingress Controller (AGIC) and contains several parameters that will specify details from your AKS environment that are required to deploy Pega Platform into your environment.
 
 2. Use a text editor to open the addons-aks.yaml file and update the following parameters in the chart based on your AKS requirements:
 
-  - Specify your Azure subscription ID with the `appgw.subscriptionId: <YOUR.SUBSCRIPTION_ID>` parameter.
+  - Specify your Azure subscription ID in the `appgw.subscriptionId: <YOUR-SUBSCRIPTION-ID>` parameter.
 
-  - Specify the Azure resource group in which you created the Application Gateway with the `appgw.resourceGroup: <RESOURCE_GROUP_NAME>` parameter.
+  - Specify the Azure resource group in which you created the Application Gateway in the `appgw.resourceGroup: <RESOURCE-GROUP-NAME>` parameter.
 
-  - Specify the name of the Application Gateway with the `appgw.name: <APPLICATION-GATEWAY-NAME>` parameter.
+  - Specify the name of the Application Gateway in the `appgw.name: <APPLICATION-GATEWAY-NAME>` parameter.
 
   - To restrict all Ingresses to be exposed over a private IP address, set the `appgw.usePrivateIP: true` parameter; to allow other ingresses, set the `appgw.usePrivateIP: false` parameter.
 
-  - To configure authentication, REVIEWERS: need to complete this section
-  , set the `armAuth.type: servicePrincipal` parameter and set the `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>` parameter.
+  - To configure authentication, REVIEWERS: need to complete this section, set the `armAuth.type: servicePrincipal` parameter and set the `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>` parameter.
 
-  - To configure Role-Based Access Control (RBAC) to match the RBAC setting in your environment, REVIEWERS: please review, set the `rbac.enabled: true` parameter.
+  - To enable Role-Based Access Control (RBAC) in your deployment, which you must also enabled in your Azure AKS environment, set the `rbac.enabled: true` parameter.
 
 3. Save the file.
 

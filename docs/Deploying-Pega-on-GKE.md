@@ -209,9 +209,7 @@ Pega maintains a repository of Helm charts that are required to deploy Pega Plat
 
 - pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
-- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
-
-To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+To customize this pega.yaml file, you must download it from the Pega-managed repository to your local system, edit it with a text editor, and then save it to your local system using the same filename.
 
 1. To add the Pega repository to your Helm installation, enter:
 
@@ -226,17 +224,7 @@ To customize these files, you must download them from the repository to your loc
   pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
 ```
 
-These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
-
-### Updating the addons.yaml Helm chart values
-
-Use the provided example addons.yaml file to configure the use of a Google Cloud Load Balancer (GCLB).
-
-1. Download the example pega/addons [addons.yaml](./resources/addons-gke.yaml) the \<local filepath\>/gke-demo.
-
-   This example addons file disables the basic addons functionality so your deployment will use the required Kubernetes resources that are native to your GKE environment, including the Google Cloud Load Balancer (GCLB), Google Cloud Operations suite for log aggregation, and a metrics server.
-
-   When you install the addons namespace, you will specify this example file for the configuration details.
+There is no need to use the addons file for GKE environments, since your deployment will use the required Kubernetes resources that are native to your GKE environment, including the Google Cloud Load Balancer (GCLB), Google Cloud Operations suite for log aggregation, and a metrics server.
 
 ### Add any known, customized settings for Pega to your deployment
 
@@ -437,20 +425,7 @@ ingress:
     ssl_annotation: kubernetes.io/ingress.global-static-ip-name: web-ip-address
 ```
 
-13. To install the addons chart, which you updated in [Preparing your local system](#preparing-your-gke-resources--45-minutes), enter:
-
-```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values addons-gke.yaml
-    NAME: addons
-    LAST DEPLOYED: Fri Jan  3 18:58:28 2020
-    NAMESPACE: pegaaddons
-    STATUS: deployed
-    REVISION: 1
-```
-
-The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
-
-14. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
+13. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
     $ helm install mypega-gke-demo pega/pega --namespace mypega-gke-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -466,9 +441,9 @@ For subsequent Helm installs, use the command `helm install mypega-gke-demo pega
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-gke-demo` deployment.
 
-15. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
+14. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
 
-16. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
+15. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
 ![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -476,11 +451,11 @@ A successful Pega deployment immediately returns details that show progress for 
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-17. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-18. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
+17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
 A successful deployment does not show errors across the various workloads. The `mypega-pks-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
