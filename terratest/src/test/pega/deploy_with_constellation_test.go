@@ -8,8 +8,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const PegaHelmChartPath = "../../../charts/pega"
-
 // set action execute to install
 var options = &helm.Options{
 	SetValues: map[string]string{
