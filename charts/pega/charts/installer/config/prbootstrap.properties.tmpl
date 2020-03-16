@@ -15,5 +15,9 @@ com.pega.pegarules.bootstrap.tempdir=/opt/pega/temp
 poolPreparedStatements=true
 install.{{ .Env.DB_TYPE }}.connectionProperties={{ .Env.JDBC_CUSTOM_CONNECTION }}
 install.{{ .Env.DB_TYPE }}.password={{ .Env.DB_PASSWORD }}
+{{- if isTrue .Env.BYPASS_LOAD_ENGINE_CLASSES }}
+com.pega.pegarules.bootstrap.codeset.version.Pega-EngineCode=do_not_set
+{{- else }}
 com.pega.pegarules.bootstrap.codeset.version.Pega-EngineCode={{ .Env.CODESET_VERSION }}
+{{- end }}
 com.pega.pegarules.bootstrap.engineclasses.dbcpsource=install.{{ .Env.DB_TYPE }}

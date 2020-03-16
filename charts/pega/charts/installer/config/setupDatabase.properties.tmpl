@@ -72,3 +72,9 @@ prlogging.config=/opt/pega/kit/scripts/prlog4j2.xml
 
 # Create schema if absent flag - Only from Docker related deployments
 pega.schema.autocreate=true
+
+# Load engine classes to database?
+bypass.load.engine.classes={{ .Env.BYPASS_LOAD_ENGINE_CLASSES }}
+
+# Load assembly classes to database?
+bypass.load.assembly.classes={{ .Env.BYPASS_LOAD_ASSEMBLY_CLASSES }}
