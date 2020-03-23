@@ -20,11 +20,11 @@ spec:
         # component: constellation
     spec:
       imagePullSecrets:
-      - name: regcred
+      - name: {{ template "pegaRegistrySecret" }}
       containers:
       # cli - the sidecar - here be the brains
-      - name: clln-cli
-        #imagePullPolicy: Never
+      - name: clln
+        imagePullPolicy: {{ .root.Values.global.docker.pega.imagePullPolicy }}
         image: {{ .Values.dockerRepos }}
         args:
         - port=3000

@@ -9,7 +9,6 @@ metadata:
     # component: constellation
 spec:
   selector:
-    # is this on the pod or the deployment?
     app: constellation
     # component: constellation
   ports:
@@ -17,6 +16,4 @@ spec:
     port: 3000
     targetPort: 3000
   type: NodePort
-  #externalIPs:
-  #  - 3.216.78.82
 {{ end }}

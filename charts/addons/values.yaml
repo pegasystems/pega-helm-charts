@@ -6,7 +6,7 @@
 # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
 # Set traefik.enabled: true to deploy Traefik using the parameters specified below.
 traefik:
-  enabled: false
+  enabled: true
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
