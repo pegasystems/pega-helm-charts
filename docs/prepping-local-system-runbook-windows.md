@@ -231,12 +231,42 @@ With the hostname associated with the verification value, wait several minutes t
 
 You will manage these certificates in the environment to which you deploy Pega Platform. For environment-specific details, see the **Deploying Pega Platform using the command line** section in the runbook for that environment.
 
-Downloading a Pega Platform distribution to your local system
--------------------------------------------------------------
+Downloading a Pega Platform installer docker image
+-----------------------------------------------
+
+To download the docker images Pega Platform distribution image to install the Pega Platform onto your database. 
+
+.
+
+## Requesting access to a Pega Platform distribution
+
+1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
+
+2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
+    site with the credentials your Pega representative provided.
+
+3. In the **Download and Upgrade Licensed Software** area, click **New
+    request**.
+
+4. In the right side of the page, click **Continue**.
+
+![](media/029c6531bd52109598047a2ee6966657.png)
+
+Open the email you received. It will look similar to the image shown.
+
+![](media/dockerimage-access-email.png)
+
+
+
+
+
+
+Building a Pega Platform installer docker image
+-----------------------------------------------
 
 These instructions require the Pega Platform distribution image to install the Pega Platform onto your database. To obtain a copy, you must download an image from Pega. For detailed instructions, see [Pega Digital Software Delivery User Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
 
-### Requesting access to a Pega Platform distribution
+## Requesting access to a Pega Platform distribution
 
 1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
@@ -278,7 +308,7 @@ The icon changes to a green check and a new cart item appears in the top right o
 
 11. When satisfied with the order, click **Close**.
 
-### Downloading Pega Platform to your local system
+## Downloading Pega Platform to your local system
 
 To download your Pega Platform image:
 
@@ -315,8 +345,7 @@ If it is not the right version number, you must complete a new request.
 
 After you expand the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
 
-Prepare your Pega Platform installation Docker image – 15 minutes
------------------------------------------------------------------
+## Prepare your Pega Platform installation Docker image
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [Pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the docker cli and docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 

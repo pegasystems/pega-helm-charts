@@ -44,7 +44,7 @@ traefik:
 
 ### Amazon ALB
 
-If deploying on EKS, you can use the native Amazon Load Balancer (ALB). In the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`) and enable ALB (set `aws-alb-ingress-controller.enabled` to `true`)
+When deploying on EKS, you can use the native Amazon Load Balancer (ALB). In the Addons Helm chart: disable Traefik (set `traefik.enabled` to `false`) and enable ALB (set `aws-alb-ingress-controller.enabled` to `true`)
 
 Configuration   | Usage
 ---             | ---
@@ -72,7 +72,15 @@ aws-alb-ingress-controller:
 
 ### Azure AGIC
 
-If deploying on AKS, you can use an Azure Application Gateway for the deployment load balancer. After you create the Application Gateway and an ingress controller, in the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`) and enable AGIC (set `ingress-azure.enabled` to `true`).
+When deploying on Azure AKS, you can use an Application Gateway Ingress Controller (AGIC) for the deployment load balancer. The AGIC is a pod within your AKS cluster that monitors the Kubernetes Ingress resources, which creates and applies the Application Gateway configuration based on the status of the Kubernetes cluster. For details, see [Azure Resource Manager Authentication](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#azure-resource-manager-authentication).
+
+After you create the deployment ingress controller, in the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`), enable AGIC (set `ingress-azure.enabled` to `true`) and add the AGIC gateway configuration details from your AKS deployment.
+
+To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result to the `armAuth.secretJSON` field. For details, see the comments in the addons [values.yaml](charts/addons/values.yaml) or the [AKS runbook](docs/Deploying-Pega-on-AKS.md).
+
+As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access with the AGIC in your cluster via the Azure Resource Manager. For details, see [Set up AAD Pod Identity](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#set-up-aad-pod-identity).
+
+It is a recommended best practice to enable RBAC on your AKS cluster and match the setting in the Addons Helm chart.
 
 Example:
 
@@ -83,6 +91,7 @@ ingress-azure:
       subscriptionId: <YOUR.SUBSCRIPTION_ID>
       resourceGroup: <RESOURCE_GROUP_NAME>
       name: <APPLICATION_GATEWAY_NAME>
+      usePrivateIP: true
     armAuth:
     type: servicePrincipal
     secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>

@@ -392,9 +392,29 @@ Use the provided example addons.yaml file to configure the use of an Application
 
   - To restrict all Ingresses to be exposed over a private IP address, set the `appgw.usePrivateIP: true` parameter; to allow other ingresses, set the `appgw.usePrivateIP: false` parameter.
 
-  - To configure authentication, REVIEWERS: need to complete this section, set the `armAuth.type: servicePrincipal` parameter and set the `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>` parameter.
+  - To configure authentication with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result to the `armAuth.secretJSON` field. For details, see [Using a Service Principal](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#using-a-service-principal).
 
-  - To enable Role-Based Access Control (RBAC) in your deployment, which you must also enabled in your Azure AKS environment, set the `rbac.enabled: true` parameter.
+     In Linux, use the command:
+     
+     `$ az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true | base64 -w0`
+
+    Copy the output and paste it in `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>`
+    
+    In a Windows powershell, encode the command output with the following sequence of commands:
+    
+    ```bash
+    PS C:\local-system> $Command = az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true
+    PS C:\local-system> $Encoded = [convert]::ToBase64String([System.Text.encoding]::Unicode.GetBytes($command))
+    PS C:\local-system> powershell.exe -encoded $Encoded
+    ```
+
+    Copy the output and paste it in `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>`
+
+    When you deploy, the actual JSON values that were encoded in the previous step is copied into the "config" file in the C:\Users\XXXXX\.kube folder.
+
+    As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access with the AGIC in your cluster via the Azure Resource Manager. For details, see [set-up-aad-pod-identity](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#set-up-aad-pod-identity) using the  AAD-Pod-Identity [GitHub project](https://github.com/Azure/aad-pod-identity).
+
+  - To enable Role-Based Access Control (RBAC) in your deployment, which you must also enable in your Azure AKS environment, set the `rbac.enabled: true` parameter.
 
 3. Save the file.
 
