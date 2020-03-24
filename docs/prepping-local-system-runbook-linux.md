@@ -347,7 +347,7 @@ You must build an installer docker image to install or upgrade all of the Pega-s
 
 Clients with appropriate licenses can log in to the image repository and download docker images that are required to install the Pega Platform onto your database.
 
-### Requesting access to a Pega Platform distribution
+### Requesting access to the Pega Docker repository
 
 1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
