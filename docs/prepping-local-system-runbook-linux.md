@@ -43,19 +43,15 @@ Installing required applications for the deployment
 ---------------------------------------------------
 
 The entire deployment requires the following applications to be used during the configuration process; therefore, you should prepare your local system with all of the applications before you start your deployment:
-- Helm
-- kubectl
-- Docker
+- Helm (download the binary from the Helm GitHub repository)
+- kubectl (download the binary file from the kubernetes git repository)
+- Docker (Use the Linux apt or equivalent package manager)
 - unzip (or an equivalent to extract files from .zip archive files.)
 - az cli (only for AKS deployments)
 - AWS IAM Authenticator for Kubernetes (only for EKS deployments)
 - eksctl (only for EKS deployments)
 - pks cli (only for PKS deployments)
 - Google Cloud SDK and gcloud (only for GKE deployments)
-
-Some of the required applications are binary files that you download from the organization's download area; you can install other applications by using a Linux package manager.
-
-To use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
 ### Installing Unzip
 
@@ -105,10 +101,7 @@ For additional information, see [Helm documentation](https://helm.sh/docs/); for
 
 ### Installing kubectl
 
-Kubernetes supports a variety of installation methods for the kubectl command.
-The organization provides a link to download the latest version of the
-executable file, which will be run after you move the binary file in to your
-PATH:
+Kubernetes supports a variety of installation methods for the kubectl command. The organization provides a link to download the latest version of the executable file, which will be run after you move the binary file in to your PATH:
 
 1. To download the latest binary from their git repository, enter:
 
@@ -236,7 +229,7 @@ Run `gcloud topic configurations` to learn more.
 
 ### Installing Docker
 
-For Linux command line users, you can follow these steps to install Docker Community Edition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+For Linux command line users, you can follow these steps to install Docker Community Edition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository. For your convenience, the instructions available on the Docker website are included in this this section of this document.
 
 **SET UP THE REPOSITORY**
 
@@ -334,6 +327,88 @@ With the hostname associated with the verification value, wait several minutes t
 8. In the main page of **SSL for Free**, click **Download All SSL Certificate Files** and save the certificate file and private key file in the \<platform\>-demo folder you have already created on your local system.
 
 You will manage these certificates in the environment to which you deploy Pega Platform. For environment-specific details, see the **Deploying Pega Platform using the command line** section in the runbook for that environment.
+
+Deploying Pega Platform using Pega-provided docker images
+---------------------------------------------------------
+
+To deploy Pega Platform, you must pull several required images from the Pega-managed Docker image repository and push them into your private Docker registry from where you reference them in the Pega Helm chart. For more information, see [Pega Helm chart](https://github.com/pegasystems/pega-helm-charts).
+
+Pegasystems uses a standard naming practice of `hostname/product/image:tag`.  All Pega images are available from the `pega-docker.downloads.pega.com` host.  The `:tag` represents the version if Pega being deployed, for example `:8.3.1` to download Pega 8.3.1.  Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+
+ Name        | Description                                           |
+-------------|-------------------------------------------------------|
+platform/pega  | *Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+ platform/search | *Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+ platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment. 
+ 
+You must build an installer docker image to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database of your deployment. To do so, follow the tasks in the sections to download the Pega Platform distribution and build an installer image using the Pega files in the distribution.
+
+## Downloading a Pega Platform installer docker image
+
+Clients with appropriate licenses can log in to the image repository and download docker images that are required to install the Pega Platform onto your database.
+
+### Requesting access to a Pega Platform distribution
+
+1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
+
+2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
+    site with the credentials your Pega representative provided.
+
+3. In the **Download and Upgrade Licensed Software** area, click **New
+    request**.
+
+4. In the right side of the page, click **Request access key**.
+
+![Select your distribution](media/dockerimage-download.png)
+
+5. Enter your credential details.
+
+   After you enter valid credentials, you recieve confirmation that an email is on the way. 
+
+![Select your distribution](media/dockerimage-download-access.png)
+
+6. Open the email you received. It will look similar to the image shown.
+
+![Confirmation email with access key details](media/dockerimage-access-email.png)
+
+7. Save your access key to a text file the <local filepath>\<platform>-demo folder so you can pass it into your docker login command to ensure the it will not display in your bash history or logs.
+
+### Downloading Pega Platform docker images to your local system
+
+With access to the Pega-managed Docker image repository, clients log in to the image repository and download required images.
+
+1. In a Linux bash shell with root privileges, change folders to the \home\<local filepath>\<platform>-demo directory, navigate to the <localfilepath>\<platform>-demo folder where you saved your access key, and log into the Pega-managed Docker image repository:
+
+```bash
+$ cat <localfilepath>\<platform>-demo\<access-key-filename>.txt |  docker login pega-docker.downloadsqa.pega.com --username=reg-<User ID> --password-stdin
+Login Succeeded
+```
+
+2. To download the version of Pega image for your deployment, enter and specify the version tag:
+
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform/pega:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
+```
+
+3. To download the version of search image image for your deployment, enter and specify the version tag:
+
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform/search:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
+```
+
+To build an installer docker image to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database of your deployment, follow the tasks in the next sections.
+
+## Building a Pega Platform installer docker image
+
+These instructions require the Pega Platform distribution image to install the Pega Platform onto your database. 
+
+Clients with appropriate licenses can download a distribution image from Pega. For additional instructions, see [Pega Digital Software Delivery User Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
+
+
 
 Downloading a Pega Platform distribution to your local system
 -------------------------------------------------------------
