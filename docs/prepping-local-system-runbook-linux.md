@@ -339,7 +339,7 @@ Pegasystems uses a standard naming practice of `hostname/product/image:tag`.  Al
 -------------|-------------------------------------------------------|
 platform/pega  | *Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
  platform/search | *Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
- platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment. 
+ platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
  
 You must build an installer docker image to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database of your deployment. To do so, follow the tasks in the sections to download the Pega Platform distribution and build an installer image using the Pega files in the distribution.
 
