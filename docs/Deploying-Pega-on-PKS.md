@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-2. Verify access to your PKS cluster and create an SQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
+2. Verify access to your PKS cluster and create an PostgreSQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
 
 3. Customize a configuration file with your PKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your PKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -84,11 +84,11 @@ During deployment the required Kubernetes configuration file is copied into the 
 
 ### Creating a database resource
 
-PKS deployments require you to install Pega Platform software in an PostgreSQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
+PKS deployments require you to install Pega Platform software in an PostgreSQL database. After you create an PostgreSQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the PostgreSQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
 
-#### Creating an SQL instance
+#### Creating an PostgreSQL instance
 
-To begin, create an SQL Instance that is available to your PKS cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
+To begin, create an PostgreSQL Instance that is available to your PKS cluster. In this example, we create an PostgreSQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
 
 1. Use a web browser to log in to <https://cloud.google.com/> and navigate to your **Console** in the upper right corner.
 
@@ -143,9 +143,9 @@ To begin, create an SQL Instance that is available to your PKS cluster. In this 
 
 Create a PostgreSQL database in your new SQL instance for the Pega Platform installation. Use the database editing tool of your choice to log into your SQL instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
 
-1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
+1. Use a database editor tool, such as pgadmin4, to log into your PostgreSQL instance.
 
-    You can find your access information and login credentials, by selecting the SQL instance in the GCP console.
+    You can find your access information and login credentials, by selecting the PostgreSQL instance in the GCP console.
 
 2. In the database editor tool, navigate to Databases and create a new database.
 
@@ -226,7 +226,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Credentials for your DockerHub account in order to access the required Docker images.
 
-- Access your GCP SQL database.
+- Access your GCP PostgreSQL database.
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
@@ -234,7 +234,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml to the \<local filepath\>/pks-demo, enter:
 
-`$ helm inspect values pega/pega > /home/<local filepath>/pks-demo/pega.yaml`
+`$ helm inspect values pega/pega > <local filepath>/pks-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your PKS requirements:
 

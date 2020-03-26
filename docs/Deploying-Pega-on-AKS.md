@@ -398,7 +398,7 @@ Use the provided example addons.yaml file to configure the use of an Application
      
      `$ az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true | base64 -w0`
 
-    Copy the output and paste it in `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>`
+    Copy the output and paste it in `armAuth.secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>`
     
     In a Windows powershell, encode the command output with the following sequence of commands:
     
@@ -408,7 +408,7 @@ Use the provided example addons.yaml file to configure the use of an Application
     PS C:\local-system> powershell.exe -encoded $Encoded
     ```
 
-    Copy the output and paste it in `armAuth.secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>`
+    Copy the output and paste it in `armAuth.secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>`
 
     When you deploy, the actual JSON values that were encoded in the previous step is copied into the "config" file in the C:\Users\XXXXX\.kube folder.
 
@@ -454,7 +454,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 
-`$ helm inspect values pega/pega > /home/<local filepath>/aks-demo/pega.yaml`
+`$ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your AKS requirements:
 
@@ -465,7 +465,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | Jdbc.url:               | Specify the server and database name for your Pega Platform installation.   | <ul><li>url: “jdbc:sqlserver://**YOUR_DB_HOST_NAME**:1433; databaseName=**YOUR_DB_NAME**; selectMethod=cursor; sendStringParametersAsUnicode=false” </li><li>To locate **YOUR_DB_HOST_NAME** and **YOUR_DB_NAME** of your Azure SQL database, see [Locating your SQL database details](#locating-your-sql-database-details).</li></ul> |
 | Jdbc.driverClass:       | Specify the driver class for this type of database. | driverClass: "com.microsoft.sqlserver.jdbc.SQLServerDriver"                                              |
 | Jdbc.dbType:            | Specify the database type.                | dbType: "mssql”    |
-| Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment. For AKS, we can obtain the URL of the required 7.4.1. driver file that is publicly available in the referenced Maven repository.                              | driverUri: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/7.4.1.jre11/mssql-jdbc-7.4.1.jre11.jar" |
+| Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment. For AKS, we can obtain the URL of the required 7.4.1. driver file that is publicly available in the referenced Maven repository.                              | driverUri: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.0.jre11/mssql-jdbc-8.2.0.jre11.jar" |
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.           | <ul><li>username: "\<name of your database user\>"</li><li> password: "\<password for your database user\>"</li></ul>     |
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
@@ -473,7 +473,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
+| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image:your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
 | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
 3. Save the file.

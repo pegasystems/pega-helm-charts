@@ -337,8 +337,8 @@ Pegasystems uses a standard naming practice of `hostname/product/image:tag`.  Al
 
  Name        | Description                                           |
 -------------|-------------------------------------------------------|
-platform/pega  | *Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
- platform/search | *Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+ platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
  platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
  
 You must build an installer docker image to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database of your deployment. To do so, follow the tasks in the sections to download the Pega Platform distribution and build an installer image using the Pega files in the distribution.
@@ -380,7 +380,7 @@ With access to the Pega-managed Docker image repository, clients log in to the i
 1. In a Linux bash shell with root privileges, change folders to the \home\<local filepath>\<platform>-demo directory, navigate to the <localfilepath>\<platform>-demo folder where you saved your access key, and log into the Pega-managed Docker image repository:
 
 ```bash
-$ cat <localfilepath>\<platform>-demo\<access-key-filename>.txt |  docker login pega-docker.downloadsqa.pega.com --username=reg-<User ID> --password-stdin
+$ cat <localfilepath>\<platform>-demo\<access-key-filename>.txt |  docker login pega-docker.downloads.pega.com --username=<reg-XXXXX> --password-stdin
 Login Succeeded
 ```
 

@@ -148,7 +148,7 @@ ingress-azure:
     # PS C:\local-system> $Command = 'az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true'
     # PS C:\local-system> $Encoded = [convert]::ToBase64String([System.Text.encoding]::Unicode.GetBytes($command))
     # PS C:\local-system> powershell.exe -encoded $Encoded
-    # copy the output and paste it in secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+    # copy the encoded output and paste it in secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>
     #
     # When you deploy, the actual JSON values that were encoded in the previous step is copied into the "config" file in the C:\Users\XXXXX\.kube folder.
     #
@@ -163,7 +163,7 @@ ingress-azure:
     #
     # and comment out the Service Principal parameters:
     type: servicePrincipal
-    secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+    secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>
     #
     # Configure your AKs cluster with RBAC enabled and enable it:
   rbac:

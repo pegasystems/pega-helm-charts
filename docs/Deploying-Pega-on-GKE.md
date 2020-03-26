@@ -261,7 +261,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/gke-demo, enter:
 
-`$ helm inspect values pega/pega > /home/<local filepath>/gke-demo/pega.yaml`
+`$ helm inspect values pega/pega > /<local filepath>/gke-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your GKE requirements:
 
