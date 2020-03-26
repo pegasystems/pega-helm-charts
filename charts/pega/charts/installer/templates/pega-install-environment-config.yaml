@@ -62,4 +62,12 @@ data:
   # Distribution kit URL
   DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
 {{- end }}
+{{- if .Values.bypassLoadEngineClasses }}
+  # Bypass loading engine classes into database during installation
+  BYPASS_LOAD_ENGINE_CLASSES: {{ .Values.bypassLoadEngineClasses | quote }}
+{{- end }}
+{{- if .Values.bypassLoadAssembledClasses }}
+  # Bypass loading assembly classes into database during installation
+  BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
+{{- end }}
 {{ end }}
