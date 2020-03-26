@@ -129,6 +129,8 @@ ingress-azure:
     resourceGroup: <RESOURCE_GROUP_NAME>
     # Name of the Application Gateway you created.
     name: <APPLICATION_GATEWAY_NAME>
+    # To expose the ingress endpoint within the Virtual Network, use privateIP.This setting is not required for Internet exposed ingress, hence disabling.
+    usePrivateIP: false
   # Authentication using which ingress controller authenticates with Azure Resource Manager.
   armAuth:
     # There are two supported authentication methods:
