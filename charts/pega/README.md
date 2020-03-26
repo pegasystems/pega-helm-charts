@@ -4,7 +4,7 @@ The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubern
 
 ## Supported providers
 
-Enter your Kubernetes provider which will allow the Helm charts to configure to any differences between deployment environments.
+Enter your Kubernetes provider which will allow the Helm charts to configure to any differences between deployment environments. These values are case-sensitive and must be lowercase.
 
 Value       | Deployment target
 ---         | ---
@@ -22,12 +22,8 @@ provider: "k8s"
 ```
 
 ## Actions
-<!-- After upgrades are documented in runbooks, use this paragraph
-Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install or upgrade a Pega system.
 
-For additional, required installation or upgrade parameters, see the [Installer section](#install).
--->
-Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system.
+Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system. These values are case-sensitive and must be lowercase.
 
 For additional, required installation parameters, see the [Installer section](#install).
 
