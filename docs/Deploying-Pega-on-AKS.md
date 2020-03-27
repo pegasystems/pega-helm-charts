@@ -400,13 +400,11 @@ Use the provided example addons.yaml file to configure the use of an Application
 
     Copy the output and paste it in `armAuth.secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>`
     
-    In a Windows powershell, encode the command output with the following sequence of commands:
+    In a Windows system, use a gitbash shell or equivalent command line to encode the command output with the following sequence of commands:
     
-    ```bash
-    PS C:\local-system> $Command = az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true
-    PS C:\local-system> $Encoded = [convert]::ToBase64String([System.Text.encoding]::Unicode.GetBytes($command))
-    PS C:\local-system> powershell.exe -encoded $Encoded
-    ```
+    `$ az ad sp create-for-rbac --sdk-auth | base64 -w0`
+
+    Note: Powershell commands for the encryption do not support this command.
 
     Copy the output and paste it in `armAuth.secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>`
 
