@@ -202,7 +202,7 @@ pegasearch:
   memLimit: "3Gi"
   replicas: 1
 
-# Pega Installer settings. The Admin password cannot start with "@".
+# Pega Installer settings.
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
