@@ -150,7 +150,8 @@ Install the PKS CLI binary executable file from the Pivotal support site that yo
 
 ### Installing Docker Desktop on Windows 10
 
-In order to build a docker installation image in the section, [Prepare your Pega Platform installation Docker image – 15 minutes](#prepare-your-pega-platform-installation-docker-image--15-minutes), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system. For your convenience, the instructions available on the Docker website are included in this this section of this document.
+In order to build a docker installation image in the section, [Deploying Pega Platform using Pega-provided docker images](#Deploying-Pega-Platform-using-Pega--provided-docker-images), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system. For your convenience, the instructions available on the Docker website are included in this this section of this document.
+Deploying Pega Platform using Pega-provided docker images
 
 1. Download the installer (Docker for Windows Installer.exe) from [download.docker.com](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe).
 
@@ -389,7 +390,7 @@ After you expand the archive, the files in the Pega Platform distribution image 
 
 As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [Pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the docker cli and docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
 
-Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#downloading-a-pega-platform-distribution-to-your-local-system) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
+Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#downloading-pega-platform-to-your-local-system) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
 
 Follow these steps to create a Docker image you can use to install or upgrade
 Pega Platform.
