@@ -117,10 +117,9 @@ metrics-server:
 # Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
 # - --kubelet-insecure-tls
-
 # When deploying on Azure AKS, set ingress-azure.enabled to true to install an Application Gateway Ingress Controller (AGIC).
-# The AGIC is a pod within your AKS cluster that monitors the Kubernetes Ingress resources, and creates and applies the 
-# Application Gateway config based on the status of the Kubernetes cluster. For details, see 
+# The AGIC is a pod within your AKS cluster that monitors the Kubernetes Ingress resources, and creates and applies the
+# Application Gateway config based on the status of the Kubernetes cluster. For details, see
 # (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#azure-resource-manager-authentication).
 ingress-azure:
   enabled: true
@@ -137,7 +136,7 @@ ingress-azure:
   # Authentication using which ingress controller authenticates with Azure Resource Manager.
   armAuth:
     # To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal
-    # that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result 
+    # that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result
     # to the `secretJSON` field. for details, see (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#using-a-service-principal).
     #
     # In Linux, use the command:
@@ -156,7 +155,7 @@ ingress-azure:
     # the Azure Resource Manager. For details, see (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#set-up-aad-pod-identity).
     #
     # to add a AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity).
-    #armAuth:
+    # armAuth:
     #   type: aadPodIdentity
     #   identityResourceID: <identityResourceId>
     #   identityClientID:  <identityClientId>
