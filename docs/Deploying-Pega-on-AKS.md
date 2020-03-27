@@ -390,7 +390,7 @@ Use the provided example addons.yaml file to configure the use of an Application
 
   - Specify the name of the Application Gateway in the `appgw.name: <APPLICATION-GATEWAY-NAME>` parameter.
 
-  - To expose the ingress endpoint within the Virtual Network, set the `appgw.usePrivateIP: true` parameter. By default this is not required and the parameter is disabled: `appgw.usePrivateIP: false`.
+  - To expose the AGIK loadbalancer ingress to a public IP, leave the parameter setting to `usePrivateIP: false`; for cases where you need to restrict the ingress to only use a private IP address, enable the setting with the parameter value `usePrivateIP: true`.
 
   - To configure authentication with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result to the `armAuth.secretJSON` field. For details, see [Using a Service Principal](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#using-a-service-principal).
 
