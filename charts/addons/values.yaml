@@ -140,13 +140,11 @@ ingress-azure:
     # to the `secretJSON` field. for details, see (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#using-a-service-principal).
     #
     # In Linux, use the command:
-    # $ az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true | base64 -w0
+    # $ az ad sp create-for-rbac --sdk-auth | base64 -w0
     # copy the output and paste it in secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
     #
-    # In a Windows powershell, encode the command output with the following sequence of commands:
-    # PS C:\local-system> $Command = 'az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true'
-    # PS C:\local-system> $Encoded = [convert]::ToBase64String([System.Text.encoding]::Unicode.GetBytes($command))
-    # PS C:\local-system> powershell.exe -encoded $Encoded
+    # On a Windows system, use a Gitbash shell or equivalent instead of Powershell to run the command:
+    # $ az ad sp create-for-rbac --sdk-auth | base64 -w0
     # copy the encoded output and paste it in secretJSON: <SECRET_ENCODED_JSON_CREATED_USING_ABOVE_COMMAND>
     #
     # When you deploy, the actual JSON values that were encoded in the previous step is copied into the "config" file in the C:\Users\XXXXX\.kube folder.
