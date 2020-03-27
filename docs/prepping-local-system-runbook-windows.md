@@ -150,7 +150,7 @@ Install the PKS CLI binary executable file from the Pivotal support site that yo
 
 ### Installing Docker Desktop on Windows 10
 
-In order to build a docker installation image in the section, [Deploying Pega Platform using Pega-provided docker images](#Deploying-Pega-Platform-using-Pega--provided-docker-images), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system. For your convenience, the instructions available on the Docker website are included in this this section of this document.
+In order to build a docker installation image in the section, [Deploying Pega Platform using Pega-provided docker images](#Deploying-Pega-Platform-using-Pega-provided-docker-images), you must install the Community Edition (CE) of Docker for Windows. To do so, you must download, install, and log into Docker for Windows in order to complete the setup on your local system. For your convenience, the instructions available on the Docker website are included in this this section of this document.
 Deploying Pega Platform using Pega-provided docker images
 
 1. Download the installer (Docker for Windows Installer.exe) from [download.docker.com](https://download.docker.com/win/stable/Docker%20for%20Windows%20Installer.exe).
