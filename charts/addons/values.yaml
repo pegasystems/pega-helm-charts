@@ -133,7 +133,7 @@ ingress-azure:
     # Name of the Application Gateway you created.
     name: <APPLICATION-GATEWAY-NAME>
     # To restrict all Ingresses to be exposed over a private IP address.
-    usePrivateIP: true
+    usePrivateIP: false
   # Authentication using which ingress controller authenticates with Azure Resource Manager.
   armAuth:
     # To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal
