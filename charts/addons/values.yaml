@@ -10,7 +10,7 @@ traefik:
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
-  serviceType: LoadBalancer
+  serviceType: NodePort
   # If enabled is set to "true", ssl will be enabled for Traefik
   ssl:
     enabled: false
@@ -60,7 +60,7 @@ aws-alb-ingress-controller:
 
 # Replace false with true to deploy EFK.
 # Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
-deploy_efk: &deploy_efk true
+deploy_efk: &deploy_efk false
 
 elasticsearch:
   enabled: *deploy_efk
@@ -120,7 +120,7 @@ metrics-server:
 
 # When deploying on Azure AKS, set ingress-azure.enabled to true to install the application-gateway-ingress-controller.
 ingress-azure:
-  enabled: true
+  enabled: false
   # Add required details about the Application Gateway you created.
   appgw:
     # Subscription ID of your Azure subscription.

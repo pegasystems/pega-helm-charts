@@ -24,7 +24,7 @@ spec:
       containers:
       # cli - the sidecar - here be the brains
       - name: clln
-        imagePullPolicy: {{ .root.Values.global.docker.pega.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.dockerRepos }}
         args:
         - port=3000
