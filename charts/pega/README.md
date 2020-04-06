@@ -103,7 +103,7 @@ It is standard practice to have separate schemas for your rules and data.  You m
  
  Example:
  
- ```yaml
+```yaml
 jdbc:
   ...
   rulesSchema: "rules"
@@ -119,7 +119,7 @@ When using a private registry that requires a username and password, specify the
 
 Example:
 
- ```yaml
+```yaml
 docker:
   registry:
     url: "YOUR_DOCKER_REGISTRY"
@@ -341,6 +341,21 @@ Parameter       | Description    | Default value
 `memLimit`      | Memory limit for pods in the current tier. | `8Gi`
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
+
+### JVM Arguments
+
+You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter used the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
+
+Best-practice arguments for heap tuning and garbage collection are included by default in CATALINA_OPTS.  Specifying a value for this parameter will replace the default values with your organization's preferred arguments.  Ensure that any default values you wish to keep are also included in `additionalCatalinaOpts`.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    javaOpts: ""
+    additionalCatalinaOpts: "-Dcustom.argument"
+```
 
 ### Liveness and readiness probes
 

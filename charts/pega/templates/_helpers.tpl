@@ -122,6 +122,12 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 # Additional JVM arguments
 - name: JAVA_OPTS
   value: "{{ .node.javaOpts }}"
+- name: ADDITIONAL_CATALINA_OPTS
+{{- if .node.additionalCatalinaOpts }}
+  value: "{{ .node.additionalCatalinaOpts }}"
+{{- else }}
+  value: "-XX:MetaspaceSize=512M -XX:MaxMetaspaceSize=1G -XX:ReservedCodeCacheSize=512M -XX:+DisableExplicitGC -XX:+ParallelRefProcEnabled -XX:+UseStringDeduplication -Djava.awt.headless=true -Xlog:gc*,gc+heap=debug,gc+humongous=debug:file=/usr/local/tomcat/logs/gc.log:tags,uptime,pid,level,time"
+{{- end }}
 # Initial JVM heap size, equivalent to -Xms
 - name: INITIAL_HEAP
 {{- if .node.initialHeap }}
