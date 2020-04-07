@@ -22,7 +22,6 @@ spec:
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
       containers:
-      # cli - the sidecar - here be the brains
       - name: clln
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.dockerRepos }}
