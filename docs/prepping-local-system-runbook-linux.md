@@ -270,6 +270,8 @@ and test repositories.
 
 **INSTALL DOCKER CE**
 
+After you install Docker CE on your Linux system, you can run Docker commands without using the 'sudo' preface. To learn how, see [Manage Docker as a non-root user](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user). The recommended steps to change ownership of the Unix socket that binds to the Docker daemon on your Linux system (from the default, `root`, to your system user) originate in that document and are added here for your convenience. You can skip steps 3 - 6 if you run the docker command with the `sudo` preface.
+
 1. Update the apt package index.
 
     `$ sudo apt-get update`
@@ -279,12 +281,21 @@ and test repositories.
 
     `$ sudo apt-get install docker-ce docker-ce-cli containerd.io`
 
-3. Verify that Docker Engine - Community is installed correctly by running the
-    hello-world image.
+3. To create a `docker` group of users, enter:
 
-    `$ sudo docker run hello-world`
+    `$ sudo groupadd docker`
 
-    These instructions are sourced from the article <https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/>. For additional information and links to other Linux distributions, see the instructions provided by other supported Linux distributions.
+4. To add your user name to the docker group, enter:
+
+    `$ sudo usermod -aG docker $USER`
+
+5. Log out and log back in so that your group membership is re-evaluated.
+
+6. To verify that the dpocker command runs without the `sudo` preface and that Docker CE is installed correctly by running the hello-world image, enter:
+
+    `$ docker run hello-world`
+
+    These installation instructions are sourced from the Docker documentation,  [Install Docker Engine on Ubuntu](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/). For additional information and links to other Linux distributions, see the instructions provided by other supported Linux distributions.
 
 Creating SSL certificates for HTTPS load balancer on a Kubernetes ingress
 -----------------------------------
