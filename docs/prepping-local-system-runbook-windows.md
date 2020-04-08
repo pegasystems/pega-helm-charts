@@ -242,7 +242,7 @@ platform/pega  | Download required. Deploys the Pega Platform with its customize
  
 When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for all three downloaded images.
 
-Pega supports experienced client's ability to build your own installer docker image using components of a full Pega Platform 8.3 or later distribution image  to install or upgrade the Pega Platform database. If you build your own installation image, you do not have to download the Pega-provided docker image listed in the table. For details on building your own image, see [Building a Pega Platform installer docker image](building-your-own-pega-installer-image.md).
+Pega supports experienced client's ability to build your own installer docker image using components of a full Pega Platform 8.3 or later distribution image  to install or upgrade the Pega Platform database. If you build your own installation image, you do not have to download the Pega-provided docker image listed in the table. For details on building your own image, see [Building a Pega Platform installer docker image](building-your-own-Pega-installer-image.md).
 
 ## Downloading a Pega Platform installer docker image
 
