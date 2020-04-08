@@ -466,13 +466,14 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment. For AKS, we can obtain the URL of the required 7.4.1. driver file that is publicly available in the referenced Maven repository.                              | driverUri: "https://repo1.maven.org/maven2/com/microsoft/sqlserver/mssql-jdbc/8.2.0.jre11/mssql-jdbc-8.2.0.jre11.jar" |
 | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.           | <ul><li>username: "\<name of your database user\>"</li><li> password: "\<password for your database user\>"</li></ul>     |
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
-| docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
-| docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
+| docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
+| docker.pega.image:       | Refer to the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image:your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
-| installer. adminPassword:                | Specify the initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
+| pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
+| installer.image:        | Specify the Docker `installer` image for installing Pega Platform. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
+| installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
 
@@ -627,7 +628,7 @@ A successful Pega deployment immediately returns details that show progress for 
 Logging in to Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **aks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
+After you complete your deployment, the host name of the pega-web tier ingress is automatically associated with the IP address that the deployment AGIC Gateway assigns to the load balancer for the tier during deployment. The host name of the pega-web tier ingress used in this demo, **aks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
 
 ```yaml
 tier:
@@ -639,49 +640,6 @@ tier:
       domain: "**aks.web.dev.pega.io**"
 ```
 
-To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
-
-You can view the networking endpoint that is associated with your AKS deployment using the `kubectl` command.
-
-`$ kubectl get services --namespace mypega-aks-demo`
-
-The pega-web tier external endpoint (the IP address and port number) are displayed. Port 80 is used for HTTP traffic, which means that you cannot use HTTPS encryption to access the web-tier in a web browser; instead, use the domain name that you configured for the pega-web tier ingress.
-
-To manually associate the host name of the pega-web tier ingress with the tier's external endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a AKS **DNS zone** configured to manage your DNS lookups, you can create a new record set with the pega-web tier the host name and add the IP address of the pega-web tier.
-
-The mypega-web node is the only tier with an externally exposed IP address. Note the external IP address that the load-balancer gives to the web node: this is the IP address which in order to log into Pega Platform with your host name.
-
-1. In a web browser, login to Microsoft Azure Portal (https://portal.azure.com/)
-    with your credentials.
-
-2. Search for **DNS zones** and select it in the dropdown list.
-
-    You are brought to the DNS zones for your Azure account.
-
-![](media/3c7f4a5c3c21c6577a4dbab5f5cfa79d.png)
-
-3. In the **Name** column, click on the **DNS zone** for your deployment.
-
-4. To associate the IP address of the pega-web tier with domain name of the pega-web tier ingress that you configured during your deployment, add a **Record set** to your DNS zone for this host name:
-
-    a. Click **+Record** set
-
-    b.  In the **Name** field, enter **"\<the host name for your web service tier\>"**.
-
-    c.  In the **Type** field, select **A**.
-
-    d.  In **Alias record set** the configuration remains **No**.
-
-    e.  Set **TTL** to **5** and **TTL Unit** to Minutes.
-
-    f.  In the IP Address field, enter the IP from the pega-web tier.
-
-    g.  Click **OK**.
-
-    The new record set appears in the list of record sets for this Azure DNS zone.
-
-![](media/ccb6329a621c6f11970e25531cfa1857.png)
-
-With the ingress host name name associated with this IP address in your DNS service, you can log in to Pega Platform with a web browser using the URL: `http://\<pega-web tier ingress host name>/prweb`.
+With the ingress host name name associated with an IP address in the load balancer in your DNS service, you can log in to Pega Platform with a web browser using the URL: `http://\<pega-web tier ingress host name>/prweb`.
 
 ![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)

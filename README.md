@@ -88,6 +88,14 @@ $ helm delete mypega
 
 Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download docker images that are required to install the Pega Platform onto your database. After you pull the images to your local system you must push them into your private Docker registry.
 
+To download your preferred version of the Pega image to your local system, specify the version tag when you enter:
+
+```bash
+$ sudo docker pull pega-docker.downloads.pega.com/platform/pega:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
+```
+
 For details, see the examples listed in the runbooks:
 
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
@@ -97,36 +105,11 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. All P
 
  Name        | Description                                           |
 -------------|-------------------------------------------------------|
-platform/pega  | *Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
- platform/search | *Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+ platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
  platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
 
-With your required Docker images pushed to your private repository, you provide your repository credentials and reference your images in the Pega Helm chart.
-
-Examples:
-
-```yaml
- # If using a custom Docker registry, supply the credentials here to pull Docker images.
-  docker:
-    registry:
-      url: "YOUR_DOCKER_REGISTRY"
-      username: "YOUR_DOCKER_REGISTRY_USERNAME"
-      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-      # Docker image information for the Pega docker image, containing the application server.
-    pega:
-      image: "pegasystems/pega"
-
-# Elasticsearch deployment settings.
-pegasearch:
-  image: "pegasystems/search"
-  memLimit: "3Gi"
-  replicas: 1
-
-# Pega Installer settings.
-installer:
-  image: "YOUR_INSTALLER_IMAGE:TAG"
-  adminPassword: "ADMIN_PASSWORD"
-```
+ Clients push their three Pega-provided images to their registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
 
 # Contributing
 
