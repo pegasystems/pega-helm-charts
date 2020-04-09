@@ -625,10 +625,10 @@ A successful Pega deployment immediately returns details that show progress for 
 
     A successful deployment does not show errors across the various workloads. The **mypega-aks-demo** Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
-Logging in to Pega Platform – 10 minutes
----------------------------------------
+Logging in to Pega Platform
+---------------------------
 
-After you complete your deployment, the host name of the pega-web tier ingress is automatically associated with the IP address that the deployment AGIC Gateway assigns to the load balancer for the tier during deployment. The host name of the pega-web tier ingress used in this demo, **aks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
+After you complete your deployment, the deployment AGIC Gateway automatically assigns the IP address to the load balancer for the tier during deployment and associates it with host name of the pega-web tier ingress. The host name of the pega-web tier ingress used in this demo, **aks.web.dev.pega.io**, is specified in the pega.yaml file in the following lines:
 
 ```yaml
 tier:
@@ -637,7 +637,7 @@ tier:
     service:
       # Enter the domain name to access web nodes via a load balancer.
       #  e.g. web.mypega.example.com
-      domain: "**aks.web.dev.pega.io**"
+      domain: "aks.web.dev.pega.io"
 ```
 
 With the ingress host name name associated with an IP address in the load balancer in your DNS service, you can log in to Pega Platform with a web browser using the URL: `http://\<pega-web tier ingress host name>/prweb`.
