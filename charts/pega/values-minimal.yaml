@@ -6,6 +6,10 @@ global:
 
   # Enter your Kubernetes provider.
   provider: "k8s"
+  
+  # Safe to evict during auto scaling
+  kubernetes:
+    safeToEvict: "true"
 
   # Deploy Pega nodes
   actions:
