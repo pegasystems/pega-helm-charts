@@ -9,7 +9,6 @@ metadata:
     component: Pega
 spec:
   # Replicas specify the number of copies for {{ .name }}
-  # Replicas specify the number of copies for {{ .name }}
   replicas: {{ .node.replicas }}
 {{- if (eq .kind "Deployment") }}
   progressDeadlineSeconds: 2147483647
@@ -32,7 +31,7 @@ spec:
       annotations:
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
-		cluster-autoscaler.kubernetes.io/safe-to-evict: "{{.Values.kubernetes.safeToEvict}}"
+        cluster-autoscaler.kubernetes.io/safe-to-evict: "{{.Values.kubernetes.safeToEvict}}"
     spec:
       volumes:
       # Volume used to mount config files.
