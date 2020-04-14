@@ -1,62 +1,57 @@
 Preparing your local Linux system – 45 minutes
 =====================================================================
 
-In order to deploy Pega Platform using a local Linux system on which you can run commands with
-Administrator privileges, you must prepare your system with required applications and configuration files you will use for your deployment. Pega recommends doing this first so you can complete the deployment without having to pause in order to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
+To deploy Pega Platform using a local Linux system on which you can run commands with administrator privileges, prepare your system with required applications and configuration files that you need for your deployment. By preparing your system, you can complete the deployment without having to pause to obtain a Linux executable file or prepare a configuration file that is required to complete the deployment.
 
-Assumptions and prerequisites
------------------------------
+Before you begin
+----------------
 
-This guide assumes:
+To prepare a Linux system, it is assumed:
 
 - You have a basic familiarity with running commands from a Linux command prompt with and without root privileges.
 
 - You use a packaging tool to install application packages. For demonstration purposes, this document refers to the Ubuntu Advanced Packaging Tool (apt) commands that is available for use on Ubuntu Linux distributions.
 
-- Basic familiarity with GitHub account with which you will download a Pega-managed GitHub repository containing configuration files and scripts that you use to install Pega Platform and then deploy it in the Kubernetes cluster.
+- You have basic familiarity with a GitHub account with which you download a Pega-managed GitHub repository that contains configuration files and scripts that support installing Pega Platform and deploying it in the Kubernetes cluster.
 
 Creating a local folder to access all of the configuration files
 ----------------------------------------------------------------
 
-Deploying with Helm requires that you run commands from a specific folder on your local system. To ensure you stay oriented to the correct filepath, these instructions always use the reference \<local filepath\>/\<platform\>-demo directory when you must extract files to a folder or run commands from a folder.
+Deploying with Helm requires you to run commands from a specific folder on your local system. To ensure you use the correct filepath, these instructions always use the reference `<local filepath>/<platform>-demo` folder when you extract files to a folder or run commands from a folder.
 
-In order to stay consistent with the instructions, you can create a directory called \<platform\>-demo on your local system in your /home directory. This way, you associate the generic \<local filepath\>/\<platform\>-demo references to the folder /home/\<*linux-username*\>/\<platform\>-demo that is specific to your local
-system.
+To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your Windows user folder. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
 
 To create this folder, open a Linux command prompt and enter:
 
 `$ mkdir /home/<linux-username>/<platform>-demo`
 
-Where \<platform\>-demo is:
+Where `\<platform\>-demo` is:
 
-- AKS-demo - for the AKS runbook
+- For the AKS runbook, `AKS-demo`
 
-- EKS-demo - for the EKS runbook
+- For the EKS runbook, `EKS-demo`
 
-- GKE-demo - for the GKE runbook
+- For the GKS runbook, `GKS-demo`
 
-- PKS-demo - for the PKS runbook
+- For the PKS runbook, `PKS-demo`
 
-- Openshift-demo - for the Openshift runbook
+- For the Openshift runbook, `Openshift-demo`
 
 You are ready to continue preparing your local system.
 
 Installing required applications for the deployment
 ---------------------------------------------------
 
-The entire deployment requires the following applications to be used at some point during the process, so it's useful to prepare your local system with all of the files before you start your deployment:
-- Helm
-- kubectl
-- Docker
-- unzip (or something equivalent to extract files from .zip archive files.)
+The entire deployment requires the following applications to be used during the configuration process; therefore, you should prepare your local system with all of the applications before you start your deployment:
+- Helm (download the binary from the Helm GitHub repository)
+- kubectl (download the binary file from the kubernetes git repository)
+- Docker (Use the Linux apt or equivalent package manager)
+- unzip (or an equivalent to extract files from .zip archive files.)
 - az cli (only for AKS deployments)
+- AWS IAM Authenticator for Kubernetes (only for EKS deployments)
+- eksctl (only for EKS deployments)
 - pks cli (only for PKS deployments)
 - Google Cloud SDK and gcloud (only for GKE deployments)
-
-Some of the required applications are binary files that you download from the
-organization's download area; other applications can be installed by using a Linux package manager. 
-
-In order to use the Docker command in the runbooks, you must have the Docker application installed; however, you must install the application directly from the Docker website. For your convenience, the instructions available on the Docker website are included in this document.
 
 ### Installing Unzip
 
@@ -66,7 +61,7 @@ Install the Unzip utility with a packaging tool such as apt.
 
 ### Installing Helm
 
-Pega supports using Helm version 2.1 and later. The latest runbooks use version 3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the commands will differ slightly for Helm 2.x.
+Pega supports using Helm version 2.1 and later. The latest runbooks use version 3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the commands differ slightly for Helm 2.x.
 
 Helm supports a variety of installation methods. To learn more, see https://helm.sh/docs/intro/install/.
 
@@ -79,8 +74,7 @@ Helm provides a script that you can download and then run to install the latest 
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
 get_helm.sh`
 
-2. To update the permissions of the file so you can use it for installations,
-    enter:
+2. To update the permissions of the file to you can use it for installations, enter:
 
     `$ chmod 700 get_helm.sh`
 
@@ -103,15 +97,11 @@ GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
 GoVersion:"go1.13.4"}
 ```
 
-For details about installation methods for previous Helm versions, see
-<https://v2.helm.sh/docs/using_helm/#installing-helm>.
+For additional information, see [Helm documentation](https://helm.sh/docs/); for details about installation methods for previous Helm versions, see <https://v2.helm.sh/docs/using_helm/#installing-helm>.
 
 ### Installing kubectl
 
-Kubernetes supports a variety of installation methods for the kubectl command.
-The organization provides a link to download the latest version of the
-executable file, which will be run after you move the binary file in to your
-PATH:
+Kubernetes supports a variety of installation methods for the kubectl command. The organization provides a link to download the latest version of the executable file, which will be run after you move the binary file in to your PATH:
 
 1. To download the latest binary from their git repository, enter:
 
@@ -130,8 +120,7 @@ This command downloads and parses the \`stable.txt\` in the repository, navigate
 
     `$ sudo mv ./kubectl /usr/local/bin/kubectl`
 
-For details about installing on Linux and other supported installation methods,
-see <https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux>.
+For details about installing on Linux and other supported installation methods, see [Install kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux).
 
 ### For PKS only: installing the PKS CLI
 
@@ -145,7 +134,7 @@ Install the PKS CLI binary file from the Pivotal support site as an executable t
 
 4. Click **PKS CLI - Linux** to display the **Release Download Files**.
 
-5. Click **PKS CLI - Linux** and in the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the downloaded Linux binary file.
+5. Click **PKS CLI - Linux** and in the **Save as** window, choose the `<local filepath>/<platform>-demo` folder to which you save the downloaded Linux binary file.
 
 6. Rename the downloaded binary file to "pks".
 
@@ -240,7 +229,7 @@ Run `gcloud topic configurations` to learn more.
 
 ### Installing Docker
 
-For Linux command line users, you can follow these steps to install Docker Community Edition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository.
+For Linux command line users, you can follow these steps to install Docker Community Edition (CE) for the first time on a new host machine. For these instructions, you need to set up the Docker repository. Afterward, you can install and update Docker from the repository. For your convenience, the instructions available on the Docker website are included in this this section of this document.
 
 **SET UP THE REPOSITORY**
 
@@ -281,6 +270,8 @@ and test repositories.
 
 **INSTALL DOCKER CE**
 
+After you install Docker CE on your Linux system, you can run Docker commands without using the 'sudo' preface. To learn how, see [Manage Docker as a non-root user](https://docs.docker.com/engine/install/linux-postinstall/#manage-docker-as-a-non-root-user). The recommended steps to change ownership of the Unix socket that binds to the Docker daemon on your Linux system (from the default, `root`, to your system user) originate in that document and are added here for your convenience. You can skip steps 3 - 6 if you run the docker command with the `sudo` preface.
+
 1. Update the apt package index.
 
     `$ sudo apt-get update`
@@ -290,114 +281,32 @@ and test repositories.
 
     `$ sudo apt-get install docker-ce docker-ce-cli containerd.io`
 
-3. Verify that Docker Engine - Community is installed correctly by running the
-    hello-world image.
+3. To create a `docker` group of users, enter:
 
-    `$ sudo docker run hello-world`
+    `$ sudo groupadd docker`
 
-    These instructions are sourced from the article <https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/>. For additional information and links to other Linux distributions, see the instructions provided by other supported Linux distributions.
+4. To add your user name to the docker group, enter:
 
-Adding the Pega configuration files to your Helm installation on your local system
-----------------------------------------------------------------------------------
+    `$ sudo usermod -aG docker $USER`
 
-Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
+5. Log out and log back in so that your group membership is re-evaluated.
 
-- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+6. To verify that the dpocker command runs without the `sudo` preface and that Docker CE is installed correctly by running the hello-world image, enter:
 
-- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment. The required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment, when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+    `$ docker run hello-world`
 
-To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
-
-To simplify the instruction, you can download the file to the \<platform\>-demo folder you have already created on your local system.
-
-1. To add the Pega repository to your Helm installation, enter:
-
-    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
-
-2. To verify the new repository, you can search it by entering:
-
-```bash
-$ helm search repo pega
-NAME        CHART VERSION   APP VERSION     DESCRIPTION
-pega/pega   1.2.0                           Pega installation on kubernetes
-pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
-```
-
-These two charts in this repository, pega and addons, require customization for your deployment of Pega Platform.
-
-Updating the Pega/addons Helm chart
------------------------------------
-
-Update this Helm chart in order to enable the Traefik load balancer and disable
-the metrics-server for deployments to the following platforms:
-
-- AKS
-
-- PKS
-
-- GKE
-
-If you are deploying to a different platform you can skip this section.
-
-1. To download pega/addons Helm chart to the \<local filepath\>/\<platform\>-demo, enter:
-
-    `$ helm inspect values pega/addons > addons.yaml`
-
-2. Open the addons.yaml file from this folder in a text editor
-
-3. In the traefik configuration area, ensure the following two settings are
-    configured to use Traefik for your deployment load-balancer:
-
-```yaml
-traefik:
-enabled: **true**
-
-# Set any additional Traefik parameters. These values will be used by Traefik's Helm chart.
-# See https://github.com/Helm/charts/blob/master/stable/traefik/values.yaml
-# Set traefik.serviceType to "LoadBalancer" on gke, PKS, and pks
-serviceType: **LoadBalancer**
-
-Note: Do not enclose the text in quotes.
-```
-
-4. For GKE or PKS deployments, you must ensure that the Pega metrics server is disabled in the metrics-server section of this *addon* values.yaml file, since PKS deployments use the PKS metrics server.
-
-```yaml
-metrics-server:
-
-# Set this to true to install metrics-server. Follow below guidelines specific to each provider,
-# open-source Kubernetes, Openshift & EKS - mandatory to set this to true if any tier as hpa.enabled is true
-# GKE or PKS - set this to false since metrics-server is installed in the cluster by default.
-
-enabled: **false**
-```
-
-5. Save the file.
-
-Add any known, customized settings for Pega to your deployment
---------------------------------------------------------------
-
-The Pega deployment model supports advanced configurations to fit most existing clients' needs. If you are a Pega client and have known, required customizations for your deployment and you already use the following files to add your known customizations, you can copy those configurations into the configuration files Pega added for this purpose in the pega-helm-charts repository folder, \<local filepath\>/\<platform\>-demo/pega-helm-charts-master/charts/pega/config/deploy:
-
-- context.xml: add additional required data sources
-
-- prlog4j2.xml: modify your logging configuration, if required
-
-- prconfig.xml: adjust the standard Pega Platform configuration with known,
-    required settings
-
-Make these changes before you begin deploying Pega Platform using Helm charts.
+    These installation instructions are sourced from the Docker documentation,  [Install Docker Engine on Ubuntu](https://docs.docker.com/v17.09/engine/installation/linux/docker-ce/ubuntu/). For additional information and links to other Linux distributions, see the instructions provided by other supported Linux distributions.
 
 Creating SSL certificates for HTTPS load balancer on a Kubernetes ingress
 -----------------------------------
 
-When you configure an HTTPS load balancer through a Kubernetes ingress, you can configure the load balancer to present authentication certificates to the client. After you generate your certificates and corresponding private keys using any SSL Certificate creation tool, you pass the certificates and private keys to your Kubernetes ingress using the method supported for the specific environment. For Pega support details, see the [Addons Helm chart](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/addons). 
+When you configure an HTTPS load balancer through a Kubernetes ingress, you can configure the load balancer to present authentication certificates to the client. After you generate your certificates and corresponding private keys using any SSL Certificate creation tool, you pass the certificates and private keys to your Kubernetes ingress using the method supported for the specific environment. For Pega support details, see the [Addons Helm chart](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/addons).
 
-Use the generation method best suited to your company standards. The following steps create one or more certificates and private keys for a hostname using a manually verified domain.
+Use the generation method best suited to your company standards. The following steps create one or more certificates and private keys for a host name using a manually verified domain.
 
 1. Navigate to the certificate generator, such as [SSL For Free](https://www.sslforfree.com/).
 
-2. Enter your hostname for which you are creating a certificate and click **Create FreeSSL Certificate**.
+2. Enter your host name for which you are creating a certificate and click **Create FreeSSL Certificate**.
 
 3. To validate the certificate manually, click **Manual Verification (DNS)**.
 
@@ -416,7 +325,7 @@ TTL (Seconds) :   1
 Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
 ```
 
-With the hostname associated with the verification value, wait several minutes to ensure the configuration is established.
+With the host name associated with the verification value, wait several minutes to ensure the configuration is established.
 
 6. Click the link for name/host record.
 
@@ -424,18 +333,34 @@ With the hostname associated with the verification value, wait several minutes t
 
 7. When successful, you will see that the link returned the correct value and you can generate the SSL certificate files.
 
-   If it is not successful, you may have to wait longer for the DNS lookup to correctly associate the verification value with the hostname; if it continues to not work, you may need to update your DNS settings.
+   If it is not successful, you may have to wait longer for the DNS lookup to correctly associate the verification value with the host name; if it continues to not work, you may need to update your DNS settings.
 
 8. In the main page of **SSL for Free**, click **Download All SSL Certificate Files** and save the certificate file and private key file in the \<platform\>-demo folder you have already created on your local system.
 
 You will manage these certificates in the environment to which you deploy Pega Platform. For environment-specific details, see the **Deploying Pega Platform using the command line** section in the runbook for that environment.
 
-Downloading a Pega Platform distribution to your local system
--------------------------------------------------------------
+Deploying Pega Platform using Pega-provided docker images
+---------------------------------------------------------
 
-These instructions require the Pega Platform distribution image to install the Pega Platform onto your database. To obtain a copy, you must download an image from Pega. For detailed instructions, see [Pega Digital Software Delivery User Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
+To deploy Pega Platform, you must pull several required images from the Pega-managed Docker image repository and push them into your private Docker registry from where you reference them in the Pega Helm chart. For more information, see [Pega Helm chart](https://github.com/pegasystems/pega-helm-charts).
 
-### Requesting access to a Pega Platform distribution
+Pegasystems uses a standard naming practice of `host name/product/image:tag`.  All Pega images are available from the `pega-docker.downloads.pega.com` host.  The `:tag` represents the version if Pega being deployed, for example `:8.3.1` to download Pega 8.3.1.  Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+
+ Name        | Description                                           |
+-------------|-------------------------------------------------------|
+platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+ platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+ platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
+ 
+When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for all three downloaded images.
+
+Pega supports experienced client's ability to build your own installer docker image using components of a full Pega Platform 8.3 or later distribution image  to install or upgrade the Pega Platform database. If you build your own installation image, you do not have to download the Pega-provided docker image listed in the table. For details on building your own image, see [Building a Pega Platform installer docker image](building-your-own-Pega-installer-image.md).
+
+## Downloading a Pega Platform installer docker image
+
+Clients with appropriate licenses can log in to the image repository and download docker images that are required to install the Pega Platform onto your database.
+
+### Requesting access to the Pega Docker repository
 
 1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
@@ -445,146 +370,119 @@ These instructions require the Pega Platform distribution image to install the P
 3. In the **Download and Upgrade Licensed Software** area, click **New
     request**.
 
-4. In the right side of the page click **Continue**.
+4. In the right side of the page, click **Request access key**.
 
-If you have multiple associations with the Pega Community, the page requests you to select the organization with which you want to affiliate this request and then click **Continue**. You will receive an email with a link to your software using an email address that is associated with the organization you select on this screen.
+![Select your distribution](media/dockerimage-download.png)
 
-5. In the **You're viewing products available** page, enter **Pega Platform** in the **Search**, which will filter the list of products in the page.
+5. Enter your credential details.
 
-The **Pega Platform** card should appear near the top of the card list, below
-the list of all of the **Language packs for Pega Platform.**
+   After you enter valid credentials, you recieve confirmation that an email is on the way. 
 
-6. In the Pega Platform card, your mouse arrow changes into a shopping cart icon, which you use to select **Pega Platform**.
+![Select your distribution](media/dockerimage-download-access.png)
 
-The icon changes to a green check and a new cart item appears in the top right of the product list.
+6. Open the email you received. It will look similar to the image shown.
 
-![](media/029c6531bd52109598047a2ee6966657.png)
+![Confirmation email with access key details](media/dockerimage-access-email.png)
 
-7. Click **Continue**.
+7. Save your access key to a text file the <local filepath>\<platform>-demo folder so you can pass it into your docker login command to ensure the it will not display in your bash history or logs.
 
-8. In the cart review page, in the **Pega Platform** area, select the version
-    of Pega Platform for your deployment.
+### Downloading and managing Pega Platform docker images
 
-![](media/386d4eb20a4e2be6b767bc522cbdda91.png)
+With access credentials to the Pega Docker image repository, you log in, download each required image, retag each image appropriately, and finally upload each image to your own Docker registry. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
 
-9. After your selection and review are complete, click **Finish.**
+Important: Use the same Docker image tag to ensure you download compatible images.
 
-10. When the order is processed, a confirmation screen displays with details about your order.
+Pega supports any of the following Docker image registries from which your deployment will access the three Pega-provided Docker images. For details about setting up your choice of Docker registry, click the link for that registry's documentation:
 
-- An email with a link to the requested Pega Platform software is sent within a few minutes. The email address used is associated with the organization you selected in this section.
+- [DockerHub](https://docs.docker.com/docker-hub/repos/)
+- [Amazon elstic Container Registry (ECR)](https://docs.aws.amazon.com/AmazonECR/latest/userguide/get-set-up-for-amazon-ecr.html)
+- [Azure Container Registry](https://azure.microsoft.com/en-us/services/container-registry/)
+- [Google Cloud Container Registry](https://cloud.google.com/container-registry/)
 
-![](media/748ea91e3ff43cf4544ce2f4638e86bf.png)
+With a Docker registry configured, clients push their three Pega-provided images to their registry so it is available to the deployment. Clients must also provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart.
 
-11. When satisfied with the order, click **Close**.
-
-### Downloading Pega Platform to your local system
-
-To download your Pega Platform image,
-
-1. Open the email you received. It will look similar to the image shown.
-
-![](media/98b1055e0e63487db7bbb2c90c9ea40c.png)
-
-2. Click **Download now**.
-
-3. The **Pega Licensed Software Downloads** page opens.
-
-You can download your requested Pega Platform software using the link under **My Downloads**.
-
-4. Click **Download software**.
-
-Your secure **Inbox** of requested Pega software products opens. Your request for a version of Pega Platform software is listed at the top of the inbox table.
-
-5. In the **Subject** column, click the link to your requested Pega Platform software.
-
-The Package details window opens in the Package tab, which shows details about the Pega Platform software distribution package that you requested.
-
-6. In the **Files:** area of the window, ensure that version of the Pega distribution image is correct.
-
-If it is not the right version number, you must complete a new request.
-
-7. To download the file, select the Pega distribution image checkbox and click
-    **Download**.
-
-8. In the **Save as** window, choose the \<local filepath\>/\<platform\>-demo folder to which you save the Pega Platform distribution zip file.
-
-9. In a Linux bash shell, change folders to the /home/\<local filepath\>/\<platform\>-demo directory, where you saved the Pega Platform distribution zip and extract your files to create a new distribution image folder on your local system:
-
-    `$ unzip ./<pega-distribution-image>.zip`
-
-After you extract the archive, the files in the Pega Platform distribution image are available to use in preparing your Pega Platform installation Docker image.
-
-Prepare your Pega Platform installation Docker image – 15 minutes
------------------------------------------------------------------
-
-As stated previously, you must have a [DockerHub](https://hub.docker.com/) account and log into it in order to see the [pega-installer-ready Docker image](https://hub.docker.com/r/pegasystems/pega-installer-ready). You also need the Docker cli and Docker-desktop installed on your system before you begin this procedure. The Pega-provided Docker image, pega-installer-ready, includes some components of a full installation image that you can use to install or upgrade the Pega Platform database. While it is built on top of a JDK, it does not contain the contents of the Pega distribution kit which are essential for installing or upgrading Pega Platform.
-
-Pega provides this image as the primary content of the final Docker image you will use to install or upgrade Pega Platform. This section describes how you can use this Docker image in combination with a Dockerfile and the Pega Platform distribution image that you have made available on your local system. The procedure assumes you’ve downloaded the software in [Downloading Pega Platform to your local system](#downloading-a-pega-platform-distribution-to-your-local-system) and installed the required components on your local system listed in [Install required applications for the deployment](#creating-a-local-folder-to-access-all-of-the-configuration-files).
-
-Follow these steps to create a Docker image you can use to install or upgrade Pega Platform.
-
-1. From a Linux bash shell, ensure you are logged into your DockerHub account:
-
-    `$ docker login -u <username> -p <username-password>`
-
-    For details about logging into Docker from a secure password file using the `--password-stdin` option, see <https://docs.docker.com/engine/reference/commandline/login/>.
-
-2. Change your directory to the top folder of your Pega distribution <pega-distribution-image\>.
-
-    `$ cd ./<pega-distribution-image>/`
-
-3. Create a text file with the text editor of your choice in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
-
-    From this folder, you can list the folder content and see folders for Pega archives, Images, rules, and scripts.
-
-4. Copy the following lines of instruction into the new text file:
+Examples:
 
 ```yaml
-FROM pegasystems/pega-installer-ready
-COPY scripts /opt/pega/kit/scripts
-COPY archives /opt/pega/kit/archives
-COPY rules /opt/pega/kit/rules
-RUN chmod -R 777 /opt/pega
+# If using a custom Docker registry, supply the credentials here to pull Docker images.
+  docker:
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+      # Docker image information for the Pega docker image, containing the application server.
+    pega:
+      image: "<Registry host name:Port>/my-pega:<Pega Platform version>"
+
+# Elasticsearch deployment settings.
+pegasearch:
+  image: "<Registry host name:Port>/my-pega-search:<Pega Platform version>"
+  memLimit: "3Gi"
+  replicas: 1
+
+# Pega Installer settings.
+installer:
+  image: "<Registry host name:Port>/my-pega-installer:<Pega Platform version>"
+  adminPassword: "ADMIN_PASSWORD"
 ```
 
-These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.
+Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
 
-5. Save the text-only file with the filename, "dockerfile", without an extension, in the \<local filepath\>/\<platform\>-demo/\<pega-distribution-image\> folder where you extracted the Pega distribution on your local system.
+It is a best practice to retag each of your Pega Docker images by including your registry host name and port; if this information is not included, the docker tag command uses the Docker public registry located at [registry-1.docker.io](https://registry-1.docker.io/) by default. For more details and naming convention guidance, see the [docker tag](https://docs.docker.com/engine/reference/commandline/tag/) documentation.
 
-6. From your Linux command prompt, in your current directory, build your pega install Docker image by entering:
+1. In a Linux bash shell with root privileges, change folders to the \home\<local filepath>\<platform>-demo directory, navigate to the <localfilepath>\<platform>-demo folder where you saved the file that contains your access key and log into the Pega-managed Docker image repository:
 
-    `$ docker build -t pega-installer .`
+```bash
+$ cat <localfilepath>\<platform>-demo\<access-key-filename>.txt | docker login pega-docker.downloads.pega.com --username=<reg-XXXXX> --password-stdin
+Login Succeeded
+```
 
-This command uses your dockerfile to build a full Docker image with the name “pega-installer” and gives it the tag, “latest”. You can use the Docker command to see that your new image exists in your Docker image inventory.
+2. To download your preferred version of the `Pega` image to your local system, specify the version tag when you enter:
 
-7. Tag the local version of your new image, pega-installer, with your DockerHub ID:
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform/pega:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
+```
 
-    `$ docker tag pega-installer <your-dockerhub-ID>/pega-installer`
+3. Retag the `Pega` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega:<Pega Platform version>`.
 
-8. Create a private repository on your [DockerHub](https://hub.docker.com/) account that is tagged as a private repository.
+   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega:8.4.0`
 
-9. From your default login page, click the Repositories link (at the top of the page).
+4. To push the retagged `my-pega` image to your registry, enter:
 
-10. In the Repositories view, click **Create Repository +**.
+   `$ docker push <Registry host name:Port>/my-pega:8.4.0`
 
-11. Enter a Name that matches the Docker image you just built.
+5. To download your preferred version of the `search` image to your local system, specify the version tag when you enter:
+ 
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform/search:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
+```
 
-12. Provide a brief Description, that will help you remember the version of Pega
-    with which you built this image, or any other useful information.
+6. To retag the `search` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-search:<Pega Platform version>`, enter:
 
-13. In the Visibility area, select the **Private**.
+   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
 
-You should not maintain this image with Pega proprietary software as a viewable **Public** image.
+7. To push the retagged `my-pega-search` image to your registry, enter:
 
-14. Click **Create**.
+   `$ docker push <Registry host name:Port>/my-pega-search:8.4.0`
 
-Free DockerHub accounts support the use of a single private repository, so you may have to delete an existing private repository in order to create a new one for your Pega Docker installation image.
+8. To download your preferred version of the `installer` image to your local system, specify the version tag when you enter:
 
-15. From a Linux bash shell, use the Docker command to push the new image to
-    your new private repository:
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform/installer:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
+```
 
-    `$ docker push <your-dockerhub-ID>/pega-installer`
+9. To retag the `installer` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-installer:<Pega Platform version>`, enter:
 
-After the command completes you will see your new image in your private repository, similar to the image below.
+   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
 
-![](media/9fd09158a821f828a93d6ab7c74e278a.png)
+10. To push the retagged `my-pega-installer` image to your registry, enter:
+
+   `$ docker push <Registry host name:Port>/my-pega-installer:8.4.0`
+
+After you push these three downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
