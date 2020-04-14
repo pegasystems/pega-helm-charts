@@ -5,6 +5,9 @@ global:
 
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
+  
+  kubernetes:
+    safeToEvict: "true"
 
   # Deploy Pega nodes
   actions:
