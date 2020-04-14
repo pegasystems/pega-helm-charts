@@ -31,7 +31,9 @@ spec:
       annotations:
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
+{{- if (.Values.kubernetes.safeToEvict) }}
         cluster-autoscaler.kubernetes.io/safe-to-evict: "{{.Values.kubernetes.safeToEvict}}"
+{{- end }}
     spec:
       volumes:
       # Volume used to mount config files.
