@@ -113,3 +113,6 @@ pegasearch:
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   adminPassword: "ADMIN_PASSWORD"
+
+# Annotations to be used in all pod deployments
+annotations: {}

@@ -256,3 +256,6 @@ installer:
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
+
+# Annotations to be used in all pod deployments
+annotations: {}
