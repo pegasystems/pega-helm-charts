@@ -10,6 +10,8 @@ To prepare a Wndows 10 system, it is assumed:
 
 - You have a basic familiarity with running commands from a Windows 10 PowerShell with administrator privileges.
 
+- You have appropriate administrative privileges to install programs on your local computer.
+
 - You use the open source packaging tool Chocolatey to install applications onto your Windows laptop. For more information, see [How Chocolatey Works](https://chocolatey.org/how-chocolatey-works).
 
 - You have basic familiarity with a GitHub account with which you download a Pega-managed GitHub repository that contains configuration files and scripts that support installing Pega Platform and deploying it in the Kubernetes cluster.
@@ -95,13 +97,20 @@ The kubernetes-cli application includes the `kubectl` command.
 
 For details about installing on Windows 10 and supported installation methods, see [Install kubectl on Windows](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-windows).
 
-For Amazon EKS only: - To install [eksctl](https://chocolatey.org/packages/eksctl): in the PowerShell command prompt, enter:
+For Amazon EKS only: Pega recommends deploying your EKS cluster for your Pega Platform deployment using the AWS `eksctl` command line utility for creating and managing clusters on Amazon EKS.
+
+To install [eksctl](https://chocolatey.org/packages/eksctl): in the PowerShell command prompt, enter:
 
 `$ choco install eksctl`
 
 If a prompt to run the script appears, enter **Yes**.
 
-For Amazon EKS only: - To install [AWS IAM Authenticator for Kubernetes](https://chocolatey.org/packages/aws-iam-authenticator#files): in the PowerShell command prompt, enter:
+PS C:\Users\aciut> eksctl version
+[ℹ]  version.Info{BuiltAt:"", GitCommit:"", GitTag:"0.13.0"}
+
+For Amazon EKS only: Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate with your Kubernetes cluster using your AWS credentials.
+
+To install [AWS IAM Authenticator for Kubernetes](https://chocolatey.org/packages/aws-iam-authenticator#files): in the PowerShell command prompt, enter:
 
 `$ choco install aws-iam-authenticator`
 
@@ -113,8 +122,6 @@ Confirm the AWS CLI that comes withe the `AWS IAM Authenticator for Kubernetes` 
 $ aws --version
 aws-cli/1.16.272 Python/3.6.0 Windows/10 botocore/1.13.8
 ```
-
-For additional AWS tool information, see [Install the AWS CLI version 1 on Windows](https://docs.aws.amazon.com/cli/latest/userguide/install-windows.html).
 
 ### For AKS only: installing the Azure CLI
 
