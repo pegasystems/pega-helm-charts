@@ -53,6 +53,10 @@ global:
     pega:
       image: "pegasystems/pega"
 
+  # If monitoring the Pega deployment with the DataDog Helm chart/DaemonSet, uncomment the following
+  # line to enable DataDog autodiscovery annotations on pods to be monitored.  
+  #enableDataDogAutoDiscovery: true
+  
   # Upgrade specific properties
   upgrade:
     # Configure only for aks/pks
@@ -170,7 +174,7 @@ global:
         resources:
           requests:
             storage: 5Gi
-
+  
 # External services
 
 # Cassandra automatic deployment settings.

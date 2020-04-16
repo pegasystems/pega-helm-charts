@@ -31,6 +31,7 @@ spec:
       annotations:
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
+        {{- include "DataDogJMXAutoDiscoveryForPega" . }}                                         
     spec:
       volumes:
       # Volume used to mount config files.
@@ -75,6 +76,8 @@ spec:
         ports:
         - containerPort: 8080
           name: pega-web-port
+        - containerPort: 9001
+          name: pega-jmx-port                                               
 {{- if .custom }}
 {{- if .custom.ports }}
         # Additional custom ports
@@ -83,6 +86,10 @@ spec:
 {{- end }}
         # Specify any of the container environment variables here
         env:
+        - name: JMX_SERVER_HOSTNAME
+          valueFrom: 
+            fieldRef:
+              fieldPath: status.podIP                               
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
