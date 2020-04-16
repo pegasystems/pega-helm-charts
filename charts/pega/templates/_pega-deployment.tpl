@@ -29,10 +29,11 @@ spec:
       labels:
         app: {{ .name }}
       annotations:
+{{- if .Values.annotations }}
+{{ toYaml .Values.annotations | indent 4 }}
+{{- else }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
-{{- if (.Values.global.kubernetes.safeToEvict) }}
-        cluster-autoscaler.kubernetes.io/safe-to-evict: "{{.Values.global.kubernetes.safeToEvict}}"
 {{- end }}
     spec:
       volumes:
