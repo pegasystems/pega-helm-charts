@@ -401,6 +401,19 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
+### Custom Annotations for deployment
+
+Pega supports the ability to provide custom annotation on pods that are deployed. Add the annotations section as
+ mentioned in the example.
+ 
+**`NOTE`** : Using custom annotations, clears out the annotations that are added by default.
+
+Example:
+
+```yaml
+annotations:
+    <annotation key-word>: <annotation value>
+```
 
 ### Pega configuration files
 
