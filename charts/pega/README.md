@@ -403,10 +403,9 @@ tier:
 ```
 ### Custom Annotations for deployment
 
-Pega supports the ability to provide custom annotation on pods that are deployed. Add the annotations section as
- mentioned in the example.
- 
-**`NOTE`** : Using custom annotations, clears out the annotations that are added by default.
+Pega supports the ability to provide custom annotation on pods that are deployed which clients can use to to extend
+ the default properties of Kubernetes. When you add a custom annotation, the deployment removes any default
+  annotations on a pod. To add a custom annotation, enter a text string for the in the annotations section as shown in the example.
 
 Example:
 
