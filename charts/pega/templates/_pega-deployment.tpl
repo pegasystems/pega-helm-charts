@@ -30,7 +30,7 @@ spec:
         app: {{ .name }}
       annotations:
 {{- if .root.Values.annotations }}
-{{ toYaml .root.Values.annotations | indent 4 }}
+{{ toYaml .root.Values.annotations | indent 8 }}
 {{- else }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
