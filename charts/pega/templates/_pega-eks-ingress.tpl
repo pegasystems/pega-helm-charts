@@ -25,12 +25,16 @@ metadata:
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     {{ end }}
     {{ end }}
-    # override the default scheme internal as ALB should be internet-facing 
+    {{- if .node.ingress.annotations }}
+    {{ toYaml .node.ingress.annotations }}
+    {{- else }}
+    # override the default scheme internal as ALB should be internet-facing
     alb.ingress.kubernetes.io/scheme: internet-facing
-    # enable sticky sessions on target group
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
     # set to ip mode to route traffic directly to the pods ip
     alb.ingress.kubernetes.io/target-type: ip
+    {{- end }}
+    # enable sticky sessions on target group
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 spec:
   rules:
   {{ if (.node.service.domain) }}
