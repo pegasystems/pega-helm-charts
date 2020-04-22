@@ -401,7 +401,7 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
-### Custom Annotations for deployment
+### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the podAnnotations element for a given tier.
 
