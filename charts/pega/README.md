@@ -403,7 +403,7 @@ tier:
 ```
 ### Custom Annotations for Pods
 
-You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the podAnnotations element for a given tier.
+You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
 
 Example:
 
