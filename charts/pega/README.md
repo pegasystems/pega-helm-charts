@@ -401,17 +401,17 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
-### Custom Annotations for deployment
+### Custom Annotations for Pods
 
-Pega supports the ability to provide custom annotation on pods that are deployed which clients can use to to extend
- the default properties of Kubernetes. When you add a custom annotation, the deployment removes any default
-  annotations on a pod. To add a custom annotation, enter a text string for the in the annotations section as shown in the example.
+You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
 
 Example:
 
 ```yaml
-annotations:
-    <annotation key-word>: <annotation value>
+tier:
+  - name: my-tier
+    podAnnotations:
+      <annotation-key>: <annotation-value>
 ```
 
 ### Pega configuration files
@@ -495,6 +495,7 @@ Parameter   | Description   | Default value
 `podSecurityContext.runAsUser`   | ElasticSearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
 `set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the ElasticSearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
+`podAnnotations` | Configurable annotations applied to all Elasticsearch pods. | {}
 
 Additional env settings supported by ElasticSearch may be specified in a `custom.env` block as shown in the example below.
 
