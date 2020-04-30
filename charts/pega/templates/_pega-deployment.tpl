@@ -29,8 +29,12 @@ spec:
       labels:
         app: {{ .name }}
       annotations:
+{{- if .node.podAnnotations }}
+{{ toYaml .node.podAnnotations | indent 8 }}
+{{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
+
     spec:
       volumes:
       # Volume used to mount config files.
