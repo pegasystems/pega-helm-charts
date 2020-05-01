@@ -357,8 +357,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
     You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only GKE resources display. The dashboard does not display your GKE cluster name or your resource name, which is expected behavior.
 
-    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this  Linux shell open.
-
+    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux shell open.
 
 10. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 

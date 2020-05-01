@@ -106,7 +106,7 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 ### Making your Docker images available to your deployment
 
-
+TBD
 
 
 
@@ -115,12 +115,12 @@ With your Docker images available to your AWS account, you are ready to create y
 
 ### Creating an Amazon EKS cluster
 
-Pega Recommends creating your EKS cluster using the `eksctl` command line utility; to do so, it's a best practice to define your configuration in a yaml file that you pass to the `eksctl` command. For more details and options available to advanced EKS users, see [Create your Amazon EKS cluster and worker nodes](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html#eksctl-create-cluster).
+You can create your EKS cluster using the `eksctl` command line utility. This example shows how to define your configuration in a yaml file that you pass to the `eksctl` command. For more details and options available to advanced EKS users, see [Create your Amazon EKS cluster and worker nodes](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html#eksctl-create-cluster).
 
 At a minimum, your cluster must be provisioned with at least two worker nodes that have 32GB of RAM in order to support the typical processing loads in a Pega
-Platform deployment; for this option, Pega recommends using a minimum of two m5.xlarge nodes for your deployment. AWS documentation warns that the minimum required Kubernetes version for following this procedure is 1.14.
+Platform deployment; for this option, Pega recommends using a minimum of two m5.xlarge nodes for your deployment. Pega has not tested this method using Windows worker nodes.
 
-To create Amazon EKS cluster with Windows and Linux workloads:
+To create Amazon EKS cluster with Linux worker nodes:
 
 1. Save the following text to a file named similar to `my-EKS-cluster-spec.yaml` in your EKS-demo folder:
 
@@ -144,7 +144,7 @@ minSize: 3
 
 `eksctl create cluster -f ./cluster-spec.yaml`
 
- It takes 10 to 15 minutes for the cluster provisioning to completion. During deployment the required Kubernetes configuration file is copied into the cluster and into your . 
+ It takes 10 to 15 minutes for the cluster provisioning to completion. During deployment the required Kubernetes configuration file is copied into the cluster and into your default ~/.kube directory.
  
  3. After provisioning is complete, to verify that the worker nodes joined the cluster and are in Ready state, enter:
 
@@ -152,21 +152,88 @@ minSize: 3
 
 With your cluster created and running as expected, you must create a database resource for your Pega Platform installation. If you have to delete your cluster for some reason before you have namespaces deployed in it, use the command, `eksctl delete cluster --name <cluster-name>'.
 
+4. To deploy the Kubernetes dashboard and see your EKS cluster, enter:
+
+kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
+
+5. Create an eks-admin Service Account and Cluster Role Binding to securely connect to the dashboard with admin-level permissions as by default Kubernetes dashboard has limited permissions.
+
+Create a file called `eks-admin-service-account.yaml` using the following example text.
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: eks-admin
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRoleBinding
+metadata:
+  name: eks-admin
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+-kind: ServiceAccount
+ name: eks-admin
+ namespace: kube-system
+```
+
+This manifest defines a service account and cluster role binding called `eks-admin`.
+
+6. Apply the service account and cluster role binding to your cluster.
+
+`kubectl apply -f eks-admin-service-account.yaml`
+
+7. Retrieve an authentication token for the eks-admin service account. Copy the <authentication_token> value from the output. You use this token to connect to the dashboard. 
+
+tbd
+
+8. Connect to the dashboard using the administrative service account.
+
+`kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')`
+
+9. To start the proxy server for the Kubernetes dashboard, enter:
+
+    `$ kubectl proxy`
+
+10. To access the Dashboard UI, open a web browser and navigate to the following URL:
+
+    `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
+
+11. In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
+
+- To use a cluster Kubeconfig access credential file: select **Kubeconfig**, navigate to your \<local filepath\>/.kube directory and select the config file. Click **SIGN IN**.
+
+- To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
+
+    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only GKE resources display. The dashboard does not display your GKE cluster name or your resource name, which is expected behavior.
+
+    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this shell open. At this point, you must create a database instance into which you must install Pega Platform.
+
 ### Creating a database resource
 
-AMAZON EKS deployments require you to install Pega Platform software in an Amazon RDS instance that contains a PostgreSQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
+AMAZON EKS deployments require you to install Pega Platform software in an Amazon RDS instance that contains a PostgreSQL database. After you create an SQL instance that is available to your EKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
 
-#### Creating an SQL instance
+#### Creating an Amazon RDS instance
 
-To begin, create an SQL Instance that is available to your PKS cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
+Create a database that is available to your EKS cluster. In this example, we create an Amazon RDS instance in AWS; however, you can create or use an database resource that is available to your EKS cluster. Pega Platfrom deployments require this region is the same as the region where your EKS worker nodes are located.
 
-1. Use a web browser to log in to <https://cloud.google.com/> and navigate to your **Console** in the upper right corner.
+1. Use a web browser to log in to <https://aws.amazon.com/console/>, which logs you into your default region.
 
-2. In your **Google Cloud Platform** console, use the **Navigation Menu** to go to **Storage** grouping and select **SQL**.
+2. In the AWS Management Console, use the search tool to navigate to **Amazon RDS** main page.
 
-3. In the SQL page, click **+Create Instance**.
+3. In **Amazon RDS** main page, in the Create Database section, click **Create database**.
 
-4. In the **Choose your database engine** screen, click **Choose PostgreSQL**.
+    This process will create an RDS database in your default region. If this region is different from the region where your EKS worker nodes are located, you must reset your region to the region when you created your EKS cluster.
+
+4. To create your database, in the **Create database** page, select the following options:
+
+a. For `Choose a database creation method`, select **Standard create**.
+
+b. For 
 
 5. In the **Create PostgreSQL instance** page, add details to the following
     required fields for this database server:

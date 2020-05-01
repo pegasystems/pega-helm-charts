@@ -248,13 +248,26 @@ Pega recommends deploying your EKS cluster for your Pega Platform deployment usi
 
 These instructions were sourced from the AWS document, [Install eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html), which includes additional information about how to use the 'eksctl' utility in combination with the 'kubectl' command-line utility, which you should have already installed earlier in this document.
 
+### For EKS only: installing AWS CLI version 2
+
+Install the AWS CLI utility with a packaging tool such as apt-get.
+
+`$ sudo apt-get install awscli`
+
+To confirm the installation or upgrade, enter:
+
+```bash
+$ aws --version
+aws-cli/2.0.10 Python/3.7.3 Linux/5.3.0-51-generic botocore/2.0.0dev14
+```
+
 ### For EKS only: installing AWS IAM authenticator
 
 Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate with your Kubernetes cluster using your AWS credentials. You must download the binary file from AWS and then install the CLI on your local computer.
 
 1. To download the latest binary from the AWS site, from your home directory, enter:
 
-   ```bash
+```bash
    $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
    % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
                                   Dload  Upload   Total   Spent    Left  Speed
