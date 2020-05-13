@@ -207,6 +207,5 @@ true
         ad.datadoghq.com/pega-web-tomcat.check_names: '["pega-web-tomcat-{{- uuidv4 | trunc 5 -}}"]'
         ad.datadoghq.com/pega-web-tomcat.init_configs: '[{{ toJson (fromYaml (.root.Files.Get "dd-metrics/pega-web-tomcat-metrics.yaml")).init_config }}]'
         ad.datadoghq.com/pega-web-tomcat.instances: '{{ toJson (fromYaml (.root.Files.Get "dd-metrics/pega-web-tomcat-metrics.yaml")).instances }}'
-        ad.datadoghq.com/pega-web-tomcat.tags: '{"kube_pod_name": "metadata.name"}'
 {{- end }}
 {{- end }}
