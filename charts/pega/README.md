@@ -336,7 +336,7 @@ Parameter       | Description    | Default value
 ---             | ---       | ---
 `replicas`      | Specify the number of Pods to deploy in the tier. | `1`
 `cpuRequest`    | Initial CPU request for pods in the current tier.  | `200m`
-`cpuLimit`      | CPU limit for pods in the current tier.  | `2`
+`cpuLimit`      | CPU limit for pods in the current tier.  | `4`
 `memRequest`    | Initial memory request for pods in the current tier. | `6Gi`
 `memLimit`      | Memory limit for pods in the current tier. | `8Gi`
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
