@@ -133,11 +133,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "MAX_HEAP")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "7168m")
 	require.Equal(t, pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
-    if expectedSpec.name == "pega-stream" {
-	    require.Equal(t, "2", pod.Containers[0].Resources.Limits.Cpu().String())
-	} else {
-	   require.Equal(t, "4", pod.Containers[0].Resources.Limits.Cpu().String())
-	}
+	require.Equal(t, "4", pod.Containers[0].Resources.Limits.Cpu().String())
 	require.Equal(t, "8Gi", pod.Containers[0].Resources.Limits.Memory().String())
 	require.Equal(t, "200m", pod.Containers[0].Resources.Requests.Cpu().String())
 	require.Equal(t, "6Gi", pod.Containers[0].Resources.Requests.Memory().String())

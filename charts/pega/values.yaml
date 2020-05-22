@@ -107,6 +107,14 @@ global:
           maxUnavailable: 25%
         type: RollingUpdate
 
+      # Optionally overridde default resource specifications
+      #cpuRequest: 200m
+      #memRequest: "6Gi"
+      #cpuLimit: 4
+      #memLimit: "8Gi"
+      #initialHeap: "4096m"
+      #maxHeap: "7168m"
+
       hpa:
         enabled: true
 
@@ -158,13 +166,6 @@ global:
           # ssl_annotation:
 
       replicas: 2
-      cpuRequest: 200m
-      memRequest: "6Gi"
-      cpuLimit: 2
-      memLimit: "8Gi"
-      javaOpts: ""
-      initialHeap: "4096m"
-      maxHeap: "7168m"
 
       volumeClaimTemplate:
         resources:
