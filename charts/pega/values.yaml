@@ -108,7 +108,7 @@ global:
         type: RollingUpdate
 
       # Optionally overridde default resource specifications
-      # cpuRequest: 200m
+      # cpuRequest: 2
       # memRequest: "6Gi"
       # cpuLimit: 4
       # memLimit: "8Gi"
