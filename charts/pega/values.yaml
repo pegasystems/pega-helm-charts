@@ -50,6 +50,8 @@ global:
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
       # Docker image information for the Pega docker image, containing the application server.
+    config:
+      path: ""
     pega:
       image: "pegasystems/pega"
 
