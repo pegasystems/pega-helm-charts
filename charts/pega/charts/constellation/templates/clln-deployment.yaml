@@ -27,7 +27,6 @@ spec:
         image: {{ .Values.dockerRepos }}
         args:
         - port=3000
-        - infinity={{ .Values.infinityUrl }}
         - sync=true
         - {{ .Values.logLevel }}
         ports:
