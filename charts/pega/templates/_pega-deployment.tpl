@@ -113,7 +113,7 @@ spec:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
           {{- else }}
-            cpu: 2
+            cpu: 4
           {{- end }}
           {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
@@ -125,7 +125,7 @@ spec:
           {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
           {{- else }}
-            cpu: 200m
+            cpu: 2
           {{- end }}
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"
