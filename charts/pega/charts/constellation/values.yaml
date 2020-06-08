@@ -1,7 +1,7 @@
 ---
 # Parameters for Constellation operation:
 # Docker repos and tag for image
-dockerRepos: meshbincam.pega.com:7000/constellationui/service
+dockerRepos: IMAGE_REPO_URL_HERE
 # log level : error, warn, info, debug.  use error for production
 logLevel: info
 enabled: false
