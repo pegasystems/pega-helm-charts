@@ -49,7 +49,8 @@ global:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-    # Optional config path to a secrets file if not using registry creds.
+    # Optional config path to an external secrets file if not using registry creds. This does require
+    # the use and deployment of https://github.com/godaddy/kubernetes-external-secrets.
     config:
       path: ""
     # Docker image information for the Pega docker image, containing the application server.
