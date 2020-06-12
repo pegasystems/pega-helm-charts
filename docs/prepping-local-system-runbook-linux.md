@@ -534,7 +534,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
 
 6. To retag the `search` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-search:<Pega Platform version>`, enter:
 
-   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
+   `$ docker tag pega-docker.downloads.pega.com/platform/search:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
 
 7. To push the retagged `my-pega-search` image to your registry, enter:
 
@@ -550,7 +550,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
 
 9. To retag the `installer` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-installer:<Pega Platform version>`, enter:
 
-   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
+   `$ docker tag pega-docker.downloads.pega.com/platform/installer:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
 
 10. To push the retagged `my-pega-installer` image to your registry, enter:
 

@@ -231,20 +231,32 @@ Create a database that is available to your EKS cluster. In this example, we cre
 
 4. To create your database, in the **Create database** page, select the following options:
 
-a. For `Choose a database creation method`, select **Standard create**.
+   a. For **Choose a database creation method**, select **Standard create**.
+   
+   b. For **Engine Options**, select **PostgreSQL**.
 
-b. For 
+   c. For **Version**, select the latest available PostgreSQL version 11 series.
 
-5. In the **Create PostgreSQL instance** page, add details to the following
-    required fields for this database server:
+   d. For **Templates**, select **Production**.
 
-    a. In **Instance ID**, enter a database server ID.
+   e. In the **Settings** section, add details:
 
-    b. In **Default user password**, enter a “postgres” user password.
+   - In the **DB instance identifier**, enter a unique \<*databasename*\>.
+   - In **Credentials Settings**, leave **Master username** set to the default.
+   - Create a master password for your database that meets your organization standards.
 
-    c. Select an appropriate **Region** and **Zone** for your database server. Contact your Pivotal representative so you can select the same zone or region that Pivotal used to create your PKS demo cluster.
+   f. In the **DB instance size** section, add details:
 
-    d. In **Database version**, select **PostgreSQL 11**.
+   - Select **Standard classes**.
+   - Select **b.m5.2xlarge** or greater. The **b.m5.2xlarge** selection  provides the minimum hardware requirement for Pega Platform installations of a minimum of **4** vCores and **32 GB** storage.
+
+   g. In the **Storage** section, for details, accept the default values:
+
+   - **Storage type** is **Provisioned IOPS**.
+   - **Allocated storage** is **100GiB**.
+   - **Provisioned IOPS** is **1000**.
+   - **Storageautoscaling** can be selected.
+
 
     e. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
 
