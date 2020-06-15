@@ -19,7 +19,7 @@ Creating a local folder to access all of the configuration files
 
 Deploying with Helm requires you to run commands from a specific folder on your local system. To ensure you use the correct filepath, these instructions always use the reference `<local filepath>/<platform>-demo` folder when you extract files to a folder or run commands from a folder.
 
-To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your Windows user folder. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
+To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your home directory. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
 
 To create this folder, open a Linux command prompt and enter:
 
@@ -227,40 +227,6 @@ Run `gcloud topic configurations` to learn more.
 
 These instructions were sourced from the Google document, [Quickstart for Linux](https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
 
-### For EKS only: installing the eksctl utility
-
-Pega recommends deploying your EKS cluster for your Pega Platform deployment using the AWS `eksctl` command line utility for creating and managing clusters on Amazon EKS.
-
-1. To download and extract the latest `eksctl` binary from the AWS site, from your home directory, enter:
-
-   `$ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp`
-
-2. To move the extracted binary to /usr/local/bin, which allows the command to be run without the "sudo" prefix, enter:
-
-   `$ sudo mv /tmp/eksctl /usr/local/bin`
-
-3. To verify the `eksctl` version, enter:
-
-   ```bash
-   $ eksctl version
-   0.17.0
-   ```
-
-These instructions were sourced from the AWS document, [Install eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html), which includes additional information about how to use the 'eksctl' utility in combination with the 'kubectl' command-line utility, which you should have already installed earlier in this document.
-
-### For EKS only: installing AWS CLI version 2
-
-Install the AWS CLI utility with a packaging tool such as apt-get.
-
-`$ sudo apt-get install awscli`
-
-To confirm the installation or upgrade, enter:
-
-```bash
-$ aws --version
-aws-cli/2.0.10 Python/3.7.3 Linux/5.3.0-51-generic botocore/2.0.0dev14
-```
-
 ### For EKS only: installing AWS IAM authenticator
 
 Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate with your Kubernetes cluster using your AWS credentials. You must download the binary file from AWS and then install the CLI on your local computer.
@@ -297,6 +263,40 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 ```
 
 These instructions were sourced from the AWS document, [Installing aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
+
+### For EKS only: installing the eksctl utility
+
+Pega recommends deploying your EKS cluster for your Pega Platform deployment using the AWS `eksctl` command line utility for creating and managing clusters on Amazon EKS.
+
+1. To download and extract the latest `eksctl` binary from the AWS site, from your home directory, enter:
+
+   `$ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp`
+
+2. To move the extracted binary to /usr/local/bin, which allows the command to be run without the "sudo" prefix, enter:
+
+   `$ sudo mv /tmp/eksctl /usr/local/bin`
+
+3. To verify the `eksctl` version, enter:
+
+   ```bash
+   $ eksctl version
+   0.17.0
+   ```
+
+These instructions were sourced from the AWS document, [Install eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html), which includes additional information about how to use the 'eksctl' utility in combination with the 'kubectl' command-line utility, which you should have already installed earlier in this document.
+
+### For EKS only: installing AWS CLI version 2
+
+Install the AWS CLI utility with a packaging tool such as apt-get. Depending on the tool you use, youmay need a have SAML profile for your AWS account on your system.
+
+`$ sudo apt-get install awscli`
+
+To confirm the installation or upgrade, enter:
+
+```bash
+$ aws --version
+aws-cli/2.0.10 Python/3.7.3 Linux/5.3.0-51-generic botocore/2.0.0dev14
+```
 
 ### Installing Docker
 
