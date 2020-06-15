@@ -168,7 +168,7 @@ To install the Google Cloud SDK:
 
 3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
 
-4. to extract the Google SDK distribution archive file to your system, enter:
+4. To extract the Google SDK distribution archive file to your system, enter:
 
     `tar zxvf [ARCHIVE_FILE] google-cloud-sdk`
 
