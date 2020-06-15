@@ -28,6 +28,10 @@ distributionKitURL: ""
 # This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence.
 # Only distriubtion kit zip file is expected inside the volume.
 distributionKitVolumeClaimName: ""
+# Bypass loading engine classes into database.
+bypassLoadEngineClasses: ""
+# Bypass loading assembly classes into database
+bypassLoadAssembledClasses: ""
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5
