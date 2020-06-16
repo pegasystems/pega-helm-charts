@@ -19,7 +19,7 @@ Creating a local folder to access all of the configuration files
 
 Deploying with Helm requires you to run commands from a specific folder on your local system. To ensure you use the correct filepath, these instructions always use the reference `<local filepath>/<platform>-demo` folder when you extract files to a folder or run commands from a folder.
 
-To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your Windows user folder. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
+To stay consistent with the instructions, you can create a folder named `<platform>-demo` on your local system at the top level of your home directory. This way, you associate the generic `<local filepath>/<platform>-demo` references to the folder `/home/<linux-username>/<platform>-demo` that is specific to your local system.
 
 To create this folder, open a Linux command prompt and enter:
 
@@ -50,6 +50,7 @@ The entire deployment requires the following applications to be used during the 
 - az cli (only for AKS deployments)
 - AWS IAM Authenticator for Kubernetes (only for EKS deployments)
 - eksctl (only for EKS deployments)
+- AWS cli (only for EKS deployments)
 - pks cli (only for PKS deployments)
 - Google Cloud SDK and gcloud (only for GKE deployments)
 
@@ -67,8 +68,7 @@ Helm supports a variety of installation methods. To learn more, see https://helm
 
 Helm provides a script that you can download and then run to install the latest version:
 
-1. To download the Helm installation script from their Git repository, from
-    your home directory enter:
+1. To download the Helm installation script from the Helm Git repository, from your home directory, enter:
 
 `$ curl
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
@@ -138,11 +138,11 @@ Install the PKS CLI binary file from the Pivotal support site as an executable t
 
 6. Rename the downloaded binary file to "pks".
 
-7. On the command line, run the following command to make the PKS CLI binary executable:
+7. On the command line, to make the PKS CLI binary executable, enter:
 
     `$ chmod +x pks`
 
-8. Move the binary file into your $PATH directory.
+8. To move the binary file into your $PATH directory, enter:
 
     `$ sudo mv ./pks /bin`
 
@@ -150,7 +150,7 @@ These instructions were mostly sourced from the [Installing the PKS CLI](https:/
 
 ### For AKS only: installing the Azure CLI
 
-Install the Azure CLI as a super user with a single command with the command curl piped into your bash:
+To install the Azure CLI as a super user with a single command with the command curl piped into your bash, enter:
 
 `$ curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash`
 
@@ -168,17 +168,17 @@ To install the Google Cloud SDK:
 
 3. Download the appropriate Google SDK distribution for your Linux version. See [Installing from versioned archives](https://cloud.google.com/sdk/docs/downloads-versioned-archives). There are also versions available for Debian and Ubuntu or Red Hat and CentOS Linux.
 
-4. Extract the Google SDK distribution archive file to your system.
+4. To extract the Google SDK distribution archive file to your system, enter:
 
     `tar zxvf [ARCHIVE_FILE] google-cloud-sdk`
 
-5. Use the install script to add Cloud SDK tools to your path.
+5. To use the install script to add Cloud SDK tools to your path, enter:
 
     `./google-cloud-sdk/install.sh`
 
 6. Restart your terminal for the changes to take effect.
 
-7. In a Linux command prompt, initialize the Google Cloud SDK.
+7. From your command prompt, to initialize the Google Cloud SDK, enter:
 
     `gcloud init`
 
@@ -192,7 +192,7 @@ To install the Google Cloud SDK:
 
 9. In your browser, log in to your Google Cloud user account when prompted and click **Allow** to grant permission to access Google Cloud Platform resources.
 
-10. In your Linux command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
+10. In your command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
 
 ```bash
 Pick cloud project to use:
@@ -217,15 +217,86 @@ This gcloud configuration is called [default]. You can create additional configu
 Run `gcloud topic configurations` to learn more.
 ```
 
-11. To list accounts whose credentials are stored on the local system:
+11. To list accounts whose credentials are stored on the local system, enter:
 
     `gcloud auth list`
 
-12. To view information about your Cloud SDK installation and the active SDK configuration:
+12. To view information about your Cloud SDK installation and the active SDK configuration, enter:
 
     `gcloud info`
 
-    These instructions were sourced from the Google document, [Quickstart for Linux](https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
+These instructions were sourced from the Google document, [Quickstart for Linux](https://cloud.google.com/sdk/docs/quickstart-linux), which includes additional information.
+
+### For EKS only: installing AWS IAM authenticator
+
+Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate with your Kubernetes cluster using your AWS credentials. You must download the binary file from AWS and then install the CLI on your local computer.
+
+1. To download the latest binary from the AWS site, from your home directory, enter:
+
+```bash
+   $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
+   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                  Dload  Upload   Total   Spent    Left  Speed
+   100 33.6M  100 33.6M    0     0  1996k      0  0:00:17  0:00:17 --:--:-- 4786k
+```
+
+2. To make the AWS IAM Authenticator binary executable, enter:
+
+    `$ chmod +x ./aws-iam-authenticator`
+
+3. To use the AWS recommended command to copy the AWS IAM Authenticator file to a newly created folder, `$HOME/bin/aws-iam-authenticator`, and ensure that $HOME/bin comes first in your $PATH, enter:
+
+   `$ mkdir -p $HOME/bin && cp ./aws-iam-authenticator $HOME/bin/aws-iam-authenticator && export PATH=$PATH:$HOME/bin`
+
+4. To add $HOME/bin to your PATH environment variable, enter:
+
+   `$ echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc`
+
+5.  To verify the AWS IAM Authenticator is working, enter:
+
+   ```bash
+   $ ws-iam-authenticator help
+   A tool to authenticate to Kubernetes using AWS IAM credentials
+
+   Usage:
+     aws-iam-authenticator [command]
+```
+
+These instructions were sourced from the AWS document, [Installing aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
+
+### For EKS only: installing the eksctl utility
+
+Pega recommends deploying your EKS cluster for your Pega Platform deployment using the AWS `eksctl` command line utility for creating and managing clusters on Amazon EKS.
+
+1. To download and extract the latest `eksctl` binary from the AWS site, from your home directory, enter:
+
+   `$ curl --silent --location "https://github.com/weaveworks/eksctl/releases/latest/download/eksctl_$(uname -s)_amd64.tar.gz" | tar xz -C /tmp`
+
+2. To move the extracted binary to /usr/local/bin, which allows the command to be run without the "sudo" prefix, enter:
+
+   `$ sudo mv /tmp/eksctl /usr/local/bin`
+
+3. To verify the `eksctl` version, enter:
+
+   ```bash
+   $ eksctl version
+   0.17.0
+   ```
+
+These instructions were sourced from the AWS document, [Install eksctl](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html), which includes additional information about how to use the 'eksctl' utility in combination with the 'kubectl' command-line utility, which you should have already installed earlier in this document.
+
+### For EKS only: installing AWS CLI version 2
+
+Install the AWS CLI utility with a packaging tool such as apt-get. Depending on the tool you use, youmay need a have SAML profile for your AWS account on your system.
+
+`$ sudo apt-get install awscli`
+
+To confirm the installation or upgrade, enter:
+
+```bash
+$ aws --version
+aws-cli/2.0.10 Python/3.7.3 Linux/5.3.0-51-generic botocore/2.0.0dev14
+```
 
 ### Installing Docker
 
@@ -463,7 +534,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
 
 6. To retag the `search` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-search:<Pega Platform version>`, enter:
 
-   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
+   `$ docker tag pega-docker.downloads.pega.com/platform/search:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
 
 7. To push the retagged `my-pega-search` image to your registry, enter:
 
@@ -479,7 +550,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
 
 9. To retag the `installer` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-installer:<Pega Platform version>`, enter:
 
-   `$ docker tag pega-docker.downloads.pega.com/platform/pega:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
+   `$ docker tag pega-docker.downloads.pega.com/platform/installer:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
 
 10. To push the retagged `my-pega-installer` image to your registry, enter:
 

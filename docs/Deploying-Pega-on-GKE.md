@@ -20,7 +20,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging in to Pega Platform – 10 minutes](#logging-in-to-pega-platform--10-minutes).
 
-To understand how Pega maps Kubernetes objects with Pega applications and services, see [How Pega Platform and applications are deployed on Kubernetes](https://community.pega.com/knowledgebase/articles/cloud-choice/how-pega-platform-and-applications-are-deployed-kubernetes).
+To understand how Pega maps Kubernetes objects with Pega applications and services, see [Understanding the Pega deployment architecture](https://community.pega.com/knowledgebase/articles/client-managed-cloud/cloud/understanding-pega-deployment-architecture).
 
 Assumptions and prerequisites
 -----------------------------
@@ -41,11 +41,7 @@ The following account, resources, and application versions are required for use 
 
 - Pega Platform 8.3.1 or later.
 
-- Pega Docker images – your deployment requires the use of a custom Docker image to install Pega Platform into a database that is used by your GKE cluster. After you build your image, you must make it available in a private Docker registry. To build your own image from the base image that Pega provides, you must have:
-
-  - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
-
-  - The Docker application downloaded to your local system. Log into your DockerHub account from the Docker application on your local system.
+- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For details, see [Downloading Docker images for your deployment](https://github.com/pegasystems/pega-helm-charts#downloading-docker-images-for-your-deployment).
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes Yaml examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -361,8 +357,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
     You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only GKE resources display. The dashboard does not display your GKE cluster name or your resource name, which is expected behavior.
 
-    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this  Linux shell open.
-
+    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux shell open.
 
 10. Open a new Linux bash shell and change the location to the top folder of your gke-demo directory.
 
