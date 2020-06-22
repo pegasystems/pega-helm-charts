@@ -344,7 +344,7 @@ Parameter       | Description    | Default value
 
 ### nodeSelector
 
-In some Kubernetes environments, you may have configured certain Nodes in your Kubernetes cluster with different attributes, such as persistent storage.  You may use the nodeSelector pattern to assign Pods of a tier to run on particular node(s).  For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
+Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
 
 ```yaml
 tier:
