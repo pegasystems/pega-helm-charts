@@ -66,6 +66,10 @@ spec:
 {{ toYaml .custom.initContainers | indent 6 }}
 {{- end }}
 {{- end }}
+{{- if .node.nodeSelector }}
+      nodeSelector:
+{{ toYaml .node.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat

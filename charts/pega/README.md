@@ -342,6 +342,19 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### nodeSelector
+
+Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
+
+```yaml
+tier:
+- name: "stream"
+  nodeType: "Stream"
+
+  nodeSelector:
+    disktype: ssd
+```
+
 ### Liveness and readiness probes
 
 [Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
