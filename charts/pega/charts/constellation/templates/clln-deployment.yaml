@@ -22,9 +22,9 @@ spec:
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
       containers:
-      - name: clln
+      - name: constellationUI
         imagePullPolicy: {{ .Values.imagePullPolicy }}
-        image: {{ .Values.dockerRepos }}
+        image: {{ .Values.image }}
         args:
         - port=3000
         - sync=true

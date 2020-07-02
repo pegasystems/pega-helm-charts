@@ -38,7 +38,7 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths: 
-      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) (eq .node.nodeType "WebUser") }}
+      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /prweb/constellation     
         backend:
           serviceName: constellation
