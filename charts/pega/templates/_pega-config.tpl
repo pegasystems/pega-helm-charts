@@ -27,13 +27,12 @@ data:
 {{- end }}
 
   # Pega deployment contextXML template file
-  prconfig.xml: |-
+  context.xml.tmpl: |-
 {{- if $custom_config.contextXML }}
 {{ $custom_config.contextXML | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/prconfig.xml" | indent 6 }}
+{{ .root.Files.Get "config/deploy/context.xml.tmpl" | indent 6 }}
 {{- end }}
 {{- end }}
 ---
 {{- end }}
-
