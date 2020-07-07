@@ -429,12 +429,30 @@ tier:
 
 ### Pega configuration files
 
-While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.
+While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
 
-Parameter       | Description    | Default value
----             | ---       | ---
-`prconfigPath`  | The location of a [prconfig.xml](config/deploy/prconfig.xml) template.  | `config/prconfig.xml`
-`prlog4j2Path`  | The location of a [prlog4j2.xml](config/deploy/prlog4j2.xml) template.  | `config/prlog4j2.xml`
+Parameter     | Description    | Default value
+---           | ---       | ---
+`prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
+`prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
+`contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
+
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      prconfig: |-
+        ...
+
+      prlog4j2: |-
+        ...
+
+      contextXML: |-
+        ...
+```
 
 ### Pega diagnostic user
 
