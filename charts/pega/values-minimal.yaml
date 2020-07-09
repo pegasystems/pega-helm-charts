@@ -77,8 +77,8 @@ global:
       memRequest: "5Gi"
       cpuLimit: 2
       memLimit: "6Gi"
-      # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
-      constellationSettings: "Pega-UIEngine/CosmosServicesURI=/prweb/constellation"
+      # Pass the cosmosUI url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
+      cosmosUISettings: "Pega-UIEngine/CosmosServicesURI=/prweb/cosmosUI"
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
@@ -117,7 +117,7 @@ installer:
   adminPassword: "ADMIN_PASSWORD"
 
 # Pega Constellation UI settings.
-# Note : This node is for constellation service whose purpose is to serve static content to applications.
+# Note : This node is for cosmosUI service whose purpose is to serve static content to applications.
 # This is a feature currently under development and is to be used only with Pega versions 8.5 and above.
-constellation:
+cosmosUI:
   enabled: false

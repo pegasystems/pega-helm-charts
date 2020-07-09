@@ -1,16 +1,16 @@
-#Deploy only when the constellation flag has been enabled in the values yaml.
+#Deploy only when the cosmosUI flag has been enabled in the values yaml.
 {{ if and .Values.enabled (eq .Values.enabled true) }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: constellation
+  name: cosmosUI
   labels:
-    app: constellation
-    # component: constellation
+    app: cosmosUI
+    # component: cosmosUI
 spec:
   selector:
-    app: constellation
-    # component: constellation
+    app: cosmosUI
+    # component: cosmosUI
   ports:
   - protocol: TCP
     port: 3000

@@ -48,8 +48,8 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 	// Verify search service
 	VerifySearchService(t, helmChartPath, options)
 
-	if options.SetValues["constellation.enabled"] == "true" {
-		// Verify constellation service
+	if options.SetValues["cosmosUI.enabled"] == "true" {
+		// Verify cosmosUI service
 		VerifyConstellationService(t, helmChartPath, options)
 	}
 
@@ -128,15 +128,15 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "REQUESTOR_PASSIVATION_TIMEOUT")
 		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
 	}
-	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name == "pega-web" {
+	if options.SetValues["cosmosUI.enabled"] == "true" && expectedSpec.name == "pega-web" {
 		envIndex++
-		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CONSTELLATION_SETTINGS")
-		require.Equal(t, "Pega-UIEngine/CosmosServicesURI=/prweb/constellation", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
+		require.Equal(t, "Pega-UIEngine/CosmosServicesURI=/prweb/cosmosUI", pod.Containers[0].Env[envIndex].Value)
 	}
 
-	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name != "pega-web" {
+	if options.SetValues["cosmosUI.enabled"] == "true" && expectedSpec.name != "pega-web" {
 		envIndex++
-		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CONSTELLATION_SETTINGS")
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
 		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
@@ -293,13 +293,13 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 		VerifyGKEIngress(t, ingressObj, expectedIngress)
 	} else if provider == "aks" {
 		VerifyAKSIngress(t, ingressObj, expectedIngress)
-	} else if provider != "eks" && options.SetValues["constellation.enabled"] == "false" {
+	} else if provider != "eks" && options.SetValues["cosmosUI.enabled"] == "false" {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
-	} else if provider != "aks" && options.SetValues["constellation.enabled"] == "false" {
+	} else if provider != "aks" && options.SetValues["cosmosUI.enabled"] == "false" {
 		VerifyAKSIngress(t, ingressObj, expectedIngress)
-	} else if provider != "gke" && options.SetValues["constellation.enabled"] == "false" {
+	} else if provider != "gke" && options.SetValues["cosmosUI.enabled"] == "false" {
 		VerifyGKEIngress(t, ingressObj, expectedIngress)
-	} else if options.SetValues["constellation.enabled"] == "true" {
+	} else if options.SetValues["cosmosUI.enabled"] == "true" {
 		VerifyK8SIngressWithConstellationEnabled(t, ingressObj, expectedIngress)
 	} else {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
@@ -345,12 +345,12 @@ func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
 
-// VerifyPegaIngressWithConstellationEnabled - Performs Pega Ingress assertions with the values as provided in default values.yaml when the constellation service is enabled.
+// VerifyPegaIngressWithConstellationEnabled - Performs Pega Ingress assertions with the values as provided in default values.yaml when the cosmosUI service is enabled.
 func VerifyK8SIngressWithConstellationEnabled(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
-	if ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName == "constellation" {
+	if ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName == "cosmosUI" {
 		require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
-		require.Equal(t, "/prweb/constellation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Path)
-		require.Equal(t, "constellation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+		require.Equal(t, "/prweb/cosmosUI", ingressObj.Spec.Rules[0].HTTP.Paths[0].Path)
+		require.Equal(t, "cosmosUI", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 		require.Equal(t, intstr.FromInt(3000), ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 		require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[1].Backend.ServiceName)
 		require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[1].Backend.ServicePort)
@@ -373,16 +373,16 @@ func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Optio
 	require.Equal(t, searchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9200))
 }
 
-// VerifyConstellationService - Verifies constellation service deployment used by constellation pod with the values as provided in default values.yaml
+// VerifyConstellationService - Verifies cosmosUI service deployment used by cosmosUI pod with the values as provided in default values.yaml
 func VerifyConstellationService(t *testing.T, helmChartPath string, options *helm.Options) {
 
-	constellationService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/constellation/templates/clln-service.yaml"})
-	var constellationServiceObj k8score.Service
-	helm.UnmarshalK8SYaml(t, constellationService, &constellationServiceObj)
-	require.Equal(t, constellationServiceObj.Spec.Selector["app"], "constellation")
-	// require.Equal(t, constellationServiceObj.Spec.Ports[0].Protocol, "TCP")
-	require.Equal(t, constellationServiceObj.Spec.Ports[0].Port, int32(3000))
-	require.Equal(t, constellationServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(3000))
+	cosmosUIService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/cosmosUI/templates/clln-service.yaml"})
+	var cosmosUIServiceObj k8score.Service
+	helm.UnmarshalK8SYaml(t, cosmosUIService, &cosmosUIServiceObj)
+	require.Equal(t, cosmosUIServiceObj.Spec.Selector["app"], "cosmosUI")
+	// require.Equal(t, cosmosUIServiceObj.Spec.Ports[0].Protocol, "TCP")
+	require.Equal(t, cosmosUIServiceObj.Spec.Ports[0].Port, int32(3000))
+	require.Equal(t, cosmosUIServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(3000))
 }
 
 // VerifyEnvironmentConfig - Verifies the environment configuration used by the pods with the values as provided in default values.yaml

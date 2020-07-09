@@ -26,10 +26,10 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths: 
-      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
-      - path: /prweb/constellation     
+      {{ if and .root.Values.cosmosUI (eq .root.Values.cosmosUI.enabled true) }}
+      - path: /prweb/cosmosUI     
         backend:
-          serviceName: constellation
+          serviceName: cosmosUI
           servicePort: 3000
       {{ end }}
       - backend: 
