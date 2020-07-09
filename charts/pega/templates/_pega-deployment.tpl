@@ -91,8 +91,8 @@ spec:
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
 {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
-        - name: NODE_SETTINGS
-          value: "{{ .node.nodeSettings }}"
+        - name: CONSTELLATION_SETTINGS
+          value: "{{ .node.constellationSettings }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}

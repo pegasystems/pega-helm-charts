@@ -130,13 +130,13 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	}
 	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name == "pega-web" {
 		envIndex++
-		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "NODE_SETTINGS")
-		require.Equal(t, "PEGA-UIENGINE/CONSTELLATIONSVCURL=/prweb/constellation", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CONSTELLATION_SETTINGS")
+		require.Equal(t, "Pega-UIEngine/CosmosServicesURI=/prweb/constellation", pod.Containers[0].Env[envIndex].Value)
 	}
 
 	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name != "pega-web" {
 		envIndex++
-		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "NODE_SETTINGS")
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CONSTELLATION_SETTINGS")
 		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
