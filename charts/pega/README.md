@@ -429,7 +429,7 @@ tier:
 
 ### Pega configuration files
 
-While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
+While Pega includes default configuration files in the Helm charts, the charts provide extension points to override the defaults with additional customizations. To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
 
 Parameter     | Description    | Default value
 ---           | ---       | ---
