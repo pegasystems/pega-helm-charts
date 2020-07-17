@@ -19,13 +19,13 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-2. Verify access to your PKS cluster and create an SQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
+2. Verify access to your PKS cluster and create an PostgreSQL instance in an account such as Google Cloud Platform (GPC) - [Prepare your PKS resources – 45 minutes](#prepare-your-resources--45-minutes).
 
 3. Customize a configuration file with your PKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your PKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
 4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging in to Pega Platform – 10 minutes](#logging-in-to-pega-platform--10-minutes).
 
-To understand how Pega maps Kubernetes objects with Pega applications and services, see [How Pega Platform and applications are deployed on Kubernetes](https://community.pega.com/knowledgebase/articles/cloud-choice/how-pega-platform-and-applications-are-deployed-kubernetes).
+To understand how Pega maps Kubernetes objects with Pega applications and services, see [Understanding the Pega deployment architecture](https://community.pega.com/knowledgebase/articles/client-managed-cloud/cloud/understanding-pega-deployment-architecture).
 
 Assumptions and prerequisites
 -----------------------------
@@ -48,15 +48,13 @@ The following account, resources, and application versions are required for use 
 
 - Pega Platform 8.3.1 or later.
 
-- Pega Docker images – your deployment requires the use of a custom Docker image to install Pega Platform into a database that is used by your PKS cluster. After you build your image, you must make it available in a private Docker registry. To build your own image from the base image that Pega provides, you must have:
-
-  - A DockerHub account to which you will push your final image to a private DockerHub repository. The image you build with Pega-provided components cannot be shared in a public DockerHub repository.
-
-  - The Docker application downloaded to your local system, either Linux- or Windows-based. Log into your DockerHub account from the Docker application on your local system.
+- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For details, see [Downloading Docker images for your deployment](https://github.com/pegasystems/pega-helm-charts#downloading-docker-images-for-your-deployment).
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
+
+- PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
 
 Prepare your resources – 45 minutes
 -----------------------------------
@@ -82,11 +80,11 @@ During deployment the required Kubernetes configuration file is copied into the 
 
 ### Creating a database resource
 
-PKS deployments require you to install Pega Platform software in an SQL database. After you create an SQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
+PKS deployments require you to install Pega Platform software in an PostgreSQL database. After you create an PostgreSQL instance that is available to your PKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the PostgreSQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
 
-#### Creating an SQL instance
+#### Creating an PostgreSQL instance
 
-To begin, create an SQL Instance that is available to your PKS cluster. In this example, we create an SQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
+To begin, create an PostgreSQL Instance that is available to your PKS cluster. In this example, we create an PostgreSQL instance in GCP; however, you can create or use an database resource that is available to the PKS cluster.
 
 1. Use a web browser to log in to <https://cloud.google.com/> and navigate to your **Console** in the upper right corner.
 
@@ -141,9 +139,9 @@ To begin, create an SQL Instance that is available to your PKS cluster. In this 
 
 Create a PostgreSQL database in your new SQL instance for the Pega Platform installation. Use the database editing tool of your choice to log into your SQL instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
 
-1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
+1. Use a database editor tool, such as pgadmin4, to log into your PostgreSQL instance.
 
-    You can find your access information and login credentials, by selecting the SQL instance in the GCP console.
+    You can find your access information and login credentials, by selecting the PostgreSQL instance in the GCP console.
 
 2. In the database editor tool, navigate to Databases and create a new database.
 
@@ -158,6 +156,62 @@ To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that h
 
 An installation with deployment will take about 90 minutes total, because a Pega Platform installation in your PostgreSQL database takes up to an hour.
 
+### Adding the Pega configuration files to your Helm installation on your local system
+
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
+
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
+To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+
+1. To add the Pega repository to your Helm installation, enter:
+
+    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+
+2. To verify the new repository, you can search it by entering:
+
+```bash
+  $ helm search repo pega
+  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega   1.2.0                           Pega installation on kubernetes
+  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+```
+
+These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
+
+### Updating the addons.yaml Helm chart values
+
+Use the provided example addons.yaml file to configure the use of a the Traefik load balancer and enabling EFK for log aggregation. You must disable the Pega metric server to ensure your deployment uses the Pivotal-supplied metrics server.
+
+1. Download the example pega/addons [addons.yaml](./resources/addons-pks.yaml) the \<local filepath\>/pks-demo.
+
+   When you install the addons namespace, you will specify this example file for the configuration details.
+
+2. Review the settings for this file. The example addons file is configured to automatically deploy EFK for log aggregation. 
+
+  - To use the default EFK settings, you must set a domain name to access kibana from your load balancer using the `kibana.hosts: "YOUR_WEB.KIBANA.EXAMPLE.COM"` parameter.
+
+  - If your PKS deployment already has log aggregation capabilities configured, you must disable EFK deploy by setting the `deploy_efk: &deploy_efk false` parameter.
+
+### Add any known, customized addons settings for Pega to your deployment
+
+The Pega deployment model supports advanced configurations to fit most existing
+clients' needs. If you are a Pega client and have known, required customizations
+for your deployment and you already use the following files to add your known
+customizations, you can copy those configurations into the configuration files
+Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts) repository folder, pega-helm-charts/charts/pega/config/deploy:
+
+- context.xml: add additional required data sources
+
+- prlog4j2.xml: modify your logging configuration, if required
+
+- prconfig.xml: adjust the standard Pega Platform configuration with known,
+    required settings
+
+Make these changes before you begin deploying Pega Platform using Helm charts.
+
 ### Updating the pega.yaml Helm chart values
 
 To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \gke-demo folder you have already created on your local system. 
@@ -168,15 +222,15 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Credentials for your DockerHub account in order to access the required Docker images.
 
-- Access your GCP SQL database.
+- Access your GCP PostgreSQL database.
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
 - Specify host names for your web and stream tiers.
 
-1. To download the pega.yaml Helm chart to the \<local filepath\>/pks-demo, enter:
+1. To download the pega.yaml to the \<local filepath\>/pks-demo, enter:
 
-`$ helm inspect values pega/pega > pega.yaml`
+`$ helm inspect values pega/pega > <local filepath>/pks-demo/pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your PKS requirements:
 
@@ -188,15 +242,17 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | Jdbc.driverClass:       | Specify the driver class for a PostgreSQL database. | driverClass: "org.postgresql.Driver"                |
 | Jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
 | Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul><li>driverUri: "latest jar file available” </li><li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>|
-| Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For GCP PostgreSQL databases, the default user is “postgres”.</li></ul>|
+| Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>For GCP PostgreSQL databases, the default user is “postgres”.</li></ul>|
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
-| docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
+| docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
+| docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>Your stream tier hostname should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](prepping-local-system-runbook-linux.md)</li></ul>|
-| installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
+| pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
+| installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. |Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>"|
+| installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
 
@@ -307,15 +363,26 @@ ingress:
 14. To install the addons chart, which you updated in [Preparing your local system](#prepare-your-resources--45-minutes), enter:
 
 ```bash
-    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+    $ helm install addons pega/addons --namespace pegaaddons --values addons-pks.yaml
+    NAME: addons
+    LAST DEPLOYED: Fri Jan  3 18:58:28 2020
+    NAMESPACE: pegaaddons
+    STATUS: deployed
+    REVISION: 1
 ```
 
-The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
+A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
 15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
     $ helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
+    NAME: mypega-pks-demo
+    LAST DEPLOYED: Fri Jan  3 19:00:19 2020
+    NAMESPACE: mypega-pks-demo
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
 ```
 
 For subsequent Helm installs, use the command `helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo` to deploy Pega Platform and avoid another Pega Platform installation.

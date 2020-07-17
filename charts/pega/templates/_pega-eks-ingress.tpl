@@ -8,29 +8,35 @@ metadata:
   annotations:
     # Ingress class used is 'alb'
     kubernetes.io/ingress.class: alb
-    {{ if (.node.service.domain) }}
+{{ if (.node.service.domain) }}
     {{ template "eksHttpsAnnotationSnippet" }}
-    {{ else }}
-    {{- if (.node.ingress) }}
-    {{- if (.node.ingress.tls) }}
-    {{- if (eq .node.ingress.tls.enabled true) }}
+{{ else }}
+{{- if (.node.ingress) }}
+{{- if (.node.ingress.tls) }}
+{{- if (eq .node.ingress.tls.enabled true) }}
     {{ template "eksHttpsAnnotationSnippet" }}
-    {{ if (.node.ingress.tls.ssl_annotation) }}
-    {{ toYaml .node.ingress.tls.ssl_annotation }}
-    {{ end }}
-    {{ end }}
-    {{ end }}
-    {{ else }}
+{{ if (.node.ingress.tls.ssl_annotation) }}
+{{ toYaml .node.ingress.tls.ssl_annotation | indent 4 }}
+{{ end }}
+{{ end }}
+{{ end }}
+{{ else }}
     # specifies the ports that ALB used to listen on
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
-    {{ end }}
-    {{ end }}
-    # override the default scheme internal as ALB should be internet-facing 
+{{ end }}
+{{ end }}
+{{- if .node.ingress.annotations }}
+{{ toYaml .node.ingress.annotations | indent 4 }}
+{{- else }}
+    # override the default scheme internal as ALB should be internet-facing
     alb.ingress.kubernetes.io/scheme: internet-facing
-    # enable sticky sessions on target group
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
     # set to ip mode to route traffic directly to the pods ip
     alb.ingress.kubernetes.io/target-type: ip
+{{- end }}
+{{- if not (and (.node.ingress.annotations) ( .node.ingress.annotations | quote | regexFind "alb.ingress.kubernetes.io/target-group-attributes:" ) ) }}
+    # enable sticky sessions on target group
+    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
+{{- end }}
 spec:
   rules:
   {{ if (.node.service.domain) }}

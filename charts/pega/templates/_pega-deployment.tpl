@@ -29,8 +29,12 @@ spec:
       labels:
         app: {{ .name }}
       annotations:
+{{- if .node.podAnnotations }}
+{{ toYaml .node.podAnnotations | indent 8 }}
+{{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
+
     spec:
       volumes:
       # Volume used to mount config files.
@@ -61,6 +65,10 @@ spec:
         # Additional custom init containers
 {{ toYaml .custom.initContainers | indent 6 }}
 {{- end }}
+{{- end }}
+{{- if .node.nodeSelector }}
+      nodeSelector:
+{{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
       containers:
       # Name of the container
@@ -111,7 +119,7 @@ spec:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
           {{- else }}
-            cpu: 2
+            cpu: 4
           {{- end }}
           {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
@@ -123,7 +131,7 @@ spec:
           {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
           {{- else }}
-            cpu: 200m
+            cpu: 2
           {{- end }}
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"

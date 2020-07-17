@@ -16,7 +16,6 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Red Hat OpenShift
 * Pivotal Container Service (PKS) - see the [PKS runbook](docs/Deploying-Pega-on-PKS.md)
 
-
 # Getting started
 
 This project assumes you have an installation of Kubernetes available and have Helm installed locally. The following commands will verify your installation. The exact output may be slightly different, but they should return without error.
@@ -85,6 +84,32 @@ $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 ```bash
 $ helm delete mypega
 ```
+# Downloading Docker images for your deployment
+
+Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download docker images that are required to install the Pega Platform onto your database. After you pull the images to your local system you must push them into your private Docker registry.
+
+To download your preferred version of the Pega image to your local system, specify the version tag when you enter:
+
+```bash
+$ sudo docker pull pega-docker.downloads.pega.com/platform/pega:<version>
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
+```
+
+For details, see the examples listed in the runbooks:
+
+* [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
+* [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
+
+Pegasystems uses a standard naming practice of hostname/product/image:tag. All Pega images are available from the pega-docker.downloads.pega.com host. The :tag represents the version if Pega being deployed, for example :8.3.1 to download Pega 8.3.1. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+
+ Name        | Description                                           |
+-------------|-------------------------------------------------------|
+platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+ platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+ platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
+
+ Clients push their three Pega-provided images to their registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
 
 # Contributing
 

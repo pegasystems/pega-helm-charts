@@ -22,6 +22,10 @@ spec:
       labels:
         app: {{ template "searchName" . }}
         component: "Search"
+{{- if .Values.podAnnotations }}
+      annotations:
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
     spec:
       {{ if ne .Values.global.provider "openshift" }}
       securityContext:
