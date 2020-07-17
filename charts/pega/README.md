@@ -238,7 +238,7 @@ Specify the `ingress` yaml block to expose a Pega tier to access from outside Ku
 Parameter | Description
 ---       | ---
 `domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
-`appContextPath`  | Specify the application context path to be used to access applications on a specific tier.  If not specified, /prweb will used. 
+`appContextPath`  | Specify the application context path to be used to access applications on a specific tier.  If not specified, prweb will used. 
 `tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
