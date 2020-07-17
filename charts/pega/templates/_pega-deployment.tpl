@@ -82,12 +82,12 @@ spec:
 {{- end }}
 {{- end }}
         # Specify any of the container environment variables here
-        env:
+        env:	
         # Node type of the Pega nodes for {{ .name }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
-        - name: PEGA_APP_CONTEXT_ROOT
-          value: "{{ template "pega.applicationRootContext" . }}"
+        - name: PEGA_APP_CONTEXT_PATH
+          value: {{ template "pega.applicationContextPath" . }}
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
@@ -150,7 +150,7 @@ spec:
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
           httpGet:
-            path: "/{{ template "pega.applicationRootContext" . }}/PRRestService/monitor/pingService/ping"
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
@@ -162,7 +162,7 @@ spec:
         {{- $readinessProbe := .node.readinessProbe }}
         readinessProbe:
           httpGet:
-            path: "/{{ template "pega.applicationRootContext" . }}/PRRestService/monitor/pingService/ping"
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}
