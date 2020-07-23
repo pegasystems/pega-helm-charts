@@ -90,9 +90,9 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
-{{ if and .root.Values.cosmosUI (eq .root.Values.cosmosUI.enabled true) }}
+{{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
-          value: "{{ .node.cosmosUISettings }}"
+          value: "{{ .node.constellationSettings }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
