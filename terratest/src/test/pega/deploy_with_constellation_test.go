@@ -9,11 +9,11 @@ import (
 )
 
 // set action execute to install
-var cosmosUI_options = &helm.Options{
+var constellation_options = &helm.Options{
 	SetValues: map[string]string{
 		"global.provider":        "k8s",
 		"global.actions.execute": "deploy",
-		"cosmosUI.enabled":  "true",
+		"constellation.enabled":  "true",
 	},
 }
 
@@ -25,5 +25,5 @@ func TestPegaStandardTierDeploymentWithConstellation(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	VerifyPegaStandardTierDeployment(t, helmChartPath, cosmosUI_options, []string{"wait-for-pegasearch", "wait-for-cassandra"})
+	VerifyPegaStandardTierDeployment(t, helmChartPath, constellation_options, []string{"wait-for-pegasearch", "wait-for-cassandra"})
 }
