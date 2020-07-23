@@ -54,7 +54,7 @@ spec:
     http:
       paths: 
       {{ if and .root.Values.cosmosUI (eq .root.Values.cosmosUI.enabled true) }}
-      - path: /prweb/cosmosUI     
+      - path: /prweb/constellation     
         backend:
           serviceName: cosmosUI
           servicePort: 3000

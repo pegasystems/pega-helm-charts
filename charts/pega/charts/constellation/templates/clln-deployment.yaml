@@ -22,7 +22,7 @@ spec:
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
       containers:
-      - name: cosmosUIUI
+      - name: cosmosUI
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.image }}
         args:

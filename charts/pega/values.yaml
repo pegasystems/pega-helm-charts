@@ -96,8 +96,8 @@ global:
           # ssl_annotation:
 
       replicas: 1
-      # Pass the cosmosUI url as a Dynamic System Setting to the infinity. Added only when Constellation is enabled.
-      cosmosUISettings: "Pega-UIEngine/CosmosServicesURI=/prweb/cosmosUI"
+      # Pass the cosmosUI url as a Dynamic System Setting to the infinity. Added only when cosmosUI is enabled.
+      cosmosUISettings: "Pega-UIEngine/cosmosservicesURI=/prweb/constellation"
       javaOpts: ""
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
@@ -215,7 +215,7 @@ installer:
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
 
-# Pega Constellation UI settings.
+# Pega cosmosUI UI settings.
 # Note : This node is for cosmosUI service whose purpose is to serve static content to applications.
 # This is a feature currently under development and is to be used only with Pega versions 8.5 and above.
 cosmosUI:
