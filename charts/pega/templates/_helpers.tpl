@@ -164,6 +164,19 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
   {{- add $passivationTime $passivationDelay -}}
 {{- end -}}
 
+# Determine application root context to use in pega tomcat nodes
+{{- define "pega.applicationContextPath" -}}
+   {{- if .node.ingress -}}
+      {{- if .node.ingress.appContextPath -}}
+         {{ trimAll "/" .node.ingress.appContextPath }}
+      {{- else -}}
+         prweb
+      {{- end -}}	 
+   {{- else -}}
+      prweb
+   {{- end -}}
+{{- end }}
+
 {{- define "gkemanagedcertificate" }}
 apiVersion: networking.gke.io/v1beta1
 kind: ManagedCertificate
