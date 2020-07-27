@@ -29,6 +29,9 @@ spec:
         - port=3000
         - sync=true
         - {{ .Values.logLevel }}
+        livenessProbe:
+          httpGet:
+            path: /c11n/api/v1/ping
         ports:
         - containerPort: 3000
 {{ end }}

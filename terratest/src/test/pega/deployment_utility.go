@@ -131,7 +131,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name == "pega-web" {
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
-		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/prweb/constellation", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
 	}
 
 	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name != "pega-web" {
@@ -349,7 +349,7 @@ func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 func VerifyK8SIngressWithConstellationEnabled(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
 	if ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName == "constellation" {
 		require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
-		require.Equal(t, "/prweb/constellation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Path)
+		require.Equal(t, "/c11n", ingressObj.Spec.Rules[0].HTTP.Paths[0].Path)
 		require.Equal(t, "constellation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 		require.Equal(t, intstr.FromInt(3000), ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 		require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[1].Backend.ServiceName)

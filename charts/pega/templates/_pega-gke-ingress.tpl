@@ -39,7 +39,7 @@ spec:
     http:
       paths: 
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
-      - path: /prweb/constellation     
+      - path: /c11n     
         backend:
           serviceName: constellation
           servicePort: 3000
