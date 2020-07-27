@@ -168,7 +168,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- define "pega.applicationContextPath" -}}
    {{- if .node.ingress -}}
       {{- if .node.ingress.appContextPath -}}
-         {{ .node.ingress.appContextPath }}
+         {{ trimAll "/" .node.ingress.appContextPath }}
       {{- else -}}
          prweb
       {{- end -}}	 
