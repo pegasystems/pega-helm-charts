@@ -238,7 +238,7 @@ Specify the `ingress` yaml block to expose a Pega tier to access from outside Ku
 Parameter | Description
 ---       | ---
 `domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
-`appContextPath`  | Specify the application context path to be used to access applications on a specific tier.  If not specified, prweb will used. 
+`appContextPath`  | Specify the path for access to the Pega application on a specific tier. If not specified, users will have access to the Pega application via /prweb 
 `tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
@@ -336,25 +336,12 @@ You can optionally configure the resource allocation and limits for a tier using
 Parameter       | Description    | Default value
 ---             | ---       | ---
 `replicas`      | Specify the number of Pods to deploy in the tier. | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.  | `2`
-`cpuLimit`      | CPU limit for pods in the current tier.  | `4`
+`cpuRequest`    | Initial CPU request for pods in the current tier.  | `200m`
+`cpuLimit`      | CPU limit for pods in the current tier.  | `2`
 `memRequest`    | Initial memory request for pods in the current tier. | `6Gi`
 `memLimit`      | Memory limit for pods in the current tier. | `8Gi`
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
-
-### nodeSelector
-
-Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
-
-```yaml
-tier:
-- name: "stream"
-  nodeType: "Stream"
-
-  nodeSelector:
-    disktype: ssd
-```
 
 ### Liveness and readiness probes
 
@@ -415,45 +402,15 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
-### Custom Annotations for Pods
-
-You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
-
-Example:
-
-```yaml
-tier:
-  - name: my-tier
-    podAnnotations:
-      <annotation-key>: <annotation-value>
-```
 
 ### Pega configuration files
 
-While Pega includes default configuration files in the Helm charts, the charts provide extension points to override the defaults with additional customizations. To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
+While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.
 
-Parameter     | Description    | Default value
----           | ---       | ---
-`prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
-`prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
-`contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
-
-
-Example:
-
-```yaml
-tier:
-  - name: my-tier
-    custom:
-      prconfig: |-
-        ...
-
-      prlog4j2: |-
-        ...
-
-      contextXML: |-
-        ...
-```
+Parameter       | Description    | Default value
+---             | ---       | ---
+`prconfigPath`  | The location of a [prconfig.xml](config/deploy/prconfig.xml) template.  | `config/prconfig.xml`
+`prlog4j2Path`  | The location of a [prlog4j2.xml](config/deploy/prlog4j2.xml) template.  | `config/prlog4j2.xml`
 
 ### Pega diagnostic user
 
@@ -527,7 +484,6 @@ Parameter   | Description   | Default value
 `podSecurityContext.runAsUser`   | ElasticSearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
 `set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the ElasticSearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
-`podAnnotations` | Configurable annotations applied to all Elasticsearch pods. | {}
 
 Additional env settings supported by ElasticSearch may be specified in a `custom.env` block as shown in the example below.
 
