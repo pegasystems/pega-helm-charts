@@ -1,4 +1,6 @@
 language: python
+os: linux
+dist: xenial
 env:
   global:
     - HELM_URL=https://storage.googleapis.com/kubernetes-helm
