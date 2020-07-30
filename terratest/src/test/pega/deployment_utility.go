@@ -137,7 +137,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name != "pega-web" {
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
-		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
