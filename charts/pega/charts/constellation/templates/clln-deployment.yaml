@@ -8,7 +8,7 @@ metadata:
     app: constellation
     # component: constellation
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: constellation
@@ -27,7 +27,6 @@ spec:
         image: {{ .Values.image }}
         args:
         - port=3000
-        - sync=true
         - {{ .Values.logLevel }}
         livenessProbe:
           httpGet:

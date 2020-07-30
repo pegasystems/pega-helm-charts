@@ -103,8 +103,6 @@ global:
 
 
       replicas: 1
-      # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when constellation is enabled.
-      constellationSettings: "Pega-UIEngine/cosmosservicesURI=/c11n"
       javaOpts: ""
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""

@@ -92,7 +92,7 @@ spec:
 {{- end }}
 {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
-          value: "{{ .node.constellationSettings }}"
+          value: "Pega-UIEngine/cosmosservicesURI=/c11n"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}

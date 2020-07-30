@@ -77,8 +77,6 @@ global:
       memRequest: "5Gi"
       cpuLimit: 2
       memLimit: "6Gi"
-      # Pass the constellation url as a Dynamic System Setting to the infinity. Added only when constellation is enabled.
-      constellationSettings: "Pega-UIEngine/cosmosservicesURI=/c11n"
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
