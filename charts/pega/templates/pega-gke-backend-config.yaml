@@ -10,4 +10,12 @@ spec:
   sessionAffinity:
     affinityType: "GENERATED_COOKIE"
     affinityCookieTtlSec: {{ template "lbSessionCookieStickiness" }}
+  healthCheck:
+    checkIntervalSec: 5
+    healthyThreshold: 1
+    port: 8080
+    requestPath: /prweb/PRRestService/monitor/pingService/ping
+    timeoutSec: 5
+    type: HTTP
+    unhealthyThreshold: 2
 {{ end }}
