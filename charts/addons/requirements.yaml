@@ -24,6 +24,6 @@ dependencies:
   repository: https://kubernetes-charts.storage.googleapis.com/
   condition: metrics-server.enabled
 - name: ingress-azure
-  version: "1.2.0-rc3"
+  version: "1.2.0"
   repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
   condition: ingress-azure.enabled
