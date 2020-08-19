@@ -256,9 +256,3 @@ installer:
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
-
-# Pega constellation UI settings.
-# Note : This node is for constellation service whose purpose is to serve static content to applications.
-# This is a feature currently under development and is to be used only with Pega versions 8.5 and above.
-constellation:
-  enabled: false
