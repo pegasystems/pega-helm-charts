@@ -1,0 +1,7 @@
+---
+# Parameters for constellation operation:
+# Docker repos and tag for image
+image: IMAGE_REPO_URL_HERE
+# log level : error, warn, info, debug.  use error for production
+logLevel: info
+enabled: false

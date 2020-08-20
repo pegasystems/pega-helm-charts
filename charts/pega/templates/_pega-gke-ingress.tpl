@@ -37,9 +37,15 @@ spec:
   # To access the below service, along with {{ .node.domain }}, http/https port also has to be provided in the URL.
   - host: {{ template "domainName" dict "node" .node }}
     http:
-      paths:
-      - backend:
-          serviceName: {{ .name }}
+      paths: 
+      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
+      - path: /c11n     
+        backend:
+          serviceName: constellation
+          servicePort: 3000
+      {{ end }}
+      - backend: 
+          serviceName: {{ .name }} 
           servicePort: {{ .node.service.port }}
 ---
 {{- end }}

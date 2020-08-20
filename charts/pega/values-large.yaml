@@ -101,9 +101,9 @@ global:
           # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
           ssl_annotation:
 
+
       replicas: 1
       javaOpts: ""
-
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 

@@ -1,0 +1,37 @@
+#Deploy only when the constellation flag has been enabled in the values yaml.
+{{ if and .Values.enabled (eq .Values.enabled true) }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: constellation
+  labels:
+    app: constellation
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: constellation
+  template:
+    metadata:
+      labels:
+        app: constellation
+    spec:
+      imagePullSecrets:
+      - name: {{ template "pegaRegistrySecret" }}
+      containers:
+      - name: constellation
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.image }}
+        args:
+        - port=3000
+        - {{ .Values.logLevel }}
+        livenessProbe:
+          httpGet:
+            path: /c11n/api/v1/ping
+        readinessProbe:
+          initialDelaySeconds: 1
+          httpGet:
+            path: /c11n/api/v1/ping
+        ports:
+        - containerPort: 3000
+{{ end }}

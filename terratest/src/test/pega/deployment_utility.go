@@ -48,6 +48,11 @@ func VerifyPegaStandardTierDeployment(t *testing.T, helmChartPath string, option
 	// Verify search service
 	VerifySearchService(t, helmChartPath, options)
 
+	if options.SetValues["constellation.enabled"] == "true" {
+		// Verify constellation service
+		VerifyConstellationService(t, helmChartPath, options)
+	}
+
 	// Verfiy Pega deployed services
 	SplitAndVerifyPegaServices(t, helmChartPath, options)
 
@@ -125,6 +130,17 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "REQUESTOR_PASSIVATION_TIMEOUT")
 		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
+	}
+	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name == "pega-web" {
+		envIndex++
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
+		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
+	}
+
+	if options.SetValues["constellation.enabled"] == "true" && expectedSpec.name != "pega-web" {
+		envIndex++
+		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "COSMOS_SETTINGS")
+		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
@@ -279,6 +295,14 @@ func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIng
 		VerifyGKEIngress(t, ingressObj, expectedIngress)
 	} else if provider == "aks" {
 		VerifyAKSIngress(t, ingressObj, expectedIngress)
+	} else if provider != "eks" && options.SetValues["constellation.enabled"] == "false" {
+		VerifyK8SIngress(t, ingressObj, expectedIngress)
+	} else if provider != "aks" && options.SetValues["constellation.enabled"] == "false" {
+		VerifyAKSIngress(t, ingressObj, expectedIngress)
+	} else if provider != "gke" && options.SetValues["constellation.enabled"] == "false" {
+		VerifyGKEIngress(t, ingressObj, expectedIngress)
+	} else if options.SetValues["constellation.enabled"] == "true" {
+		VerifyK8SIngressWithConstellationEnabled(t, ingressObj, expectedIngress)
 	} else {
 		VerifyK8SIngress(t, ingressObj, expectedIngress)
 	}
@@ -323,6 +347,21 @@ func VerifyK8SIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
 
+// VerifyPegaIngressWithconstellationEnabled - Performs Pega Ingress assertions with the values as provided in default values.yaml when the constellation service is enabled.
+func VerifyK8SIngressWithConstellationEnabled(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress) {
+	if ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName == "constellation" {
+		require.Equal(t, "traefik", ingressObj.Annotations["kubernetes.io/ingress.class"])
+		require.Equal(t, "/c11n", ingressObj.Spec.Rules[0].HTTP.Paths[0].Path)
+		require.Equal(t, "constellation", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+		require.Equal(t, intstr.FromInt(3000), ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
+		require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[1].Backend.ServiceName)
+		require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[1].Backend.ServicePort)
+	} else {
+		require.Equal(t, expectedIngress.Name, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
+		require.Equal(t, expectedIngress.Port, ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
+	}
+}
+
 // VerifySearchService - Verifies search service deployment used by search pod with the values as provided in default values.yaml
 func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Options) {
 
@@ -334,6 +373,18 @@ func VerifySearchService(t *testing.T, helmChartPath string, options *helm.Optio
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Name, "http")
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Port, int32(80))
 	require.Equal(t, searchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9200))
+}
+
+// VerifyconstellationService - Verifies constellation service deployment used by constellation pod with the values as provided in default values.yaml
+func VerifyConstellationService(t *testing.T, helmChartPath string, options *helm.Options) {
+
+	constellationService := helm.RenderTemplate(t, options, helmChartPath, []string{"charts/constellation/templates/clln-service.yaml"})
+	var constellationServiceObj k8score.Service
+	helm.UnmarshalK8SYaml(t, constellationService, &constellationServiceObj)
+	require.Equal(t, constellationServiceObj.Spec.Selector["app"], "constellation")
+	// require.Equal(t, constellationServiceObj.Spec.Ports[0].Protocol, "TCP")
+	require.Equal(t, constellationServiceObj.Spec.Ports[0].Port, int32(3000))
+	require.Equal(t, constellationServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(3000))
 }
 
 // VerifyEnvironmentConfig - Verifies the environment configuration used by the pods with the values as provided in default values.yaml

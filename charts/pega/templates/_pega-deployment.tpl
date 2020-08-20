@@ -100,6 +100,10 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
+{{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
+        - name: COSMOS_SETTINGS
+          value: "Pega-UIEngine/cosmosservicesURI=/c11n"
+{{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
         # Additional custom env vars
