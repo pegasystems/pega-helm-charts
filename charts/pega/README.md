@@ -171,12 +171,12 @@ bix         | Nodes dedicated to BIX processing can be helpful when the BIX work
 
 ### Name (*Required*)
 
-Use the `tier` section in the helm chart to specify the name of each tier configuration in order to label a tier in your Kubernetes deployment.  This becomes the name of the tier's replica set in Kubernetes.
+Use the `tier` section in the helm chart to specify the name of each tier configuration in order to label a tier in your Kubernetes deployment.  This becomes the name of the tier's replica set in Kubernetes. This name must be unique across all Pega deployments to ensure compatibility with logging and monitoring tools.
 
 Example:
 
 ```yaml
-name: "web"
+name: "mycrm-prod-web"
 ```
 
 ### nodeType (*Required*)
