@@ -390,7 +390,7 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `700` which corresponds to 700% of 200m ) | `700`
+`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
 
 ### Volume claim template
