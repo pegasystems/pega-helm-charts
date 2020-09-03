@@ -5,7 +5,7 @@ apiVersion: batch/v1
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-{{- if or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade") }}
+{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
   annotations:
     # Forces Helm to wait for the install or upgrade to complete.
     "helm.sh/hook": post-install
