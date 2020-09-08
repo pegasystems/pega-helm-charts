@@ -1,4 +1,4 @@
-package common
+package addons
 
 type SearchResourceOption struct {
 	Name string
