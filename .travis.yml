@@ -3,21 +3,20 @@ os: linux
 dist: xenial
 env:
   global:
-    - HELM_URL=https://storage.googleapis.com/kubernetes-helm
-    - HELM_TGZ=helm-v2.14.0-linux-amd64.tar.gz
+    - HELM_URL=https://get.helm.sh
+    - HELM_TGZ=helm-v3.2.4-linux-amd64.tar.gz
     - YAMLLINT_VERSION=1.15.0
+    - TRAVIS_GO_VERSION=1.13.1
 install:
   # Install Helm
   - wget -q ${HELM_URL}/${HELM_TGZ}
   - tar xzf ${HELM_TGZ}
   - PATH=`pwd`/linux-amd64/:$PATH
-  - helm init --client-only
   # Install YamlLint
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
   - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
-  - wget -c https://storage.googleapis.com/golang/go1.7.3.linux-amd64.tar.gz
-  - sudo tar -C /usr/local -xzf go1.7.3.linux-amd64.tar.gz
+  - eval "$(gimme 1.13.1)"
   - export  PATH=$PATH:/usr/local/go/bin
 script:
   - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
@@ -25,9 +24,6 @@ script:
   - remark -i .remark_ignore -f -u validate-links .
   # Now load the helm dependencies
   - make dependencies
-  # Run Helm lint
-  - helm lint ./charts/pega  
-  - helm lint ./charts/addons
   # Run GO helm unit tests
   - mkdir $TRAVIS_BUILD_DIR/terratest/bin
   - export GOPATH=$TRAVIS_BUILD_DIR/terratest
