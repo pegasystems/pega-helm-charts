@@ -1,9 +1,8 @@
-package common
+package addons
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"strings"
-	"test/pega"
 	"testing"
 )
 
@@ -13,13 +12,13 @@ type HelmChartParser struct {
 }
 
 func NewHelmConfigParser(helmTest *HelmTest) *HelmChartParser {
-	parsedChart := helm.RenderTemplate(helmTest.T, helmTest.HelmOptions, helmTest.ChartPath, []string{})
+	parsedChart := helm.RenderTemplate(helmTest.T, helmTest.HelmOptions, helmTest.ChartPath, "pega",[]string{})
 	slicedResource := strings.Split(parsedChart, "---")
 	return &HelmChartParser{T: helmTest.T, SlicedResource: slicedResource}
 }
 
 func (p *HelmChartParser) Find(searchOptions SearchResourceOption, resource interface{}) {
-	var d pega.DeploymentMetadata
+	var d DeploymentMetadata
 	for _, slice := range p.SlicedResource {
 		helm.UnmarshalK8SYaml(p.T, slice, &d)
 		if (searchOptions.Kind != "" && searchOptions.Kind == d.Kind) && (searchOptions.Name != "" && searchOptions.Name == d.Name) {
@@ -31,7 +30,7 @@ func (p *HelmChartParser) Find(searchOptions SearchResourceOption, resource inte
 	p.T.FailNow()
 }
 func (p *HelmChartParser) Contains(searchOptions SearchResourceOption) bool {
-	var d pega.DeploymentMetadata
+	var d DeploymentMetadata
 	for _, slice := range p.SlicedResource {
 		helm.UnmarshalK8SYaml(p.T, slice, &d)
 		if (searchOptions.Kind != "" && searchOptions.Kind == d.Kind) && (searchOptions.Name != "" && searchOptions.Name == d.Name) {
