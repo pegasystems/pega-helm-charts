@@ -46,13 +46,3 @@ func assertPegaTierIngress(t *testing.T, ingressYaml string, options *helm.Optio
 	require.Equal(t, "constellation", tierIngressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
 	require.Equal(t, intstr.FromInt(3000), tierIngressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServicePort)
 }
-
-
-
-
-
-
-
-
-
-
