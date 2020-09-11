@@ -8,27 +8,32 @@ import (
 	"testing"
 )
 
-func TestPegaGkeStandardTierDeployment(t *testing.T) {
-	var options = &helm.Options{
-		SetValues: map[string]string{
-			"global.provider":        "gke",
-			"global.actions.execute": "deploy",
-		},
-	}
 
-	t.Parallel()
+func TestPegaGKEBackendConfig(t *testing.T) {
+	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	VerifyPegaStandardTierDeployment(t, helmChartPath, options, []string{"wait-for-pegasearch", "wait-for-cassandra"})
-	verifyBackendConfig(t, helmChartPath, options)
+	for _,operation := range supportedOperations{
+
+			var options = &helm.Options{			
+				SetValues: map[string]string{
+					"global.provider":        "gke",
+					"global.actions.execute": operation,
+			 	},
+		    }
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
+			verifyBackendConfig(t, yamlContent)			
+
+		}
+
 }
 
-func verifyBackendConfig(t *testing.T, helmChartPath string, options *helm.Options) {
-	output := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
-
+func verifyBackendConfig(t *testing.T, yamlContent string) {
 	var backendConfig v1beta1.BackendConfig
-	helm.UnmarshalK8SYaml(t, output, &backendConfig)
+	UnmarshalK8SYaml(t, yamlContent, &backendConfig)
 
 	require.Equal(t, "pega-backend-config", backendConfig.Name)
 	require.Equal(t, 40, int(*backendConfig.Spec.TimeoutSec))

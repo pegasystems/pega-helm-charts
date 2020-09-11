@@ -14,27 +14,6 @@ import (
 var volumeDefaultMode int32 = 420
 var volumeDefaultModePtr = &volumeDefaultMode
 
-// VerifyCredentialsSecret - Verifies the credential secret deployed with the values as provided in default values.yaml
-func VerifyCredentialsSecret(t *testing.T, helmChartPath string, options *helm.Options) {
-
-	secretOutput := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
-	var secretobj k8score.Secret
-	helm.UnmarshalK8SYaml(t, secretOutput, &secretobj)
-	secretData := secretobj.Data
-	require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
-	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
-}
-
-// VerfiyRegistrySecret - Verifies the registry secret deployed with the values as provided in default values.yaml
-func VerfiyRegistrySecret(t *testing.T, helmChartPath string, options *helm.Options) {
-
-	registrySecret := helm.RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
-	var registrySecretObj k8score.Secret
-	helm.UnmarshalK8SYaml(t, registrySecret, &registrySecretObj)
-	reqgistrySecretData := registrySecretObj.Data
-	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
-	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
-}
 
 // compareConfigMapData - Compares the config map deployed for each kind of tier with the excepted xml's
 func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName string) {
@@ -80,10 +59,10 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container, option
 			require.Equal(t, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://pega-search); do echo Waiting for search to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
-			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
-			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" release-name-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)

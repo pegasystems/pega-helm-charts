@@ -3,19 +3,18 @@ package addons
 import (
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"test/common"
 	"testing"
 )
 
 func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "false",
 		}),
 	)
 
 	for _, i := range metricServerResources {
-		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -23,14 +22,14 @@ func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
 }
 
 func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"metrics-server.enabled": "true",
 		}),
 	)
 
 	for _, i := range metricServerResources {
-		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -38,22 +37,22 @@ func Test_shouldContainMetricServerIfEnabled(t *testing.T) {
 }
 
 func Test_shouldContainCommandArgs(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(common.NewHelmTest(t, helmChartRelativePath, map[string]string{
+	helmChartParser := NewHelmConfigParser(NewHelmTest(t, helmChartRelativePath, map[string]string{
 		"metrics-server.enabled": "true",
 	}))
 
 	var deployment *v1.Deployment
-	helmChartParser.Find(common.SearchResourceOption{
-		Name: "release-name-metrics-server",
+	helmChartParser.Find(SearchResourceOption{
+		Name: "pega-metrics-server",
 		Kind: "Deployment",
 	}, &deployment)
 
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
 }
 
-var metricServerResources = []common.SearchResourceOption{
+var metricServerResources = []SearchResourceOption{
 	{
-		Name: "release-name-metrics-server",
+		Name: "pega-metrics-server",
 		Kind: "ServiceAccount",
 	},
 	{
@@ -61,31 +60,31 @@ var metricServerResources = []common.SearchResourceOption{
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "system:release-name-metrics-server",
+		Name: "system:pega-metrics-server",
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "release-name-metrics-server:system:auth-delegator",
+		Name: "pega-metrics-server:system:auth-delegator",
 		Kind: "ClusterRoleBinding",
 	},
 	{
-		Name: "system:release-name-metrics-server",
+		Name: "system:pega-metrics-server",
 		Kind: "ClusterRoleBinding",
 	},
 	{
-		Name: "release-name-metrics-server-auth-reader",
+		Name: "pega-metrics-server-auth-reader",
 		Kind: "RoleBinding",
 	},
 	{
-		Name: "release-name-metrics-server",
+		Name: "pega-metrics-server",
 		Kind: "Service",
 	},
 	{
-		Name: "release-name-metrics-server-test",
+		Name: "pega-metrics-server-test",
 		Kind: "Pod",
 	},
 	{
-		Name: "release-name-metrics-server",
+		Name: "pega-metrics-server",
 		Kind: "Deployment",
 	},
 	{
