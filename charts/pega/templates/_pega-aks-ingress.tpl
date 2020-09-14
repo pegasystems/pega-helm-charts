@@ -10,6 +10,9 @@ metadata:
     kubernetes.io/ingress.class: azure/application-gateway
     # Ingress annotations for aks
     appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
+    {{ if .node.ingress.annotations }}
+    {{ toYaml .node.ingress.annotations }}
+    {{ end }}
     {{ if ( include "ingressTlsEnabled" . ) }}
     # HTTP to HTTPS Redirect
     appgw.ingress.kubernetes.io/ssl-redirect: "true"
