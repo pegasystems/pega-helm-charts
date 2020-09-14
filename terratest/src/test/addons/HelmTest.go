@@ -1,4 +1,4 @@
-package common
+package addons
 
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
