@@ -33,7 +33,8 @@ spec:
           # This name will be referred in the volume mounts kind.
           name: {{ template "pegaInstallConfig"}}
           # Used to specify permissions on files within the volume.
-          defaultMode: 420          
+          defaultMode: 420
+{{- include "customInstallerVolumes" . | indent 6 }}          
       initContainers:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
@@ -60,16 +61,19 @@ spec:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
-{{- end }}      
+{{- end }}
+{{- include "customInstallerVolumeMounts" . | indent 8 }}      
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
         -  name: ACTION
            value: {{ .action }}
+{{- include "customInstallerEnvEntries" . | indent 8 }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
 {{- end }}
 {{- if (eq $arg "install") }}
+{{- include "customInstallerEnv" . | indent 8 }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
