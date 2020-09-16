@@ -92,24 +92,4 @@
 {{- end }}
 {{- end }}
 
-#Override this template to define custom volumes (do not indent)
-{{- define "customInstallerVolumes" }}
-{{- end }}
-
-#Override this template to define custom volume mounts (do not indent)
-{{- define "customInstallerVolumeMounts" }}
-{{- end }}
-
-#Override this template to define environment entries (do not indent)
-{{- define "customInstallerEnvEntries" }}
-{{- end }}
-
-{{- define "customInstallerEnv" }}
-{{- $customEnvEntries := include "customInstallerEnvEntries" . }}
-{{- if ne "" $customEnvEntries }}
-env:
-{{- include "customInstallerEnvEntries" . }} 
-{{- end }}
-{{- end }}
-
 

@@ -34,7 +34,12 @@ spec:
           name: {{ template "pegaInstallConfig"}}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-{{- include "customInstallerVolumes" . | indent 6 }}          
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.volumes }}
+      # Additional custom volumes
+{{ toYaml .root.Values.custom.volumes | indent 6 }}
+{{- end }}
+{{- end }}          
       initContainers:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
@@ -62,18 +67,34 @@ spec:
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
 {{- end }}
-{{- include "customInstallerVolumeMounts" . | indent 8 }}      
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.volumeMounts }}
+        # Additional custom mounts
+{{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
+{{- end }}
+{{- end }}
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
         -  name: ACTION
            value: {{ .action }}
-{{- include "customInstallerEnvEntries" . | indent 8 }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
 {{- end }}
 {{- if (eq $arg "install") }}
-{{- include "customInstallerEnv" . | indent 8 }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        env:
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
