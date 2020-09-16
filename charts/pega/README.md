@@ -243,10 +243,21 @@ Parameter | Description
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
-`annotations` | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+`annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes and EKS deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
-  - For `EKS` - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>
+  - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
+  - For `AKS` - use `appgw.ingress.kubernetes.io/request-timeout: \<*time-out-in-seconds*\>` to configure application gateway timeout settings.
+
+Example:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+    annotation-name-1: annotation-value-1
+    annotation-name-2: annotation-value-2
+```
 
 #### Provider support for SSL certificate management
 

@@ -5,20 +5,23 @@ apiVersion: extensions/v1beta1
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-  {{ if (.node.ingress) }}
-  {{ if (.node.ingress.tls) }}
-  {{ if (eq .node.ingress.tls.enabled true) }}
+{{ if (.node.ingress) }}
+{{ if (.node.ingress.tls) }}
+{{ if (eq .node.ingress.tls.enabled true) }}
   annotations:
     kubernetes.io/ingress.allow-http: "false"
-  {{ if (.node.ingress.tls.useManagedCertificate) }}
+{{ if (.node.ingress.tls.useManagedCertificate) }}
     networking.gke.io/managed-certificates: managed-certificate-{{ .node.name }}
-  {{ end }}
-  {{ if (.node.ingress.tls.ssl_annotation) }}
-    {{ toYaml .node.ingress.tls.ssl_annotation }}
-  {{ end }}
-  {{ end }}
-  {{ end }}
-  {{ end }}
+{{ end }}
+{{ if (.node.ingress.tls.ssl_annotation) }}
+{{ toYaml .node.ingress.tls.ssl_annotation | indent 4 }}
+{{ end }}
+{{- if .node.ingress.annotations }}
+{{ toYaml .node.ingress.annotations | indent 4 }}
+{{- end }}
+{{ end }}
+{{ end }}
+{{ end }}
 spec:
 {{ if (.node.ingress) }}
 {{ if (.node.ingress.tls) }}
