@@ -45,12 +45,7 @@ spec:
           name: {{ .name }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-      - name: {{ template "pegaVolumeCredentials" }}
-        secret:
-          # This name will be referred in the volume mounts kind.
-          secretName: {{ template "pegaCredentialsSecret" }}
-          # Used to specify permissions on files within the volume.
-          defaultMode: 420
+{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes

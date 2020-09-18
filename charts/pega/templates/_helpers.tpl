@@ -218,3 +218,13 @@ true
 #Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
 {{- define "generatedPodAnnotations" }}
 {{- end }}
+
+#Override this template in a subchart if your secret values are provided by seperate secrets
+{{- define "pegaCredentialVolumeTemplate" }}
+- name: {{ template "pegaVolumeCredentials" }}
+  secret:
+    # This name will be referred in the volume mounts kind.
+    secretName: {{ template "pegaCredentialsSecret" }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
