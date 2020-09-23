@@ -34,7 +34,7 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         revision: "{{ .root.Release.Revision }}"
-{{- include "generatedPodAnnotations" . | indent 8 }}
+{{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
       volumes:
