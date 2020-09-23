@@ -87,9 +87,10 @@ node("pc-2xlarge") {
 
 def validateProviderLabel(String provider){
     def validProviders = ["integ-all","integ-eks","integ-gke","integ-aks"]
+    def failureMessage = "Invalid provider label - ${provider}. valid labels are ${validProviders}"
     if(!validProviders.contains(provider)){
         currentBuild.result = 'FAILURE'
-        pullRequest.comment("Invalid provider label - ${provider}. valid labels are ${validProviders}")
-        throw new Exception("Invalid provider label - ${provider}. valid labels are ${validProviders}")
+        pullRequest.comment("${failureMessage}")
+        throw new Exception("${failureMessage}")
     }
 }
