@@ -4,8 +4,7 @@ def labels = ""
 def bintrayPackageVersion = "1.0.0" 
 def curlSuccessStatus = '{"message":"success"}'
 
-node("pc-2xlarge") {
-
+node {
       stage("Init"){
           if (env.CHANGE_ID) {
             pullRequest.labels.each{
