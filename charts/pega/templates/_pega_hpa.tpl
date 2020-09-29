@@ -28,7 +28,7 @@ spec:
       {{- if .hpa.targetAverageCPUUtilization }}
       targetAverageUtilization: {{ .hpa.targetAverageCPUUtilization }}
       {{- else }}
-      targetAverageUtilization: 700
+      targetAverageUtilization: 70
       {{- end }}  
   - type: Resource
     resource:
