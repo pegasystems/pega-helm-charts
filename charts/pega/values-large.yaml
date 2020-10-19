@@ -148,6 +148,8 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+      # Port 7003 turned ON by default in all installs except large.
+      # comment following lines NOT to expose service and ports.
       service:
         port: 7003
         targetPort: 7003
