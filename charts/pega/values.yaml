@@ -152,8 +152,8 @@ global:
       # Port 7003 turned off by default in all installs except large.
       # Uncomment following lines to expose service and ports.
       # service:
-        # port: 7003
-        # targetPort: 7003
+      #   port: 7003
+      #   targetPort: 7003
 
       # If a nodeSelector is required for this or any tier, it may be specified here:
       # nodeSelector:
