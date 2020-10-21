@@ -48,9 +48,9 @@ aws-alb-ingress-controller:
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
   awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv:
-    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+  extraEnv: {}
+  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 
 # Configure EFK stack for logging:
 # For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
