@@ -2,7 +2,7 @@
 pega-search
 {{- end -}}
 {{- define "isExternalSearch" }}
-  {{- if and (.Values.externalURL) (ne .Values.externalURL "http://pega-search") -}}
+  {{- if or (and (.Values.externalURL) (ne .Values.externalURL "http://pega-search")) .Values.externalSearchService -}}
     true
   {{- else -}}
     false
