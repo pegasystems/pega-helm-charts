@@ -49,6 +49,14 @@
   {{- end -}}
 {{- end }}
 
+{{- define "customerDeploymentID" -}}
+  {{- if .Values.global.customerDeploymentId -}}
+    {{ .Values.global.customerDeploymentId}}
+  {{- else -}}
+    {{ .Release.Namespace }}
+  {{- end -}}
+{{- end }}
+
 # list of either external or internal cassandra nodes
 {{- define "cassandraNodes" }}
   {{- if .Values.dds.externalNodes -}}
