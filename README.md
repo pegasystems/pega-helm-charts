@@ -109,7 +109,7 @@ Pegasystems uses a standard naming practice of hostname/product/image-type:tag. 
 `platform/pega`  | Download required. Deploys Pega Platform with its customized version of the Tomcat application server.|
 `platform/search` | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.|
 
-For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1. For the `platform/pega` and `platform/search` images, Pega appends the version tag with a datestamp to the image tag using the pattern `pegaVersion-YYYYMMDD` to indicate the date that Pega builds the image. For example, if you pull the `platform/pega` with  tag, `pega:8.5.1-20201026`, the tag indicates that this 8.5.1 image was built on 26 October 2020.
+For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1. For the `platform/pega` and `platform/search` images, Pega appends the version tag with a datestamp using the pattern `pegaVersion-YYYYMMDD` so the tag indicates the version and the date that Pega built the image. For example, if you pull the `platform/pega` with  tag, `pega:8.5.1-20201026`, the tag indicates that this 8.5.1 image was built on 26 October 2020.
 
 This datestamp allows clients to ensure that the image they download includes the changes that are committed to the repository pull requests by a certain date. Pega makes the last five daily-built images available for downloading.
 
