@@ -594,7 +594,7 @@ installer:
 
 ### Installer Pod Annotations
 
-Annotations can be added to the installer pod.
+You can add annotations to the installer pod.
 
 Example:
 
