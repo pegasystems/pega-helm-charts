@@ -105,15 +105,19 @@ Pegasystems uses a standard naming practice of hostname/product/image-type:tag. 
 
  Name        | Description                                           |
 -------------|-------------------------------------------------------|
-`platform/installer`   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
-`platform/pega`  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
-`platform/search` | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
- 
+`platform/installer`   | A utility image which your Pega Platform deployments use to install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment.
+`platform/pega`  | Download required. Deploys Pega Platform with its customized version of the Tomcat application server.|
+`platform/search` | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.|
+
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1. For the `platform/pega` and `platform/search` images, Pega appends the version tag with a datestamp to the image tag using the pattern `pegaVersion-YYYYMMDD` to indicate the date that Pega builds the image. For example, if you pull the `platform/pega` with  tag, `pega:8.5.1-20201026`, the tag indicates that this 8.5.1 image was built on 26 October 2020.
 
 This datestamp allows clients to ensure that the image they download includes the changes that are committed to the repository pull requests by a certain date. Pega makes the last five daily-built images available for downloading.
 
-After you obtain access to the Pega-provide repository and pull the image, you push each of the three Pega-provided images to your preferred Docker registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
+After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the three Pega-provided images to your preferred Docker registry so it is available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
+
+You then provide your registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
+
+These images do not expire and you can keep them in your repository for as long as you require.
 
 # Contributing
 
