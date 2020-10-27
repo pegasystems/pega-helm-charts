@@ -591,3 +591,16 @@ installer:
     upgradeType: "out-of-place"
     targetRulesSchema: "rules_upgrade"
 ```
+
+### Installer Pod Annotations
+
+You can add annotations to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podAnnotations:
+    annotation-name1: annotation-value1
+    annotation-name2: annotation-value2
+```
