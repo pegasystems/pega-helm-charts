@@ -101,15 +101,19 @@ For details, see the examples listed in the runbooks:
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
 * [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
 
-Pegasystems uses a standard naming practice of hostname/product/image:tag. All Pega images are available from the pega-docker.downloads.pega.com host. The :tag represents the version if Pega being deployed, for example :8.3.1 to download Pega 8.3.1. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+Pegasystems uses a standard naming practice of hostname/product/image-type:tag. Pega images are available from the pega-docker.downloads.pega.com host. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
  Name        | Description                                           |
 -------------|-------------------------------------------------------|
-platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
- platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
- platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
+`platform/installer`   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
+`platform/pega`  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
+`platform/search` | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
+ 
+For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1. For the `platform/pega` and `platform/search` images, Pega appends the version tag with a datestamp to the image tag using the pattern `pegaVersion-YYYYMMDD` to indicate the date that Pega builds the image. For example, if you pull the `platform/pega` with  tag, `pega:8.5.1-20201026`, the tag indicates that this 8.5.1 image was built on 26 October 2020.
 
- Clients push their three Pega-provided images to their registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
+This datestamp allows clients to ensure that the image they download includes the changes that are committed to the repository pull requests by a certain date. Pega makes the last five daily-built images available for downloading.
+
+After you obtain access to the Pega-provide repository and pull the image, you push each of the three Pega-provided images to your preferred Docker registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
 
 # Contributing
 
