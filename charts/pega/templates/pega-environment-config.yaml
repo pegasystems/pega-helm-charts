@@ -47,6 +47,6 @@ data:
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
-  # Deployment ID for FNX services
+  # Unique ID for multitenant backing services
   CUSTOMER_DEPLOYMENT_ID: "{{ include "customerDeploymentID" . }}"
 {{ end }}
