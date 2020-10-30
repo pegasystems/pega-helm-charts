@@ -52,7 +52,7 @@ The entire deployment requires the following applications to be used during the 
 - az cli (only for AKS deployments)
 - AWS IAM Authenticator for Kubernetes (only for EKS deployments)
 - eksctl (only for EKS deployments)
-- PCF Dev (only for TKGI deployments)
+- pks cli (only for TKGI deployments)
 
 Some of the required applications are binary files that you download from the organization's download area; you can install other applications by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
@@ -133,9 +133,27 @@ The prompt returns when the installation is completed.
 
 For details about installing the Azure CLI on a Windows system, see [Install Azure CLI on Windows](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest).
 
-### For TKGI only: installing PCF Dev
+### For TKGI only: installing pks cli
 
-To use a Windows client to configure and deploy Pega Platform to TKGI clusters, you must enable Hyper-V and install PCF Dev. For detailed instructions, see [Installing PCF Dev on Microsoft Windows 10](https://docs.pivotal.io/pcf-dev/install-windows.html).
+Install the PKS CLI binary executable file from the VMware Enterprise PKS support site that you run with Windows administrator permissions during the TKGI deployment steps:
+
+1. Use the browser of your choice to navigate to [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html) and log in.
+
+2. Open the latest version and navigate to the Windows section.
+
+3. Click **PKS CLI – <version>**.
+
+4. Click **PKS CLI - Windows**.
+
+5. In the EULA tab, click **AGREE**.
+
+6. In the Windows explorer window, choose the `TKGI-demo` folder to save the `pks-windows-amd64-1.5.1-build.xx.exe` file, change the filename to `pks.exe`, and then click **Save**.
+
+7. Add this executable file to the PATH on your local computer so you can run `pks` from the command-line by entering:
+
+    `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
+
+    Advanced users can add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html).
 
 ### Installing Docker Desktop on Windows 10
 

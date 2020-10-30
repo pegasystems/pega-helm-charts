@@ -51,7 +51,7 @@ The entire deployment requires the following applications to be used during the 
 - AWS IAM Authenticator for Kubernetes (only for EKS deployments)
 - eksctl (only for EKS deployments)
 - AWS cli (only for EKS deployments)
-- CF cli (only for TKGI deployments)
+- pks cli (only for TKGI deployments)
 - Google Cloud SDK and gcloud (only for GKE deployments)
 
 ### Installing Unzip
@@ -122,9 +122,29 @@ This command downloads and parses the \`stable.txt\` in the repository, navigate
 
 For details about installing on Linux and other supported installation methods, see [Install kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux).
 
-### For TKGI only: installing the cf CLI
+### For TKGI only: installing the PKS CLI
 
-To use a Linux client to configure and deploy Pega Platform to TKGI clusters, install the cf CLI binary file from the Cloud Foundry support site as an executable that you will run as a super user with a single command with the command curl piped into your bash. For the best instructions that matches your Linux setup, see the [Installing the cf CLI](https://docs.cloudfoundry.org/cf-cli/install-go-cli.html).
+Install the PKS CLI binary file from the VMware Enterprise PKS support site as an executable that you will run as a super user with a single command with the command curl piped into your bash:
+
+1. Use the browser of your choice to navigate to [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html) and log in.
+
+2. Select release version 1.7 or later from the Releases dropdown.
+
+3. Click **PKS CLI - Linux** to display the **Release Download Files**.
+
+4. Click **PKS CLI - Linux** and in the **Save as** window, choose the `<local filepath>/TKGI-demo` folder to which you save the downloaded Linux binary file.
+
+5. Rename the downloaded binary file to "pks".
+
+6. On the command line, to make the PKS CLI binary executable, enter:
+
+    `$ chmod +x pks`
+
+7. To move the binary file into your $PATH directory, enter:
+
+    `$ sudo mv ./pks /bin`
+
+These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html).
 
 ### For AKS only: installing the Azure CLI
 
