@@ -1,7 +1,6 @@
 {{ if (eq (include "performDeployment" .) "true") }}
-# Only attempt to generate this file IF the user has NOT supplied
-# an external search URL or enabled the search service, which means we
-# need to deploy Elasticsearch internally.
+# The deployment generates this file to deploy Elasticsearch internally when the external search URL is blank (or the default value is left) 
+# AND no search service is enabled.
 {{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
 kind: StatefulSet
 apiVersion: apps/v1
