@@ -88,7 +88,7 @@ $ helm delete mypega
 
 Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download these Docker images to install the Pega Platform onto your database. After you pull the images to your local system, you must push them into your private Docker registry.
 
-To download your preferred version of the Pega image to your local system, you can specify the version tag when you enter:
+To download your preferred version of the Pega image to your local system, specify the version tag when by entering:
 
 ```bash
 $ sudo docker pull pega-docker.downloads.pega.com/platform/pega:<version>
@@ -97,7 +97,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details, see the examples listed in each preparation runbook:
+For details, see the examples listed in the preparation runbook:
 
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
 * [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
@@ -112,13 +112,13 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
-For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that this 8.5.1 image was built on 26 October 2020. The version tag without the datestamp will always point to the most recently built image for that version.
+For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
 
-This datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After a new patch version is released, the prior patch version no longer receive daily builds with a datestamp tag.
+The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
 After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the three Pega-provided images to your preferred Docker registry to make them available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
 
-You then provide your registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
+After you have the images in your Docker repository, you then provide your registry URL, credentials, and reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
 
 These images do not expire, and you can keep them in your repository for as long as you require.
 
