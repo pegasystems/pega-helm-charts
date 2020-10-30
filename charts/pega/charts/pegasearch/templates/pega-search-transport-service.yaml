@@ -1,7 +1,9 @@
 {{ if (eq (include "performDeployment" .) "true") }}
+
+{{ if (eq (include "isExternalSearch" .) "true") }}
 # The deployment generates this file to deploy Elasticsearch internally when the external search URL is blank (or the default value is left) 
 # AND no search service is enabled.
-{{ if (eq (include "isExternalSearch" .) "true") }} {{ else }}
+{{ else }}
 kind: Service
 apiVersion: v1
 metadata:
