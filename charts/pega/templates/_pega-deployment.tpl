@@ -88,6 +88,9 @@ spec:
         # Specify any of the container environment variables here
         env:	
         # Node type of the Pega nodes for {{ .name }}
+{{- if and (.root.Values.search.url) (contains "Stream" .nodeType) }}
+{{ fail "Cannot have 'Stream' nodeType when Stream url is provided" }}
+{{- end }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_PATH

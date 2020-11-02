@@ -49,4 +49,7 @@ data:
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
   # Unique ID for multitenant backing services
   CUSTOMER_DEPLOYMENT_ID: "{{ include "customerDeploymentID" . }}"
+{{ if .Values.stream.url }}
+  PEGA_STREAM_URL: {{ .Values.stream.url }}
+{{ end }}
 {{ end }}
