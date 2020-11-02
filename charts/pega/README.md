@@ -265,7 +265,7 @@ Provider  | Kubernetes Secrets | Cloud SSL management service
 ---       | ---                | ---
 AKS       | Supported          | None
 EKS       | Not supported      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
-TKGI       | Supported          | None
+PKS (now TKGI)       | Supported          | None
 GKE       | Supported          | [Pre-shared or Google-managed certificates](#managing-certificates-in-google-cloud)
 
 #### Managing certificates using Kubernetes secrets

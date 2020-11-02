@@ -1,7 +1,7 @@
 Deploying Pega Platform on a TKGI cluster
 ===============================
 
-Deploy Pega Platform™ on a VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). If your TKGI cluster is deployed on a different cloud, the database steps may be different. These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a TKGI cluster.
+Deploy Pega Platform™ on a VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). TKGI was formerly knows Pivotal Container Service (PKS). If your TKGI cluster is deployed on a different cloud, the database steps may be different. These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a TKGI cluster.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a TKGI cluster without much experience in either TKGI configurations or Pega Platform deployments.
 
@@ -54,7 +54,7 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-- Cloud Foundry CLI - the Cloud Foundry command-line tool that you use to manage and communicate with your TKGI cluster.
+- PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
 
 Prepare your resources – 45 minutes
 -----------------------------------
@@ -273,22 +273,22 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
     `$ cd /home/<local filepath>/TKGI-demo`
 
-2. To use the CF CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
+2. To use the pks CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
 
-    `$ cf login -a <API> -u <USERNAME> -p <PASSWORD> -k`
+    `$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
 
 If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
 
 3. To view the status of all of your TKGI clusters and verify the name of the cluster for the Pega Platform deployment, enter:
 
-    `$ cf clusters`
+    `$ pks clusters`
 
 Your cluster name is displayed in the **Name** field.
 
-4. To use the CF CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
+4. To use the pks CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-    $ cf get-credentials <cluster-name>`
+    $ pks get-credentials <cluster-name>`
     Fetching credentials for cluster pega-platform.
     Context set for cluster pega-platform.
 ```
@@ -414,7 +414,7 @@ A successful deployment does not show errors across the various workloads. The `
 Logging in to Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **TKGI.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
+After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **tkgi.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
 
 ```yaml
 tier:
@@ -423,7 +423,7 @@ tier:
     service:
       # Enter the domain name to access web nodes via a load balancer.
       #  e.g. web.mypega.example.com
-      domain: "**TKGI.web.dev.pega.io**"
+      domain: "**tkgi.web.dev.pega.io**"
 ```
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
