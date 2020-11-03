@@ -14,7 +14,7 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Amazon Elastic Kubernetes Service (EKS)
 * Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
 * Red Hat OpenShift
-* Pivotal Container Service (PKS) - see the [PKS runbook](docs/Deploying-Pega-on-PKS.md)
+* VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) - see the [TKGI runbook](docs/Deploying-Pega-on-PKS.md)
 
 # Getting started
 
@@ -86,30 +86,41 @@ $ helm delete mypega
 ```
 # Downloading Docker images for your deployment
 
-Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download docker images that are required to install the Pega Platform onto your database. After you pull the images to your local system you must push them into your private Docker registry.
+Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download these Docker images to install the Pega Platform onto your database. After you pull the images to your local system, you must push them into your private Docker registry.
 
-To download your preferred version of the Pega image to your local system, specify the version tag when you enter:
+To download your preferred version of the Pega image to your local system, specify the version tag when by entering:
 
 ```bash
 $ sudo docker pull pega-docker.downloads.pega.com/platform/pega:<version>
+
 Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details, see the examples listed in the runbooks:
+For details, see the examples listed in the preparation runbook:
 
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
 * [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
 
-Pegasystems uses a standard naming practice of hostname/product/image:tag. All Pega images are available from the pega-docker.downloads.pega.com host. The :tag represents the version if Pega being deployed, for example :8.3.1 to download Pega 8.3.1. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
- Name        | Description                                           |
--------------|-------------------------------------------------------|
-platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
- platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
- platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment.
+ Name        | Description                                           | Tags     |
+-------------|-------------------------------------------------------|----------|
+`platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
+`platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
+`platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
 
- Clients push their three Pega-provided images to their registry so it is available to the deployment. Clients then provide their registry URL, credentials, and then reference each image appropriately in the Pega Helm chart. Example usage details for referencing your three images in a repository are included in the appropriate runbook for your type of deployment.
+For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
+
+For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
+
+The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
+
+After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the three Pega-provided images to your preferred Docker registry to make them available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
+
+After you have the images in your Docker repository, you then provide your registry URL, credentials, and reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
+
+These images do not expire, and you can keep them in your repository for as long as you require.
 
 # Contributing
 

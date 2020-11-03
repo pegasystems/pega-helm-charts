@@ -114,10 +114,10 @@ Follow these steps to create a Docker image you can use to install or upgrade Pe
 
 ```yaml
 FROM pegasystems/pega-installer-ready
-COPY scripts /opt/pega/kit/scripts
-COPY archives /opt/pega/kit/archives
-COPY rules /opt/pega/kit/rules
-RUN chmod -R 777 /opt/pega
+COPY --chown=pegauser:root scripts /opt/pega/kit/scripts
+COPY --chown=pegauser:root archives /opt/pega/kit/archives
+COPY --chown=pegauser:root rules /opt/pega/kit/rules
+
 ```
 
 These instructions direct a docker build function to use the Pega public Docker image, pega-install-ready, and these three folders from the Pega distribution image in order to build your Pega Platform installation image.

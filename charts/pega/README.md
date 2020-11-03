@@ -12,7 +12,7 @@ k8s         | Open-source Kubernetes
 openshift   | Red Hat Openshift
 eks         | Amazon Elastic Kubernetes Service (EKS)
 gke         | Google Kubernetes Engine (GKE)
-pks         | Pivotal Container Service (PKS)
+pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS)
 aks         | Microsoft Azure Kubernetes Service (AKS)
 
 Example for a kubernetes environment:
@@ -243,10 +243,21 @@ Parameter | Description
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
-`annotations` | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+`annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes and EKS deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
-  - For `EKS` - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>
+  - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
+  - For `AKS` - use `appgw.ingress.kubernetes.io/request-timeout: \<*time-out-in-seconds*\>` to configure application gateway timeout settings.
+
+Example:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+    annotation-name-1: annotation-value-1
+    annotation-name-2: annotation-value-2
+```
 
 #### Provider support for SSL certificate management
 
@@ -254,7 +265,7 @@ Provider  | Kubernetes Secrets | Cloud SSL management service
 ---       | ---                | ---
 AKS       | Supported          | None
 EKS       | Not supported      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
-PKS       | Supported          | None
+PKS (now TKGI)       | Supported          | None
 GKE       | Supported          | [Pre-shared or Google-managed certificates](#managing-certificates-in-google-cloud)
 
 #### Managing certificates using Kubernetes secrets
@@ -390,7 +401,7 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `700` which corresponds to 700% of 200m ) | `700`
+`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
 
 ### Volume claim template
@@ -579,4 +590,17 @@ installer:
   upgrade:
     upgradeType: "out-of-place"
     targetRulesSchema: "rules_upgrade"
+```
+
+### Installer Pod Annotations
+
+You can add annotations to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podAnnotations:
+    annotation-name1: annotation-value1
+    annotation-name2: annotation-value2
 ```

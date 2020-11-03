@@ -5,12 +5,15 @@ apiVersion: batch/v1
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
   annotations:
+{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
     # Forces Helm to wait for the install or upgrade to complete.
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation
+{{- end }}
+{{- if .root.Values.podAnnotations}}
+{{ toYaml .root.Values.podAnnotations | indent 4 }}
 {{- end }}
 spec:
   backoffLimit: 0
@@ -22,12 +25,7 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}      
-      - name: {{ template "pegaVolumeCredentials" }}
-        secret:
-          # This name will be referred in the volume mounts kind.
-          secretName: {{ template "pegaCredentialsSecret" }}
-          # Used to specify permissions on files within the volume.
-          defaultMode: 420
+{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.

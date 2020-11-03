@@ -48,9 +48,9 @@ aws-alb-ingress-controller:
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
   awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv:
-    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+  extraEnv: {}
+  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 
 # Configure EFK stack for logging:
 # For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
@@ -65,25 +65,30 @@ deploy_efk: &deploy_efk true
 elasticsearch:
   enabled: *deploy_efk
   # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
+  # See https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
   #
-  # If you need to change this value then you will also need to replace the same
-  # part of the value within the following properties further below:
-  #
-  #   kibana.files.kibana.yml.elasticsearch.url
-  #   fluentd-elasticsearch.elasticsearch.host
-  #
-  fullnameOverride: "elastic-search"
+  antiAffinity: soft
+  esJavaOpts: "-Xmx512m -Xms512m"
+  # Allocate smaller chunks of memory per pod.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512M"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  # Request smaller persistent volumes.
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 10Gi
 
 kibana:
   enabled: *deploy_efk
   # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
-  files:
-    kibana.yml:
-      elasticsearch.url: http://elastic-search-client:9200
-  service:
-    externalPort: 80
+  # See https://github.com/elastic/helm-charts/blob/master/kibana/values.yaml
+  elasticsearchHosts: "http://elasticsearch-master:9200"
   ingress:
     # If enabled is set to "true", an ingress is created to access kibana.
     enabled: true
@@ -94,11 +99,9 @@ kibana:
 fluentd-elasticsearch:
   enabled: *deploy_efk
   # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+  # See https://github.com/kiwigrid/helm-charts/blob/master/charts/fluentd-elasticsearch/values.yaml
   elasticsearch:
-    host: elastic-search-client
-    buffer_chunk_limit: 250M
-    buffer_queue_limit: 30
+    hosts: ["elasticsearch-master:9200"]
 
 # Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
 # EKS, open-source Kubernetes, Openshift - set this to true.
@@ -122,7 +125,7 @@ metrics-server:
 # Application Gateway config based on the status of the Kubernetes cluster. For details, see
 # (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#azure-resource-manager-authentication).
 ingress-azure:
-  enabled: true
+  enabled: false
   # Add required details about the Application Gateway you created.
   appgw:
     # Subscription ID of your Azure subscription.
