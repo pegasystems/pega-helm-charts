@@ -12,7 +12,7 @@ k8s         | Open-source Kubernetes
 openshift   | Red Hat Openshift
 eks         | Amazon Elastic Kubernetes Service (EKS)
 gke         | Google Kubernetes Engine (GKE)
-pks         | Pivotal Container Service (PKS)
+pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS)
 aks         | Microsoft Azure Kubernetes Service (AKS)
 
 Example for a kubernetes environment:
@@ -265,7 +265,7 @@ Provider  | Kubernetes Secrets | Cloud SSL management service
 ---       | ---                | ---
 AKS       | Supported          | None
 EKS       | Not supported      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
-PKS       | Supported          | None
+PKS (now TKGI)       | Supported          | None
 GKE       | Supported          | [Pre-shared or Google-managed certificates](#managing-certificates-in-google-cloud)
 
 #### Managing certificates using Kubernetes secrets
