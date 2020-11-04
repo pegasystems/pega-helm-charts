@@ -54,6 +54,17 @@ data:
   # Specify the workload manager to load UDFs into db2zos
   DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
 {{- end }}
+  # Type of Upgrade
+  UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
+ 
+  # If upgrade type is "custom" then exposing upgrade steps as env variables  
+{{ if eq "custom" .Values.upgrade.upgradeType }}
+  {{- $parts := splitList "," .Values.upgrade.upgradeStepsToRun }}
+  {{- range $parts }}
+  {{ . | upper }}: {{ true | quote }}
+  {{- end }}
+{{- end }}
+
   # Specify Database Type
   DB_TYPE: {{ .Values.global.jdbc.dbType}}
   # Action to be performed by installer image
