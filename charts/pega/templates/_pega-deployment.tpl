@@ -2,6 +2,10 @@
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
+  annotations:
+{{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.annotations }}
+{{ toYaml .root.Values.global.pegaTier.annotations | indent 4 }}
+{{- end }}{{- end }}
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
