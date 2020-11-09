@@ -62,5 +62,4 @@ func verifyBackendConfig(t *testing.T, backendConfig *v1beta1.BackendConfig, nam
 	require.Equal(t, 5, int(*backendConfig.Spec.HealthCheck.TimeoutSec))
 	require.Equal(t, "HTTP", *backendConfig.Spec.HealthCheck.Type)
 	require.Equal(t, 2, int(*backendConfig.Spec.HealthCheck.UnhealthyThreshold))
-
 }
