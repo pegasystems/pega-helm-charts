@@ -1,7 +1,6 @@
 package pega
 
 import (
-	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	"k8s.io/ingress-gce/pkg/apis/backendconfig/v1beta1"
@@ -27,7 +26,6 @@ func TestPegaGKEBackendConfig(t *testing.T) {
 		    }
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
-			fmt.Print(yamlContent)
 			verifyBackendConfigs(t, yamlContent)
 		}
 }
