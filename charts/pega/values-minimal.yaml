@@ -22,37 +22,37 @@ global:
     #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
     #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
     #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
-    url: "jdbc:postgresql://55.55.55.5:38400/postgres"
+    url: "YOUR_JDBC_URL"
     #   driverClass 	-- jdbc class.  Valid values are:
     #
     #   Oracle              oracle.jdbc.OracleDriver
     #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
     #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
     #   PostgreSQL          org.postgresql.Driver
-    driverClass: "org.postgresql.Driver"
+    driverClass: "YOUR_JDBC_DRIVER_CLASS"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
-    dbType: "postgres"
+    dbType: "YOUR_DATABASE_TYPE"
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "https://jdbc.postgresql.org/download/postgresql-42.2.5.jar"
-    username: "postgres"
-    password: "postgres"
+    driverUri: "YOUR_JDBC_DRIVER_URI"
+    username: "YOUR_JDBC_USERNAME"
+    password: "YOUR_JDBC_PASSWORD"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
     connectionProperties: ""
-    rulesSchema: "rules"
-    dataSchema: "data"
+    rulesSchema: "YOUR_RULES_SCHEMA"
+    dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
     registry:
-      url: "https://index.docker.io/v1/"
-      username: "arvasrikanth"
-      password: "12345pega"
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
       # Docker image information for the Pega docker image, containing the application server.
     pega:
-      image: "scrumteamwhitewalkers/web:8.5"
+      image: "pegasystems/pega"
 
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
@@ -69,14 +69,14 @@ global:
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
-        domain: "myweb-minikube.dev.pega.io"
+        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
 
       # Set resource consumption to minimal levels
       replicas: 1
       cpuRequest: 200m
-      memRequest: "3Gi"
+      memRequest: "5Gi"
       cpuLimit: 2
-      memLimit: "5Gi"
+      memLimit: "6Gi"
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
