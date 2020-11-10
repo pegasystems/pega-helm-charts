@@ -32,6 +32,9 @@ spec:
     metadata:
       labels:
         app: {{ .name }}
+{{- if .node.podLabels }}
+{{ toYaml .node.podLabels | indent 8 }}
+{{- end }}
       annotations:
 {{- if .node.podAnnotations }}
 {{ toYaml .node.podAnnotations | indent 8 }}
