@@ -12,6 +12,9 @@ metadata:
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation
 {{- end }}
+{{- if .root.Values.global.pegaJob }}{{- if .root.Values.global.pegaJob.annotations }}
+{{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
+{{- end }}{{- end }}
 spec:
   backoffLimit: 0
   template:
