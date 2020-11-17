@@ -54,5 +54,16 @@ data:
   PEGA_STREAM_URL: {{ .Values.stream.url }}
 {{- end }}
 {{- end }}
-
+{{ if .Values.hazelcast.enabled }}
+  ON_PEGA_K8s: "true"
+  CLIENT_MODE: "true"
+{{ if .Values.hazelcast.client.clusterName }}
+  # Hazelcast Cluster Name
+  CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
+{{- end }}
+  # Namespace of K8s deployment
+  NAMESPACE: {{ .Release.Namespace }}
+  # Hazelcast service name
+  SERVICE_NAME: {{ template "hazelcastName" . }}-service
+{{- end }}
 {{ end }}
