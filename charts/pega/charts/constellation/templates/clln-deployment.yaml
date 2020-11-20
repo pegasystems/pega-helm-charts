@@ -7,7 +7,7 @@ metadata:
   labels:
     app: constellation
 spec:
-  replicas: 2
+  replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
       app: constellation
@@ -24,14 +24,27 @@ spec:
         image: {{ .Values.image }}
         args:
         - port=3000
-        - {{ .Values.logLevel }}
+        # constellation URL path, if you change it, you need to change ingress template files too 
+        - urlPath=/c11n
+        - logLevel={{ .Values.logLevel }}
         livenessProbe:
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
             path: /c11n/api/v1/ping
+            port: 3000
         readinessProbe:
-          initialDelaySeconds: 1
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
             path: /c11n/api/v1/ping
+            port: 3000
         ports:
         - containerPort: 3000
 {{ end }}
