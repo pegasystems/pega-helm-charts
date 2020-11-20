@@ -530,9 +530,9 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
     `$ az aks browse --resource-group <resource-group-name> --name <cluster-name>`
 
-![](media/81a7ae961cabc463381869e3bae5c722.png)
+![The basic Kubernetes dashboard](media/81a7ae961cabc463381869e3bae5c722.png)
 
-    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only AKS resources display. The dashboard does not display your AKS cluster name or your resource name, which is expected behavior.
+    You can now view your AKS cluster details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment. Without a deployment, only AKS resources display. The dashboard does not display your cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 
