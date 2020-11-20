@@ -76,7 +76,7 @@ In order to login to your cluster, you must have the following information:
 
 - Whether any SSL information is required to authenticate your login.
 
-During deployment the required Kubernetes configuration file is copied into the cluster.
+During deployment the required Kubernetes configuration file is copied into the cluster and into your default ~/.kube directory.
 
 ### Creating a database resource
 
@@ -288,7 +288,7 @@ Your cluster name is displayed in the **Name** field.
 4. To use the pks CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-    $ pks get-credentials <cluster-name>`
+    $ pks get-credentials <cluster-name>
     Fetching credentials for cluster pega-platform.
     Context set for cluster pega-platform.
 ```
