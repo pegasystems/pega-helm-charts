@@ -55,7 +55,7 @@ data:
 {{- end }}
 {{- end }}
 {{ if .Values.hazelcast.enabled }}
-  ON_PEGA_K8s: "true"
+  ON_PEGA_K8S: "true"
   CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}
   # Hazelcast Cluster Name
