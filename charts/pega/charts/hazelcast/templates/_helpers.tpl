@@ -21,12 +21,12 @@
   - >
     set -e
     counter=0;
-    while [ $(wget -q -O - "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-size" /dev/null) -ne {{ .Values.hazelcast.replicas }} ] || [ $(wget -S "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') -ne 200 ]; do
+    while [ -z $(wget -S "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') ] || [ $(wget -q -O - "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-size" /dev/null) -ne {{ .Values.hazelcast.replicas }} ] || [ $(wget -S "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') -ne 200 ]; do
     echo "waiting for hazelcast pods to start and join the cluster..." ;
     counter=$(($counter+5));
     sleep 5;
-    if [ $counter -gt 300 ]; then
-    echo "Timeout Reached. Hazelcast pods failed to join the cluster within 5 minutes";
+    if [ $counter -gt 150 ]; then
+    echo "Timeout Reached. Hazelcast pods failed to join the cluster";
     exit 1;
     fi
     done;

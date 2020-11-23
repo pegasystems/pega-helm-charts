@@ -9,7 +9,7 @@ spec:
     matchLabels:
       app: {{ template "hazelcastName" . }}
       component: "Hazelcast"
-  serviceName: {{ template "hazelcastName" . }}
+  serviceName: {{ template "hazelcastName" . }}-service
   replicas: {{ .Values.replicas }}
   template:
     metadata:

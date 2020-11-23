@@ -9,9 +9,9 @@ metadata:
     component: Pega
 spec:
   ports:
-    - port: 5701
-      targetPort: 5701
-      name: hazelcast
+  - name: hazelcast
+    port: 5701
+    targetPort: 5701   
   clusterIP: None
   selector:
     app: {{ template "hazelcastName" . }}
