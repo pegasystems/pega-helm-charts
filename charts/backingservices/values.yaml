@@ -1,0 +1,49 @@
+srs:
+  imageCredentials:
+    registry: "YOUR_DOCKER_REGISTRY"
+    username: "YOUR_DOCKER_REGISTRY_USERNAME"
+    password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  #specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
+  deploymentName: acme-demo-dev-srs
+  srsruntime:
+    replicaCount: 2
+    srsImage:
+      name: platform-services/fnx-search
+      version: 1.6.1
+  #This section specifies the elasticsearch cluster configuration.
+  elasticsearch:
+    # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
+    provisionCluster: true
+    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
+    # make sure the endpoint is accessible from the kubernetes cluster pods.
+#    domain: managed-elasticsearch.acme.io
+#    port: 443
+#    protocol: https
+
+
+#This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
+# The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
+# based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
+# as per runtime and storage requirements.
+elasticsearch:
+  imageTag: 7.1.1
+  # Permit co-located instances for solitary minikube virtual machines.
+  antiAffinity: "soft"
+  # Shrink default JVM heap.
+  esJavaOpts: "-Xmx512m -Xms512m"
+  # Allocate smaller chunks of memory per pod.
+  resources:
+    requests:
+      cpu: "500m"
+      memory: "1Gi"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  volumeClaimTemplate:
+    accessModes: [ "ReadWriteOnce" ]
+    storageClassName: "standard"
+    resources:
+      requests:
+        # configure volume size based on 2 * [sum of expected search data size (based on existing search) from each
+        # pega environment which will be sharing the Search Service].
+        storage: 20Gi
