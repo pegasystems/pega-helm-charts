@@ -30,8 +30,8 @@
     exit 1;
     fi
     done;
-    echo "Hazelcast cluster is up now"
-    exit 0
+    echo "Hazelcast cluster is up now";
+    exit 0;
 {{- end }}
 
 

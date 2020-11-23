@@ -15,5 +15,5 @@ spec:
   clusterIP: None
   selector:
     app: {{ template "hazelcastName" . }}
-    component: "Hazelcast"
+    component: Hazelcast
 {{ end }}
