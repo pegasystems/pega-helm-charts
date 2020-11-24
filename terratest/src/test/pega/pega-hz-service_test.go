@@ -31,10 +31,11 @@ func TestHazelcastService(t *testing.T){
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"hazelcast.enabled":  "true",
 				},
 			}
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/hz-service.yaml"})
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/pega-hz-service.yaml"})
 			VerifyHazelcastService(t,yamlContent,options)
 		}
 	}

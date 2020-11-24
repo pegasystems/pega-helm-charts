@@ -6,9 +6,9 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   # Key Value pairs
-  NAMESPACE: {{ .Release.Namespace }}.svc.cluster.local
+  URL: {{ .Release.Namespace/ }}{{ template "hazelcastName" }}-service
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
-  SERVICE_NAME: {{ template "hazelcastName" }}-service
+  SERVICE_NAME: 
 {{- if .Values.server.hz_health_monitoring_level }}
   HZ_HEALTH_MONITORING_LEVEL: {{ .Values.server.hz_health_monitoring_level | quote }}
 {{- end }}
