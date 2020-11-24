@@ -21,7 +21,7 @@
   - >
     set -e
     counter=0;
-    while [ -z $(wget -S "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') ] || [ $(wget -q -O - "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-size" /dev/null) -ne {{ .Values.hazelcast.replicas }} ] || [ $(wget -S "http://hazelcast-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') -ne 200 ]; do
+    while [ -z $(wget -S "http://{{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') ] || [ $(wget -q -O - "http://{{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-size" /dev/null) -ne {{ .Values.hazelcast.replicas }} ] || [ $(wget -S "http://{{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}:5701/hazelcast/health/cluster-safe" 2>&1 | grep "HTTP/" | awk '{print $2}') -ne 200 ]; do
     echo "waiting for hazelcast pods to start and join the cluster..." ;
     counter=$(($counter+5));
     sleep 5;
