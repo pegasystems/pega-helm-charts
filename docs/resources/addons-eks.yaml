@@ -1,0 +1,42 @@
+---
+
+# When deploying on AWS EKS, set the parameters, install aws-alb-ingress-controller and metrics-server
+# to true and then fill in the remaining parameters with your EKS environment details.
+aws-alb-ingress-controller:
+  enabled: true
+  ## Resources created by the ALB Ingress controller will be prefixed with this string
+  clusterName: "YOUR_EKS_CLUSTER_NAME"
+  ## Auto Discover awsRegion from ec2metadata, set this to true and omit awsRegion when ec2metadata is available.
+  autoDiscoverAwsRegion: false
+  ## AWS region of your EKS cluster. You must enter your region here if ec2metadata is unavailable from controller pod
+  ## or if you set the autoDiscoverAwsRegion parameter = false.
+  awsRegion: "YOUR_EKS_CLUSTER_REGION"
+  ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
+  autoDiscoverAwsVpcID: false
+  ## VPC ID of your EKS cluster. This setting is required if ec2metadata is unavailable from controller pod
+  ## Required if you set the autoDiscoverAwsVpcID parameter = true.
+  awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
+  extraEnv: {}
+  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+
+traefik:
+  enabled: false
+
+deploy_efk: &deploy_efk false
+
+elasticsearch:
+  enabled: *deploy_efk
+
+kibana:
+  enabled: *deploy_efk
+
+fluentd-elasticsearch:
+  enabled: *deploy_efk
+
+metrics-server:
+  enabled: false
+
+ingress-azure:
+  enabled: false
+

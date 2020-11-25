@@ -376,11 +376,65 @@ Create a PostgreSQL database in your new RDS DB instance for the Pega Platform i
 With new database available in your RDS DB instance, you are ready to continue to the next section.
 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
-----------------------------------------------------------
+---------------------------------------------------------------------
 
-To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
+To deploy Pega Platform by using Helm, customize the default Helm charts that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation with deployment will take about 90 minutes total, because a Pega Platform installation in your PostgreSQL database takes up to an hour.
+
+### Adding the Pega configuration files to your Helm installation on your local system
+
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
+
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment. With the instructions in this runbook, you deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
+- pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+
+To customize these files, you must download them from the source github repository to your local system, edit them with a text editor, and then save them to your local system using the same filename.
+
+1. To add the Pega repository to your Helm installation, enter:
+
+    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+
+2. To verify the new repository, you can search it by entering:
+
+```bash
+  $ helm search repo pega
+  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega   1.2.0                           Pega installation on kubernetes
+  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+```
+
+These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your organization's EKS deployment of Pega Platform.
+
+### Updating the addons.yaml Helm chart values
+
+Use the provided example addons-eks.yaml file to configure the use of an Amazon AWS ALB ingress controller. Pega provides this example file as a convenient way to quickly configure your addons file appropriately for EKS deployments. You can use it in place of filing our the default values.yaml file in the /addons 
+
+1. Download the example [addons-eks.yaml](./resources/addons-eks.yaml) to the \<local filepath\>/EKS-demo that will over-write the default pega/addons file.
+
+   This example addons file specifies the use of an Amazon AWS ALB ingress controller and contains several parameters that will specify details from your EKS environment so your Pega Platform deployment can use the load balancer in your EKS environment.
+
+2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your AKS requirements:
+
+  - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
+
+  - To allow your deployment to automatically determine the AWS region of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsRegion: true`. The setting is disabled by default.
+
+  - Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
+
+  - To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
+
+  - Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
+
+extraEnv: {}
+  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+
+
+To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
+
+
 
 ### Updating the pega.yaml Helm chart values
 
