@@ -16,6 +16,8 @@ spec:
       labels:
         app: {{ template "hazelcastName" . }}
         component: "Hazelcast"
+      annotations:
+{{- include "generatedHazelcastServicePodAnnotations" .root | indent 8 }}
     spec:
       containers:
       - name: hazelcast
@@ -36,6 +38,8 @@ spec:
         ports:
         - containerPort: 5701
           name: hazelcast
+        - containerPort: 8089
+          name: tcp-prometheus
         readinessProbe:
           initialDelaySeconds: 30
           periodSeconds: 10

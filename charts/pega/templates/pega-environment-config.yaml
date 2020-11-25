@@ -55,15 +55,13 @@ data:
 {{- end }}
 {{- end }}
 {{ if .Values.hazelcast.enabled }}
-  ON_PEGA_K8S: "true"
-  CLIENT_MODE: "true"
+  HZ_DISCOVERY_K8S: "true"
+  HZ_CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}
   # Hazelcast Cluster Name
-  CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
+  HZ_CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
 {{- end }}
-  # Namespace of K8s deployment
-  NAMESPACE: {{ .Release.Namespace }}
-  # Hazelcast service name
-  SERVICE_NAME: {{ template "hazelcastName" . }}-service
+  # DNS of hazelcast service
+  HZ_DNS: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
 {{ end }}

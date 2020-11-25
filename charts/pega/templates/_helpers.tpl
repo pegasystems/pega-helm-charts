@@ -227,6 +227,9 @@ true
 {{- define "generatedPodAnnotations" }}
 {{- end }}
 
+{{- define "generatedHazelcastServicePodAnnotations" }}
+{{- end }}
+
 #Override this template in a subchart if your secret values are provided by seperate secrets
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
