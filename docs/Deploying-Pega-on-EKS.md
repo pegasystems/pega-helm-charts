@@ -116,7 +116,7 @@ With your Docker images available to your AWS account, you are ready to create y
 You can create your EKS cluster using the `eksctl` command line utility. This example shows how to define your configuration in a yaml file that you pass to the `eksctl` command. For more details and options available to advanced EKS users, see [Create your Amazon EKS cluster and worker nodes](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html#eksctl-create-cluster).
 
 At a minimum, your cluster must be provisioned with at least two worker nodes that have 32GB of RAM in order to support the typical processing loads in a Pega
-Platform deployment; for this option, Pega recommends using a minimum of two m5.xlarge nodes for your deployment. Pega has not tested this method using Windows worker nodes.
+Platform deployment; for this option, Pega recommends using a minimum of two m5.xlarge nodes for your deployment worker nodes. Pega has not tested this method using Windows worker nodes.
 
 To create Amazon EKS cluster with Linux worker nodes:
 
@@ -227,13 +227,49 @@ Create a database that is available to your EKS cluster.This example creates an 
 
     This creates an RDS database in your default region. If this region is different from the region where your EKS worker nodes are located, you must reset your region to the region when you created your EKS cluster.
 
-4. To create your database, in the **Create database** page, select the following options:
+4. In a new AWS console, create an Amazon RDS parameter group for this new database that it can use to limit the number of database connections.
+
+   a.  Open the Amazon RDS navigation (menu in upper left of screen) and right-click **Parameter groups** to open the menu in a new screen.
+
+   ![Open Parameter groups](media/new-parameter-groups.png)
+
+   b. Click **Create parameter group**.
+
+   c. Enter the following group details:
+
+   - in **Parameter group family** select the database family to which this parameter group will apply; this family is based on the PostgreSQL engine and version you chose for your database instance.
+
+   - in **Type** select `DB parameter group`.
+
+   - in **Group name** enter an applicable name for this database parameter group.
+
+   - in **Description** enter any distinguishing details for this parameter group, such as `DB connection limitation settings`.
+
+   ![](media/create-parameter-groups.png)
+
+   d. Click **Create**.
+
+   e. Select the new parameter group created and click on it to open.
+
+   ![](media/select-parameter-group.png)
+
+   f. In the search area, enter `max_connections`, select the parameter and click **Edit parameters**.
+
+   ![](media/max-connections-parameter-group.png)
+
+   g. Update the value to a minimum of 5000 and then click **Save changes**.
+
+   ![](media/min-connections-parameter-group.png)
+
+   With your changes saved, you can close the parameter group window in your browser.
+
+5. To create your database, return to the **Create database** page and select the following options:
 
    a. For **Choose a database creation method**, select **Standard create**.
 
    b. For **Engine Options**, select **PostgreSQL**.
 
-   c. For **Version**, select the latest available PostgreSQL version 11 series.
+   c. For **Version**, select the latest available PostgreSQL version 11 series. For example, select `PostgreSQL 11.9-R1`.
 
    d. For **Templates**, select **Production**.
 
@@ -241,47 +277,89 @@ Create a database that is available to your EKS cluster.This example creates an 
 
    - In the **DB instance identifier**, enter a unique \<*databasename*\>.
    - In **Credentials Settings**, leave **Master username** set to the default.
-   - Create a master password for your database that meets your organization standards.
+   - Create a master password for your database that meets your organization standards and then confirm it.
 
    f. In the **DB instance size** section, add these details:
 
    - Select **Standard classes**.
-   - Select **b.m5.2xlarge** or greater. The **b.m5.2xlarge** selection  provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
+   - Select **db.m5.2xlarge** or greater. The **db.m5.2xlarge** selection provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
 
    g. In the **Storage** section, for details, accept the default values:
 
    - **Storage type** is **Provisioned IOPS**.
    - **Allocated storage** is **100GiB**.
-   - **Provisioned IOPS** is **1000**.
-   - **Storageautoscaling** can be selected.
+   - **Provisioned IOPS** is **3000**.
+   - **Storage autoscaling** and a **Maximum storage threshold** can be selected to allow the storage to increase if your deployment exceeds the threshold you define. Clear this setting if you do not want storage autoscaling enabled on the database instance.
 
-   h. In **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP address to whitelist for this PostgreSQL database, and click **Done**.
+   h. In the **Availability & durability** > **Multi-AZ deployment** section, for details, accept the default value, **Create a standby instance (recommended for production usage)**.
 
-5. In **Configuration options \> Machine type and storage**:
+   i. In the **Connectivity** section, choose the existing VPC cluster network, so that you create the database in the same VPC as cluster:
 
-    a. For **Machine type**, select 4 vCPU **Cores** and 15 GB **Memory**.
+   - **Virtual private cloud (VPC)** select your cluster VCP which should be accessible by your organization.
+   - **Subnet group** select **default** or specify a subnet your deployment requires.
+   - **Public access** select **no** unless your organizaiton requires public access and you have appropriate security protocols for your subnet in place.
+   - **VPC security group** select **Create new** and in **New VPC security group name**, specify an appropriate `security-group-name`.
+   - If required, click **Additional configuration** and specify a non-default **Database port** if your access requires a port other than port `5432`.
 
-    b. For **Network throughput**, select **SSD (Recommended)**.
+    j. In **Database authentication** > **Database authentication options** select backups `Password authentication`.
 
-    c. For **Storage capacity**, enter **20 GB** and select **Enable automatic storage increases**.
+    k. In the **Additional configuration** add the following settings and configurations:
 
-6. Configure the remaining setting using the default values:
+    - **Database options** - enter an initial name for this database instance, which Amazon RDS creates when it creates this DB instance. If you do not specify a database name, Amazon RDS does not create a database when it creates the DB instance.
 
-    a. For **Auto backups and high availability**, select backups can be automated 1AM – 5AM in a single zone.
+    - **DB parameter group** - select the parameter group you created your organization's deployment in step 4.
 
-    b. For **Flags**, no flags are required.
+    - **Backup** - clear `Enable automatic backups` unless it is required by your organization's deployment.
 
-    c. **For Maintenance**, any preference is supported.
+    - **Encryption** - clear `Enable encryption` unless it is required by your organization's deployment.
 
-    d. For **Labels**, no labels are required.
+    - **Performance Insights** - clear `Enable Performance Insights` your organization's deployment can take advantage of this RDS database performance monitoring feature that makes it easy to diagnose and solve performance challenges on Amazon RDS databases.
 
-    Labels can help clarify billing details for your EKS resources.
+    - **Monitoring** - clear `Enable Enhanced monitoring` unless your organization can take advantage of this AWS  enhanced monitoring metrics service.
 
-8. Click **Create**.
+    - **Log exports** - skip this section unless your organization requires integration with Amazon CloudWatch Logs.
 
-    A deployment progress page displays the status of your deployment until it is complete, which takes up to 5 minutes. When complete, the EKS UI displays all of the SQL resources in your account, which includes your newly created SQL instance:
+    - **Maintenance** - clear `Enable auto minor version upgrade` unless your organization's deployment requires automated version upgrades; In the **Maintenance window section, leave the default `No preference`selection.
 
-    TBDTBD
+    - **Deletion protection** - clear `Enable deletion protection` unless your organization's deployment requires it.
+
+    l. After reviewing your choices and approving the **Estimated monthly costs** for these choices,  click **Create database**.
+
+    A deployment progress page displays the status of your deployment until it is complete, which takes up to 5 minutes. When complete, the EKS UI displays all of the SQL resources in your account, which includes your newly created SQL instance, which should be in an **Available** state.
+
+6. Find and note the Security group ID of your Linux worker nodes in your deployment to later add each of these security groups to your RDS instance security group (in the next step).
+
+   a. Open an EC2 dashboard, click **Instances** in the left navigation pane and select one of your worker nodes in the **Instances** page.
+
+   b. In the instance details area below the primary list of instances, click the **Security** tab, copy the Security groups to a text editor for use in the next step.
+
+   c. Repeat steps a. and b. for each of your deployment's worker nodes.
+
+After you note the security groups for each of your deployment's worker nodes, proceed to the next step.
+
+7. Update the RDS security group to provide inbound access from each of your deployment's worker nodes.
+
+   a. Open the Amazon RDS navigation (menu in upper left of screen), select **Databases** and open the page for your new PostgreSQL DB instance.
+
+   b. In the **Connectivity & Security** tab, in the **Security** area, click the RDS security group to open it.
+
+   ![](media/database-security-group-mainscreen.png)
+
+   c. In the *SG-security-group-name* page, in the **Inbound rules** tab, click **Edit inbound rules**.
+
+   ![](media/edit-inbound-rules-security-group.png)
+
+   d. In the **Edit inbound rules** page, click **Add rule** with the following parameters:
+
+   - **Type** - select `PostgreSQL`.
+   - **Protocol** and **Port range** are set automatically.
+   - **Source** - select **Custom** and use the search tool to find a security group associated with the worker nodes in your organization's deployment and then select that security group.
+
+   e. Repeat step d. to add an inbound rule that is associated with each of your organization's deployment worker node security groups.
+
+   f. After you add all of the required inbound rules for all of the security groups click **Save**.
+
+After you complete these steps, your EKS cluster has the  appropriate access to the RDS DB instance and you can proceed to the next section.
 
 #### Creating a database in your SQL instance
 
@@ -306,35 +384,35 @@ An installation with deployment will take about 90 minutes total, because a Pega
 
 ### Updating the pega.yaml Helm chart values
 
-To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \gke-demo folder you have already created on your local system. 
+To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \EKS-demo folder you have already created on your local system. 
 
 Configure the parameters so the pega.yaml Helm chart matches your deployment resources in these areas:
 
-- Specify that this is an PKS deployment.
+- Specify that this is an EKS deployment.
 
 - Credentials for your DockerHub account in order to access the required Docker images.
 
-- Access your GCP SQL database.
+- Access your RDS database.
 
-- Install the version of Pega Platform that you built into your Docker installation image.
+- Install the version of Pega Platform built into your Docker installation image.
 
 - Specify host names for your web and stream tiers.
 
-1. To download the pega.yaml Helm chart to the \<local filepath\>/pks-demo, enter:
+1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
 `$ helm inspect values pega/pega > pega.yaml`
 
-2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your PKS requirements:
+2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your EKS requirements:
 
 | Chart parameter name    | Purpose                                   | Your setting |
 |-------------------------|-------------------------------------------|--------------|
-| provider:               | Specify a PKS deployment.                 | provider:"pks"|
+| provider:               | Specify an EKS deployment.                 | provider:"eks"|
 | actions.execute:        | Specify a “deploy” deployment type.       | execute: "deploy"   |
 | Jdbc.url:               | Specify the database IP address and database name for your Pega Platform installation.        | <ul><li>url: "jdbc:postgresql://**localhost**:5432/**dbName**"</li><li>where **localhost** is the public IP address you configured for your database connectivity and **dbName** is the name you entered for your PostgreSQL database in [Creating a database resource](#creating-a-database-resource).</li></ul>|
 | Jdbc.driverClass:       | Specify the driver class for a PostgreSQL database. | driverClass: "org.postgresql.Driver"                |
 | Jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
 | Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul><li>driverUri: "latest jar file available” </li><li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>|
-| Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For GCP PostgreSQL databases, the default user is “postgres”.</li></ul>|
+| Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, the default user is “postgres”.</li></ul>|
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
 | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
@@ -355,126 +433,77 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 1. Do one of the following:
 
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-`$ cd <local filepath>\pks-demo`
+`$ cd <local filepath>\EKS-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your pks-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+- Open a Linux bash shell and change the location to the top folder of your EKS-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
-`$ cd /home/<local filepath>/pks-demo`
+`$ cd /home/<local filepath>/EKS-demo`
 
-2. Use the PKS CLI to log into your account using the Pivotal-provided API and login credentials and skip SSL validation.
+2. Do one of the following:
 
-`$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
+- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder.
 
-If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
+`$ cd <local filepath>\EKS-demo`
 
-3. View the status of all of your PKS clusters and verify the name of the cluster for the Pega Platform deployment.
+- Open a new Linux bash shell and change the location to the top folder of your EKS-demo directory.
 
-`$ pks clusters`
+`$ cd /home/<local filepath>/EKS-demo`
 
-Your cluster name is displayed in the **Name** field.
-
-4. To use the PKS CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory.
+3. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
 
 ```yaml
-$ pks get-credentials <cluster-name>`
-Fetching credentials for cluster pega-platform.
-Context set for cluster pega-platform.
-```
-
-If you need to use a Bearer Token Access Credentials instead of this credential file, see the Pivotal document, [Accessing Dashboard](https://docs.pivotal.io/pks/1-3/access-dashboard.html).
-
-5. To use the kubectl command to view the VM nodes, including cluster names and status.
-
-`$ kubectl get nodes`
-
-6. Establish a required cluster role binding setting so that you can launch the Kubernetes dashboard.
-
-`$ kubectl create clusterrolebinding dashboard-admin -n kube-system
---clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard`
-
-7. Start the proxy server for the Kubernetes dashboard.
-
-`$ kubectl proxy`
-
-8. To access the Dashboard UI, open a web browser and navigate to the following URL:
-
-<http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/>
-
-9. In the **Kubernetes Dashboard** sign in window, choose the appropriate sign in method:
-
-- To use a cluster Kubeconfig access credential file: select **Kubeconfig**, navigate to your \<local filepath\>/.kube directory and select the config file. Click **SIGN IN**.
-
-- To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
-
-    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only PKS resources display. The dashboard does not display your PKS cluster name or your resource name, which is expected behavior.
-
-    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
-
-10. Do one of the following:
-
-- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your pks-demo folder.
-
-`$ cd <local filepath>\pks-demo`
-
-- Open a new Linux bash shell and change the location to the top folder of your pks-demo directory.
-
-`$ cd /home/<local filepath>/pks-demo`
-
-11. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
-
-```yaml
-$ kubectl create namespace mypega-pks-demo
-namespace/mypega-pks-demo created
+$ kubectl create namespace mypega-EKS-demo
+namespace/mypega-EKS-demo created
 $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-12. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
+4. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-The `pegaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
+The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-13. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
+5. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
 
 ```yaml
-helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo --values pega.yaml --set global.actions.execute=install-deploy
+helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy
 ```
 
-For subsequent Helm installs, use the command `helm install mypega-pks-demo pega/pega --namespace mypega-pks-demo` to deploy Pega Platform and avoid another Pega Platform installation.
+For subsequent Helm installs, use the command `helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo` to deploy Pega Platform and avoid another Pega Platform installation.
 
-A successful Pega deployment immediately returns details that show progress for your `mypega-pks-demo` deployment.
+A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
 
-14. Refresh the Kubernetes dashboard that you opened in step 8. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 7, and relaunch the web browser as directed in Step 8.
+6. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
-15. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
+7. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
-![](media/dashboard-mypega-pks-demo-install-initial.png)
+    ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
     Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+8. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-pks-demo` namespace pods.
+9. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
 
-![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
+    ! [](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
-A successful deployment does not show errors across the various workloads. The `mypega-pks-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
+    A successful deployment does not show errors across the various workloads. The `mypega-EKS-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
-![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
+    ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
 Logging in to Pega Platform – 10 minutes
 ---------------------------------------
 
-After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **pks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
+After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **eks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
 
 ```yaml
 tier:
@@ -483,7 +512,7 @@ tier:
     service:
       # Enter the domain name to access web nodes via a load balancer.
       #  e.g. web.mypega.example.com
-      domain: "**pks.web.dev.pega.io**"
+      domain: "**eks.web.dev.pega.io**"
 ```
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
