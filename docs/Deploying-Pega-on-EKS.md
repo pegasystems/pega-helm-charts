@@ -1,5 +1,4 @@
-Deploying Pega Platform on an Amazon EKS cluster
-===============================
+# Deploying Pega Platform on an Amazon EKS cluster
 
 Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
 
@@ -7,8 +6,7 @@ Pega helps enterprises and agencies quickly build business apps that deliver the
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a EKS cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a EKS cluster with a Amazon RDS database instance and two clustered virtual machines (VMs).
 
-Deployment process overview
-------------------------
+## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a EKS cluster that you create for the deployment:
 
@@ -27,8 +25,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 To understand how Pega maps Kubernetes objects with Pega applications and services, see [Understanding the Pega deployment architecture](https://community.pega.com/knowledgebase/articles/client-managed-cloud/cloud/understanding-pega-deployment-architecture).
 
-Assumptions and prerequisites
------------------------------
+## Assumptions and prerequisites
 
 This guide assumes:
 
@@ -40,7 +37,7 @@ The following account, resources, and application versions are required for use 
 
 - An Amazon AWS account with a payment method set up to pay for the Amazon cluster and RDS resources you create and appropriate AWS account permissions and knowledge to:
 
-  - Create an Amazon RDS database.
+  - Create an Amazon RDS DB instance.
 
   - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
 
@@ -58,16 +55,17 @@ The following account, resources, and application versions are required for use 
 
 - eksctl - the Amazon EKS command-line tool that you use for creating and managing clusters on Amazon EKS. If you have to update the version of kubernetes on an existing Amazon EKS cluster, enter the following command, replacing `<cluster-name>` with your existing cluster name: `eksctl update cluster --name <cluster-name> --approve`.
 
-Prepare your Amazon EKS resources – 45 minutes
-----------------------------------------------
+## Prepare your Amazon EKS resources – 45 minutes
 
 This section covers the details necessary to obtain your AWS credentials and configure the required Amazon RDS database in an AWS account. Pega supports creating a database resource in any environment if the IP address of the database is available to your Amazon EKS cluster.
 
 ### Creating your IAM user access keys
 
-In order to create an EKS cluster, you must create your IAM user access keys. Use the following steps, which are sourced from the AWS documentation, **Access Key and Secret Access Key** on the page, [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
+In order to create an EKS cluster, Pega recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credential, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
 
-To create access keys for an IAM user
+Use the following steps, which are sourced from the AWS documentation, **Access Key and Secret Access Key** on the page, [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
+
+To create access keys for an IAM user:
 
 1. Sign in to the AWS Management Console and open the IAM console at https://console.aws.amazon.com/iam/.
 
@@ -79,14 +77,16 @@ To create access keys for an IAM user
 
 5. To view the new access key pair, choose Show. You will not have access to the secret access key again after this dialog box closes. Your credentials will look something like this:
 
-- Access key ID: AKIAIOSFODNN7EXAMPLE
-- Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
+   - Access key ID: AKIAIOSFODNN7EXAMPLE
+   - Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
 6. To download the key pair, choose Download .csv file. Store the keys in a secure location. You will not have access to the secret access key again after this dialog box closes.
 
-Keep the keys confidential in order to protect your AWS account and never email them. Do not share them outside your organization, even if an inquiry appears to come from AWS or Amazon.com. No one who legitimately represents Amazon will ever ask you for your secret key.
+   Keep the keys confidential in order to protect your AWS account and never email them. Do not share them outside your organization, even if an inquiry appears to come from AWS or Amazon.com. No one who legitimately represents Amazon will ever ask you for your secret key.
 
-7. After you download the .csv file, choose Close. When you create an access key, the key pair is active by default, and you can use the pair right away.
+7. After you download the .csv file, choose Close. 
+
+When you create an access key, the key pair is active by default, and you can use the pair right away.
 
 ### Configuring your AWS CLI credentials
 
@@ -107,18 +107,15 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 ### Making your Docker images available to your deployment
 
-TBD
-
-With your Docker images available to your AWS account, you are ready to create your Amazon EKS cluster.
+Clients with appropriate licenses can request access to several required Docker images from the Pega-managed image repository. Pega Plaform requires you to download these images and then push them to a repository that is available to your EKS environment. After you make your Pega-provided Docker images available to your AWS account, you are ready to create your Amazon EKS cluster.
 
 ### Creating an Amazon EKS cluster
 
 You can create your EKS cluster using the `eksctl` command line utility. This example shows how to define your configuration in a yaml file that you pass to the `eksctl` command. For more details and options available to advanced EKS users, see [Create your Amazon EKS cluster and worker nodes](https://docs.aws.amazon.com/eks/latest/userguide/getting-started-eksctl.html#eksctl-create-cluster).
 
-At a minimum, your cluster must be provisioned with at least two worker nodes that have 32GB of RAM in order to support the typical processing loads in a Pega
-Platform deployment; for this option, Pega recommends using a minimum of two m5.xlarge nodes for your deployment worker nodes. Pega has not tested this method using Windows worker nodes.
+At a minimum, for if you are creating a simple Pega demo, your cluster must be provisioned with at least two worker nodes that have 32GB of RAM in order to support the typical processing loads in a Pega Platform deployment; for this option, you can use a minimum of two m5.xlarge nodes for your deployment worker nodes. Pega has not tested this method using Windows worker nodes. Larger deployments may required additional processing capacity.
 
-To create Amazon EKS cluster with Linux worker nodes:
+To create an Amazon EKS cluster with Linux worker nodes:
 
 1. Save the following text to a file named similar to `my-EKS-cluster-spec.yaml` in your EKS-demo folder:
 
@@ -213,11 +210,17 @@ At this point, you must create a database instance into which you must install P
 
 ### Creating a database resource
 
-AMAZON EKS deployments require that you install Pega Platform software in an Amazon RDS instance that contains a PostgreSQL database. After you create an SQL instance that is available to your EKS cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address which you create in this procedure in order to add this information to your pega.yaml Helm chart.
+Amazon EKS deployments require that you install Pega Platform software in an Amazon RDS instance that contains a PostgreSQL database. In general, it is recommended, but not required to name this database `pega`; the idea is to ensure that your organization recognizes the AWS database resource in which you install Pega Platform rules and the data your Pega deployment manages.
+
+During the configuration screens with which you create an RDS instance for your EKS deployment, you can create a database and name it `pega` and add a password during the DB instance provisioning in the **Additional configuration** section. After the DB instance is created, this runbook section includes an optional section to review and optimize the database for any specific organization requirements before you install and deploy Pega using this database.
 
 #### Creating an Amazon RDS instance
 
-Create a database that is available to your EKS cluster.This example creates an Amazon RDS instance in AWS; however, you can create or use an database resource that is available to your EKS cluster. Pega Platform deployments require that the region you select is located in the same region where your EKS worker nodes are located.
+Create a database that is available to your EKS cluster. This example creates an Amazon RDS instance in AWS; however, you can create or use any database resource that is available to your EKS cluster. 
+
+At a minimum, for if you are creating a simple Pega demo, your Amazon RDS instance must be provisioned with at least 20GB of storage to support the installation of a Pega Platform software and a limited space for processing data; to provision a Pega Platform deployment to store typical Pega workload data, the size varies by workload, but should be over 70GB of total storage.
+
+Pega Platform deployments require that the region you select is located in the same region where your EKS worker nodes are located.
 
 1. Use a web browser to log in to <https://aws.amazon.com/console/>, which logs you into your default region.
 
@@ -231,8 +234,6 @@ Create a database that is available to your EKS cluster.This example creates an 
 
    a.  Open the Amazon RDS navigation (menu in upper left of screen) and right-click **Parameter groups** to open the menu in a new screen.
 
-   ![Open Parameter groups](media/new-parameter-groups.png)
-
    b. Click **Create parameter group**.
 
    c. Enter the following group details:
@@ -245,21 +246,13 @@ Create a database that is available to your EKS cluster.This example creates an 
 
    - in **Description** enter any distinguishing details for this parameter group, such as `DB connection limitation settings`.
 
-   ![](media/create-parameter-groups.png)
-
    d. Click **Create**.
 
    e. Select the new parameter group created and click on it to open.
 
-   ![](media/select-parameter-group.png)
-
    f. In the search area, enter `max_connections`, select the parameter and click **Edit parameters**.
 
-   ![](media/max-connections-parameter-group.png)
-
    g. Update the value to a minimum of 5000 and then click **Save changes**.
-
-   ![](media/min-connections-parameter-group.png)
 
    With your changes saved, you can close the parameter group window in your browser.
 
@@ -283,11 +276,11 @@ Create a database that is available to your EKS cluster.This example creates an 
 
    - Select **Standard classes**.
    - Select **db.m5.2xlarge** or greater. The **db.m5.2xlarge** selection provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
-
+RAM
    g. In the **Storage** section, for details, accept the default values:
 
    - **Storage type** is **Provisioned IOPS**.
-   - **Allocated storage** is **100GiB**.
+   - **Allocated storage** is **100GiB**. Minimum size can be 20 GiB; however, more than 70GiB of storage is more appropriate to store typical Pega application workload data.
    - **Provisioned IOPS** is **3000**.
    - **Storage autoscaling** and a **Maximum storage threshold** can be selected to allow the storage to increase if your deployment exceeds the threshold you define. Clear this setting if you do not want storage autoscaling enabled on the database instance.
 
@@ -297,7 +290,7 @@ Create a database that is available to your EKS cluster.This example creates an 
 
    - **Virtual private cloud (VPC)** select your cluster VCP which should be accessible by your organization.
    - **Subnet group** select **default** or specify a subnet your deployment requires.
-   - **Public access** select **no** unless your organizaiton requires public access and you have appropriate security protocols for your subnet in place.
+   - **Public access** select **no** unless your organization requires public access and you have appropriate security protocols for your subnet in place.
    - **VPC security group** select **Create new** and in **New VPC security group name**, specify an appropriate `security-group-name`.
    - If required, click **Additional configuration** and specify a non-default **Database port** if your access requires a port other than port `5432`.
 
@@ -305,7 +298,7 @@ Create a database that is available to your EKS cluster.This example creates an 
 
     k. In the **Additional configuration** add the following settings and configurations:
 
-    - **Database options** - enter an initial name for this database instance, which Amazon RDS creates when it creates this DB instance. If you do not specify a database name, Amazon RDS does not create a database when it creates the DB instance.
+    - **Database options** - create and name a database in this RDS DB instance and add a secure password. When the instance is provisioned, Amazon RDS creates this database within this DB instance. If you do not specify a database name, Amazon RDS does not create a database when it creates the DB instance and you must do it later before you install Pega Platform.
 
     - **DB parameter group** - select the parameter group you created your organization's deployment in step 4.
 
@@ -325,7 +318,7 @@ Create a database that is available to your EKS cluster.This example creates an 
 
     l. After reviewing your choices and approving the **Estimated monthly costs** for these choices,  click **Create database**.
 
-    A deployment progress page displays the status of your deployment until it is complete, which takes up to 5 minutes. When complete, the EKS UI displays all of the SQL resources in your account, which includes your newly created SQL instance, which should be in an **Available** state.
+    A deployment progress page displays the status of your deployment until it is complete, which takes up to 5 minutes. When complete, the EKS UI displays all of the database resources in your account, which includes your newly created RDS DB instance, which should be in an **Available** state.
 
 6. Find and note the Security group ID of your Linux worker nodes in your deployment to later add each of these security groups to your RDS instance security group (in the next step).
 
@@ -343,11 +336,7 @@ After you note the security groups for each of your deployment's worker nodes, p
 
    b. In the **Connectivity & Security** tab, in the **Security** area, click the RDS security group to open it.
 
-   ![](media/database-security-group-mainscreen.png)
-
    c. In the *SG-security-group-name* page, in the **Inbound rules** tab, click **Edit inbound rules**.
-
-   ![](media/edit-inbound-rules-security-group.png)
 
    d. In the **Edit inbound rules** page, click **Add rule** with the following parameters:
 
@@ -361,22 +350,21 @@ After you note the security groups for each of your deployment's worker nodes, p
 
 After you complete these steps, your EKS cluster has the  appropriate access to the RDS DB instance and you can proceed to the next section.
 
-#### Creating a database in your SQL instance
+#### Optional: Reviewing or creating a database in your RDS DB instance 
 
-Create a PostgreSQL database in your new RDS DB instance for the Pega Platform installation. Use the database editing tool of your choice to log into your RDS DB instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
+The RDS DB instance must contain a database in order to install Pega Platform in your EKS deployment. If you did not create a PostgreSQL database in your new RDS DB instance in step 5k, you must do it now. If you did, you can also review the database and add any organizational requirements other than a password. Use the database editing tool of your choice to log into your RDS DB instance and create this new PostgreSQL database. The following example used pgAdmin4.
 
-1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
+1. Use a database editor tool, such as pgadmin4, to log into your RDS DB instance.
 
-    You can find your access information and login credentials, by selecting the SQL instance in the GCP console.
+    You can find your access information and login credentials, by selecting the RDS DB instance in the GCP console.
 
-2. In the database editor tool, navigate to Databases and create a new database.
+2. If you have to create a new database, in the database editor tool, navigate to Databases and create a new database; if you already have a database created, you can review the settings to ensure it meets your organization's database requirements.
 
-   No additional configuration is required.
+   Pega does not require any additional configuration.
 
 With new database available in your RDS DB instance, you are ready to continue to the next section.
 
-Installing and deploying Pega Platform using Helm charts – 90 minutes
----------------------------------------------------------------------
+## Installing and deploying Pega Platform using Helm charts – 90 minutes
 
 To deploy Pega Platform by using Helm, customize the default Helm charts that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
@@ -407,9 +395,9 @@ To customize these files, you must download them from the source github reposito
 
 These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your organization's EKS deployment of Pega Platform.
 
-### Updating the addons.yaml Helm chart values
+#### Updating the addons.yaml Helm chart values
 
-Use the provided example addons-eks.yaml file to configure the use of an Amazon AWS ALB ingress controller. Pega provides this example file as a convenient way to quickly configure your addons file appropriately for EKS deployments. You can use it in place of filing our the default values.yaml file in the /addons 
+Use the provided example addons-eks.yaml file to configure the use of an Amazon AWS ALB ingress controller. Pega provides this example file as a convenient way to quickly configure your addons file appropriately for EKS deployments. You can use it in place of filing our the default values.yaml file in the /addons directory.
 
 1. Download the example [addons-eks.yaml](./resources/addons-eks.yaml) to the \<local filepath\>/EKS-demo that will over-write the default pega/addons file.
 
@@ -417,26 +405,20 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 
 2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your AKS requirements:
 
-  - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
+- Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
+- To allow your deployment to automatically determine the AWS region of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsRegion: true`. The setting is disabled by default.
+- Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
+- To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
+- Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
 
-  - To allow your deployment to automatically determine the AWS region of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsRegion: true`. The setting is disabled by default.
-
-  - Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
-
-  - To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
-
-  - Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
-
+TBD: We need help define what to use these settings for:
 extraEnv: {}
-  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
-
+AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
-
-
-### Updating the pega.yaml Helm chart values
+#### Updating the pega.yaml Helm chart values
 
 To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \EKS-demo folder you have already created on your local system. 
 
@@ -454,27 +436,28 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
-`$ helm inspect values pega/pega > pega.yaml`
+   `$ helm inspect values pega/pega > pega.yaml`
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your EKS requirements:
 
-| Chart parameter name    | Purpose                                   | Your setting |
-|-------------------------|-------------------------------------------|--------------|
-| provider:               | Specify an EKS deployment.                 | provider:"eks"|
-| actions.execute:        | Specify a “deploy” deployment type.       | execute: "deploy"   |
-| Jdbc.url:               | Specify the database IP address and database name for your Pega Platform installation.        | <ul><li>url: "jdbc:postgresql://**localhost**:5432/**dbName**"</li><li>where **localhost** is the public IP address you configured for your database connectivity and **dbName** is the name you entered for your PostgreSQL database in [Creating a database resource](#creating-a-database-resource).</li></ul>|
-| Jdbc.driverClass:       | Specify the driver class for a PostgreSQL database. | driverClass: "org.postgresql.Driver"                |
-| Jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
-| Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul><li>driverUri: "latest jar file available” </li><li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>|
-| Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, the default user is “postgres”.</li></ul>|
-| jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
-| docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
-| docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
-| upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-| tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
-| tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
-| installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)</li></ul>|
-| installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
+   | Chart parameter name    | Purpose                                   | Your setting |
+   |-------------------------|-------------------------------------------|--------------|
+   | provider:               | Specify an EKS deployment.                 | provider:"eks"|
+   | actions.execute:        | Specify a “deploy” deployment type.       | execute: "deploy"   |
+   | Jdbc.url:               | Specify the database IP address and database name for your Pega Platform installation.        | <ul><li>url: "jdbc:postgresql://**localhost**:5432/`pega`"</li><li>where **localhost** is the public IP address you configured for your database connectivity and `pega` is the recommended name of the database you created in your RDS DB instance.</li></ul>
+   |
+   | Jdbc.driverClass:       | Specify the driver class for a PostgreSQL database. | driverClass: "org.postgresql.Driver"|
+   | Jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
+   | Jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul><li>driverUri: "latest jar file available” </li><li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>|
+   | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>|
+   | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
+   | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
+   | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
+   | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
+   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li></ul>|
+   | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
+   | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)</li></ul>|
+   | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
 
@@ -487,46 +470,46 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 1. Do one of the following:
 
-- Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+   - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-`$ cd <local filepath>\EKS-demo`
+   `$ cd <local filepath>\EKS-demo`
 
-- Open a Linux bash shell and change the location to the top folder of your EKS-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+   - Open a Linux bash shell and change the location to the top folder of your EKS-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
-`$ cd /home/<local filepath>/EKS-demo`
+   `$ cd /home/<local filepath>/EKS-demo`
 
 2. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
 
-```yaml
-$ kubectl create namespace mypega-EKS-demo
-namespace/mypega-EKS-demo created
-$ kubectl create namespace pegaaddons
-namespace/pegaaddons created
-```
+   ```yaml
+   $ kubectl create namespace mypega-EKS-demo
+   namespace/mypega-EKS-demo created
+   $ kubectl create namespace pegaaddons
+   namespace/pegaaddons created
+   ```
 
 3. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
 
-```yaml
-$ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
-```
+   ```yaml
+   $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+   ```
 
-The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
+   The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
 4. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
 
-```yaml
-helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy
-```
+   ```yaml
+   helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy
+   ```
 
-For subsequent Helm installs, use the command `helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo` to deploy Pega Platform and avoid another Pega Platform installation.
+   For subsequent Helm installs, use the command `helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo` to deploy Pega Platform and avoid another Pega Platform installation.
 
-A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
+   A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
 
 5. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
 6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
-    ![](media/dashboard-mypega-pks-demo-install-initial.png)
+    ! [](media/dashboard-mypega-pks-demo-install-initial.png)
 
     Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -542,10 +525,9 @@ A successful Pega deployment immediately returns details that show progress for 
 
     A successful deployment does not show errors across the various workloads. The `mypega-EKS-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
-    ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
+    ! [](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
-Logging in to Pega Platform – 10 minutes
----------------------------------------
+## Logging in to Pega Platform – 10 minutes
 
 After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **eks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
 
@@ -561,10 +543,10 @@ tier:
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-To manually associate the host name of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** that is configured to manage your DNS lookups, create a record set that specifies the pega-web tier the host name and add the IP address of the pega-web tier.
+To manually associate the host name of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. If your organization has an AWS Route 53 DNS lookup service already established to manage your DNS lookups, use the Route 53 Dashboard to create a record set that specifies the pega-web tier the host name and add the IP address of the pega-web tier.
 
-For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart). If not using the GCP **Cloud DNS**, for configuration details, see the documentation for your DNS lookup management system.
+For AWS Route53 Cloud DNS lookup service documentation details, see [What is Amazon Route 53?](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html). If not using AWS Route53 Cloud DNS lookup service, see the documentation for your DNS lookup service.
 
 With the ingress host name name associated with this IP address in your DNS service, you can log in to Pega Platform with a web browser using the URL: http://\<pega-web tier ingress host name>/prweb.
 
-![](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
+! [](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
