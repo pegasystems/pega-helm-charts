@@ -363,7 +363,7 @@ After you complete these steps, your EKS cluster has the  appropriate access to 
 
 #### Creating a database in your SQL instance
 
-Create a PostgreSQL database in your new SQL instance for the Pega Platform installation. Use the database editing tool of your choice to log into your SQL instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
+Create a PostgreSQL database in your new RDS DB instance for the Pega Platform installation. Use the database editing tool of your choice to log into your RDS DB instance and create this new PostgreSQL database. The following example was completed using pgAdmin4.
 
 1. Use a database editor tool, such as pgadmin4, to log into your SQL instance.
 
@@ -373,7 +373,7 @@ Create a PostgreSQL database in your new SQL instance for the Pega Platform inst
 
    No additional configuration is required.
 
-With your SQL service IP address and your new database name, you are ready to continue to the next section.
+With new database available in your RDS DB instance, you are ready to continue to the next section.
 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ----------------------------------------------------------
@@ -441,17 +441,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 `$ cd /home/<local filepath>/EKS-demo`
 
-2. Do one of the following:
-
-- Open a new Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder.
-
-`$ cd <local filepath>\EKS-demo`
-
-- Open a new Linux bash shell and change the location to the top folder of your EKS-demo directory.
-
-`$ cd /home/<local filepath>/EKS-demo`
-
-3. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
+2. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
 
 ```yaml
 $ kubectl create namespace mypega-EKS-demo
@@ -460,7 +450,7 @@ $ kubectl create namespace pegaaddons
 namespace/pegaaddons created
 ```
 
-4. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
+3. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
 
 ```yaml
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -468,7 +458,7 @@ $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 
 The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-5. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
+4. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
 
 ```yaml
 helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -478,9 +468,9 @@ For subsequent Helm installs, use the command `helm install mypega-EKS-demo pega
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
 
-6. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
+5. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
-7. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
+6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
     ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -488,11 +478,11 @@ A successful Pega deployment immediately returns details that show progress for 
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-8. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+7. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-9. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
+8. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
 
     ! [](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
