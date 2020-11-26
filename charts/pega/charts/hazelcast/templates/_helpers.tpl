@@ -1,5 +1,5 @@
 {{- define "hazelcastName" -}} pega-hazelcast {{- end -}}
-{{- define "hazelcastEnvironmentConfig" -}} hz-env-config {{- end -}}
+{{- define "hazelcastEnvironmentConfig" -}} pega-hz-env-config {{- end -}}
 
 
 {{- define "isHazelcastEnabled" }}
