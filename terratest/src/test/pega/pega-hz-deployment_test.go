@@ -46,7 +46,7 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 		if index >= 1 {
 			UnmarshalK8SYaml(t, statefulInfo, &statefulsetObj)
 			require.Equal(t, *statefulsetObj.Spec.Replicas, int32(3))
-			require.Equal(t, statefulsetObj.Spec.ServiceName, "hazelcast-service")
+			require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-hazelcast-service")
 			statefulsetSpec := statefulsetObj.Spec.Template.Spec
 			require.Equal(t, "/hazelcast/health/ready", statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Path)
 			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Port)

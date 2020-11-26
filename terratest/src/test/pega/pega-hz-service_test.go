@@ -47,8 +47,9 @@ func VerifyHazelcastService(t *testing.T, yamlContent string, options *helm.Opti
 	for index, serviceInfo := range serviceSlice {
 		if index >= 1 {
 			UnmarshalK8SYaml(t, serviceInfo, &hazelcastServiceObj)
+			require.Equal(t,"pega-hazelcast-service", hazelcastServiceObj.Name)
 			require.Equal(t, "Hazelcast", hazelcastServiceObj.Spec.Selector["component"])
-			require.Equal(t, "hazelcast", hazelcastServiceObj.Spec.Selector["app"])
+			require.Equal(t, "pega-hazelcast", hazelcastServiceObj.Spec.Selector["app"])
 			require.Equal(t, "hazelcast", hazelcastServiceObj.Spec.Ports[0].Name)
 			require.Equal(t, int32(5701), hazelcastServiceObj.Spec.Ports[0].Port)
 			require.Equal(t, intstr.FromInt(5701), hazelcastServiceObj.Spec.Ports[0].TargetPort)
