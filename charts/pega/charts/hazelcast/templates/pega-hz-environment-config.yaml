@@ -6,7 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 data:
   # Key Value pairs
-  Namespace: {{ .Release.Namespace }}
+  NAMESPACE: {{ .Release.Namespace }}
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
   SERVICE_NAME: {{ template "hazelcastName" }}-service
   PROMETHEUS_PORT: "8089"

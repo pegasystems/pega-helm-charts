@@ -17,7 +17,7 @@ spec:
         app: {{ template "hazelcastName" . }}
         component: "Hazelcast"
       annotations:
-{{- include "generatedHazelcastServicePodAnnotations" .root | indent 8 }}
+{{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
       containers:
       - name: hazelcast

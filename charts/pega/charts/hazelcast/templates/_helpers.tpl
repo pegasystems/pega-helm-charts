@@ -11,6 +11,9 @@
  {{- end -}}
 {{- end }}
 
+{{- define "generatedHazelcastServicePodAnnotations" }}
+{{- end }}
+
 {{- define "waitForHazelcast" -}}
 - name: wait-for-hazelcast
   image: busybox:1.31.0

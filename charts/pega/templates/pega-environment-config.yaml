@@ -62,6 +62,6 @@ data:
   HZ_CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
 {{- end }}
   # DNS of hazelcast service
-  HZ_DNS: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+  HZ_SERVER_URL: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
 {{ end }}
