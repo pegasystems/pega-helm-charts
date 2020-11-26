@@ -2,7 +2,7 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 deploymentName: srs
-defaultRegistrySecretName: "srs-regcred"
+enabled: true
 # If using a custom Docker registry, supply the credentials here to pull Docker images.
 imageCredentials:
   registry: "YOUR_DOCKER_REGISTRY"

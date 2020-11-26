@@ -1,3 +1,4 @@
+{{ if .Values.enabled }}
 ---
 apiVersion: policy/v1beta1
 kind: PodDisruptionBudget
@@ -10,4 +11,5 @@ spec:
   minAvailable: 1
   selector:
     matchLabels:
-  {{ include "srs.srs-service.match-labels" . | indent 6 }}
+  {{- include "srs.srs-service.match-labels" . | indent 6 }}
+{{ end }}

@@ -35,7 +35,7 @@ Create chart name and version as used by the chart label.
 {{/*
 Common labels
 */}}
-{{- define "srs.labels" -}}
+{{- define "srs.labels" }}
 helm.sh/chart: {{ include "srs.chart" . }}
 {{ include "srs.selectorLabels" . }}
 {{- if .Root.Chart.AppVersion }}
@@ -50,10 +50,6 @@ Selector labels
 {{- define "srs.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "srs.name" . }}
 app.kubernetes.io/instance: {{ .Root.Release.Name }}
-{{- end }}
-
-{{- define "srsRegistrySecret" }}
-{{- default "srs-registry-secret" .Values.defaultRegistrySecretName }}
 {{- end }}
 
 {{/*
@@ -103,7 +99,7 @@ srs-service labels
 */}}
 {{- define "srs.srs-service.labels" -}}
 {{ $data := dict "Root" $ "Name" "srs-service" }}
-{{ include "srs.labels" $data }}
+{{- include "srs.labels" $data }}
 {{- end -}}
 
 {{/*
@@ -146,6 +142,10 @@ srs-ops antiaffinity
 {{ $data := dict "Root" $ "Name" "srs-ops" }}
 {{ include "srs.antiaffinity" $data }}
 {{- end -}}
+
+{{- define "srsRegistrySecretName" -}}
+{{ include "srs.fullname" . }}-reg-secret
+{{- end }}
 
 {{- define "imageRepositorySecret" }}
   {{- with .Values.imageCredentials }}

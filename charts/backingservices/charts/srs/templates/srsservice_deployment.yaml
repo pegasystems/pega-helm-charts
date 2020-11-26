@@ -1,4 +1,4 @@
----
+{{ if .Values.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -10,16 +10,16 @@ spec:
   replicas: {{ .Values.srsruntime.replicaCount }}
   selector:
     matchLabels:
-{{ include "srs.srs-service.match-labels" . | indent 6 }}
+{{- include "srs.srs-service.match-labels" . | indent 6 }}
   strategy:
     type: RollingUpdate
   template:
     metadata:
       labels:
-{{ include "srs.srs-service.match-labels" . | indent 8 }}
+{{- include "srs.srs-service.match-labels" . | indent 8 }}
     spec:
       imagePullSecrets:
-        - name: {{ .Values.defaultRegistrySecretName }}
+        - name: {{ template "srsRegistrySecretName" . }}
       affinity:
 {{- include "srs.srs-service.antiaffinity" . | indent 8 }}
       containers:
@@ -60,3 +60,4 @@ spec:
               value: "8081"
           resources:
             {{- toYaml .Values.srsruntime.resources | nindent 12 }}
+{{ end }}

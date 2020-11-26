@@ -1,4 +1,6 @@
 srs:
+  #always set srs.provisionCluster=false when srs.enabled=false
+  enabled: true
   imageCredentials:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
