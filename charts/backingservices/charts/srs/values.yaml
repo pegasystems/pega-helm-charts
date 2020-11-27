@@ -1,8 +1,8 @@
 # Default values for srs-search.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
-deploymentName: srs
 enabled: true
+deploymentName: srs
 # If using a custom Docker registry, supply the credentials here to pull Docker images.
 imageCredentials:
   registry: "YOUR_DOCKER_REGISTRY"
@@ -14,7 +14,7 @@ srsruntime:
   replicaCount: 2
   srsImage:
     name: platform-services/fnx-search
-    version: 1.6.1
+    version: 1.7.0
     pullPolicy: IfNotPresent
   resources:
     limits:

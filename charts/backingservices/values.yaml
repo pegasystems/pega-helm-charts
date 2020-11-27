@@ -1,17 +1,17 @@
 srs:
   #always set srs.provisionCluster=false when srs.enabled=false
   enabled: true
+  deploymentName: acme-demo-dev-srs
   imageCredentials:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
   #specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
-  deploymentName: acme-demo-dev-srs
   srsruntime:
     replicaCount: 2
     srsImage:
       name: platform-services/fnx-search
-      version: 1.6.1
+      version: 1.7.0
   #This section specifies the elasticsearch cluster configuration.
   elasticsearch:
     # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
