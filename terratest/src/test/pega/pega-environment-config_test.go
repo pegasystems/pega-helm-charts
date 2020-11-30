@@ -63,12 +63,8 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
 	require.Equal(t, envConfigData["HZ_DISCOVERY_K8S"], "true")
-    require.Equal(t, envConfigData["HZ_CLIENT_MODE"], "true")
+       require.Equal(t, envConfigData["HZ_CLIENT_MODE"], "true")
 	require.Equal(t, envConfigData["HZ_CLUSTER_NAME"], "PRPC")
 	require.Equal(t, envConfigData["HZ_SERVER_URL"], "pega-hazelcast-service.default.svc.cluster.local")
 }
