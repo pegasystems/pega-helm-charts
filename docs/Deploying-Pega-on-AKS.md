@@ -440,8 +440,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
-- Specify host names for your web and stream tiers.
-
+- Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 

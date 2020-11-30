@@ -57,7 +57,7 @@ The following account, resources, and application versions are required for use 
 
 ## Prepare your Amazon EKS resources – 45 minutes
 
-This section covers the details necessary to obtain your AWS credentials and configure the required Amazon RDS database in an AWS account. Pega supports creating a database resource in any environment if the IP address of the database is available to your Amazon EKS cluster.
+This section covers the details necessary to obtain your AWS credentials and configure the required Amazon RDS database in an AWS account.
 
 ### Creating your IAM user access keys
 
@@ -105,9 +105,19 @@ Default output format [None]:  specify your preference for a result format.
 
 With your credentials saved locally, you must push your Pega-provided Docker images to your Docker registry. For details on where the AWS CLI stores your credentials locally, see [Where Are Configuration Settings Stored?](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where)
 
+### Managing SSL certificates in AWS certificate manager
+
+Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For details, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
+
+To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, Pega supports using an SSL certificate that you create or import into AWS Credential Manager. After you have your Amazon Resource Name (ARN) credential using this certificate, you must add an annotation to the web tier ingress configuration so the deployment passes your ARN certificate to the web tier.
+
+To import or create a new SSL certificate, see [Importing Certificates into AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html). After you have your ARN certificate, use the appropriate annotation:
+
+For EKS - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\> to specify required ARN certificate.
+
 ### Making your Docker images available to your deployment
 
-Clients with appropriate licenses can request access to several required Docker images from the Pega-managed image repository. Pega Plaform requires you to download these images and then push them to a repository that is available to your EKS environment. After you make your Pega-provided Docker images available to your AWS account, you are ready to create your Amazon EKS cluster.
+Clients with appropriate licenses can request access to several required Docker images from the Pega-managed image repository. Pega Platform requires you to download these images and then push them to a repository that is available to your EKS environment. After you make your Pega-provided Docker images available to your AWS account, you are ready to create your Amazon EKS cluster.
 
 ### Creating an Amazon EKS cluster
 
@@ -132,13 +142,13 @@ version: '1.15'
 nodeGroups:
 - name: linux-ng
 instanceType: m5.xlarge
-minSize: 3
+minSize: 2
 ```
-You should use a name and region here to reflect the version of Pega Platform you want to deploy and specific the region in which your cluster will run.
+You should use a name and region here to reflect the version of Pega Platform you want to deploy and specify the region in which your cluster will run.
 
 2. To create your Amazon EKS cluster and Windows and Linux worker nodes, from your /EKS-demo folder, enter.
 
-`eksctl create cluster -f ./cluster-spec.yaml`
+`eksctl create cluster -f ./my-EKS-cluster-spec.yaml`
 
  It takes 10 to 15 minutes for the cluster provisioning to complete. During deployment this command copies the required Kubernetes configuration file to the cluster and into your default ~/.kube directory.
  
@@ -204,7 +214,7 @@ service account/eks-admin created
 
     You can now view your EKS cluster details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment. Without a deployment, only EKS resources display. The dashboard does not display your EKS cluster name or your resource name, which is expected behavior.
 
-    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this keep this PowerShell or Linux shell open.
+    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 
 At this point, you must create a database instance into which you must install Pega Platform.
 
@@ -356,7 +366,7 @@ The RDS DB instance must contain a database in order to install Pega Platform in
 
 1. Use a database editor tool, such as pgadmin4, to log into your RDS DB instance.
 
-    You can find your access information and login credentials, by selecting the RDS DB instance in the GCP console.
+    You can find your access information and login credentials, by selecting the RDS DB instance in the EKS console.
 
 2. If you have to create a new database, in the database editor tool, navigate to Databases and create a new database; if you already have a database created, you can review the settings to ensure it meets your organization's database requirements.
 
@@ -403,7 +413,7 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 
    This example addons file specifies the use of an Amazon AWS ALB ingress controller and contains several parameters that will specify details from your EKS environment so your Pega Platform deployment can use the load balancer in your EKS environment.
 
-2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your AKS requirements:
+2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your EKS requirements:
 
 - Specify `aws-alb-ingress-controller:> enabled: true` to install an AWS ALB ingress controller for your deployment.
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
@@ -434,7 +444,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Install the version of Pega Platform built into your Docker installation image.
 
-- Specify host names for your web and stream tiers.
+- Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
