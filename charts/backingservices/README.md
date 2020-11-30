@@ -1,6 +1,6 @@
 # BackingServices Helm chart
 
-A backing service is a module from Pega Infinity platform which can be deployed independently `as a Service`. For example `Search and Reporting Service` or `SRS` is a backing service which can replace the embedded search feature from Pega Infinity Platform and can be provisioned independently and configured as an external service providing search capabilities with one or more Pega Infinity environments.  
+A backing service is a feature from Pega Infinity platform which can be deployed as an independent service module. For example `Search and Reporting Service` or `SRS` is a backing service which can replace the embedded search feature from Pega Infinity Platform and can be provisioned independently and configured as an external service providing search capabilities with one or more Pega Infinity environments.  
 
 The backingservices chart supports deployment options for `Search and Reporting Service` (abbreviated as SRS). A backing service may be configured with one or more Pega deployments. 
 These backing services should be deployed in their own namespace and may be shared across multiple Pega Infinity environments.
@@ -24,7 +24,7 @@ The service deployment provisions runtime service pods along with a dependency o
 Pega Infinity version   | SRS version   | ElasticSearch version     | Description
 ---                     | ---           | ---                       | ---
 < 8.6                   | NA            | NA                        | SRS service can be used with Pega Infinity 8.6 and above
->= 8.6                  | > 1.6.0       | 7.1.x                     | Pega Infinity 8.6 and above version may use SRS Image tag version 1.6.0 and above. Current SRS versions are certified to work with Elasticsearch version 7.1.x.
+\>= 8.6                 | \> 1.6.0      | 7.1.x                     | Pega Infinity 8.6 and above version may use SRS Image tag version 1.6.0 and above. Current SRS versions are certified to work with Elasticsearch version 7.1.x.
 
 
 #### SRS service runtime configuration:
@@ -40,7 +40,7 @@ Configuration                       | Usage
 ---                                 | ---
 `enabled`                           | Enable the Search and Reporting Service deployment as a backing service.
 `deploymentName`                    | The name of your SRS cluster.  Resources created will be prefixed with this string. This is also the service name for SRS.
-`srsruntime`                        | This section defines the SRS service specific resource configuration options like image, replica count, cpu and memory resource settings etc.
+`srsRuntime`                        | This section defines the SRS service specific resource configuration options like image, replica count, cpu and memory resource settings etc.
 `elasticsearch`                     | Define the elasticsearch cluster configurations using this section. The chart from ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) is used for provisioning the cluster.
 `elasticsearch.provisionCluster`    | This setting when enabled will provision Elasticsearch cluster automatically with SRS runtime. Disable this to use an existing external ElasticSearch cluster with the SRS runtime.
 
@@ -50,11 +50,7 @@ Example:
 srs:
   enabled: true
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
-  imageCredentials:
-    registry: "YOUR_DOCKER_REGISTRY"
-    username: "YOUR_DOCKER_REGISTRY_USERNAME"
-    password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-  srsruntime:
+  srsRuntime:
     #srs-service values
     replicaCount: 2
     srsImage:

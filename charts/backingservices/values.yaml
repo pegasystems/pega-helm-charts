@@ -1,13 +1,16 @@
-srs:
-  #always set srs.provisionCluster=false when srs.enabled=false
-  enabled: true
-  deploymentName: acme-demo-dev-srs
+---
+global:
   imageCredentials:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+
+srs:
+  #always set srs.provisionCluster=false when srs.enabled=false
+  enabled: true
+  deploymentName: acme-demo-dev-srs
   #specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
-  srsruntime:
+  srsRuntime:
     replicaCount: 2
     srsImage:
       name: platform-services/fnx-search

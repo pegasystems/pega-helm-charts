@@ -119,7 +119,7 @@ var srsResources = []SearchResourceOption{
 		Kind: "NetworkPolicy",
 	},
 	{
-		Name: "srs-registry-secret",
+		Name: "test-srs-reg-secret",
 		Kind: "Secret",
 	},
 }

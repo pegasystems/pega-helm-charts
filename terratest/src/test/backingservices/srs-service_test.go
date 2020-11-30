@@ -31,7 +31,4 @@ func VerifySRSService(t *testing.T, serviceObj *k8score.Service) {
 	require.Equal(t, serviceObj.Spec.Ports[0].Name, "rest")
 	require.Equal(t, serviceObj.Spec.Ports[0].Port, int32(8080))
 	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, intstr.FromInt(8080))
-	require.Equal(t, serviceObj.Spec.Ports[1].Name, "management")
-	require.Equal(t, serviceObj.Spec.Ports[1].Port, int32(8081))
-	require.Equal(t, serviceObj.Spec.Ports[1].TargetPort, intstr.FromInt(8081))
 }

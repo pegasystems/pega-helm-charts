@@ -14,12 +14,12 @@ func TestSRSDeployment(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
-			"srs.imageCredentials.registry": "docker-registry.io",
-			"srs.srsruntime.replicaCount": "1",
-			"srs.srsruntime.srsImage.name": "platform-services/fnx-search",
-			"srs.srsruntime.srsImage.version": "latest",
-			"srs.srsruntime.env.AuthEnabled": "false",
-			"srs.srsruntime.env.PublicKeyURL": "",
+			"global.imageCredentials.registry": "docker-registry.io",
+			"srs.srsRuntime.replicaCount": "1",
+			"srs.srsRuntime.srsImage.name": "platform-services/fnx-search",
+			"srs.srsRuntime.srsImage.version": "latest",
+			"srs.srsRuntime.env.AuthEnabled": "false",
+			"srs.srsRuntime.env.PublicKeyURL": "",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -52,16 +52,16 @@ func TestSRSDeploymentVariables(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs-dev",
-			"srs.imageCredentials.registry": "docker-registry.io",
-			"srs.srsruntime.replicaCount": "3",
-			"srs.srsruntime.srsImage.name": "platform-services/fnx-search",
-			"srs.srsruntime.srsImage.version": "1.0.0",
-			"srs.srsruntime.env.AuthEnabled": "true",
-			"srs.srsruntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
-			"srs.srsruntime.resources.limits.cpu": "2",
-			"srs.srsruntime.resources.limits.memory": "4Gi",
-			"srs.srsruntime.resources.requests.cpu": "1",
-			"srs.srsruntime.resources.requests.memory": "2Gi",
+			"global.imageCredentials.registry": "docker-registry.io",
+			"srs.srsRuntime.replicaCount": "3",
+			"srs.srsRuntime.srsImage.name": "platform-services/fnx-search",
+			"srs.srsRuntime.srsImage.version": "1.0.0",
+			"srs.srsRuntime.env.AuthEnabled": "true",
+			"srs.srsRuntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
+			"srs.srsRuntime.resources.limits.cpu": "2",
+			"srs.srsRuntime.resources.limits.memory": "4Gi",
+			"srs.srsRuntime.resources.requests.cpu": "1",
+			"srs.srsRuntime.resources.requests.memory": "2Gi",
 			"srs.elasticsearch.provisionCluster": "false",
 			"srs.elasticsearch.domain": "es-id.managed.cloudiest.io",
 			"srs.elasticsearch.port": "443",
@@ -109,8 +109,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, pod.Containers[0].Image, expectedSpec.imageURI)
 	require.Equal(t, pod.Containers[0].Ports[0].Name, "srs-port")
 	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
-	require.Equal(t, pod.Containers[0].Ports[1].Name, "srs-mgmt")
-	require.Equal(t, pod.Containers[0].Ports[1].ContainerPort, int32(8081))
 	var envIndex int32 = 0
 	require.Equal(t, "ELASTICSEARCH_HOST", pod.Containers[0].Env[envIndex].Name )
 	require.Equal(t, expectedSpec.elasticsearchEndPoint.domain, pod.Containers[0].Env[envIndex].Value)
@@ -132,9 +130,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	envIndex++
 	require.Equal(t, "PUBLIC_KEY_URL", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.publicKeyURL, pod.Containers[0].Env[envIndex].Value)
-	envIndex++
-	require.Equal(t, "MANAGEMENT_PORT", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, "8081", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 
 	require.Equal(t, expectedSpec.podLimits.cpuLimit, pod.Containers[0].Resources.Limits.Cpu().String())

@@ -7,7 +7,7 @@ metadata:
   labels:
 {{- include "srs.srs-service.labels" . | indent 4 }}
 spec:
-  replicas: {{ .Values.srsruntime.replicaCount }}
+  replicas: {{ .Values.srsRuntime.replicaCount }}
   selector:
     matchLabels:
 {{- include "srs.srs-service.match-labels" . | indent 6 }}
@@ -24,14 +24,11 @@ spec:
 {{- include "srs.srs-service.antiaffinity" . | indent 8 }}
       containers:
         - name: srs-service
-          image: {{ .Values.imageCredentials.registry }}/{{ .Values.srsruntime.srsImage.name }}:{{ .Values.srsruntime.srsImage.version }}
-          imagePullPolicy: {{ .Values.srsruntime.srsImage.pullPolicy }}
+          image: {{ .Values.global.imageCredentials.registry }}/{{ .Values.srsRuntime.srsImage.name }}:{{ .Values.srsRuntime.srsImage.version }}
+          imagePullPolicy: {{ .Values.srsRuntime.srsImage.pullPolicy }}
           ports:
             - name: srs-port
               containerPort: 8080
-              protocol: TCP
-            - name: srs-mgmt
-              containerPort: 8081
               protocol: TCP
           readinessProbe:
             httpGet:
@@ -53,11 +50,9 @@ spec:
             - name: APPLICATION_PORT
               value: "8080"
             - name: AUTH_ENABLED
-              value: "{{ .Values.srsruntime.env.AuthEnabled | default "false" }}"
+              value: "{{ .Values.srsRuntime.env.AuthEnabled | default "false" }}"
             - name: PUBLIC_KEY_URL
-              value: "{{ .Values.srsruntime.env.PublicKeyURL }}"
-            - name: MANAGEMENT_PORT
-              value: "8081"
+              value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
           resources:
-            {{- toYaml .Values.srsruntime.resources | nindent 12 }}
+            {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
 {{ end }}

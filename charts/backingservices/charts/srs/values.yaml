@@ -3,13 +3,8 @@
 # Declare variables to be passed into your templates.
 enabled: true
 deploymentName: srs
-# If using a custom Docker registry, supply the credentials here to pull Docker images.
-imageCredentials:
-  registry: "YOUR_DOCKER_REGISTRY"
-  username: "YOUR_DOCKER_REGISTRY_USERNAME"
-  password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
-srsruntime:
+srsRuntime:
   #srs-service values
   replicaCount: 2
   srsImage:
