@@ -80,7 +80,7 @@ To create access keys for an IAM user:
    - Access key ID: AKIAIOSFODNN7EXAMPLE
    - Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
-   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](####-Updating-the-addons-Helm-chart-values).
+   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](#-Updating-the-addons-Helm-chart-values).
 
 6. To download the key pair, choose Download .csv file. Store the keys in a secure location. You will not have access to the secret access key again after this dialog box closes.
 
@@ -438,7 +438,7 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
    ```
-   
+
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
 #### Updating the pega Helm chart values
