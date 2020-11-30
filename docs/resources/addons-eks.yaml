@@ -14,11 +14,12 @@ aws-alb-ingress-controller:
   ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
   autoDiscoverAwsVpcID: false
   ## VPC ID of your EKS cluster. This setting is required if ec2metadata is unavailable from controller pod
-  ## Required if you set the autoDiscoverAwsVpcID parameter = true.
+  ## Required if you set the autoDiscoverAwsVpcID parameter = false.
   awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
+  # Add your access key ID and secret access key for the primary IAM user who is responsible for your EKS deployment.
   extraEnv: {}
-  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 
 traefik:
   enabled: false

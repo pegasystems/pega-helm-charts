@@ -80,11 +80,13 @@ To create access keys for an IAM user:
    - Access key ID: AKIAIOSFODNN7EXAMPLE
    - Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
+   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](####-Updating-the-addons-Helm-chart-values).
+
 6. To download the key pair, choose Download .csv file. Store the keys in a secure location. You will not have access to the secret access key again after this dialog box closes.
 
    Keep the keys confidential in order to protect your AWS account and never email them. Do not share them outside your organization, even if an inquiry appears to come from AWS or Amazon.com. No one who legitimately represents Amazon will ever ask you for your secret key.
 
-7. After you download the .csv file, choose Close. 
+7. After you download the .csv file, choose Close.
 
 When you create an access key, the key pair is active by default, and you can use the pair right away.
 
@@ -111,9 +113,17 @@ Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, wh
 
 To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, Pega supports using an SSL certificate that you create or import into AWS Credential Manager. After you have your Amazon Resource Name (ARN) credential using this certificate, you must add an annotation to the web tier ingress configuration so the deployment passes your ARN certificate to the web tier.
 
-To import or create a new SSL certificate, see [Importing Certificates into AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html). After you have your ARN certificate, use the appropriate annotation:
+To import or create a new SSL certificate, see [Importing Certificates into AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html). After you have your ARN certificate, include a reference to the required ARN certificate using an appropriate "web tier" annotation as in the example:
 
-For EKS - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\> to specify required ARN certificate.
+```yaml
+tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+            ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
+```
+Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.  
 
 ### Making your Docker images available to your deployment
 
@@ -405,7 +415,7 @@ To customize these files, you must download them from the source github reposito
 
 These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your organization's EKS deployment of Pega Platform.
 
-#### Updating the addons.yaml Helm chart values
+#### Updating the addons Helm chart values
 
 Use the provided example addons-eks.yaml file to configure the use of an Amazon AWS ALB ingress controller. Pega provides this example file as a convenient way to quickly configure your addons file appropriately for EKS deployments. You can use it in place of filing our the default values.yaml file in the /addons directory.
 
@@ -421,16 +431,17 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 - Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
 - To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
 - Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
-- Specify any additional, required authentication access keys in the area:
+- Specify the required access key ID and secret access key for the primary IAM user who is responsible for your EKS deployment in the area:
 
    ```yaml
    extraEnv: {}
    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
    ```
+   
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
-#### Updating the pega.yaml Helm chart values
+#### Updating the pega Helm chart values
 
 To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \EKS-demo folder you have already created on your local system. 
 
