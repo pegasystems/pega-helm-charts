@@ -405,17 +405,19 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 
 2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your AKS requirements:
 
+- Specify `aws-alb-ingress-controller:> enabled: true` to install an AWS ALB ingress controller for your deployment.
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
 - To allow your deployment to automatically determine the AWS region of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsRegion: true`. The setting is disabled by default.
 - Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
 - To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
 - Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
+- Specify any additional, required authentication access keys in the area:
 
-TBD: We need help define what to use these settings for:
-extraEnv: {}
-AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
-
+   ```yaml
+   extraEnv: {}
+   AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
+   AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+   ```
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
 #### Updating the pega.yaml Helm chart values
@@ -444,11 +446,11 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    |-------------------------|-------------------------------------------|--------------|
    | provider:               | Specify an EKS deployment.                 | provider:"eks"|
    | actions.execute:        | Specify a “deploy” deployment type.       | execute: "deploy"   |
-   | Jdbc.url:               | Specify the database IP address and database name for your Pega Platform installation.        | <ul><li>url: "jdbc:postgresql://**localhost**:5432/`pega`"</li><li>where **localhost** is the public IP address you configured for your database connectivity and `pega` is the recommended name of the database you created in your RDS DB instance.</li></ul>  |
+   | jdbc.url:               | Specify the database IP address and database name for your Pega Platform installation.        | <ul><li>url: "jdbc:postgresql://**localhost**:5432/`pega`"</li><li>where **localhost** is the public IP address you configured for your database connectivity and `pega` is the recommended name of the database you created in your RDS DB instance.</li></ul>  |
    | jdbc.driverClass:       | Specify the driver class for a PostgreSQL database. | driverClass: "org.postgresql.Driver"|
    | jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
    | jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul> <li>driverUri: "latest jar file available” </li> <li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>    |
-   | Jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>   |
+   | jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>   |
    | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data"    |
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
