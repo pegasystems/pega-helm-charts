@@ -80,7 +80,7 @@ To create access keys for an IAM user:
    - Access key ID: AKIAIOSFODNN7EXAMPLE
    - Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
-   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](#-Updating-the-addons-Helm-chart-values).
+   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](#Updating-the-addons-Helm-chart-values).
 
 6. To download the key pair, choose Download .csv file. Store the keys in a secure location. You will not have access to the secret access key again after this dialog box closes.
 
