@@ -14,7 +14,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
    - To prepare a local Linux system, install required applications and configuration files - [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
-    - To prepare a local Windows system, install required applications and configuration files -
+   - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
 2. Create an Amazon EKS cluster and create an Amazon RDS instance in your AWS account - [Prepare your Amazon EKS resources – 45 minutes](#prepare-your-resources--45-minutes).
@@ -109,7 +109,7 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 ### Managing SSL certificates in AWS certificate manager
 
-Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For details, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
+Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For an overview, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
 
 To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, Pega supports using an SSL certificate that you create or import into AWS Credential Manager. After you have your Amazon Resource Name (ARN) credential using this certificate, you must add an annotation to the web tier ingress configuration so the deployment passes your ARN certificate to the web tier.
 
@@ -125,7 +125,7 @@ ingress:
             ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
 ```
 
-Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration. You add these paramaters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
+Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
 
 ### Making your Docker images available to your deployment
 
@@ -362,7 +362,7 @@ After you note the security groups for each of your deployment's worker nodes, p
 
    d. In the **Edit inbound rules** page, click **Add rule** with the following parameters:
 
-   - **Type** - select `PostgreSQL`.
+   - **Type** - select **PostgreSQL**.
    - **Protocol** and **Port range** are set automatically.
    - **Source** - select **Custom** and use the search tool to find a security group associated with the worker nodes in your organization's deployment and then select that security group.
 
@@ -372,7 +372,7 @@ After you note the security groups for each of your deployment's worker nodes, p
 
 After you complete these steps, your EKS cluster has the  appropriate access to the RDS DB instance and you can proceed to the next section.
 
-#### Optional: Reviewing or creating a database in your RDS DB instance 
+#### Optional: Reviewing or creating a database in your RDS DB instance
 
 The RDS DB instance must contain a database in order to install Pega Platform in your EKS deployment. If you did not create a PostgreSQL database in your new RDS DB instance in step 5k, you must do it now. If you did, you can also review the database and add any organizational requirements other than a password. Use the database editing tool of your choice to log into your RDS DB instance and create this new PostgreSQL database. The following example used pgAdmin4.
 
