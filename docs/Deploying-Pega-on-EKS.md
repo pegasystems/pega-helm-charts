@@ -12,16 +12,16 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 1. Prepare your local system:
 
-   - To prepare a local Linux system, install required applications and configuration files - [Preparing your local Linux system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+   - To prepare a local Linux system, install required applications and configuration files - [Preparing your local Linux system – 45 minutes](prepping-local-system-runbook-linux.md).
 
    - To prepare a local Windows system, install required applications and configuration files -
-    [Preparing your local Windows 10 system – 45 minutes](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+   [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
-2. Create an Amazon EKS cluster and create an Amazon RDS instance in your AWS account - [Prepare your Amazon EKS resources – 45 minutes](#prepare-your-resources--45-minutes).
+2. Create an Amazon EKS cluster and create an Amazon RDS instance in your AWS account - [Prepare your Amazon EKS resources – 45 minutes](#prepare-your-Amazon-EKS-resources--45-minutes).
 
 3. Customize a configuration file with your Amazon EKS cluster details and use the command-line tools, AWS CLI, eksctl, kubectl and Helm, to install and then deploy Pega Platform onto your Amazon EKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
-4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging into Pega Platform – 10 minutes](#logging-into-pega-platform--10-minutes).
+4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging in to Pega Platform – 10 minutes](#logging-in-to-pega-platform--10-minutes).
 
 To understand how Pega maps Kubernetes objects with Pega applications and services, see [Understanding the Pega deployment architecture](https://community.pega.com/knowledgebase/articles/client-managed-cloud/cloud/understanding-pega-deployment-architecture).
 
@@ -476,12 +476,13 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>   |
    | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data"    |
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
-   | docker.pega.image:       | Refer to the latest Pega Platform deployment image on DockerHub.  | <ul><li>Image: "pegasystems/pega:latest" </li><li>For a list of default images that Pega provides: <https://hub.docker.com/r/pegasystems/pega-ready/tags></li></ul> |
+   | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
    | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: "alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn>\"</li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
    | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
-   | installer.image:        | Specify the Docker image you built to install Pega Platform. | <ul><li>Image: "\<your installation Docker image :your tag\>" </li><li>You created this image in  [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)</li></ul>|
-   | installer. adminPassword:                | Specify a password for your initial log in to Pega Platform.    | adminPassword: "\<initial password\>"  |
+   | pegasearch.image: | Specify the Pega-provided Docker `search` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
+   | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
+   | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".     | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
 
@@ -511,7 +512,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
    namespace/pegaaddons created
    ```
 
-3. Install the addons chart, which you updated in [Preparing your local system](#Prepare-your-local-system-–-45-minutes).
+3. Install the addons Helm chart, which you updated in [Updating the addons Helm chart values](#Updating-the-addons-Helm-chart-values).
 
    ```yaml
    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -519,7 +520,8 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
    The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-4. Deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart.
+4. Deploy Pega Platform for the first time by 
+installing the pega Helm chart, which you updated in [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values). This installs Pega Platform software into the database you specified in the pega chart.
 
    ```yaml
    helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy

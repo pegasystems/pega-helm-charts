@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
-2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--60-minutes).
+2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 60 minutes](#prepare-your-aks-resources--60-minutes).
 
 3.  Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -463,8 +463,8 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
-| installer.image:        | Specify the Docker `installer` image for installing Pega Platform. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
+| pegasearch.image: | Specify the Pega-provided Docker `search` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
+| installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
