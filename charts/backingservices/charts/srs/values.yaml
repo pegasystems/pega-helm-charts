@@ -1,3 +1,4 @@
+---
 # Default values for srs-search.
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
@@ -5,7 +6,7 @@ enabled: true
 deploymentName: srs
 
 srsRuntime:
-  #srs-service values
+  # srs-service values
   replicaCount: 2
   srsImage:
     name: platform-services/fnx-search
@@ -20,6 +21,6 @@ srsRuntime:
       memory: "2Gi"
   serviceType: "ClusterIP"
   env:
-    #AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
+    # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
     AuthEnabled: false
     PublicKeyURL:

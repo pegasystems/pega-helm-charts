@@ -6,16 +6,16 @@ global:
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
 srs:
-  #always set srs.provisionCluster=false when srs.enabled=false
+  # always set srs.provisionCluster=false when srs.enabled=false
   enabled: true
   deploymentName: acme-demo-dev-srs
-  #specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
+  # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   srsRuntime:
     replicaCount: 2
     srsImage:
       name: platform-services/fnx-search
       version: 1.7.0
-  #This section specifies the elasticsearch cluster configuration.
+  # This section specifies the elasticsearch cluster configuration.
   elasticsearch:
     # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
     provisionCluster: true
@@ -26,7 +26,7 @@ srs:
 #    protocol: https
 
 
-#This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
+# This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
@@ -45,7 +45,7 @@ elasticsearch:
       cpu: "1000m"
       memory: "1Gi"
   volumeClaimTemplate:
-    accessModes: [ "ReadWriteOnce" ]
+    accessModes: ["ReadWriteOnce"]
     storageClassName: "standard"
     resources:
       requests:
