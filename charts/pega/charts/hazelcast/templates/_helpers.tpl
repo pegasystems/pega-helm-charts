@@ -10,6 +10,7 @@
  {{- end -}}
 {{- end }}
 
+# Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
 {{- define "generatedHazelcastServicePodAnnotations" }}
 {{- end }}
 
