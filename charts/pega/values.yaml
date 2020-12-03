@@ -227,3 +227,7 @@ hazelcast:
   enabled: false
   # No. of initial members to join
   replicas: 3
+  # UserName to be used in client server hazelcast mode for authentication
+  username: ""
+  # Password to be used in client server hazelcast mode for authentication
+  password: ""

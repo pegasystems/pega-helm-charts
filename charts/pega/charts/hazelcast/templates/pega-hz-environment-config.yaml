@@ -33,4 +33,7 @@ data:
 {{- if .Values.server.mancenter_url }}
   MANCENTER_URL: {{ .Values.server.mancenter_url | quote }}
 {{- end }}
+{{- if .Values.server.hz_graceful_shutdown_max_wait_seconds }}
+  HZ_GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds | quote }}
+{{- end }}
 {{ end }}

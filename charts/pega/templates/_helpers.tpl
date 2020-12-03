@@ -236,3 +236,11 @@ true
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}
+
+{{- define "isHzEnabled" }}
+  {{- if (eq .Values.hazelcast.enabled true) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
