@@ -14,7 +14,7 @@ import (
 )
 
 
-var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra"}
+var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra", "wait-for-hazelcast"}
 
 func TestPegaTierDeployment(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
