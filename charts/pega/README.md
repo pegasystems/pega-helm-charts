@@ -426,6 +426,20 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
+
+### Service Account
+
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
 ### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
