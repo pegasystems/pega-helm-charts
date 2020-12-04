@@ -8,13 +8,18 @@ global:
 srs:
   # always set srs.provisionCluster=false when srs.enabled=false
   enabled: true
-  deploymentName: acme-demo-dev-srs
+  deploymentName: pega-shared-srs
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   srsRuntime:
     replicaCount: 2
     srsImage:
       name: platform-services/fnx-search
       version: 1.7.0
+    env:
+      # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
+      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
+      AuthEnabled: false
+      PublicKeyURL: ""
   # This section specifies the elasticsearch cluster configuration.
   elasticsearch:
     # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
@@ -46,9 +51,7 @@ elasticsearch:
       memory: "1Gi"
   volumeClaimTemplate:
     accessModes: ["ReadWriteOnce"]
-    storageClassName: "standard"
     resources:
       requests:
-        # configure volume size based on 2 * [sum of expected search data size (based on existing search) from each
-        # pega environment which will be sharing the Search Service].
-        storage: 20Gi
+        # configure volume size of the elasticsearch nodes based on search data storage requirements. The default storage size from elasticsearch is 30Gi.
+        storage: 30Gi
