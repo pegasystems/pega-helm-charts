@@ -78,6 +78,11 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
+{{- if ne .Values.global.provider "openshift" }}
+      securityContext:
+        fsGroup: 0
+        runAsUser: {{ .node.securityContext.runAsUser | default 9001 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
