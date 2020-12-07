@@ -168,7 +168,7 @@ spec:
           mountPath: "/opt/pega/config"
 {{- if (.node.volumeClaimTemplate) }}
         - name: {{ .name }}
-          mountPath: "/opt/pega/streamvol"
+          mountPath: "/opt/pega/kafkadata"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.volumeMounts }}
