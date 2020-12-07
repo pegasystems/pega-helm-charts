@@ -81,7 +81,11 @@ spec:
 {{- if ne .Values.global.provider "openshift" }}
       securityContext:
         fsGroup: 0
-        runAsUser: {{ .node.securityContext.runAsUser | default 9001 }}
+{{- if .node.securityContext.runAsUser }}
+        runAsUser: {{ .node.securityContext.runAsUser }}
+{{- else }}
+        runAsUser: 9001
+{{- end }}
 {{- end }}
       containers:
       # Name of the container
