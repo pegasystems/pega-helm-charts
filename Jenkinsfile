@@ -4,8 +4,7 @@ def labels = ""
 def bintrayPackageVersion = "1.0.0" 
 def curlSuccessStatus = '{"message":"success"}'
 
-node("pc-2xlarge") {
-
+node {
       stage("Init"){
           if (env.CHANGE_ID) {
             pullRequest.labels.each{
@@ -71,7 +70,7 @@ node("pc-2xlarge") {
       stage("Setup Cluster and Execute Tests") {
           
           jobMap = [:]
-          jobMap["job"] = "../kubernetes-test-orchestrator/US-366319"
+          jobMap["job"] = "../kubernetes-test-orchestrator/master"
           jobMap["parameters"] = [
                                   string(name: 'PROVIDERS', value: labels),
                                   string(name: 'WEB_READY_IMAGE_NAME', value: ""),
@@ -81,15 +80,15 @@ node("pc-2xlarge") {
           jobMap["quietPeriod"] = 0 
           resultWrapper = build jobMap
           currentBuild.result = resultWrapper.result
-          echo "Into Trigger Orchestrator"
       } 
   }
 
 def validateProviderLabel(String provider){
     def validProviders = ["integ-all","integ-eks","integ-gke","integ-aks"]
+    def failureMessage = "Invalid provider label - ${provider}. valid labels are ${validProviders}"
     if(!validProviders.contains(provider)){
         currentBuild.result = 'FAILURE'
-        pullRequest.comment("Invalid provider label - ${provider}. valid labels are ${validProviders}")
-        throw new Exception("Invalid provider label - ${provider}. valid labels are ${validProviders}")
+        pullRequest.comment("${failureMessage}")
+        throw new Exception("${failureMessage}")
     }
 }

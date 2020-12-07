@@ -69,7 +69,7 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
 	} else if provider == "gke" {
 		require.Equal(t, `{"ingress": true}`, serviceObj.Annotations["cloud.google.com/neg"])
-		var expectedBackendConfig = fmt.Sprintf(`{"ports": {"%d": "pega-backend-config"}}`, expectedService.Port)
+		var expectedBackendConfig = fmt.Sprintf(`{"ports": {"%d": "%s"}}`, expectedService.Port, expectedService.Name)
 		require.Equal(t, expectedBackendConfig, serviceObj.Annotations["beta.cloud.google.com/backend-config"])
 		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("NodePort"))
 	}
