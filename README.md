@@ -125,16 +125,18 @@ For details, see the examples listed in the preparation runbook:
 
 Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
- Name        | Description                                           | Tags     |
--------------|-------------------------------------------------------|----------|
-`platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
-`platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
-`platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
-`platform/srs` | (Download required) Deploys the required search engine for Pega Infinity next-gen search and reporting capabilities. This Docker image contains Pega Search and Reporting Service.| `<version>` or `<version>-YYYYMMDD` |
+ Name                                           | Description                                           | Tags     |
+------------------------------------------------|-------------------------------------------------------|----------|
+`platform/installer`                            | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
+`platform/pega`                                 | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
+`platform/search`                               | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
+`platform-services/search-n-reporting-service`  | (Download required) Deploys the required search engine for Pega Infinity next-gen search and reporting capabilities. This Docker image contains Pega Search and Reporting Service.| `<version>` or `<version>-YYYYMMDD` |
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
 For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
+
+The docker image `platform-services/search-n-reporting-service` is part of the chart `backingservices\addons`, `srs` subchart deployment which provisions an alternate pega search feature to the `platform/search` image based search setup.  [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 

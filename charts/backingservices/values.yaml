@@ -13,7 +13,7 @@ srs:
   srsRuntime:
     replicaCount: 2
     srsImage:
-      name: platform-services/fnx-search
+      name: platform-services/search-n-reporting-service
       version: 1.7.0
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.

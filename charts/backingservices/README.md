@@ -54,7 +54,7 @@ srs:
     #srs-service values
     replicaCount: 2
     srsImage:
-        name: platform-services/fnx-search
+        name: platform-services/search-n-reporting-service
         version: 1.6.1
         pullPolicy: IfNotPresent
     resources:
