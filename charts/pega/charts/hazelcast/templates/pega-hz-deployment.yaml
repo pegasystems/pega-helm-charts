@@ -19,6 +19,7 @@ spec:
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
+      terminationGracePeriodSeconds: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds }}
       containers:
       - name: hazelcast
         image: {{ .Values.image }}

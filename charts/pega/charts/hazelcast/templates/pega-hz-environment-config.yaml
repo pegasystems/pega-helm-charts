@@ -36,4 +36,7 @@ data:
 {{- if .Values.server.hz_graceful_shutdown_max_wait_seconds }}
   HZ_GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds | quote }}
 {{- end }}
+{{- if .Values.server.service_dns_timeout }}
+  SERVICE_DNS_TIMEOUT: {{ .Values.server.service_dns_timeout | quote }}
+{{- end }}
 {{ end }}
