@@ -116,6 +116,7 @@ global:
 
       hpa:
         enabled: true
+      # runAsUser: 9001
 
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
@@ -137,6 +138,7 @@ global:
 
       hpa:
         enabled: true
+      # runAsUser: 9001
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -174,6 +176,7 @@ global:
         resources:
           requests:
             storage: 5Gi
+      # runAsUser: 9001
 
 # External services
 

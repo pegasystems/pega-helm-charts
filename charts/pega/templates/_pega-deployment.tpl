@@ -78,10 +78,10 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if ne .Values.global.provider "openshift" }}
+{{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
         fsGroup: 0
-{{- if .node.securityContext.runAsUser }}
+{{- if .node.runAsUser }}
         runAsUser: {{ .node.securityContext.runAsUser }}
 {{- else }}
         runAsUser: 9001
