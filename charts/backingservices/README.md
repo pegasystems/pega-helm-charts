@@ -1,6 +1,6 @@
 # BackingServices Helm chart
 
-A backing service is a feature from Pega Infinity platform which can be deployed as an independent service module. For example `Search and Reporting Service` or `SRS` is a backing service which can replace the embedded search feature from Pega Infinity Platform and can be provisioned independently and configured as an external service providing search capabilities with one or more Pega Infinity environments.  
+The Pega Infinity backing service is a feature which you can deploy as an independent service module. For example `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with one or more Pega Infinity environments.  
 
 The backingservices chart supports deployment options for `Search and Reporting Service` (abbreviated as SRS). A backing service may be configured with one or more Pega deployments. 
 These backing services should be deployed in their own namespace and may be shared across multiple Pega Infinity environments.
@@ -8,14 +8,14 @@ These backing services should be deployed in their own namespace and may be shar
 **Example:**
 
 **_Single backing service shared across all pega environments:_**
-backingservice 'Search and Reporting Service' provisioned in its own namespace, and the service endpoint configured across dev, staging and production pega environments. The service provides isolation of data in a shared setup.
+You can provision the backingservice `Search and Reporting Service` in its own namespace, with the service endpoint configured across dev, staging and production Pega Infinity environments. This service configuration provides isolation of data in a shared setup.
 
 **_Multiple backing service deployments:_**
-You can deploy more than one instance of backing service deployments, in case you want to host a separate deployment of 'Search and Reporting Service' for non-prod and production pega infinity environments. You need to configure the appropriate service endpoint with the pega infinity deployment values.
+You can deploy more than one instance of backing service deployments, in case you want to host a separate deployment of 'Search and Reporting Service' for non-production and production deployments of Pega Infinity. You must configure each service endpoint appropriately for each Pega Infinity deployment.
 
 ### Search and Reporting Service
 
-The Search and Reporting Service provides next gen search capabilities to the Pega Infinity platform 8.6 and above versions. 
+The Search and Reporting Service provides next generation search and reporting capabilities for Pega Infinity 8.6 and later. 
 
 This service replaces the legacy search module from the platform with an independently deployable and scalable service along with the built-in capabilities to support more than one Pega environments with its data isolation features. 
 The service deployment provisions runtime service pods along with a dependency on a backing technology ElasticSearch service for storage and retrieval of data. 

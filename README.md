@@ -38,16 +38,16 @@ $ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 ```bash
 $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
-pega/pega  	            1.2.0        	           	Pega installation on kubernetes
-pega/addons	            1.2.0        	1.0        	A Helm chart for Kubernetes 
-pega/backingservices	    1.2.0        	0.1.0           A Helm chart for Kubernetes
+pega/pega  	              1.2.0        	           	Pega installation on kubernetes
+pega/addons	              1.2.0        	1.0        	A Helm chart for Kubernetes 
+pega/backingservices          1.2.0        	                A Helm chart for Kubernetes
 ```
 
-There are three charts available in this repository - addons, backingservices and pega.
+There are three charts available in this repository - addons, backingservices, and pega.
 
 The addons chart installs a collection of supporting services and tools required for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
 
-The backingservices chart installs services like 'Search and Reporting Service' ( abbreviated as SRS) than can be configured with one or more Pega deployments. These backing services can be deployed in their own namespace can can be shared across multiple Pega Infinity environments.
+The backingservices chart installs services like 'Search and Reporting Service' ( abbreviated as SRS) that you can configure with one or more Pega deployments. You can deploy these backing services in their own namespace; you can isolate the services to a single environment or share them across multiple Pega Infinity environments.
 
 **Example:**
 _Single backing service shared across all pega environments:_
@@ -56,7 +56,7 @@ backingservice 'Search and Reporting Service' deployed and the service endpoint 
 
 _Multiple backing service deployments:_
 
-You can deploy more than one instance of backing service deployments, in case you want to host a seperate deployment of 'Search and Reporting Service' for non-prod and production pega infinity environments. You need to configure the appropriate service endpoint with the pega infinity deployment values.
+You can deploy more than one instance of backing service deployments, in case you want to host a separate deployment of 'Search and Reporting Service' for non-production and production deployments of Pega Infinity. You must configure the appropriate service endpoint using the Pega Infinity deployment values.
 
 3. Download the values file for pega/pega, pega/addons and pega/backingservices.
 
@@ -92,15 +92,15 @@ $ helm install backingservices pega/backingservices --namespace pegabackingservi
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-8. Now you can deploy Pega using the Helm chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace.  
+8. With addons and backservices deployed, you are ready to deploy Pega Infinity using the pega chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace. After you edit the chart with your configuration requirements, run the following command to install the pega chart. 
 
 ```bash
 $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 ```
 
-*If you want to edit the charts and build using your local copy, replace pega/addons, pega/backingservices or pega/pega with the path to your chart directory.*
+*To edit the charts and deploy using a local version of the pega/addons, pega/backingservices, or pega/pega charts, you must include the filepath to your local chart directory in your Helm chart reference.*
 
-9. If you wish to delete your deployment of Pega nodes, enter the following command (this will not delete your database):
+9. To delete your deployment of Pega nodes, enter the command (this will not delete your database):
 
 ```bash
 $ helm delete mypega
@@ -130,13 +130,13 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 `platform/installer`                            | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
 `platform/pega`                                 | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
 `platform/search`                               | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
-`platform-services/search-n-reporting-service`  | (Download required) Deploys the required search engine for Pega Infinity next-gen search and reporting capabilities. This Docker image contains Pega Search and Reporting Service.| `<version>` or `<version>-YYYYMMDD` |
+`platform-services/search-n-reporting-service`  | (Download required) Deploys the required search engine for the latest generation of search and reporting capabilities in Pega Infinity. This Docker image contains Pega Search and Reporting Service.| `<version>` or `<version>-YYYYMMDD` |
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
 For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
 
-The docker image `platform-services/search-n-reporting-service` is part of the chart `backingservices\addons`, `srs` subchart deployment which provisions an alternate pega search feature to the `platform/search` image based search setup.  [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
+The docker image `platform-services/search-n-reporting-service` is part of the chart `backingservices\addons`. The `srs` subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity; this service is an alternate search feature to the previous `platform/search` image-based search deployment.  [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
