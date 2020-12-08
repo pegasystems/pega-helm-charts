@@ -9,9 +9,9 @@ import (
 	"fmt"
 )
 
-var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 
 func TestPegaCredentialsSecret(t *testing.T){
+    var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"install","install-deploy", "upgrade", "upgrade-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
