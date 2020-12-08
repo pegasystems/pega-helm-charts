@@ -32,5 +32,5 @@ server:
   hz_max_join_seconds: ""
   group_name: "PRPC"
   mancenter_url: ""
-  hz_graceful_shutdown_max_wait_seconds: ""
+  hz_graceful_shutdown_max_wait_seconds: "600"
   service_dns_timeout: ""
