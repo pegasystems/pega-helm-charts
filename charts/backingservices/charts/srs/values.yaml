@@ -5,13 +5,12 @@
 enabled: true
 deploymentName: pega-shared-srs
 
+# srs-service configuration
 srsRuntime:
-  # srs-service values
   replicaCount: 2
-  srsImage:
-    name: platform-services/search-n-reporting-service
-    version: 1.7.0
-    pullPolicy: IfNotPresent
+  # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
+  srsImage: "YOUR_SRS_IMAGE:TAG"
+  imagepullPolicy: IfNotPresent
   resources:
     limits:
       cpu: 1300m

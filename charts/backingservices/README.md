@@ -53,10 +53,8 @@ srs:
   srsRuntime:
     #srs-service values
     replicaCount: 2
-    srsImage:
-        name: platform-services/search-n-reporting-service
-        version: 1.6.1
-        pullPolicy: IfNotPresent
+    srsImage: platform-services/search-n-reporting-service:1.6.1
+    imagepullPolicy: IfNotPresent
     resources:
         limits:
             cpu: 1300m

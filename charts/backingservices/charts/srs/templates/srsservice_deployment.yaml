@@ -11,8 +11,6 @@ spec:
   selector:
     matchLabels:
 {{- include "srs.srs-service.match-labels" . | indent 6 }}
-  strategy:
-    type: RollingUpdate
   template:
     metadata:
       labels:
@@ -24,8 +22,8 @@ spec:
 {{- include "srs.srs-service.antiaffinity" . | indent 8 }}
       containers:
         - name: srs-service
-          image: {{ .Values.global.imageCredentials.registry }}/{{ .Values.srsRuntime.srsImage.name }}:{{ .Values.srsRuntime.srsImage.version }}
-          imagePullPolicy: {{ .Values.srsRuntime.srsImage.pullPolicy }}
+          image: {{ .Values.srsRuntime.srsImage }}
+          imagePullPolicy: {{ .Values.srsRuntime.imagePullPolicy }}
           ports:
             - name: srs-port
               containerPort: 8080

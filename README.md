@@ -47,7 +47,7 @@ There are three charts available in this repository - addons, backingservices, a
 
 The addons chart installs a collection of supporting services and tools required for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
 
-The backingservices chart installs services like 'Search and Reporting Service' ( abbreviated as SRS) that you can configure with one or more Pega deployments. You can deploy these backing services in their own namespace; you can isolate the services to a single environment or share them across multiple Pega Infinity environments.
+The backingservices chart installs services like 'Search and Reporting Service' (SRS) that you can configure with one or more Pega deployments. You can deploy these backing services in their own namespace; you can isolate the services to a single environment or share them across multiple Pega Infinity environments.
 
 **Example:**
 _Single backing service shared across all pega environments:_

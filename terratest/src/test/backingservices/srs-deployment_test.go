@@ -16,8 +16,7 @@ func TestSRSDeployment(t *testing.T){
 			"srs.deploymentName": "test-srs",
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "1",
-			"srs.srsRuntime.srsImage.name": "platform-services/search-n-reporting-service",
-			"srs.srsRuntime.srsImage.version": "latest",
+			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:latest",
 			"srs.srsRuntime.env.AuthEnabled": "false",
 			"srs.srsRuntime.env.PublicKeyURL": "",
 		},
@@ -34,7 +33,7 @@ func TestSRSDeployment(t *testing.T){
 			"test-srs",
 			"srs-service",
 			int32(1),
-			"docker-registry.io/platform-services/search-n-reporting-service:latest",
+			"platform-services/search-n-reporting-service:latest",
 			"false",
 			"",
 			podResources{ "1300m", "2Gi", "650m", "2Gi"},
@@ -54,8 +53,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.deploymentName": "test-srs-dev",
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "3",
-			"srs.srsRuntime.srsImage.name": "platform-services/search-n-reporting-service",
-			"srs.srsRuntime.srsImage.version": "1.0.0",
+			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
 			"srs.srsRuntime.env.AuthEnabled": "true",
 			"srs.srsRuntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
 			"srs.srsRuntime.resources.limits.cpu": "2",
@@ -80,7 +78,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"test-srs-dev",
 			"srs-service",
 			int32(3),
-			"docker-registry.io/platform-services/search-n-reporting-service:1.0.0",
+			"platform-services/search-n-reporting-service:1.0.0",
 			"true",
 			"https://acme.authenticator.com/PublicKeyURL",
 			podResources{"2", "4Gi", "1", "2Gi"},
@@ -96,8 +94,6 @@ func VerifySRSDeployment(t *testing.T, deploymentObj appsv1.Deployment, expected
 	require.Equal(t, expectedDeployment.replicaCount, *deploymentObj.Spec.Replicas )
 	require.Equal(t, expectedDeployment.appName, deploymentObj.Spec.Selector.MatchLabels["app.kubernetes.io/name"])
 	require.Equal(t, "true", deploymentObj.Spec.Selector.MatchLabels["networking/allow-internet-egress"])
-
-	require.Equal(t, deploymentObj.Spec.Strategy.Type, appsv1.DeploymentStrategyType("RollingUpdate"))
 	require.Equal(t, expectedDeployment.appName, deploymentObj.Spec.Template.Labels["app.kubernetes.io/name"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment)

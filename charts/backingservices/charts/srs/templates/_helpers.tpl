@@ -1,12 +1,12 @@
 {{/*
-Expand the name of the chart.
+App name
 */}}
 {{- define "srs.name" -}}
 {{- default .Root.Chart.Name | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Create a default fully qualified app name.
+Create a default fully qualified deployment name. This is used to define the deployment resource name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
 */}}
@@ -27,13 +27,13 @@ If release name contains chart name it will be used as a full name.
 Create chart name and version as used by the chart label.
 */}}
 {{- define "srs.chart" -}}
-{{- $name := default "srs" }}
-{{- $version := default "0.1.0" }}
+{{- $name := "srs" }}
+{{- $version := "0.1.0" }}
 {{- printf "%s-%s" $name $version | replace "+" "_" | trunc 63 | trimSuffix "-" }}
 {{- end }}
 
 {{/*
-Common labels
+Common labels for all k8s resources
 */}}
 {{- define "srs.labels" }}
 helm.sh/chart: {{ include "srs.chart" . }}
@@ -45,7 +45,7 @@ app.kubernetes.io/managed-by: {{ .Root.Release.Service }}
 {{- end }}
 
 {{/*
-Selector labels
+Selector labels using app and release name
 */}}
 {{- define "srs.selectorLabels" -}}
 app.kubernetes.io/name: {{ include "srs.name" . }}
@@ -53,7 +53,7 @@ app.kubernetes.io/instance: {{ .Root.Release.Name }}
 {{- end }}
 
 {{/*
-Antiaffinity for pods
+Anti-affinity for pods
 */}}
 {{- define "srs.antiaffinity" -}}
 podAntiAffinity:
@@ -86,16 +86,9 @@ podAntiAffinity:
                 - {{ .Root.Release.Name }}
 {{- end -}}
 
-{{/*
-Generic labels
-*/}}
-{{- define "srs.generic.labels" -}}
-{{ $data := dict "Root" $ "Name" "" }}
-{{ include "srs.labels" $data }}
-{{- end -}}
 
 {{/*
-srs-service labels
+srs-service meta-data labels
 */}}
 {{- define "srs.srs-service.labels" -}}
 {{ $data := dict "Root" $ "Name" "srs-service" }}
@@ -151,15 +144,14 @@ srs-ops antiaffinity
   {{- with .Values.global.imageCredentials }}
   {{- printf "{\"auths\":{\"%s\":{\"username\":\"%s\",\"password\":\"%s\",\"auth\":\"%s\"}}}" .registry .username .password (printf "%s:%s" .username .password | b64enc) | b64enc }}
   {{- end }}
-  {{- end }}
-
+{{- end }}
 
 {{/*
   elasticsearch url details
 */}}
 {{- define "elasticsearch.domain" -}}
 {{- if .Values.elasticsearch.provisionCluster }}
-{{- $essvcname := default "elasticsearch-master" }}
+{{- $essvcname := "elasticsearch-master" }}
 {{- printf "%s.%s.svc" $essvcname .Release.Namespace | trimSuffix "-" }}
 {{- else }}
 {{- required "A valid '.Values.elasticsearch.domain' entry is required when connecting to external Elasticsearch!" .Values.elasticsearch.domain }}
@@ -181,3 +173,27 @@ srs-ops antiaffinity
 {{- required "A valid ''.Values.elasticsearch.protocol' entry is required when connecting to external Elasticsearch!" .Values.elasticsearch.protocol | quote  }}
 {{- end }}
 {{- end }}
+
+
+{{/*
+Network policy: kube-dns
+*/}}
+{{- define "srs.netpol.kube-dns" -}}
+- namespaceSelector:
+    matchLabels:
+      name: kube-system
+- podSelector:
+    matchExpressions:
+      - key: k8s-app
+        operator: In
+        values: ["kube-dns", "coredns"]
+ports:
+- protocol: TCP
+  port: 53
+- protocol: TCP
+  port: 1053
+- protocol: TCP
+  port: 80
+- protocol: TCP
+  port: 8080
+{{- end -}}

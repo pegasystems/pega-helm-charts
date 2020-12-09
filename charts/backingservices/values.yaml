@@ -10,15 +10,16 @@ srs:
   enabled: true
   deploymentName: pega-shared-srs
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
+  # srs-service configuration
   srsRuntime:
+    # Number of pods to provision
     replicaCount: 2
-    srsImage:
-      name: platform-services/search-n-reporting-service
-      version: 1.7.0
+    # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
+    srsImage: "YOUR_SRS_IMAGE:TAG"
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
-      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
       AuthEnabled: false
+      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
       PublicKeyURL: ""
   # This section specifies the elasticsearch cluster configuration.
   elasticsearch:
