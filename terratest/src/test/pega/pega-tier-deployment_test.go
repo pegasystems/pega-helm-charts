@@ -79,7 +79,7 @@ func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet
 	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-stream")
-	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/streamvol")
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/kafkadata")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].Name, "pega-volume-credentials")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].MountPath, "/opt/pega/secrets")
 	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options)
