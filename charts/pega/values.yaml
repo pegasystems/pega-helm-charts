@@ -114,9 +114,11 @@ global:
       # initialHeap: "4096m"
       # maxHeap: "7168m"
 
+      # Optionally provide runAsUser to override default pegauser
+      # runAsUser: 9001
+
       hpa:
         enabled: true
-      # runAsUser: 9001
 
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
@@ -136,9 +138,11 @@ global:
           maxUnavailable: 25%
         type: RollingUpdate
 
+      # Optionally provide runAsUser to override default pegauser
+      # runAsUser: 9001
+
       hpa:
         enabled: true
-      # runAsUser: 9001
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -170,13 +174,15 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
+      # Optionally provide runAsUser to override default pegauser
+      # runAsUser: 9001
+
       replicas: 2
 
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
-      # runAsUser: 9001
 
 # External services
 
