@@ -19,12 +19,16 @@ spec:
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
+      terminationGracePeriodSeconds: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds }}
       containers:
       - name: hazelcast
         image: {{ .Values.image }}
   {{- if ( .Values.imagePullPolicy ) }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
   {{- end }}
+        volumeMounts:
+        - name: {{ template "pegaVolumeCredentials" }}
+          mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
             name: {{ template "hazelcastEnvironmentConfig" }}
@@ -53,6 +57,9 @@ spec:
             path: /hazelcast/health/ready
             port: 5701
       restartPolicy: Always
+      volumes:
+      # Volume used to mount secret files.
+      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" }}
 {{ end }}

@@ -5,6 +5,11 @@ imagePullPolicy: "Always"
 replicas: 3
 # Setting below to true will deploy the infinity in client server hazelcast mode
 enabled: false
+# username to be used in client server hazelcast mode for authentication
+username: ""
+# password to be used in client server hazelcast mode for authentication
+password: ""
+
 # Memory and CPU settings for HZ service
 resources:
   requests:
@@ -27,3 +32,5 @@ server:
   hz_max_join_seconds: ""
   group_name: "PRPC"
   mancenter_url: ""
+  hz_graceful_shutdown_max_wait_seconds: "600"
+  service_dns_timeout: ""
