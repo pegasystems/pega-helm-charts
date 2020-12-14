@@ -36,6 +36,7 @@ func TestSRSDeployment(t *testing.T){
 			"platform-services/search-n-reporting-service:latest",
 			"false",
 			"",
+			false,
 			podResources{ "1300m", "2Gi", "650m", "2Gi"},
 			esDomain{
 				domain:   "elasticsearch-master.default.svc",
@@ -64,6 +65,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.elasticsearch.domain": "es-id.managed.cloudiest.io",
 			"srs.elasticsearch.port": "443",
 			"srs.elasticsearch.protocol": "https",
+			"srs.elasticsearch.requireInternetAccess": "true",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -81,6 +83,53 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"platform-services/search-n-reporting-service:1.0.0",
 			"true",
 			"https://acme.authenticator.com/PublicKeyURL",
+			true,
+			podResources{"2", "4Gi", "1", "2Gi"},
+			esDomain{
+				domain:   "es-id.managed.cloudiest.io",
+				port:     "443",
+				protocol: "https",
+			},
+		})
+}
+
+func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled": "true",
+			"srs.deploymentName": "test-srs-dev",
+			"global.imageCredentials.registry": "docker-registry.io",
+			"srs.srsRuntime.replicaCount": "3",
+			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
+			"srs.srsRuntime.env.AuthEnabled": "true",
+			"srs.srsRuntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
+			"srs.srsRuntime.resources.limits.cpu": "2",
+			"srs.srsRuntime.resources.limits.memory": "4Gi",
+			"srs.srsRuntime.resources.requests.cpu": "1",
+			"srs.srsRuntime.resources.requests.memory": "2Gi",
+			"srs.elasticsearch.provisionCluster": "false",
+			"srs.elasticsearch.domain": "es-id.managed.cloudiest.io",
+			"srs.elasticsearch.port": "443",
+			"srs.elasticsearch.protocol": "https",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "test-srs-dev",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"test-srs-dev",
+			"srs-service",
+			int32(3),
+			"platform-services/search-n-reporting-service:1.0.0",
+			"true",
+			"https://acme.authenticator.com/PublicKeyURL",
+			false,
 			podResources{"2", "4Gi", "1", "2Gi"},
 			esDomain{
 				domain:   "es-id.managed.cloudiest.io",
@@ -93,7 +142,9 @@ func TestSRSDeploymentVariables(t *testing.T){
 func VerifySRSDeployment(t *testing.T, deploymentObj appsv1.Deployment, expectedDeployment srsDeployment) {
 	require.Equal(t, expectedDeployment.replicaCount, *deploymentObj.Spec.Replicas )
 	require.Equal(t, expectedDeployment.appName, deploymentObj.Spec.Selector.MatchLabels["app.kubernetes.io/name"])
-	require.Equal(t, "true", deploymentObj.Spec.Selector.MatchLabels["networking/allow-internet-egress"])
+	if expectedDeployment.internetEgress {
+		require.Equal(t, "true", deploymentObj.Spec.Selector.MatchLabels["networking/allow-internet-egress"])
+	}
 	require.Equal(t, expectedDeployment.appName, deploymentObj.Spec.Template.Labels["app.kubernetes.io/name"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment)
@@ -150,6 +201,7 @@ type srsDeployment struct {
 	imageURI				string
 	authEnabled				string
 	publicKeyURL			string
+	internetEgress			bool
 	podLimits				podResources
 	elasticsearchEndPoint	esDomain
 }

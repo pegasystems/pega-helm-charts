@@ -26,9 +26,9 @@ func TestSRSService(t *testing.T){
 }
 
 func VerifySRSService(t *testing.T, serviceObj *k8score.Service) {
-	require.Equal(t, serviceObj.Spec.Selector["app.kubernetes.io/name"], "srs-service")
-	require.Equal(t, serviceObj.Spec.Selector["networking/allow-internet-egress"], "true")
-	require.Equal(t, serviceObj.Spec.Ports[0].Name, "rest")
-	require.Equal(t, serviceObj.Spec.Ports[0].Port, int32(8080))
-	require.Equal(t, serviceObj.Spec.Ports[0].TargetPort, intstr.FromInt(8080))
+	require.Equal(t, "srs-service", serviceObj.Spec.Selector["app.kubernetes.io/name"])
+	require.Equal(t, "", serviceObj.Spec.Selector["networking/allow-internet-egress"])
+	require.Equal(t, "rest", serviceObj.Spec.Ports[0].Name)
+	require.Equal(t, int32(8080), serviceObj.Spec.Ports[0].Port)
+	require.Equal(t, intstr.FromInt(8080), serviceObj.Spec.Ports[0].TargetPort)
 }
