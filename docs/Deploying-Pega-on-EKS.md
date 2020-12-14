@@ -61,7 +61,7 @@ This section covers the details necessary to obtain your AWS credentials and con
 
 ### Creating your IAM user access keys
 
-In order to create an EKS cluster, Pega recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credential, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
+In order to create an EKS cluster, Pega recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credentials, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
 
 Use the following steps, which are sourced from the AWS documentation, **Access Key and Secret Access Key** on the page, [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
 
@@ -100,10 +100,12 @@ To setup your local system and save your AWS credentials and profile to the $USE
 
 You are prompted for your AWS access credentials and details. Enter your own values. For guidance on completing each value, see [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
 
+```yaml
 AWS Access Key ID [None]: your-key-ID
 AWS Secret Access Key [None]: your-secrete-access-key
 Default region name [None]: your-region-preference
 Default output format [None]:  specify your preference for a result format.
+```
 
 With your credentials saved locally, you must push your Pega-provided Docker images to your Docker registry. For details on where the AWS CLI stores your credentials locally, see [Where Are Configuration Settings Stored?](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html#cli-configure-files-where)
 
@@ -111,7 +113,11 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For an overview, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
 
-To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, Pega supports using an SSL certificate that you create or import into AWS Credential Manager. After you have your Amazon Resource Name (ARN) credential using this certificate, you must add an annotation to the web tier ingress configuration so the deployment passes your ARN certificate to the web tier.
+**TBD review following review comment from maracle6 EKS lab demos**
+To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, it is a recommend practice to specify an SSL certificate that you create or import into AWS Credential Manager. After you have one your Amazon Resource Name (ARN) credential using this certificate or multiple certificates uploaded to AWS Credential Manager, use one of the following choices for the `annotation` parameter of the web tier ingress configuration:
+
+- Leave it blank so that the deployment automatically associates the existing certificate with your ingress controller.
+- Specify an ARN certificate out of multiple certificates or want to provide secondary certificates that the deployment associates with your ingress controller.
 
 To import or create a new SSL certificate to support HTTPS, see [Importing Certificates into AWS Certificate Manager](https://docs.aws.amazon.com/acm/latest/userguide/import-certificate.html). After you have your ARN certificate, include a reference to the required ARN certificate using an appropriate "web tier" `ingress` annotation as in the example:
 
@@ -238,9 +244,7 @@ During the configuration screens with which you create an RDS instance for your 
 
 #### Creating an Amazon RDS instance
 
-Create a database that is available to your EKS cluster. This example creates an Amazon RDS instance in AWS; however, you can create or use any database resource that is available to your EKS cluster. 
-
-At a minimum, for if you are creating a simple Pega demo, your Amazon RDS instance must be provisioned with at least 20GB of storage to support the installation of a Pega Platform software and a limited space for processing data; to provision a Pega Platform deployment to store typical Pega workload data, the size varies by workload, but should be over 70GB of total storage.
+Create a database that is available to your EKS cluster. At a minimum, for a simple Pega demo, your Amazon RDS instance must be provisioned with at least 20GB of storage to support the installation of a Pega Platform software and a limited space for processing data; to provision a Pega Platform deployment to store typical Pega workload data, the size varies by workload, but should be over 70GB of total storage.
 
 Pega Platform deployments require that the region you select is located in the same region where your EKS worker nodes are located.
 
@@ -297,7 +301,7 @@ Pega Platform deployments require that the region you select is located in the s
    f. In the **DB instance size** section, add these details:
 
    - Select **Standard classes**.
-   - Select **db.m5.2xlarge** or greater. The **db.m5.2xlarge** selection provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
+   - Select **db.m5.large** or greater. The **db.m5.large** selection provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
 RAM
    g. In the **Storage** section, for details, accept the default values:
 
@@ -328,7 +332,7 @@ RAM
 
     - **Encryption** - clear `Enable encryption` unless it is required by your organization's deployment.
 
-    - **Performance Insights** - clear `Enable Performance Insights` your organization's deployment can take advantage of this RDS database performance monitoring feature that makes it easy to diagnose and solve performance challenges on Amazon RDS databases.
+    - **Performance Insights** - clear `Enable Performance Insights` unless your organization's deployment can take advantage of this RDS database performance monitoring feature that makes it easy to diagnose and solve performance challenges on Amazon RDS databases.
 
     - **Monitoring** - clear `Enable Enhanced monitoring` unless your organization can take advantage of this AWS  enhanced monitoring metrics service.
 
@@ -474,7 +478,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | jdbc.dbType:            | Specify PostgreSQL database type.         | dbType: "postgres”   |
    | jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul> <li>driverUri: "latest jar file available” </li> <li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>    |
    | jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>   |
-   | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data"    |
+   | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | <ul><li>rulesSchema: "rules" </li><li>dataSchema: "data"</li></ul>  |
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
@@ -533,9 +537,7 @@ installing the pega Helm chart, which you updated in [Updating the pega Helm cha
 
 5. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
-6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
-
-    ! [](media/dashboard-mypega-pks-demo-install-initial.png)
+6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing.
 
     Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
 
@@ -547,11 +549,7 @@ installing the pega Helm chart, which you updated in [Updating the pega Helm cha
 
 8. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
 
-    ! [](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
-
     A successful deployment does not show errors across the various workloads. The `mypega-EKS-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
-
-    ! [](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
 ## Logging in to Pega Platform – 10 minutes
 
@@ -564,7 +562,7 @@ tier:
     service:
       # Enter the domain name to access web nodes via a load balancer.
       #  e.g. web.mypega.example.com
-      domain: "**eks.web.dev.pega.io**"
+      domain: "eks.web.dev.pega.io"
 ```
 
 To log in to Pega Platform with this host name, you can log into your ingress load balancer and note the DNS host name that the load balancer associates with web tier; after you copy the DNS host name, you can assign the host name you gave to the web tier with the DNS host name that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with the host name you configured for your deployment in the pega Helm chart, so you can independently manage security protocols that match your networking infrastructure standards.
