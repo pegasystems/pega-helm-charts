@@ -1,0 +1,11 @@
+---
+global:
+  tier:
+    - name: "web"
+      hpa:
+        enabled: true
+        disableCPUTarget: true
+    - name: "batch"
+      hpa:
+        enabled: true
+        disableMemoryTarget: true

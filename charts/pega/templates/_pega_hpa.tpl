@@ -22,6 +22,7 @@ spec:
   maxReplicas: 5
   {{- end }} 
   metrics:
+  {{- if not .hpa.disableCPUTarget }}
   - type: Resource
     resource:
       name: cpu
@@ -30,6 +31,8 @@ spec:
       {{- else }}
       targetAverageUtilization: 70
       {{- end }}  
+  {{- end }}
+  {{- if not .hpa.disableMemoryTarget }}
   - type: Resource
     resource:
       name: memory
@@ -38,6 +41,8 @@ spec:
       {{- else }}
       targetAverageUtilization: 85
       {{- end }}
+  {{- end }}
+  
 ---
 {{- end -}}
 {{- end -}}
