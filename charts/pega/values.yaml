@@ -137,6 +137,7 @@ global:
 
       hpa:
         enabled: true
+        disableMemoryTarget: true
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
