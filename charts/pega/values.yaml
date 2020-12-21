@@ -42,6 +42,7 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
+    testData: ""
 
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
