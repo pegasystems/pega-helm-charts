@@ -30,7 +30,7 @@ srs:
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
-    # set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network
+#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network
 #    requireInternetAccess: true
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
