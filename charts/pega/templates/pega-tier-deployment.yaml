@@ -17,6 +17,9 @@
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
 {{ end }}
+{{ if $.Values.hazelcast.enabled }}
+{{ $containerWaitList = append $containerWaitList "waitForHazelcast" }}
+{{ end }}
 {{ end }}
 
 {{ if (eq (include "performInstallAndDeployment" $) "true") }}
@@ -26,6 +29,9 @@
 {{ end }}
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
+{{ end }}
+{{ if $.Values.hazelcast.enabled }}
+{{ $containerWaitList = append $containerWaitList "waitForHazelcast" }}
 {{ end }}
 {{ end }}
 

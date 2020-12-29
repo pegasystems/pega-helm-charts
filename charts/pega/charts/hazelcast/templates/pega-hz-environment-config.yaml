@@ -1,0 +1,42 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isHazelcastEnabled" .) "true") }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "hazelcastEnvironmentConfig" }}
+  namespace: {{ .Release.Namespace }}
+data:
+  # Key Value pairs
+  NAMESPACE: {{ .Release.Namespace }}
+  JAVA_OPTS: {{ .Values.server.java_opts | quote }}
+  SERVICE_NAME: {{ template "hazelcastName" }}-service
+{{- if .Values.server.hz_health_monitoring_level }}
+  HZ_HEALTH_MONITORING_LEVEL: {{ .Values.server.hz_health_monitoring_level | quote }}
+{{- end }}
+{{- if .Values.server.hz_operation_generic_thread_count }}
+  HZ_OPERATION_GENERIC_THREAD_COUNT: {{ .Values.server.hz_operation_generic_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.hz_operation_thread_count }}
+  HZ_OPERATION_THREAD_COUNT: {{ .Values.server.hz_operation_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.hz_io_thread_count }}
+  HZ_IO_THREAD_COUNT: {{ .Values.server.hz_io_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.hz_event_thread_count }}
+  HZ_EVENT_THREAD_COUNT: {{ .Values.server.hz_event_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.hz_max_join_seconds }}
+  HZ_MAX_JOIN_SECONDS: {{ .Values.server.hz_max_join_seconds | quote }}
+{{- end }}
+{{- if .Values.server.group_name }}
+  GROUP_NAME: {{ .Values.server.group_name | quote }}
+{{- end }}
+{{- if .Values.server.mancenter_url }}
+  MANCENTER_URL: {{ .Values.server.mancenter_url | quote }}
+{{- end }}
+{{- if .Values.server.hz_graceful_shutdown_max_wait_seconds }}
+  HZ_GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds | quote }}
+{{- end }}
+{{- if .Values.server.service_dns_timeout }}
+  SERVICE_DNS_TIMEOUT: {{ .Values.server.service_dns_timeout | quote }}
+{{- end }}
+{{ end }}

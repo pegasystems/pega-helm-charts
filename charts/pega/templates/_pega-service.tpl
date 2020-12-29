@@ -25,7 +25,7 @@ metadata:
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
-    beta.cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ template "pegaBackendConfig" }}"}}'
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
   {{ end }}
 {{- end }}
 spec:
