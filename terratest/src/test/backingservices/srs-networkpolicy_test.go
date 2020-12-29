@@ -30,7 +30,7 @@ func TestSRSServiceNetworkPolicyWithInternetEgress(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
-			"srs.elasticsearch.requireInternetAccess": "true",
+			"srs.srsStorage.requireInternetAccess": "true",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
 	)

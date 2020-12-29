@@ -9,7 +9,7 @@ func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "false",
-			"srs.elasticsearch.provisionCluster": "false",
+			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.deploymentName": "test-srs",
 		}),
 	)
@@ -33,7 +33,7 @@ func Test_shouldContainSRSResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
-			"srs.elasticsearch.provisionCluster": "true",
+			"srs.srsStorage.provisionInternalESCluster": "true",
 		}),
 	)
 
@@ -56,7 +56,7 @@ func Test_shouldContainSRSandESResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
-			"srs.elasticsearch.provisionCluster": "true",
+			"srs.srsStorage.provisionInternalESCluster": "true",
 		}),
 	)
 
@@ -79,10 +79,10 @@ func Test_shouldContainSRSWhenEnabledandNotESResourcesWhenDisabled(t *testing.T)
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
-			"srs.elasticsearch.provisionCluster": "false",
-			"srs.elasticsearch.domain": "es.managed.io",
-			"srs.elasticsearch.port": "9200",
-			"srs.elasticsearch.protocol": "https",
+			"srs.srsStorage.provisionInternalESCluster": "false",
+			"srs.srsStorage.domain": "es.managed.io",
+			"srs.srsStorage.port": "9200",
+			"srs.srsStorage.protocol": "https",
 		}),
 	)
 

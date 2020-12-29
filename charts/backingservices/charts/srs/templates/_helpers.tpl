@@ -53,41 +53,6 @@ app.kubernetes.io/instance: {{ .Root.Release.Name }}
 {{- end }}
 
 {{/*
-Anti-affinity for pods
-*/}}
-{{- define "srs.antiaffinity" -}}
-podAntiAffinity:
-  preferredDuringSchedulingIgnoredDuringExecution:
-    - weight: 50
-      podAffinityTerm:
-        topologyKey: "kubernetes.io/hostname"
-        labelSelector:
-          matchExpressions:
-            - key: "app.kubernetes.io/name"
-              operator: In
-              values:
-                - {{ .Name | quote}}
-            - key: "app.kubernetes.io/instance"
-              operator: In
-              values:
-                - {{ .Root.Release.Name }}
-    - weight: 100
-      podAffinityTerm:
-        topologyKey: "failure-domain.beta.kubernetes.io/zone"
-        labelSelector:
-          matchExpressions:
-            - key: "app.kubernetes.io/name"
-              operator: In
-              values:
-                - {{ .Name | quote}}
-            - key: "app.kubernetes.io/instance"
-              operator: In
-              values:
-                - {{ .Root.Release.Name }}
-{{- end -}}
-
-
-{{/*
 srs-service meta-data labels
 */}}
 {{- define "srs.srs-service.labels" -}}
@@ -101,17 +66,9 @@ srs-service match labels
 {{- define "srs.srs-service.match-labels" }}
 app.kubernetes.io/name: srs-service
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{ if .Values.elasticsearch.requireInternetAccess -}}
+{{ if .Values.srsStorage.requireInternetAccess -}}
 networking/allow-internet-egress: "true"
 {{- end}}
-{{- end -}}
-
-{{/*
-srs-service antiaffinity
-*/}}
-{{- define "srs.srs-service.antiaffinity" -}}
-{{ $data := dict "Root" $ "Name" "srs-service" }}
-{{ include "srs.antiaffinity" $data }}
 {{- end -}}
 
 {{/*
@@ -130,14 +87,6 @@ app.kubernetes.io/name: srs-ops
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end -}}
 
-{{/*
-srs-ops antiaffinity
-*/}}
-{{- define "srs.srs-ops.antiaffinity" -}}
-{{ $data := dict "Root" $ "Name" "srs-ops" }}
-{{ include "srs.antiaffinity" $data }}
-{{- end -}}
-
 {{- define "srsRegistrySecretName" -}}
 {{ include "srs.fullname" . }}-reg-secret
 {{- end }}
@@ -152,27 +101,27 @@ srs-ops antiaffinity
   elasticsearch url details
 */}}
 {{- define "elasticsearch.domain" -}}
-{{- if .Values.elasticsearch.provisionCluster }}
+{{- if .Values.srsStorage.provisionInternalESCluster }}
 {{- $essvcname := "elasticsearch-master" }}
 {{- printf "%s.%s.svc" $essvcname .Release.Namespace | trimSuffix "-" }}
 {{- else }}
-{{- required "A valid '.Values.elasticsearch.domain' entry is required when connecting to external Elasticsearch!" .Values.elasticsearch.domain }}
+{{- required "A valid '.Values.srsStorage.domain' entry is required when connecting to external Elasticsearch!" .Values.srsStorage.domain }}
 {{- end }}
 {{- end }}
 
 {{- define "elasticsearch.port" -}}
-{{- if .Values.elasticsearch.provisionCluster -}}
+{{- if .Values.srsStorage.provisionInternalESCluster -}}
 {{- quote 9200 }}
 {{- else }}
-{{- required "A valid '.Values.elasticsearch.port' entry is required when connecting to external Elasticsearch!" .Values.elasticsearch.port | quote}}
+{{- required "A valid '.Values.srsStorage.port' entry is required when connecting to external Elasticsearch!" .Values.srsStorage.port | quote}}
 {{- end }}
 {{- end }}
 
 {{- define "elasticsearch.protocol" -}}
-{{- if .Values.elasticsearch.provisionCluster }}
+{{- if .Values.srsStorage.provisionInternalESCluster }}
 {{- "http" | quote }}
 {{- else }}
-{{- required "A valid ''.Values.elasticsearch.protocol' entry is required when connecting to external Elasticsearch!" .Values.elasticsearch.protocol | quote  }}
+{{- required "A valid ''.Values.srsStorage.protocol' entry is required when connecting to external Elasticsearch!" .Values.srsStorage.protocol | quote  }}
 {{- end }}
 {{- end }}
 

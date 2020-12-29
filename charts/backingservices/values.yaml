@@ -6,7 +6,7 @@ global:
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
 srs:
-  # always set srs.provisionCluster=false when srs.enabled=false
+  # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true
   deploymentName: pega-shared-srs
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
@@ -22,15 +22,17 @@ srs:
       # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
       PublicKeyURL: ""
   # This section specifies the elasticsearch cluster configuration.
-  elasticsearch:
-    # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
-    provisionCluster: true
+  srsStorage:
+    # srsStorage.provisionInternalESCluster true will provision an internal elasticsearch cluster with configuration
+    # specified in the `elasticsearch` section
+    provisionInternalESCluster: true
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # make sure the endpoint is accessible from the kubernetes cluster pods.
+    # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
-#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network
+#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
 #    requireInternetAccess: true
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.

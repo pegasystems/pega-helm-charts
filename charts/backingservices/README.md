@@ -33,7 +33,7 @@ The values.yaml provides configuration options to define the deployment resource
 
 If an externally managed elasticsearch cluster is being used, make sure the service is accessible to the k8s cluster where SRS is deployed.
 
-You may enable the component of ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) in the backingservices by configuring the 'srs.elasticsearch' section in values.yaml file to deploy ElasticSearch cluster automatically. For more configuration options available for each of the components, see their Helm Charts.
+You may enable the component of ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) in the backingservices by configuring the 'srs.srsStorage' section in values.yaml file to deploy ElasticSearch cluster automatically. For more configuration options available for each of the components, see their Helm Charts.
 
 #### configuration settings:
 Configuration                       | Usage
@@ -42,7 +42,7 @@ Configuration                       | Usage
 `deploymentName`                    | The name of your SRS cluster.  Resources created will be prefixed with this string. This is also the service name for SRS.
 `srsRuntime`                        | This section defines the SRS service specific resource configuration options like image, replica count, cpu and memory resource settings etc.
 `elasticsearch`                     | Define the elasticsearch cluster configurations using this section. The chart from ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) is used for provisioning the cluster.
-`elasticsearch.provisionCluster`    | This setting when enabled will provision Elasticsearch cluster automatically with SRS runtime. Disable this to use an existing external ElasticSearch cluster with the SRS runtime.
+`srsStorage.provisionInternalESCluster` | This setting when enabled will provision Elasticsearch cluster automatically with SRS runtime. Disable this to use an existing external ElasticSearch cluster with the SRS runtime.
 
 Example:
 
@@ -68,12 +68,14 @@ srs:
         AuthEnabled: false
         PublicKeyURL:
   
-  elasticsearch:
-    # elasticsearch.provisionCluster true will provision an internal elasticsearch cluster with specified configuration
-    provisionCluster: true
+  srsStorage:
+    # srsStorage.provisionInternalESCluster true will provision an internal elasticsearch cluster with specified configuration
+    provisionInternalESCluster: true
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # make sure the endpoint is accessible from the kubernetes cluster pods.
+    # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
-
+#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network and is available over internet
+#    requireInternetAccess: true

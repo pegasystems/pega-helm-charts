@@ -18,8 +18,6 @@ spec:
     spec:
       imagePullSecrets:
         - name: {{ template "srsRegistrySecretName" . }}
-      affinity:
-{{- include "srs.srs-service.antiaffinity" . | indent 8 }}
       containers:
         - name: srs-service
           image: {{ .Values.srsRuntime.srsImage }}

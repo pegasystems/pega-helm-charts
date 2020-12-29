@@ -37,7 +37,7 @@ spec:
       port: 9200
   - to:
 {{ include "srs.netpol.kube-dns" . | indent 4 }}
-  {{ if .Values.elasticsearch.requireInternetAccess -}}
+  {{ if .Values.srsStorage.requireInternetAccess -}}
   - to:
     - podSelector:
         matchLabels:
