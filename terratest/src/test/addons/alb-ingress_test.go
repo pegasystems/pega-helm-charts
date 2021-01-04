@@ -9,7 +9,7 @@ import (
 func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled": "false",
+			"aws-load-balancer-controller.enabled": "false",
 		}),
 	)
 
@@ -24,7 +24,7 @@ func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
 func TestAlbIngressShouldContainAllResources(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled": "true",
+			"aws-load-balancer-controller.enabled": "true",
 		}),
 	)
 
@@ -39,15 +39,15 @@ func TestAlbIngressShouldContainAllResources(t *testing.T) {
 func Test_checkSetAwsRegion(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":               "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "false",
-			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
+			"aws-load-balancer-controller.enabled":               "true",
+			"aws-load-balancer-controller.autoDiscoverAwsRegion": "false",
+			"aws-load-balancer-controller.region":             "YOUR_EKS_CLUSTER_REGION",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -57,15 +57,15 @@ func Test_checkSetAwsRegion(t *testing.T) {
 func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":               "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "true",
-			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
+			"aws-load-balancer-controller.enabled":               "true",
+			"aws-load-balancer-controller.autoDiscoverAwsRegion": "true",
+			"aws-load-balancer-controller.region":             "YOUR_EKS_CLUSTER_REGION",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -75,15 +75,15 @@ func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
 func Test_checkSetAwsVpcID(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":              "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "false",
-			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
+			"aws-load-balancer-controller.enabled":              "true",
+			"aws-load-balancer-controller.autoDiscoverAwsVpcID": "false",
+			"aws-load-balancer-controller.vpcId":             "YOUR_EKS_CLUSTER_VPC_ID",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -93,15 +93,15 @@ func Test_checkSetAwsVpcID(t *testing.T) {
 func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":              "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "true",
-			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
+			"aws-load-balancer-controller.enabled":              "true",
+			"aws-load-balancer-controller.autoDiscoverAwsVpcID": "true",
+			"aws-load-balancer-controller.vpcId":             "YOUR_EKS_CLUSTER_VPC_ID",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -111,14 +111,14 @@ func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
 func Test_checkSetClusterName(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":     "true",
-			"aws-alb-ingress-controller.clusterName": "YOUR_EKS_CLUSTER_NAME",
+			"aws-load-balancer-controller.enabled":     "true",
+			"aws-load-balancer-controller.clusterName": "YOUR_EKS_CLUSTER_NAME",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -128,15 +128,15 @@ func Test_checkSetClusterName(t *testing.T) {
 func Test_checkSetAccessKey(t *testing.T) {
 	helmChart := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":                        "true",
-			"aws-alb-ingress-controller.extraEnv.AWS_ACCESS_KEY_ID":     "YOUR_AWS_ACCESS_KEY_ID",
-			"aws-alb-ingress-controller.extraEnv.AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
+			"aws-load-balancer-controller.enabled":                        "true",
+			"aws-load-balancer-controller.env.AWS_ACCESS_KEY_ID":     "YOUR_AWS_ACCESS_KEY_ID",
+			"aws-load-balancer-controller.env.AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
 		}),
 	)
 
 	var deployment *v1.Deployment
 	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
@@ -148,19 +148,19 @@ func Test_checkSetAccessKey(t *testing.T) {
 
 var albIngressResources = []SearchResourceOption{
 	{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "ServiceAccount",
 	},
 	{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "ClusterRoleBinding",
 	},
 	{
-		Name: "pega-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	},
 }

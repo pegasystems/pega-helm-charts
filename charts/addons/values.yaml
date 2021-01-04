@@ -33,8 +33,8 @@ traefik:
       # Enter the memory limit for Traefik
       memory: 500Mi
 
-# When deploying on AWS EKS, set this to true to install aws-alb-ingress-controller.
-aws-alb-ingress-controller:
+# When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
   clusterName: "YOUR_EKS_CLUSTER_NAME"
@@ -42,13 +42,11 @@ aws-alb-ingress-controller:
   autoDiscoverAwsRegion: false
   ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsRegion != true
-  awsRegion: "YOUR_EKS_CLUSTER_REGION"
-  ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
-  autoDiscoverAwsVpcID: false
+  region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
-  awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv: {}
+  vpcId: ""
+  env: {}
   # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
   # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
 
