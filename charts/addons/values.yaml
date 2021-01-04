@@ -45,7 +45,7 @@ aws-load-balancer-controller:
   region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   ## Required if autoDiscoverAwsVpcID != true
-  vpcId: ""
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
   env: {}
   # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
   # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
