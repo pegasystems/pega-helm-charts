@@ -403,8 +403,8 @@ Parameter           | Description    | Default value
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
-`hpa.disableCPUTarget` | Set to true if you want to remove scaling based on CPU utilization and only rely on memory utilization | false
-`hpa.disableMemoryTarget` | Set to true if you want to remove scaling based on memory utilization and only rely on CPU utilization | false
+`hpa.cpuTarget` | Set to "on" if you want to enable scaling based on CPU utilization or "off" if you want to disable it | `"on"`
+`hpa.memoryTarget` | Set to "on" if you want to enable scaling based on memory utilization or "off" if you want to disable it  | `"on"`
 
 ### Volume claim template
 

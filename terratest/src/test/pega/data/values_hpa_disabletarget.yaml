@@ -4,8 +4,10 @@ global:
     - name: "web"
       hpa:
         enabled: true
-        disableCPUTarget: true
+        cpuTarget: "off"
+        memoryTarget: "on"
     - name: "batch"
       hpa:
         enabled: true
-        disableMemoryTarget: true
+        # cpuTarget should be "on" as default
+        memoryTarget: "off"

@@ -118,12 +118,12 @@ func VerifyTargets(t *testing.T, yamlContent string) {
 }
 
 func VerifyWebNoCpuTarget(t *testing.T, pegaHpaObj *autoscaling.HorizontalPodAutoscaler) {
-	require.Equal(t, len(pegaHpaObj.Spec.Metrics),1)
+	require.Equal(t, 1, len(pegaHpaObj.Spec.Metrics))
 	require.Equal(t, pegaHpaObj.Spec.Metrics[0].Resource.Name, api.ResourceName("memory"))
 }
 
 func VerifyBatchNoMemoryTarget(t *testing.T, pegaHpaObj *autoscaling.HorizontalPodAutoscaler) {
-	require.Equal(t, len(pegaHpaObj.Spec.Metrics),1)
+	require.Equal(t,1, len(pegaHpaObj.Spec.Metrics))
 	require.Equal(t, pegaHpaObj.Spec.Metrics[0].Resource.Name, api.ResourceName("cpu"))
 }
 
