@@ -40,6 +40,29 @@ func TestSRSServicePDBWithESInternetAccess(t *testing.T){
 		Name: "test-srs",
 		Kind: "PodDisruptionBudget",
 	}, &pdbObj)
+	VerifySRSServicePDB(t, &pdbObj)
+}
+
+func TestSRSServicePDBWithESInternetAccessWithExternalES(t *testing.T){
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled": "true",
+			"srs.deploymentName": "test-srs",
+			"srs.srsStorage.requireInternetAccess": "true",
+			"srs.srsStorage.provisionInternalESCluster": "false",
+			"srs.srsStorage.domain": "es.acme.io",
+			"srs.srsStorage.port": "8008",
+			"srs.srsStorage.protocol": "https",
+		},
+			[]string{"charts/srs/templates/srsservice_poddisruptionbudget.yaml"}),
+	)
+
+	var pdbObj v1beta1.PodDisruptionBudget
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "test-srs",
+		Kind: "PodDisruptionBudget",
+	}, &pdbObj)
 	VerifySRSServicePDBWithEgressLabel(t, &pdbObj)
 }
 

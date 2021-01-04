@@ -66,7 +66,7 @@ srs-service match labels
 {{- define "srs.srs-service.match-labels" }}
 app.kubernetes.io/name: srs-service
 app.kubernetes.io/instance: {{ .Release.Name }}
-{{ if .Values.srsStorage.requireInternetAccess -}}
+{{ if and (.Values.srsStorage.requireInternetAccess) (not .Values.srsStorage.provisionInternalESCluster) -}}
 networking/allow-internet-egress: "true"
 {{- end}}
 {{- end -}}

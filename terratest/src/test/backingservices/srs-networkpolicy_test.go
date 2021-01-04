@@ -24,13 +24,37 @@ func TestSRSServiceNetworkPolicy(t *testing.T){
 	VerifySRSServiceNetworkPolicy(t, &networkPolicyObj, false)
 }
 
-func TestSRSServiceNetworkPolicyWithInternetEgress(t *testing.T){
+func TestSRSServiceNetworkPolicyWithProvisionInternalESCluster(t *testing.T){
 
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
 			"srs.srsStorage.requireInternetAccess": "true",
+			"srs.srsStorage.provisionInternalESCluster": "true",
+		},
+			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
+	)
+
+	var networkPolicyObj networkingv1.NetworkPolicy
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "test-srs-networkpolicy",
+		Kind: "NetworkPolicy",
+	}, &networkPolicyObj)
+	VerifySRSServiceNetworkPolicy(t, &networkPolicyObj, false)
+}
+
+func TestSRSServiceNetworkPolicyWithProvisionInternalESClusterFalse(t *testing.T){
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled": "true",
+			"srs.deploymentName": "test-srs",
+			"srs.srsStorage.requireInternetAccess": "true",
+			"srs.srsStorage.provisionInternalESCluster": "false",
+			"srs.srsStorage.domain": "es.acme.io",
+			"srs.srsStorage.port": "8008",
+			"srs.srsStorage.protocol": "https",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
 	)
