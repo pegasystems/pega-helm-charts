@@ -306,7 +306,7 @@ RAM
    g. In the **Storage** section, for details, accept the default values:
 
    - **Storage type** is **Provisioned IOPS**.
-   - **Allocated storage** is **100GiB**. Minimum size can be 20 GiB; however, more than 70GiB of storage is more appropriate to store typical Pega application workload data.
+   - **Allocated storage** is **100GiB**. While the size can be a 20GiB, this is not enough storage for processing. Pega recommends a minimal storage size of 100GiB to store typical Pega application workload data. Provisioning a smaller disk than 100GiB can impact performance.
    - **Provisioned IOPS** is **3000**.
    - **Storage autoscaling** and a **Maximum storage threshold** can be selected to allow the storage to increase if your deployment exceeds the threshold you define. Clear this setting if you do not want storage autoscaling enabled on the database instance.
 
