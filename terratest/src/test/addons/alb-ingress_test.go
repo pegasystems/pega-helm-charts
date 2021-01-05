@@ -125,27 +125,6 @@ func Test_checkSetClusterName(t *testing.T) {
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--cluster-name=YOUR_EKS_CLUSTER_NAME")
 }
 
-func Test_checkSetAccessKey(t *testing.T) {
-	helmChart := NewHelmConfigParser(
-		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-load-balancer-controller.enabled":                        "true",
-			"aws-load-balancer-controller.env.AWS_ACCESS_KEY_ID":     "YOUR_AWS_ACCESS_KEY_ID",
-			"aws-load-balancer-controller.env.AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
-		}),
-	)
-
-	var deployment *v1.Deployment
-	helmChart.Find(SearchResourceOption{
-		Name: "pega-aws-load-balancer-controller",
-		Kind: "Deployment",
-	}, &deployment)
-
-	require.Equal(t, "AWS_ACCESS_KEY_ID", deployment.Spec.Template.Spec.Containers[0].Env[0].Name)
-	require.Equal(t, "YOUR_AWS_ACCESS_KEY_ID", deployment.Spec.Template.Spec.Containers[0].Env[0].Value)
-	require.Equal(t, "AWS_SECRET_ACCESS_KEY", deployment.Spec.Template.Spec.Containers[0].Env[1].Name)
-	require.Equal(t, "YOUR_AWS_SECRET_ACCESS_KEY", deployment.Spec.Template.Spec.Containers[0].Env[1].Value)
-}
-
 var albIngressResources = []SearchResourceOption{
 	{
 		Name: "pega-aws-load-balancer-controller",
