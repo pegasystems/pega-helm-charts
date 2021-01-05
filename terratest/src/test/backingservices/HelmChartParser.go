@@ -45,7 +45,7 @@ func (p *HelmChartParser) Find(searchOptions SearchResourceOption, resource inte
 func (p *HelmChartParser) Contains(searchOptions SearchResourceOption) bool {
 	var d DeploymentMetadata
 	for _, slice := range p.SlicedResource {
-		helm.UnmarshalK8SYamlE(p.T, slice, &d)
+		helm.UnmarshalK8SYaml(p.T, slice, &d)
 		if (searchOptions.Kind != "" && searchOptions.Kind == d.Kind) && (searchOptions.Name != "" && searchOptions.Name == d.Name) {
 			return true
 		}
