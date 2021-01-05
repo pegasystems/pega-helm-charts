@@ -69,7 +69,7 @@ func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.NotContains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-region=YOUR_EKS_CLUSTER_REGION")
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-region=YOUR_EKS_CLUSTER_REGION")
 }
 
 func Test_checkSetAwsVpcID(t *testing.T) {
