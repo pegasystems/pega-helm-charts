@@ -22,7 +22,7 @@ spec:
   maxReplicas: 5
   {{- end }} 
   metrics:
-  {{- if eq "on" ( .hpa.cpuTarget | default "on" ) }}
+  {{- if (hasKey .hpa "enableCpuTarget" | ternary .hpa.enableCpuTarget true) }}
   - type: Resource
     resource:
       name: cpu
@@ -32,7 +32,7 @@ spec:
       targetAverageUtilization: 70
       {{- end }}
   {{- end }}
-  {{- if eq "on" ( .hpa.memoryTarget | default "on" ) }}
+  {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget true) }}
   - type: Resource
     resource:
       name: memory
