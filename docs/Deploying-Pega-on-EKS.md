@@ -431,19 +431,11 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 
 2. Use a text editor to open the addons-eks.yaml file and update the following parameters in the chart based on your EKS requirements:
 
-- Specify `aws-alb-ingress-controller:> enabled: true` to install an AWS ALB ingress controller for your deployment.
+- Specify `aws-load-balancer-controller:> enabled: true` to install an AWS load balance -controller for your deployment.
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
-- To allow your deployment to automatically determine the AWS region of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsRegion: true`. The setting is disabled by default.
-- Specify the region of your EKS cluster name in the `awsRegion: <YOUR_EKS_CLUSTER_REGION>` parameter. You must enter your region here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsRegion` parameter = false.
-- To allow your deployment to automatically determine the AWS VPC ID of your EKS cluster from ec2metadata, enable the parameter value `autoDiscoverAwsVpcID: true`. The setting is disabled by default.
-- Specify the the AWS VPC ID of your EKS cluster name in the `awsVpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod or if you set the `autoDiscoverAwsVpcID` parameter = false.
-- Specify the required access key ID and secret access key for the primary IAM user who is responsible for your EKS deployment in the area:
-
-   ```yaml
-   extraEnv: {}
-   AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-   AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
-   ```
+- Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
+- Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
+- Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
