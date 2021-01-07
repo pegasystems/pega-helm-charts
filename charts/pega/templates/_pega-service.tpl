@@ -30,7 +30,7 @@ metadata:
 {{- end }}
 spec:
   type:
-  {{- if (eq .root.Values.global.provider "gke") -}}
+  {{- if or (eq .root.Values.global.provider "gke") (eq .root.Values.global.provider "eks") -}}
   {{ indent 1 "NodePort" }}
   {{- else -}}
   {{ indent 1 (.node.service.serviceType | default "LoadBalancer") }}

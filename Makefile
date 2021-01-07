@@ -6,7 +6,8 @@ dependencies:
 	helm repo add elastic https://helm.elastic.co
 	helm repo list	
 	helm dependency update ./charts/pega/
-	helm dependency update ./charts/addons/ 
+	helm dependency update ./charts/addons/
+	helm dependency update ./charts/backingservices/
 
 examples: 
 	mkdir -p ./build/kubernetes

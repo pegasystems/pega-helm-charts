@@ -1,0 +1,19 @@
+{{ if .Values.enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "srs.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- include "srs.srs-service.labels" . | indent 4 }}
+spec:
+  type: {{ .Values.srsRuntime.serviceType }}
+  selector:
+{{- include "srs.srs-service.match-labels" . | indent 4 }}
+  ports:
+    - name: rest
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+{{ end }}

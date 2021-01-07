@@ -36,6 +36,7 @@ script:
   #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
   - go test test/pega | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
   - go test test/addons | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
+  - go test test/backingservices | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
   - cd $TRAVIS_BUILD_DIR
   - chmod 777 before_deploy.sh
 before_deploy:
