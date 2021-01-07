@@ -82,8 +82,8 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, "[{\"HTTP\": 80}, {\"HTTPS\": 443}]", ingressObj.Annotations["alb.ingress.kubernetes.io/listen-ports"])
 	require.Equal(t, "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}", ingressObj.Annotations["alb.ingress.kubernetes.io/actions.ssl-redirect"])
 	require.Equal(t, "internet-facing", ingressObj.Annotations["alb.ingress.kubernetes.io/scheme"])
-	expectedStickiness := fmt.Sprint("stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=", expectedIngress.AlbStickiness)
-	require.Equal(t, expectedStickiness,
+	expectedStickinessAndALBAlgo := fmt.Sprint("load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=", expectedIngress.AlbStickiness)
+	require.Equal(t, expectedStickinessAndALBAlgo,
 		ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
 	require.Equal(t, "ip", ingressObj.Annotations["alb.ingress.kubernetes.io/target-type"])
 	require.Equal(t, "ssl-redirect", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)
