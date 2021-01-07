@@ -8,3 +8,12 @@
 # Documentation
 *.md        @taz-pega-work
 docs/*      @taz-pega-work
+
+# Addons Chart
+charts/pega/addons/*  @pegasystems/deployment
+
+# Pega Chart
+charts/pega/pega/*    @pegasystems/deployment
+
+# SRS Chart
+charts/backingservices/charts/srs/*  @pegasystems/searchservice
