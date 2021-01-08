@@ -49,7 +49,7 @@ zos:
 # Upgrade specific properties
 upgrade:
   # Type of upgrade
-  # Valid values are 'in-place' , 'out-of-place'
+  # Valid values are 'in-place' , 'zero-downtime-patch'
   upgradeType: ""
   # Specify target rules schema for migration and upgrade
   targetRulesSchema: ""

@@ -613,7 +613,7 @@ For upgrades of the Pega platform, you must specify the installer Docker image a
 Upgrade type    | Description
 ---             | ---
 `in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
-`out-of-place`  | An out-of-place upgrade involves more steps to minimize downtime.  It will place the rules into a read-only state, then migrate the rules to a new schema. Next it will upgrade the rules to the new version. Lastly it will separately upgrade the data.
+`zero-downtime-patch`  | An zero-downtime-patch upgrade involves more steps to minimize downtime.  It will place the rules into a read-only state, then migrate the rules to a new schema. Next it will upgrade the rules to the new version. Lastly it will separately upgrade the data.
 
 Example:
 
@@ -621,7 +621,7 @@ Example:
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   upgrade:
-    upgradeType: "out-of-place"
+    upgradeType: "zero-downtime-patch"
     targetRulesSchema: "rules_upgrade"
 ```
 
