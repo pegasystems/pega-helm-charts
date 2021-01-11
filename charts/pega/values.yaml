@@ -149,8 +149,8 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
-      # Port 7003 turned off by default in all installs except large.
-      # Uncomment following lines to expose service and ports.
+      # Port 7003 is not exposed by default in most deployments; the exception is large deployments.
+      # To expose service and ports in your deployment, you must uncomment the following lines.
       # service:
       #   port: 7003
       #   targetPort: 7003
