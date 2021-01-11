@@ -217,7 +217,8 @@ Example:
 ```yaml
 tier:
   - name: my-tier
-    runAsUser: RUN_AS_USER
+    securityContext:
+      runAsUser: RUN_AS_USER
 ```
 ### service
 
