@@ -115,7 +115,8 @@ global:
       # maxHeap: "7168m"
 
       # Optionally provide runAsUser to override default pegauser
-      # runAsUser: 9001
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -139,7 +140,8 @@ global:
         type: RollingUpdate
 
       # Optionally provide runAsUser to override default pegauser
-      # runAsUser: 9001
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -175,7 +177,8 @@ global:
           # ssl_annotation:
 
       # Optionally provide runAsUser to override default pegauser
-      # runAsUser: 9001
+      # securityContext:
+      #   runAsUser: 9001
 
       replicas: 2
 
