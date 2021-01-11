@@ -142,6 +142,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "")
 	envIndex++
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CATALINA_OPTS")
+    require.Equal(t, pod.Containers[0].Env[envIndex].Value, "")
+    envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "INITIAL_HEAP")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "4096m")
 	envIndex++
