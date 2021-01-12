@@ -132,7 +132,11 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
   value: "{{ .node.javaOpts }}"
 # Additional CATALINA arguments
 - name: CATALINA_OPTS
+{{- if .node.catalinaOpts }}
   value: "{{ .node.catalinaOpts }}"
+{{- else }}
+  value: ""
+{{- end }}
 # Initial JVM heap size, equivalent to -Xms
 - name: INITIAL_HEAP
 {{- if .node.initialHeap }}
