@@ -208,7 +208,19 @@ Example:
 requestor:
   passivationTimeSec: 900
 ```
+### Security context
 
+By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user. To configure an alternative user for your custom image, set value for `runAsUser`. Note that pegasystems/pega image works only with pegauser(9001).
+`runAsUser` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      runAsUser: RUN_AS_USER
+```
 ### service
 
 Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
