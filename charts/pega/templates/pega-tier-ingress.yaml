@@ -1,6 +1,5 @@
 {{- range $index, $dep := .Values.global.tier }}
 {{ if and (eq (include "performDeployment" $ ) "true") ($dep.service) }}
-{{ $alb := index $.Values "aws-alb-ingress-controller" }}
 {{- if eq $.Values.global.provider "openshift" -}}
 {{ template "pega.openshift.ingress" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
 {{- else if and (eq $.Values.global.provider "eks") -}}

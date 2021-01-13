@@ -44,6 +44,11 @@ spec:
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- if .custom }}
+{{- if .custom.serviceAccountName }}
+      serviceAccountName: {{ .custom.serviceAccountName }}
+{{- end }}
+{{- end }}
       volumes:
       # Volume used to mount config files.
       - name: {{ template "pegaVolumeConfig" }}

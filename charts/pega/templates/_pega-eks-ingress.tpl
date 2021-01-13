@@ -34,8 +34,8 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
 {{- end }}
 {{- if not (and (.node.ingress.annotations) ( .node.ingress.annotations | quote | regexFind "alb.ingress.kubernetes.io/target-group-attributes:" ) ) }}
-    # enable sticky sessions on target group
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
+    # enable sticky sessions on target group and set alb routing algorithm
+    alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 {{- end }}
 spec:
   rules:

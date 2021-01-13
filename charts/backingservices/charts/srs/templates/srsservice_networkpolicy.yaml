@@ -1,0 +1,46 @@
+{{ if .Values.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name:  {{ template "srs.fullname" . }}-networkpolicy
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- include "srs.srs-service.labels" . | indent 4 }}
+spec:
+  podSelector:
+    matchLabels:
+{{ include "srs.srs-service.match-labels" . | indent 6 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - ipBlock:
+        cidr: 0.0.0.0/0
+    ports:
+    - protocol: TCP
+      port: 8080
+  - from:
+    - podSelector:
+        matchLabels:
+{{ include "srs.srs-ops.match-labels" . | indent 10 }}
+    ports:
+    - protocol: TCP
+      port: 8080
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: "elasticsearch-master"
+    ports:
+    - protocol: TCP
+      port: 9200
+  - to:
+{{ include "srs.netpol.kube-dns" . | indent 4 }}
+  {{ if and (.Values.srsStorage.requireInternetAccess) (not .Values.srsStorage.provisionInternalESCluster) -}}
+  - to:
+    - podSelector:
+        matchLabels:
+          networking/allow-internet-egress: "true"
+  {{ end }}
+{{ end }}

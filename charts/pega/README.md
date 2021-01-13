@@ -426,6 +426,20 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
+
+### Service Account
+
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
 ### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
@@ -528,6 +542,25 @@ dds:
 ## Search deployment
 
 Use the `pegasearch` section to configure a deployment of ElasticSearch for searching Rules and Work within Pega.  This deployment is used exclusively for Pega search, and is not the same ElasticSearch deployment used by the EFK stack or any other dedicated service such as Pega BI.
+
+### For Pega Platform 8.6 and later:
+
+Pega recommends using the chart ['backingservices'](../backingservices) to enable the use of a search and reporting service in your deployment. This is a shareable and independently manageable search solution for Pega Platform that replaces the previously used Elasticsearch. To use this search and reporting service, you must follow the deployment instructions provided at [backingservices](../backingservices/README.md) to provision the service. The Search and Reporting Service (SRS) Url can be configured with the current Pega platform environment using the below configuration in values.yaml.
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | false
+`externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `""`
+
+Example:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.namespace.svc.cluster.local"
+```
+
+Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---

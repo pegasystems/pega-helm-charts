@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
     - To prepare a local Windows system, install required applications and configuration files -
     [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
-2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 45 minutes](#prepare-your-aks-resources--60-minutes).
+2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 60 minutes](#prepare-your-aks-resources--60-minutes).
 
 3.  Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -338,20 +338,19 @@ After you finalize your SQL database configuration and you are ready to deploy, 
 Installing and deploying Pega Platform using Helm charts – 90 minutes
 ---------------------------------------------------------------------
 
-To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
+To deploy Pega Platform by using Helm, customize the default Helm charts that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
 An installation with deployment will take about 90 minutes total, because a Pega Platform installation in your PostgreSQL database takes up to an hour.
 
-Adding the Pega configuration files to your Helm installation on your local system
-----------------------------------------------------------------------------------
+### Adding the Pega configuration files to your Helm installation on your local system
 
 Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
 
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment. With the instructions in this runbook, you deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
 - pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
-- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
-
-To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+To customize these files, you must download them from the source github repository to your local system, edit them with a text editor, and then save them to your local system using the same filename.
 
 1. To add the Pega repository to your Helm installation, enter:
 
@@ -366,7 +365,7 @@ To customize these files, you must download them from the repository to your loc
   pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
 ```
 
-These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
+These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your organization's AKS deployment of Pega Platform.
 
 ### Updating the addons.yaml Helm chart values
 
@@ -441,8 +440,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
-- Specify host names for your web and stream tiers.
-
+- Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 
@@ -465,8 +463,8 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
-| installer.image:        | Specify the Docker `installer` image for installing Pega Platform. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
+| pegasearch.image: | Specify the Pega-provided Docker `search` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
+| installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
 
 3. Save the file.
@@ -530,9 +528,9 @@ Merged "runbook-demo" as current context in <local filepath>\<cluster-name>.kube
 
     `$ az aks browse --resource-group <resource-group-name> --name <cluster-name>`
 
-![](media/81a7ae961cabc463381869e3bae5c722.png)
+![The basic Kubernetes dashboard](media/81a7ae961cabc463381869e3bae5c722.png)
 
-    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only AKS resources display. The dashboard does not display your AKS cluster name or your resource name, which is expected behavior.
+    You can now view your AKS cluster details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment. Without a deployment, only AKS resources display. The dashboard does not display your cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 

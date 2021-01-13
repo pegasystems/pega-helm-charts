@@ -25,12 +25,12 @@ metadata:
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
-    beta.cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ template "pegaBackendConfig" }}"}}'
+    beta.cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
   {{ end }}
 {{- end }}
 spec:
   type:
-  {{- if (eq .root.Values.global.provider "gke") -}}
+  {{- if or (eq .root.Values.global.provider "gke") (eq .root.Values.global.provider "eks") -}}
   {{ indent 1 "NodePort" }}
   {{- else -}}
   {{ indent 1 (.node.service.serviceType | default "LoadBalancer") }}

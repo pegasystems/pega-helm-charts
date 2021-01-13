@@ -1,0 +1,65 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isHazelcastEnabled" .) "true") }}
+kind: StatefulSet
+apiVersion: apps/v1
+metadata:
+  name: {{ template "hazelcastName" . }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector:
+    matchLabels:
+      app: {{ template "hazelcastName" . }}
+      component: "Hazelcast"
+  serviceName: {{ template "hazelcastName" . }}-service
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "hazelcastName" . }}
+        component: "Hazelcast"
+      annotations:
+{{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.server.hz_graceful_shutdown_max_wait_seconds }}
+      containers:
+      - name: hazelcast
+        image: {{ .Values.image }}
+  {{- if ( .Values.imagePullPolicy ) }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+  {{- end }}
+        volumeMounts:
+        - name: {{ template "pegaVolumeCredentials" }}
+          mountPath: "/opt/hazelcast/secrets"
+        envFrom:
+        - configMapRef:
+            name: {{ template "hazelcastEnvironmentConfig" }}
+        resources:
+          requests:
+            cpu: "{{ .Values.resources.requests.cpu }}"
+            memory: "{{ .Values.resources.requests.memory }}"
+          limits:
+            cpu: "{{ .Values.resources.limits.cpu }}"
+            memory: "{{ .Values.resources.limits.memory }}"
+        ports:
+        - containerPort: 5701
+          name: hazelcast
+        - containerPort: 8089
+          name: tcp-prometheus
+        readinessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          httpGet:
+            path: /hazelcast/health/ready
+            port: 5701
+        livenessProbe:
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          httpGet:
+            path: /hazelcast/health/ready
+            port: 5701
+      restartPolicy: Always
+      volumes:
+      # Volume used to mount secret files.
+      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+      imagePullSecrets:
+      - name: {{ template "pegaRegistrySecret" }}
+{{ end }}

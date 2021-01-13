@@ -201,6 +201,7 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
@@ -219,3 +220,15 @@ installer:
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
+
+# Hazelcast settings (applicable from Pega 8.6)
+hazelcast:
+  image: "YOUR_HAZELCAST_IMAGE:TAG"
+  # Setting below to true will deploy the infinity in client server hazelcast mode
+  enabled: false
+  # No. of initial members to join
+  replicas: 3
+  # UserName to be used in client server hazelcast mode for authentication
+  username: ""
+  # Password to be used in client server hazelcast mode for authentication
+  password: ""
