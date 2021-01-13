@@ -366,6 +366,20 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### JVM Arguments
+You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
+Some of the Best-practice arguments for JVM tuning are included by default in `CATALINA_OPTS`.
+Pass the required JVM parameters as `catalinaOpts` attributes in respective `values.yaml` file.  
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    javaOpts: ""
+    catalinaOpts: "-XX:SomeJVMArg=XXX"
+```
+Note that some JVM arguments are non-overrideable i.e. baked in the Docker image. <br>
+Check [RecommendedJVMArgs.md](./RecommendedJVMArgs.md) for more details.
 ### nodeSelector
 
 Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
