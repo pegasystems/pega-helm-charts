@@ -114,7 +114,8 @@ global:
       # initialHeap: "4096m"
       # maxHeap: "7168m"
 
-      # Optionally provide runAsUser to override default pegauser
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
 
@@ -139,7 +140,8 @@ global:
           maxUnavailable: 25%
         type: RollingUpdate
 
-      # Optionally provide runAsUser to override default pegauser
+      # To configure an alternative user for your custom image, set value for runAsUser 
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
 
@@ -176,7 +178,8 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
-      # Optionally provide runAsUser to override default pegauser
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
 

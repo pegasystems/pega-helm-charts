@@ -210,7 +210,8 @@ requestor:
 ```
 ### Security context
 
-You may configure security context for Pega pod deployments. By default ```pegasystems/pega``` image uses ```pegauser(9001)``` as the user.
+By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user. To configure an alternative user for your custom image, set value for `runAsUser`. Note that pegasystems/pega image works only with pegauser(9001).
+`runAsUser` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 Example:
 
