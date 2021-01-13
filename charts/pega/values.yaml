@@ -140,7 +140,7 @@ global:
           maxUnavailable: 25%
         type: RollingUpdate
 
-      # To configure an alternative user for your custom image, set value for runAsUser 
+      # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
