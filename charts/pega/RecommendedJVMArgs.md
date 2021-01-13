@@ -17,15 +17,15 @@ CodeCache is the storage for JIT generated compiled code. If CodeCache is filled
 Metaspace is a non-heap memory that stores the class metadata such as class structure, virtual method hierarchy, etc. 
 This is the Java8+ equivalent of *PermGen* space. This space is unbounded by default, in the sense that it can endlessly expand to the system Native space.<br>
 **Flag**: `-XX:MetaspaceSize=SIZE` <br>
-**Purpose**: Sets the initial size of Metaspace at which point the system induces Garbage Collection, in order to free Metaspace and prevent "Metaspace OutOfMemoryError". 
- Note that this is *not* the initial size the Metaspace is allocated. It is set just to avoid the early Metaspace induced GC.<br>
+**Purpose**: Sets the initial size of Metaspace at which point the JVM triggers Metaspace induced Garbage Collection (GC), in order to free Metaspace and prevent "Metaspace OutOfMemoryError".
+ This is *not* the minimum Metaspace allocated. The setting allows you to set a higher Metaspace trigger size in order to avoid an initial GC that may not be warranted when the deployment starts up. <br>
  **JVM default**: 20MB <br>
 **Recommendation**:Set to 512M for large scale deployments and JVM default for others.<br> 
 
 **Flag**: `-XX:MaxMetaspaceSize=SIZE` <br>
 **Purpose**: Sets the maximum value the JVM Metaspace can occupy. Beyond this "Metaspace OutOfMemoryError" is thrown.<br>
 **JVM default**: 18446744073709486080 Bytes or Unbounded <br>
-**Pega Recommendation**: Unbounded(default), to ensure that "Metaspace OutOfMemoryError" do not occur.<br>
+**Pega Recommendation**: Unbounded(default), to ensure that "Metaspace OutOfMemoryError" exceptions do not occur.<br>
 
 **Flag**: `-XX:+UseStringDeduplication` <br>
 **Purpose**: Maintains a single copy of String literals *aka Deduplication*, in case multiple Strings have the same literal value<br>
