@@ -116,11 +116,11 @@ global:
       hpa:
         enabled: true
 
-    - name: "batch"
+    - name: "background"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
       # the load balancer.
-      nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5"
+      nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5,bix"
 
       replicas: 1
       javaOpts: ""
@@ -176,10 +176,10 @@ global:
           requests:
             storage: 5Gi
 
-    - name: "bix"
+    - name: "ADM"
       # Create a background tier for BIX processing.  This tier uses
       # the BIX node type and will not be exposed to the load balancer.
-      nodeType: "BIX"
+      nodeType: "ADM"
 
       replicas: 1
       javaOpts: ""
@@ -194,7 +194,27 @@ global:
         type: RollingUpdate
 
       hpa:
-        enabled: true
+        enabled: false
+
+    - name: "RTDG"
+      # Create a background tier for BIX processing.  This tier uses
+      # the BIX node type and will not be exposed to the load balancer.
+      nodeType: "RTDG"
+
+      replicas: 1
+      javaOpts: ""
+
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 25%
+          maxUnavailable: 25%
+        type: RollingUpdate
+
+      hpa:
+        enabled: false
 
     - name: "realtime"
       # Create a dedicated tier for real-time data grid processing.
@@ -213,7 +233,7 @@ global:
         type: RollingUpdate
 
       hpa:
-        enabled: true
+        enabled: false
 
 # External services
 
