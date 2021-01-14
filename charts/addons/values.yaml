@@ -33,24 +33,21 @@ traefik:
       # Enter the memory limit for Traefik
       memory: 500Mi
 
-# When deploying on AWS EKS, set this to true to install aws-alb-ingress-controller.
-aws-alb-ingress-controller:
+# When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
   clusterName: "YOUR_EKS_CLUSTER_NAME"
-  ## Auto Discover awsRegion from ec2metadata, set this to true and omit awsRegion when ec2metadata is available.
-  autoDiscoverAwsRegion: false
   ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod
-  ## Required if autoDiscoverAwsRegion != true
-  awsRegion: "YOUR_EKS_CLUSTER_REGION"
-  ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
-  autoDiscoverAwsVpcID: false
+  region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
-  ## Required if autoDiscoverAwsVpcID != true
-  awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv: {}
-  # AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-  # AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
+  ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json and
+  ## attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
 
 # Configure EFK stack for logging:
 # For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
