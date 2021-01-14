@@ -117,7 +117,7 @@ global:
       hpa:
         enabled: true
 
-    - name: "batch"
+    - name: "background"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
       # the load balancer.
