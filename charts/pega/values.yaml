@@ -149,9 +149,11 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
-      service:
-        port: 7003
-        targetPort: 7003
+      # Port 7003 is not exposed by default in most deployments; the exception is large deployments.
+      # To expose service and ports in your deployment, you must uncomment the following lines.
+      # service:
+      #   port: 7003
+      #   targetPort: 7003
 
       # If a nodeSelector is required for this or any tier, it may be specified here:
       # nodeSelector:
