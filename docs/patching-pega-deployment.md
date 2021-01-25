@@ -90,7 +90,7 @@ Complete the following steps.
 
    | Chart parameter name    | Purpose                                   | Your setting |
    |-------------------------|-------------------------------------------|--------------|
-   | actions.execute: | Specify an “upgrade” deployment type. | execute: "upgrade-deploy" |
+   | actions.execute: | To apply a patch using the zero-downtime patch process, specify an “upgrade-deploy” deployment type. | execute: "upgrade-deploy" |
    | jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"  | For any patch, specify the name of the existing rules schema from which the patch process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
    | jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA"  | For patches to 8.4 and later, specify the name of the temporary data schema to which the patch process migrates the existing data structure from the existing data schema; if you are applying 8.2 or 8.3 Pega software patch, you can leave this value as is (do not leave it blank).  | dataSchema: "YOUR_DATA_SCHEMA"  |
    | docker.registry.url: username:  and password: | If using a new registry since you installed Pega Platform, update the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). You can skip this section if the registry is the same as youyr initial installation. | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
@@ -105,93 +105,40 @@ Complete the following steps.
 
 2. Save the file.
 
-### Deploy Pega Platform using the command line
+### Patch your Pega Platform deployment using the command line
 
-A Helm installation and a Pega Platform installation are separate processes. The Helm install command uses Helm to install your deployment as directed in the Helm charts, one in the **charts\\addons** folder and one in the **charts\\pega** folder.
-
-In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: “deploy”. In the following tasks, you overwrite this function on your *initial* Helm install by specifying `--set global.actions.execute:install-deploy`, which invokes an installation of Pega Platform using your installation Docker image and then
-automatically followed by a deploy. In subsequent Helm deployments, you should not use the override argument, `--set global.actions.execute=`, since Pega Platform is already installed in your database.
+In this document, you specify that the Helm chart always “deploys” by using the setting, actions.execute: "upgrade-deploy argument". After you have your customizations saved in your pega Helm chart, you are ready to apply the patch.
 
 1. Do one of the following:
 
-   - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your EKS-demo folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
+   - Open Windows PowerShell running as Administrator on your local system and change the location to the top folder of your `\<platform\>-demo` folder that you created in [Preparing your local Windows 10 system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-windows.md).
 
-   `$ cd <local filepath>\EKS-demo`
+   `$ cd <local filepath>\<platform>-demo`
 
-   - Open a Linux bash shell and change the location to the top folder of your EKS-demo directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
+   - Open a Linux bash shell and change the location to the top folder of your `\<platform\>-demo` directory that you created in [Preparing your local Linux system](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/prepping-local-system-runbook-linux.md).
 
-   `$ cd /home/<local filepath>/EKS-demo`
+   `$ cd /home/<local filepath>/<platform>-demo`
 
-2. Create namespaces in preparation for the pega.yaml and addons.yaml deployments.
-
-   ```yaml
-   $ kubectl create namespace mypega-EKS-demo
-   namespace/mypega-EKS-demo created
-   $ kubectl create namespace pegaaddons
-   namespace/pegaaddons created
-   ```
-
-3. Install the addons Helm chart, which you updated in [Updating the addons Helm chart values](#Updating-the-addons-Helm-chart-values).
+2. Patch Pega Platform by upgrading using your updated `pega` Helm chart.
 
    ```yaml
-   $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
+   helm upgrade mypega-<platform>-demo pega/pega --namespace mypega-<platform>-demo --values pega.yaml
    ```
 
-   The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
+   A successful upgrade immediately returns details that shows progress for your `mypega-<platform>-demo` deployment.
 
-4. Deploy Pega Platform for the first time by 
-installing the pega Helm chart, which you updated in [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values). This installs Pega Platform software into the database you specified in the pega chart.
+3. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
-   ```yaml
-   helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy
-   ```
+4. In the dashboard, in **Namespace** select the `mypega-<platform>-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
-   For subsequent Helm installs, use the command `helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo` to deploy Pega Platform and avoid another Pega Platform installation.
+    You can follow the progress of your patch using the dashboard. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-   A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
+5. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
-5. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
+   After you open the logs view, you can click the icon for automatic refresh to see current updates to the upgrade (patch) log.
 
-6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
+6. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-<platform>-demo` namespace pods.
 
-    ! [](media/dashboard-mypega-pks-demo-install-initial.png)
+   A successful deployment does not show errors across the various workloads. The `mypega-<platform>-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
-    Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
-
-    To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
-
-7. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
-
-    After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
-
-8. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
-
-    ! [](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
-
-    A successful deployment does not show errors across the various workloads. The `mypega-EKS-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
-
-    ! [](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
-
-## Logging in to Pega Platform – 10 minutes
-
-After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the DNS host name that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **eks.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
-
-```yaml
-tier:
-  - name: "web"
-
-    service:
-      # Enter the domain name to access web nodes via a load balancer.
-      #  e.g. web.mypega.example.com
-      domain: "**eks.web.dev.pega.io**"
-```
-
-To log in to Pega Platform with this host name, you can log into your ingress load balancer and note the DNS host name that the load balancer associates with web tier; after you copy the DNS host name, you can assign the host name you gave to the web tier with the DNS host name that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with the host name you configured for your deployment in the pega Helm chart, so you can independently manage security protocols that match your networking infrastructure standards.
-
-To manually associate the host name of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. If your organization has an AWS Route 53 DNS lookup service already established to manage your DNS lookups, use the Route 53 Dashboard to create a record set that specifies the pega-web tier the host name and add the DNS host name you found when you log on the load balancer.
-
-For AWS Route53 Cloud DNS lookup service documentation details, see [What is Amazon Route 53?](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html). If not using AWS Route53 Cloud DNS lookup service, see the documentation for your DNS lookup service.
-
-With the ingress host name name associated with this DNS host host in your DNS service, you can log in to Pega Platform with a web browser using the URL: http://\<pega-web tier ingress host name>/prweb.
-
-! [](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
+   It takes a little over an hour for the applicable rules to be patched and then perform a rolling reboot of your nodes.
