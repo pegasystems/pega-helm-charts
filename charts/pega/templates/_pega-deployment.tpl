@@ -78,15 +78,6 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if (ne .root.Values.global.provider "openshift") }}
-      securityContext:
-        fsGroup: 0
-{{- if .node.securityContext }}
-        runAsUser: {{ .node.securityContext.runAsUser }}
-{{- else }}
-        runAsUser: 9001
-{{- end }}
-{{- end }}
       containers:
 {{- if .custom }}
 {{- if .custom.sidecarContainers }}
@@ -178,7 +169,7 @@ spec:
           mountPath: "/opt/pega/config"
 {{- if (.node.volumeClaimTemplate) }}
         - name: {{ .name }}
-          mountPath: "/opt/pega/kafkadata"
+          mountPath: "/opt/pega/streamvol"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.volumeMounts }}

@@ -123,24 +123,24 @@ For details, see the examples listed in the preparation runbook:
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
 * [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
 
-Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains four types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
  Name                                           | Description                                           | Tags     |
 ------------------------------------------------|-------------------------------------------------------|----------|
 `platform/installer`                            | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
 `platform/pega`                                 | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
-`platform/search`                               | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD`. |
-`platform-services/search-n-reporting-service`  | An image that deploys the required search engine for the latest generation of search and reporting capabilities in Pega Infinity as a backing service. This Docker image contains Pega Search and Reporting Services. For more information about this service, see [Instructions to configure the Pega backingservices](charts/backingservices/README.md). | `<version>` |
+`platform/search`                               | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
+`platform-services/search-n-reporting-service`  | (Download required) Deploys the required search engine for the latest generation of search and reporting capabilities in Pega Infinity. This Docker image contains Pega Search and Reporting Service.| `<version>` or `<version>-YYYYMMDD` |
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
 For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
 
-The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](charts/backingservices/charts/srs), or SRS subchart under [backing services](charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
+The docker image `platform-services/search-n-reporting-service` is part of the chart `backingservices\addons`. The `srs` subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity; this service is an alternate search feature to the previous `platform/search` image-based search deployment.  [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
-After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the Pega-provided images to your preferred Docker registry to make them available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
+After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the three Pega-provided images to your preferred Docker registry to make them available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
 
 After you have the images in your Docker repository, you then provide your registry URL, credentials, and reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
 

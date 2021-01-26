@@ -104,8 +104,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-      # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
-      catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 
