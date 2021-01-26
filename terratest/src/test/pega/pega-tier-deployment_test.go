@@ -14,7 +14,7 @@ import (
 )
 
 
-var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra", "wait-for-hazelcast"}
+var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra"}
 
 func TestPegaTierDeployment(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
@@ -79,7 +79,7 @@ func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet
 	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-stream")
-	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/streamvol")
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/kafkadata")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].Name, "pega-volume-credentials")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].MountPath, "/opt/pega/secrets")
 	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options)
@@ -142,6 +142,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "JAVA_OPTS")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "")
 	envIndex++
+	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "CATALINA_OPTS")
+    require.Equal(t, pod.Containers[0].Env[envIndex].Value, "")
+    envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "INITIAL_HEAP")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "4096m")
 	envIndex++
