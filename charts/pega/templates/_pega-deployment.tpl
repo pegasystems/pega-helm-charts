@@ -88,6 +88,12 @@ spec:
 {{- end }}
 {{- end }}
       containers:
+{{- if .custom }}
+{{- if .custom.sidecarContainers }}
+        # Additional custom sidecar containers
+{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{- end }}
+{{- end }}      
       # Name of the container
       - name: pega-web-tomcat
         # The pega image, you may use the official pega distribution or you may extend
