@@ -18,7 +18,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
 1. Prepare your Docker repository by downloading the latest three Pega Platform patch release images (platform/installer, platform/pega, and platform/search) in your release stream and pushing them into your preferred Docker image repository - [Downloading your images for the patch process – 20 minutes](#downloading-your-images-for-the-patch-process--20-minutes).
 
-2. Edit the pega Helm chart by editing parameters to specify "upgrading" your software with the software contained in your provided patch image. - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero--downtime-pega-platform-patch-using-helm-charts--120-minutes).
+2. Edit the pega Helm chart by editing parameters to specify "upgrading" your software with the software contained in your provided patch image. - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero-downtime-pega-platform-patch-using-helm-charts--120-minutes).
 
 3. **For deployments running Pega Infinity 8.2.1 through 8.2.7 only:** Create a new blank rules schema in your existing database. Leave this new schema empty. If you are running Pega Infinity 8.3 or higher, you can skip this step, since the patch scripts in your deployment automate the creation of these blank schemas.
 
@@ -34,7 +34,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
    - For 8.4 and later, see [For High Availability: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-systems-preparing-cluster-patching)
    - For 8.2 or 8.3, see [For High Availability 8.2 and 8.3 systems: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-82-and-83-systems-preparing-cluster-patching)
 
-5. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#deploy-pega-platform-using-the-command-line).
+5. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
 
 ## Assumptions and prerequisites
 
