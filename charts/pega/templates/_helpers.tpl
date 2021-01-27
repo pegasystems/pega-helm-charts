@@ -243,3 +243,5 @@ true
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}
+
+{{- define "environmentName" }}{{ $environmentNamePrefix := "pega-" }}{{ if (.Values.global.environment) }}{{ if (.Values.global.environment.name) }}{{ $environmentNamePrefix = .Values.global.environment.name }}{{ end }}{{ end }}{{ $environmentNamePrefix }}{{- end }}
