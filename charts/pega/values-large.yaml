@@ -253,7 +253,7 @@ installer:
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
-    # Valid values are 'in-place' , 'zero-downtime-patch'
+    # Valid values are 'in-place' , 'out-of-place'
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
