@@ -1,12 +1,12 @@
 ---
 global:
   # This values.yaml file is an example.  For more information about
-  # each configuration option, see the project readme.
+  # supported configuration options, see the Pega readme.
 
-  # Enter your Kubernetes provider.
+  # Specify your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
-  # Deploy Pega nodes
+  # Specify a deployment action; the default is to deploy your nodes.
   actions:
     execute: "deploy"
 
@@ -231,10 +231,17 @@ installer:
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
-    # Valid values are 'in-place' , 'out-of-place'
+    # For Pega Platform 8.3 and later, to complete a zero-downtime patch, specify 'out-of-place';
+    # For installations, leave this area set to the default values.
     upgradeType: "in-place"
-    # Specify target rules schema for migration and upgrade
-    targetRulesSchema: ""
+    # For Pega Platform 8.3 and later, to complete a zero-downtime patch, specify temporary, target rules
+    # and data schemas required for migration and upgrade; for 8.3.x and later, the deployment 
+    # automatically creates and names the schemas with the name you specify.
+    # For deployments running Pega Infinity 8.2.1 through 8.2.7 only: You must create a new
+    # blank, target rules schema in your existing database; leave this new schema empty.
+    # Specify the target Rules schema name and leave the target Data schema parameter empty.
+    targetRulesSchema: ""
+    targetDataSchema: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:

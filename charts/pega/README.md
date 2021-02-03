@@ -1,6 +1,6 @@
 # Pega Helm chart
 
-The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable.
+The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm install --; you can run the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
 ## Supported providers
 
