@@ -22,7 +22,7 @@
   {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true
   {{- else -}}
-    false
+    falsex
   {{- end -}}
 {{- end }}
 
@@ -41,8 +41,17 @@
      secretName: {{ .node.ingress.tls.secretName }}
 {{- end }}
 
+#clean up at time to removing upgrade-deply
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "isZeroDowntimeUpgrde" }}
+  {{- if (and (eq .Values.global.actions.execute "upgrade") (eq .Values.installer.upgrade.upgradeType "zero-downtime")) -}}
     true
   {{- else -}}
     false

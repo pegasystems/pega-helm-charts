@@ -1,6 +1,9 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
 {{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
+{{- define "pegaDBCustomUpgrade" -}}pega-db-custom-upgrade{{- end -}}
+{{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
+{{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBUpgrade" -}}pega-db-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
@@ -28,6 +31,14 @@
 
 {{- define "performOnlyUpgrade" }}
   {{- if (eq .Values.global.actions.execute "upgrade") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "isZeroDowntimeUpgrdeInInstaller" }}
+  {{- if ( and (eq .Values.global.actions.execute "upgrade") (eq .Values.upgrade.upgradeType "zero-downtime") ) -}}
     true
   {{- else -}}
     false

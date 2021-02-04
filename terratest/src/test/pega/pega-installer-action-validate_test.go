@@ -11,7 +11,7 @@ import (
 func TestPegaInstallerAction_WithValidUpgradeType(t *testing.T) {
 
 	var supportedActions = []string{"upgrade", "upgrade-deploy"}
-	var supportedUpgradeTypes = []string{"in-place", "out-of-place"}
+	var supportedUpgradeTypes = []string{"in-place", "out-of-place" , "zero-downtime"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)

@@ -49,10 +49,12 @@ zos:
 # Upgrade specific properties
 upgrade:
   # Type of upgrade
-  # Valid values are 'in-place' , 'out-of-place'
+  # Valid values are 'in-place' , @deprecated 'out-of-place' , 'zero-downtime'
   upgradeType: ""
   # Specify target rules schema for migration and upgrade
   targetRulesSchema: ""
+  # Specify target data schema for migration and upgrade
+  targetDataSchema: ""
   # The commit count to use when loading database tables
   dbLoadCommitRate: 100
   # Update existing application will be run if this property is set to true

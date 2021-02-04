@@ -4,11 +4,11 @@ global:
   # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
-  provider: "YOUR_KUBERNETES_PROVIDER"
+  provider: "eks"
 
   # Deploy Pega nodes
   actions:
-    execute: "deploy"
+    execute: "upgrade"
 
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
@@ -21,37 +21,37 @@ global:
     #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
     #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
     #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
-    url: "YOUR_JDBC_URL"
+    url: "jdbc:postgresql://eks-upgrade.cyy9df92ztvl.us-east-1.rds.amazonaws.com/dev"
     #   driverClass 	-- jdbc class.  Valid values are:
     #
     #   Oracle              oracle.jdbc.OracleDriver
     #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
     #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
     #   PostgreSQL          org.postgresql.Driver
-    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    driverClass: "org.postgresql.Driver"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
-    dbType: "YOUR_DATABASE_TYPE"
+    dbType: "postgres"
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "YOUR_JDBC_DRIVER_URI"
-    username: "YOUR_JDBC_USERNAME"
-    password: "YOUR_JDBC_PASSWORD"
+    driverUri: "https://jdbc.postgresql.org/download/postgresql-42.2.18.jar"
+    username: "postgres"
+    password: "postgres"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
     connectionProperties: ""
-    rulesSchema: "YOUR_RULES_SCHEMA"
-    dataSchema: "YOUR_DATA_SCHEMA"
+    rulesSchema: "rules"
+    dataSchema: "data"
     customerDataSchema: ""
 
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
     registry:
-      url: "YOUR_DOCKER_REGISTRY"
-      username: "YOUR_DOCKER_REGISTRY_USERNAME"
-      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+      url: "https://index.docker.io/v1/"
+      username: "arvasrikanth"
+      password: "12345pega"
       # Docker image information for the Pega docker image, containing the application server.
     pega:
-      image: "pegasystems/pega"
+      image: "pegasystems/pega:8.4"
 
   # Upgrade specific properties
   upgrade:
@@ -87,7 +87,7 @@ global:
 
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
-        domain: "YOUR_WEB_NODE_DOMAIN"
+        domain: "dev.pega.web.io"
         tls:
           # Enable TLS encryption
           enabled: true
@@ -160,7 +160,7 @@ global:
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
+        domain: "dev.pega.web.io"
         tls:
           # Enable TLS encryption
           enabled: true
@@ -179,7 +179,7 @@ global:
 
 # Cassandra automatic deployment settings.
 cassandra:
-  enabled: true
+  enabled: false
   persistence:
     enabled: true
   resources:
@@ -209,26 +209,27 @@ pegasearch:
 
 # Pega Installer settings.
 installer:
-  image: "YOUR_INSTALLER_IMAGE:TAG"
+  image: "arvasrikanth/pega-installer:8.6custbug"
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
-  adminPassword: "ADMIN_PASSWORD"
+  adminPassword: "install"
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
     # Valid values are 'in-place' , 'out-of-place'
-    upgradeType: "in-place"
+    upgradeType: "zero-downtime"
     # Specify target rules schema for migration and upgrade
-    targetRulesSchema: ""
+    targetRulesSchema: "newrulescustom"
+    upgradeSteps: "rules_migration,rules_upgrade"
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
-  image: "YOUR_HAZELCAST_IMAGE:TAG"
+  image: "nimma4568/myhz-server:v10"
   # Setting below to true will deploy the infinity in client server hazelcast mode
   enabled: false
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client server hazelcast mode for authentication
-  username: ""
+  username: "user"
   # Password to be used in client server hazelcast mode for authentication
-  password: ""
+  password: "password"
