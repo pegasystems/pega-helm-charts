@@ -26,6 +26,17 @@
   {{- end -}}
 {{- end }}
 
+{{- define "validateAndExposeCustomUpgradeTypeSteps" }}
+  {{ if eq "" .Values.upgrade.upgradeStepsToRun }}
+    {{- $error := printf "upgradeStepsToRun must be configured in case of custom upgrade type" -}}
+    {{ required $error nil }}
+  {{- end }}
+  {{- $parts := splitList "," .Values.upgrade.upgradeStepsToRun }}
+  {{- range $parts }}
+  {{ . | upper }}: {{ true | quote }}
+  {{- end }}
+{{- end }}
+
 {{- define "performOnlyUpgrade" }}
   {{- if (eq .Values.global.actions.execute "upgrade") -}}
     true

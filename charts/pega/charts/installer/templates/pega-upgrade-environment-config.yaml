@@ -26,6 +26,12 @@ data:
 {{- end }}
   # Type of Upgrade
   UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
+
+  # If upgrade type is "custom" then exposing upgrade steps as env variables  
+{{ if eq "custom" .Values.upgrade.upgradeType }}
+  {{ include "validateAndExposeCustomUpgradeTypeSteps" . }}
+{{- end }}
+
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
   MULTITENANT_SYSTEM: {{ .Values.multitenantSystem | quote}}
   # UDF generation will be skipped if this property is set to true
@@ -39,6 +45,10 @@ data:
 {{- if .Values.upgrade.targetRulesSchema }}
   # Target Rules Schema name
   TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
+{{- end }}
+{{- if .Values.upgrade.targetRulesSchema }}
+  # Temporary Data Schema name
+  TEMP_DATA_SCHEMA: {{ .Values.upgrade.tempDataSchema }}
 {{- end }}
 {{- if .Values.zos.zosProperties }}
   # The location of the db2zos site specific properties file. Only used if the target system is a db2zos database
