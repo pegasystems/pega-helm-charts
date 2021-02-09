@@ -4,17 +4,8 @@
 {{ if (eq (include "performOnlyUpgrade" .) "true") }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" }}
 {{ end }}
-{{ if ( and (or (eq (include "performUpgradeAndDeployment" .) "true") (eq (include "isZeroDowntimeUpgrdeInInstaller" .) "true"))  (or (eq .Values.upgrade.upgradeType "out-of-place") (eq .Values.upgrade.upgradeType "zero-downtime"))) }}
+{{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaPostDBUpgrade" .) "action" "post-upgrade" "initContainers" (list "waitForPegaDBUpgrade" "waitForRollingUpdates") }}
-{{ end }}
-{{ if ( and ( or (eq (include "performOnlyUpgrade" .) "true") (eq (include "performUpgradeAndDeployment" .) "true") ) (eq .Values.upgrade.upgradeType "custom")) }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBCustomUpgrade" .) "action" "upgrade" }}
-{{ end }}
-{{ if (and ( or (eq (include "performOnlyUpgrade" .) "true") (eq (include "performUpgradeAndDeployment" .) "true") ) (eq .Values.upgrade.upgradeType "out-of-place-rules")) }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPRulesUpgrade" .) "action" "upgrade" }}
-{{ end }}
-{{ if (and ( or (eq (include "performOnlyUpgrade" .) "true") (eq (include "performUpgradeAndDeployment" .) "true") ) (eq .Values.upgrade.upgradeType "out-of-place-data")) }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPDataUpgrade" .) "action" "upgrade" }}
 {{ end }}

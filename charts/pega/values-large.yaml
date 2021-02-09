@@ -253,11 +253,7 @@ installer:
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
-    # Valid values are 'in-place' , @deprecated 'out-of-place' , 'zero-downtime' , 'custom'
+    # Valid values are 'in-place' , 'out-of-place'
     upgradeType: "in-place"
-    # in case upgradeType 'custom' provide valid upgrade steps e.g. -  'enable_cluster_upgrade,rules_migration,rules_upgrade,data_upgrade,disable_cluster_upgrade'
-    upgradeSteps: "enable_cluster_upgrade,rules_migration,rules_upgrade,data_upgrade,disable_cluster_upgrade"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
-    # Specify target data schema for migration and upgrade
-    targetDataSchema: ""

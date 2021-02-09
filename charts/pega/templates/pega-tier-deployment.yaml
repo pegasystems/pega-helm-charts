@@ -35,11 +35,11 @@
 {{ end }}
 {{ end }}
 
-{{ if or (eq (include "performUpgradeAndDeployment" $) "true") (eq (include "isZeroDowntimeUpgrde" $) "true") }}
+{{ if (eq (include "performUpgradeAndDeployment" $) "true") }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaDBUpgrade" }}
 {{ end }}
 
-{{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") (eq (include "isZeroDowntimeUpgrde" $) "true") }}
+{{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
 {{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "tierName" $dep.name "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
 {{- end }}
 {{ end }}
