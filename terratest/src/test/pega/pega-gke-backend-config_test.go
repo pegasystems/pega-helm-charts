@@ -3,6 +3,7 @@ package pega
 import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
+	"k8s.io/ingress-gce/pkg/apis/backendconfig/v1beta1"
 	"path/filepath"
 	"testing"
 )
