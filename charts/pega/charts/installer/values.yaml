@@ -1,6 +1,5 @@
 ---
-image: "arvasrikanth/pega-installer:bug86-1"
-#image: "scrumteamwhitewalkers/installer:8.3.2"
+image: "YOUR_IMAGE_NAME"
 # Creates a new System and replaces this with default system.Default is pega
 systemName: "pega"
 # During installations, the system name above is generated with the following production level.Default is 2
@@ -16,7 +15,7 @@ multitenantSystem: "false"
 # UDF generation will be skipped if this property is set to true
 bypassUdfGeneration: "true"
 # Temporary password for administrator@pega.com that is used to install Pega Platform
-adminPassword: "install"
+adminPassword: ""
 # Run the Static Assembler ('true' to run, 'false' to not run)
 assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
@@ -50,17 +49,10 @@ zos:
 # Upgrade specific properties
 upgrade:
   # Type of upgrade
-  # Valid values are 'in-place', 'out-of-place-rules-upgrade', 'out-of-place-data-upgrade', "zero-downtime-patch", "custom"
-  upgradeType: "zero-downtime-patch"
-  #valid upgrade steps : disable_rule_creation, rules_migration, rules_upgrade, Data_upgrade,enable_rule_creation
-  #Pass the upgrade steps you want to run as a comma seperated list.
-  #Ex:   upgradeStepsToRun: "disable_rule_creation,rules_migration,rules_upgrade,data_upgrade,enable_rule_creation"
-  upgradeStepsToRun: ""
+  # Valid values are 'in-place' , 'out-of-place'
+  upgradeType: ""
   # Specify target rules schema for migration and upgrade
-  targetRulesSchema: "rules123"
-  # Specify temp data schema for migration and upgrade
-  tempDataSchema: "data123"
-
+  targetRulesSchema: ""
   # The commit count to use when loading database tables
   dbLoadCommitRate: 100
   # Update existing application will be run if this property is set to true
