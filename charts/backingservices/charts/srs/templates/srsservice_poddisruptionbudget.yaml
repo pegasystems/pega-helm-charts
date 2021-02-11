@@ -1,0 +1,15 @@
+{{ if .Values.enabled }}
+---
+apiVersion: policy/v1beta1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "srs.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+  {{- include "srs.srs-service.labels" . | indent 4 }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+  {{- include "srs.srs-service.match-labels" . | indent 6 }}
+{{ end }}

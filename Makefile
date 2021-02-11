@@ -1,12 +1,13 @@
 dependencies:
-	helm repo add incubator https://kubernetes-charts-incubator.storage.googleapis.com/
-	helm repo add stable https://kubernetes-charts.storage.googleapis.com
+	helm repo add incubator https://charts.helm.sh/incubator
+	helm repo add stable https://charts.helm.sh/stable
 	helm repo add application-gateway-kubernetes-ingress https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
 	helm repo add kiwigrid https://kiwigrid.github.io
 	helm repo add elastic https://helm.elastic.co
 	helm repo list	
 	helm dependency update ./charts/pega/
-	helm dependency update ./charts/addons/ 
+	helm dependency update ./charts/addons/
+	helm dependency update ./charts/backingservices/
 
 examples: 
 	mkdir -p ./build/kubernetes

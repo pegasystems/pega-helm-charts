@@ -49,6 +49,14 @@
   {{- end -}}
 {{- end }}
 
+{{- define "customerDeploymentID" -}}
+  {{- if .Values.global.customerDeploymentId -}}
+    {{ .Values.global.customerDeploymentId}}
+  {{- else -}}
+    {{ .Release.Namespace }}
+  {{- end -}}
+{{- end }}
+
 # list of either external or internal cassandra nodes
 {{- define "cassandraNodes" }}
   {{- if .Values.dds.externalNodes -}}
@@ -122,6 +130,13 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 # Additional JVM arguments
 - name: JAVA_OPTS
   value: "{{ .node.javaOpts }}"
+# Additional CATALINA arguments
+- name: CATALINA_OPTS
+{{- if .node.catalinaOpts }}
+  value: "{{ .node.catalinaOpts }}"
+{{- else }}
+  value: ""
+{{- end }}
 # Initial JVM heap size, equivalent to -Xms
 - name: INITIAL_HEAP
 {{- if .node.initialHeap }}

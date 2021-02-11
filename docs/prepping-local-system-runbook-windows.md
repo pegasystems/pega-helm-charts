@@ -33,7 +33,7 @@ Where `<platform>-demo` is:
 
 - For the EKS runbook, `EKS-demo`
 
-- For the PKS runbook, `PKS-demo`
+- For the TKGI runbook, `TKGI-demo`
 
 - For the Openshift runbook, `Openshift-demo`
 
@@ -52,7 +52,7 @@ The entire deployment requires the following applications to be used during the 
 - az cli (only for AKS deployments)
 - AWS IAM Authenticator for Kubernetes (only for EKS deployments)
 - eksctl (only for EKS deployments)
-- pks cli (only for PKS deployments)
+- pks cli (only for TKGI deployments)
 
 Some of the required applications are binary files that you download from the organization's download area; you can install other applications by using a Windows package manager application such as [Chocolatey](https://chocolatey.org/).
 
@@ -133,27 +133,27 @@ The prompt returns when the installation is completed.
 
 For details about installing the Azure CLI on a Windows system, see [Install Azure CLI on Windows](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest).
 
-### For PKS only: installing the PKS CLI
+### For TKGI only: installing pks cli
 
-Install the PKS CLI binary executable file from the Pivotal support site that you run with Windows administrator permissions during the PKS deployment steps:
+Install the PKS CLI binary executable file from the VMware Enterprise PKS support site that you run with Windows administrator permissions during the TKGI deployment steps:
 
-1. Use the browser of your choice to navigate to [Pivotal Network](https://network.pivotal.io/) and log in.
+1. Use the browser of your choice to navigate to [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html) and log in.
 
-2. Open the [Pivotal Container Service (PKS)](https://network.pivotal.io/products/pivotal-container-service) page and release version **1.5.1**.
+2. Open the latest version and navigate to the Windows section.
 
-3. Click **PKS CLI – v1.5.1**.
+3. Click **PKS CLI – <version>**.
 
 4. Click **PKS CLI - Windows**.
 
 5. In the EULA tab, click **AGREE**.
 
-6. In the Windows explorer window, choose the `<platform>-demo` folder to save the `pks-windows-amd64-1.5.1-build.xx.exe` file, change the filename to `pks.exe`, and then click **Save**.
+6. In the Windows explorer window, choose the `TKGI-demo` folder to save the `pks-windows-amd64-1.5.1-build.xx.exe` file, change the filename to `pks.exe`, and then click **Save**.
 
 7. Add this executable file to the PATH on your local computer so you can run `pks` from the command-line by entering:
 
     `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
 
-    Advanced users may add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-6/installing-pks-cli.html).
+    Advanced users can add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html).
 
 ### Installing Docker Desktop on Windows 10
 
@@ -239,17 +239,27 @@ Deploying Pega Platform using Pega-provided docker images
 
 To deploy Pega Platform, you must pull several required images from the Pega-managed Docker image repository and push them into your private Docker registry from where you reference them in the Pega Helm chart. For more information, see [Pega Helm chart](https://github.com/pegasystems/pega-helm-charts).
 
-Pegasystems uses a standard naming practice of `host name/product/image:tag`.  All Pega images are available from the `pega-docker.downloads.pega.com` host.  The `:tag` represents the version if Pega being deployed, for example `:8.3.1` to download Pega 8.3.1.  Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
+Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains three types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
- Name        | Description                                           |
--------------|-------------------------------------------------------|
-platform/pega  | Download required. Deploys the Pega Platform with its customized version of the Tomcat application server |
- platform/search | Download required. Deploys the search engine required for the Pega Platform application’s search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins |
- platform/installer   | A utility image Pega Platform deployments use to install or upgrade all of the Pega-specific rules and database tables in the “Pega” database you have configured for your deployment. 
- 
-When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for all three downloaded images.
+ Name        | Description                                           | Tags     |
+-------------|-------------------------------------------------------|----------|
+`platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
+`platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
+`platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
 
-Pega supports experienced client's ability to build your own installer docker image using components of a full Pega Platform 8.3 or later distribution image  to install or upgrade the Pega Platform database. If you build your own installation image, you do not have to download the Pega-provided docker image listed in the table. For details on building your own image, see [Building a Pega Platform installer docker image](building-your-own-Pega-installer-image.md).
+When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for each of the three images you download.
+
+For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
+
+For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
+
+The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
+
+After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the three Pega-provided images to your preferred Docker registry to make them available to the deployment as described in the next section. You then provide your registry URL, credentials, and reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
+
+These images do not expire, and you can keep them in your repository for as long as you require.
+
+Pega also supports experienced client's ability to build your own installer docker image using components of a full Pega Platform 8.3 or later distribution image to install or upgrade the Pega Platform database. If you build your own installation image, you do not have to download the Pega-provided docker image listed in the table. For details on building your own image, see [Building a Pega Platform installer docker image](building-your-own-Pega-installer-image.md).
 
 ## Downloading a Pega Platform installer docker image
 

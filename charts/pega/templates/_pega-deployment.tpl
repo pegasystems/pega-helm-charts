@@ -2,6 +2,10 @@
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
+  annotations: 
+{{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.annotations }}
+{{ toYaml .root.Values.global.pegaTier.annotations | indent 4 }}
+{{- end }}{{- end }}
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
@@ -28,6 +32,9 @@ spec:
     metadata:
       labels:
         app: {{ .name }}
+{{- if .node.podLabels }}
+{{ toYaml .node.podLabels | indent 8 }}
+{{- end }}
       annotations:
 {{- if .node.podAnnotations }}
 {{ toYaml .node.podAnnotations | indent 8 }}
@@ -37,6 +44,11 @@ spec:
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- if .custom }}
+{{- if .custom.serviceAccountName }}
+      serviceAccountName: {{ .custom.serviceAccountName }}
+{{- end }}
+{{- end }}
       volumes:
       # Volume used to mount config files.
       - name: {{ template "pegaVolumeConfig" }}
@@ -66,6 +78,15 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
+{{- if (ne .root.Values.global.provider "openshift") }}
+      securityContext:
+        fsGroup: 0
+{{- if .node.securityContext }}
+        runAsUser: {{ .node.securityContext.runAsUser }}
+{{- else }}
+        runAsUser: 9001
+{{- end }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
@@ -88,6 +109,13 @@ spec:
         # Specify any of the container environment variables here
         env:	
         # Node type of the Pega nodes for {{ .name }}
+{{- if .root.Values.stream }}
+{{- if .root.Values.stream.url }}
+{{- if contains "Stream" .nodeType }}
+{{ fail "Cannot have 'Stream' nodeType when Stream url is provided" }}
+{{- end }}
+{{- end }}
+{{- end }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_PATH
@@ -144,7 +172,7 @@ spec:
           mountPath: "/opt/pega/config"
 {{- if (.node.volumeClaimTemplate) }}
         - name: {{ .name }}
-          mountPath: "/opt/pega/streamvol"
+          mountPath: "/opt/pega/kafkadata"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.volumeMounts }}

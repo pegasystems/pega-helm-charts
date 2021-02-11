@@ -1,21 +1,9 @@
+{{ if (eq (include "performDeployment" $) "true") }}
 {{- if (eq .Values.global.provider "gke") }}
-apiVersion: cloud.google.com/v1beta1
-kind: BackendConfig
-metadata:
-  name: {{ template "pegaBackendConfig" }}
-spec:
-  timeoutSec: 40
-  connectionDraining:
-    drainingTimeoutSec: 60
-  sessionAffinity:
-    affinityType: "GENERATED_COOKIE"
-    affinityCookieTtlSec: {{ template "lbSessionCookieStickiness" }}
-  healthCheck:
-    checkIntervalSec: 5
-    healthyThreshold: 1
-    port: 8080
-    requestPath: /prweb/PRRestService/monitor/pingService/ping
-    timeoutSec: 5
-    type: HTTP
-    unhealthyThreshold: 2
+{{ range $index, $dep := .Values.global.tier }}
+{{ if ($dep.ingress) }} 
+{{ template "pega.gke.backendConfig" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
+{{ end }}
+{{ end }}
+{{ end }}
 {{ end }}
