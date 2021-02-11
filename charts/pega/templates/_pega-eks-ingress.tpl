@@ -34,8 +34,8 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
 {{- end }}
 {{- if not (and (.node.ingress.annotations) ( .node.ingress.annotations | quote | regexFind "alb.ingress.kubernetes.io/target-group-attributes:" ) ) }}
-    # enable sticky sessions on target group
-    alb.ingress.kubernetes.io/target-group-attributes: stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
+    # enable sticky sessions on target group and set alb routing algorithm
+    alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 {{- end }}
 spec:
   rules:
@@ -58,9 +58,15 @@ spec:
   # To access the below service, along with {{ .node.domain }}, alb http port also has to be provided in the URL.
   - host: {{ template "domainName" dict "node" .node }}
     http:
-      paths:
-      - backend:
-          serviceName: {{ .name }}
+      paths: 
+      {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
+      - path: /c11n     
+        backend:
+          serviceName: constellation
+          servicePort: 3000
+      {{ end }}
+      - backend: 
+          serviceName: {{ .name }} 
           servicePort: {{ .node.service.port }}
 ---
 {{- end }}

@@ -33,24 +33,21 @@ traefik:
       # Enter the memory limit for Traefik
       memory: 500Mi
 
-# When deploying on AWS EKS, set this to true to install aws-alb-ingress-controller.
-aws-alb-ingress-controller:
+# When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
   clusterName: "YOUR_EKS_CLUSTER_NAME"
-  ## Auto Discover awsRegion from ec2metadata, set this to true and omit awsRegion when ec2metadata is available.
-  autoDiscoverAwsRegion: false
   ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod
-  ## Required if autoDiscoverAwsRegion != true
-  awsRegion: "YOUR_EKS_CLUSTER_REGION"
-  ## Auto Discover awsVpcID from ec2metadata, set this to true and omit awsVpcID: " when ec2metadata is available.
-  autoDiscoverAwsVpcID: false
+  region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
-  ## Required if autoDiscoverAwsVpcID != true
-  awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv:
-    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
+  ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json and
+  ## attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
 
 # Configure EFK stack for logging:
 # For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
@@ -65,25 +62,30 @@ deploy_efk: &deploy_efk true
 elasticsearch:
   enabled: *deploy_efk
   # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
+  # See https://github.com/elastic/helm-charts/blob/master/elasticsearch/values.yaml
   #
-  # If you need to change this value then you will also need to replace the same
-  # part of the value within the following properties further below:
-  #
-  #   kibana.files.kibana.yml.elasticsearch.url
-  #   fluentd-elasticsearch.elasticsearch.host
-  #
-  fullnameOverride: "elastic-search"
+  antiAffinity: soft
+  esJavaOpts: "-Xmx512m -Xms512m"
+  # Allocate smaller chunks of memory per pod.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512M"
+    limits:
+      cpu: "1000m"
+      memory: "1Gi"
+  # Request smaller persistent volumes.
+  volumeClaimTemplate:
+    accessModes: ["ReadWriteOnce"]
+    resources:
+      requests:
+        storage: 10Gi
 
 kibana:
   enabled: *deploy_efk
   # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
-  files:
-    kibana.yml:
-      elasticsearch.url: http://elastic-search-client:9200
-  service:
-    externalPort: 80
+  # See https://github.com/elastic/helm-charts/blob/master/kibana/values.yaml
+  elasticsearchHosts: "http://elasticsearch-master:9200"
   ingress:
     # If enabled is set to "true", an ingress is created to access kibana.
     enabled: true
@@ -94,11 +96,9 @@ kibana:
 fluentd-elasticsearch:
   enabled: *deploy_efk
   # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
-  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+  # See https://github.com/kiwigrid/helm-charts/blob/master/charts/fluentd-elasticsearch/values.yaml
   elasticsearch:
-    host: elastic-search-client
-    buffer_chunk_limit: 250M
-    buffer_queue_limit: 30
+    hosts: ["elasticsearch-master:9200"]
 
 # Configure a metrics-server tool for the deployment by following the guidelines specific to each provider:
 # EKS, open-source Kubernetes, Openshift - set this to true.
@@ -122,7 +122,7 @@ metrics-server:
 # Application Gateway config based on the status of the Kubernetes cluster. For details, see
 # (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#azure-resource-manager-authentication).
 ingress-azure:
-  enabled: true
+  enabled: false
   # Add required details about the Application Gateway you created.
   appgw:
     # Subscription ID of your Azure subscription.

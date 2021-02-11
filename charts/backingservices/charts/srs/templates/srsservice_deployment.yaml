@@ -1,0 +1,54 @@
+{{ if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "srs.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- include "srs.srs-service.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.srsRuntime.replicaCount }}
+  selector:
+    matchLabels:
+{{- include "srs.srs-service.match-labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "srs.srs-service.match-labels" . | indent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ template "srsRegistrySecretName" . }}
+      containers:
+        - name: srs-service
+          image: {{ .Values.srsRuntime.srsImage }}
+          imagePullPolicy: {{ .Values.srsRuntime.imagePullPolicy }}
+          ports:
+            - name: srs-port
+              containerPort: 8080
+              protocol: TCP
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: srs-port
+              scheme: HTTP
+            initialDelaySeconds: 2
+            periodSeconds: 5
+            timeoutSeconds: 30
+          env:
+            - name: ELASTICSEARCH_HOST
+              value: {{ template "elasticsearch.domain" . }}
+            - name: ELASTICSEARCH_PORT
+              value: {{ template "elasticsearch.port" . }}
+            - name: ELASTICSEARCH_PROTO
+              value:  {{ template "elasticsearch.protocol" . }}
+            - name: APPLICATION_HOST
+              value: "0.0.0.0"
+            - name: APPLICATION_PORT
+              value: "8080"
+            - name: AUTH_ENABLED
+              value: "{{ .Values.srsRuntime.env.AuthEnabled | default "false" }}"
+            - name: PUBLIC_KEY_URL
+              value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
+          resources:
+            {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
+{{ end }}

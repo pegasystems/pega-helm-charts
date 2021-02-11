@@ -1,13 +1,9 @@
+{{ if (eq (include "performDeployment" $) "true") }}
 {{- if (eq .Values.global.provider "gke") }}
-apiVersion: cloud.google.com/v1beta1
-kind: BackendConfig
-metadata:
-  name: {{ template "pegaBackendConfig" }}
-spec:
-  timeoutSec: 40
-  connectionDraining:
-    drainingTimeoutSec: 60
-  sessionAffinity:
-    affinityType: "GENERATED_COOKIE"
-    affinityCookieTtlSec: {{ template "lbSessionCookieStickiness" }}
+{{ range $index, $dep := .Values.global.tier }}
+{{ if ($dep.ingress) }} 
+{{ template "pega.gke.backendConfig" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) }}
+{{ end }}
+{{ end }}
+{{ end }}
 {{ end }}

@@ -32,12 +32,36 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
+{{- if .Values.pegasearch.externalSearchService }}
+  # Search deployment type so that the engine knows to connect to the search service
+  PEGA_SEARCH_TYPE: "ExternalSearchService" 
+  # URL to connect to Search and Reporting service
+  SEARCH_AND_REPORTING_SERVICE_URL: {{ .Values.pegasearch.externalURL }}
+{{- else }}
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ .Values.pegasearch.externalURL }}
+{{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
   # Comma separated list of cassandra hosts
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  # Unique ID for multitenant backing services
+  CUSTOMER_DEPLOYMENT_ID: "{{ include "customerDeploymentID" . }}"
+{{- if .Values.stream }}
+{{- if .Values.stream.url }}
+  PEGA_STREAM_URL: {{ .Values.stream.url }}
+{{- end }}
+{{- end }}
+{{ if .Values.hazelcast.enabled }}
+  HZ_DISCOVERY_K8S: "true"
+  HZ_CLIENT_MODE: "true"
+{{ if .Values.hazelcast.client.clusterName }}
+  # Hazelcast Cluster Name
+  HZ_CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
+{{- end }}
+  # Hostname of hazelcast server
+  HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+{{- end }}
 {{ end }}
