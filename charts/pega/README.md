@@ -12,7 +12,7 @@ k8s         | Open-source Kubernetes
 openshift   | Red Hat Openshift
 eks         | Amazon Elastic Kubernetes Service (EKS)
 gke         | Google Kubernetes Engine (GKE)
-pks         | Pivotal Container Service (PKS)
+pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS)
 aks         | Microsoft Azure Kubernetes Service (AKS)
 
 Example for a kubernetes environment:
@@ -171,12 +171,12 @@ bix         | Nodes dedicated to BIX processing can be helpful when the BIX work
 
 ### Name (*Required*)
 
-Use the `tier` section in the helm chart to specify the name of each tier configuration in order to label a tier in your Kubernetes deployment.  This becomes the name of the tier's replica set in Kubernetes.
+Use the `tier` section in the helm chart to specify the name of each tier configuration in order to label a tier in your Kubernetes deployment.  This becomes the name of the tier's replica set in Kubernetes. This name must be unique across all Pega deployments to ensure compatibility with logging and monitoring tools.
 
 Example:
 
 ```yaml
-name: "web"
+name: "mycrm-prod-web"
 ```
 
 ### nodeType (*Required*)
@@ -208,7 +208,19 @@ Example:
 requestor:
   passivationTimeSec: 900
 ```
+### Security context
 
+By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user. To configure an alternative user for your custom image, set value for `runAsUser`. Note that pegasystems/pega image works only with pegauser(9001).
+`runAsUser` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      runAsUser: RUN_AS_USER
+```
 ### service
 
 Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
@@ -238,14 +250,26 @@ Specify the `ingress` yaml block to expose a Pega tier to access from outside Ku
 Parameter | Description
 ---       | ---
 `domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
+`appContextPath`  | Specify the path for access to the Pega application on a specific tier. If not specified, users will have access to the Pega application via /prweb 
 `tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
-`annotations` | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used *instead of* the default configurations.
+`annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes and EKS deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
-  - For `EKS` - use alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>
+  - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
+  - For `AKS` - use `appgw.ingress.kubernetes.io/request-timeout: \<*time-out-in-seconds*\>` to configure application gateway timeout settings.
+
+Example:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+    annotation-name-1: annotation-value-1
+    annotation-name-2: annotation-value-2
+```
 
 #### Provider support for SSL certificate management
 
@@ -253,7 +277,7 @@ Provider  | Kubernetes Secrets | Cloud SSL management service
 ---       | ---                | ---
 AKS       | Supported          | None
 EKS       | Not supported      | Manage certificate using Amazon Certification Manager and use ssl_annotation - see example for details.
-PKS       | Supported          | None
+PKS (now TKGI)       | Supported          | None
 GKE       | Supported          | [Pre-shared or Google-managed certificates](#managing-certificates-in-google-cloud)
 
 #### Managing certificates using Kubernetes secrets
@@ -342,6 +366,20 @@ Parameter       | Description    | Default value
 `initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
 
+### JVM Arguments
+You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
+Some of the Best-practice arguments for JVM tuning are included by default in `CATALINA_OPTS`.
+Pass the required JVM parameters as `catalinaOpts` attributes in respective `values.yaml` file.  
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    javaOpts: ""
+    catalinaOpts: "-XX:SomeJVMArg=XXX"
+```
+Note that some JVM arguments are non-overrideable i.e. baked in the Docker image. <br>
+Check [RecommendedJVMArgs.md](./RecommendedJVMArgs.md) for more details.
 ### nodeSelector
 
 Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
@@ -389,7 +427,7 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `700` which corresponds to 700% of 200m ) | `700`
+`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
 
 ### Volume claim template
@@ -414,6 +452,20 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
+
+### Service Account
+
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
 ### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
@@ -429,12 +481,30 @@ tier:
 
 ### Pega configuration files
 
-While default configuration files are included by default, the Helm charts provide extension points to override them with additional customizations.  To change the configuration file, specify a relative path to a local implementation to be injected into a ConfigMap.
+While Pega includes default configuration files in the Helm charts, the charts provide extension points to override the defaults with additional customizations. To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
 
-Parameter       | Description    | Default value
----             | ---       | ---
-`prconfigPath`  | The location of a [prconfig.xml](config/deploy/prconfig.xml) template.  | `config/prconfig.xml`
-`prlog4j2Path`  | The location of a [prlog4j2.xml](config/deploy/prlog4j2.xml) template.  | `config/prlog4j2.xml`
+Parameter     | Description    | Default value
+---           | ---       | ---
+`prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
+`prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
+`contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
+
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      prconfig: |-
+        ...
+
+      prlog4j2: |-
+        ...
+
+      contextXML: |-
+        ...
+```
 
 ### Pega diagnostic user
 
@@ -499,6 +569,25 @@ dds:
 
 Use the `pegasearch` section to configure a deployment of ElasticSearch for searching Rules and Work within Pega.  This deployment is used exclusively for Pega search, and is not the same ElasticSearch deployment used by the EFK stack or any other dedicated service such as Pega BI.
 
+### For Pega Platform 8.6 and later:
+
+Pega recommends using the chart ['backingservices'](../backingservices) to enable the use of a search and reporting service in your deployment. This is a shareable and independently manageable search solution for Pega Platform that replaces the previously used Elasticsearch. To use this search and reporting service, you must follow the deployment instructions provided at [backingservices](../backingservices/README.md) to provision the service. The Search and Reporting Service (SRS) Url can be configured with the current Pega platform environment using the below configuration in values.yaml.
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | false
+`externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `""`
+
+Example:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.namespace.svc.cluster.local"
+```
+
+Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
+
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `image`   | Set the `pegasearch.image` location to a registry that can access the Pega search Docker image. The image is [available on DockerHub](https://hub.docker.com/r/pegasystems/search), and you may choose to mirror it in a private Docker repository. | `pegasystems/search:latest`
@@ -560,4 +649,17 @@ installer:
   upgrade:
     upgradeType: "out-of-place"
     targetRulesSchema: "rules_upgrade"
+```
+
+### Installer Pod Annotations
+
+You can add annotations to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podAnnotations:
+    annotation-name1: annotation-value1
+    annotation-name2: annotation-value2
 ```

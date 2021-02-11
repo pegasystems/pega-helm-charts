@@ -32,6 +32,8 @@ distributionKitVolumeClaimName: ""
 bypassLoadEngineClasses: "false"
 # Bypass loading assembly classes into database
 bypassLoadAssembledClasses: "false"
+# If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
+waitForJobCompletion: "false"
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5

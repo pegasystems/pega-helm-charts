@@ -1,0 +1,36 @@
+---
+image: "YOUR_HAZELCAST_IMAGE:TAG"
+imagePullPolicy: "Always"
+# Enter the number of initial members in hazelcast cluster.
+replicas: 3
+# Setting below to true will deploy the infinity in client server hazelcast mode
+enabled: false
+# username to be used in client server hazelcast mode for authentication
+username: ""
+# password to be used in client server hazelcast mode for authentication
+password: ""
+
+# Memory and CPU settings for HZ service
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: 2
+  limits:
+    memory: "4Gi"
+    cpu: 2
+# client settings for hazelcast
+client:
+  clusterName: "PRPC"
+# Server side settings for hazelcast
+server:
+  java_opts: "-Dhazelcast.initial.min.cluster.size=3 -Djava.util.logging.config.file=/opt/hazelcast/logging.properties -Dhazelcast.jmx=true -XX:MaxRAMPercentage=80.0"
+  hz_health_monitoring_level: "OFF"
+  hz_operation_generic_thread_count: ""
+  hz_operation_thread_count: ""
+  hz_io_thread_count: ""
+  hz_event_thread_count: ""
+  hz_max_join_seconds: ""
+  group_name: "PRPC"
+  mancenter_url: ""
+  hz_graceful_shutdown_max_wait_seconds: "600"
+  service_dns_timeout: ""

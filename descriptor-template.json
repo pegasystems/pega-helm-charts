@@ -23,6 +23,11 @@
                 "override" : 1
             }
         },
+        {"includePattern": "${BACKINGSERVICES_FILE_NAME}" , "uploadPattern": "${BACKINGSERVICES_FILE_NAME}",
+            "matrixParams": {
+                "override" : 1
+            }
+        },
         {"includePattern": "index.yaml", "uploadPattern": "index.yaml", 
             "matrixParams": {
                 "override" : 1

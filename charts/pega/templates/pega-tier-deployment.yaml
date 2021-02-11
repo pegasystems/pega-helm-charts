@@ -11,7 +11,9 @@
 
 {{ $containerWaitList := list  }}
 {{ if (eq (include "performOnlyDeployment" $) "true") }}
+{{ if not $.Values.pegasearch.externalSearchService }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ end }}
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
 {{ end }}
@@ -19,7 +21,9 @@
 
 {{ if (eq (include "performInstallAndDeployment" $) "true") }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaDBInstall" }} 
+{{ if not $.Values.pegasearch.externalSearchService }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ end }}
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
 {{ end }}

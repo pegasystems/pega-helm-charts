@@ -3,19 +3,19 @@ package addons
 import (
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"test/common"
+	corev1 "k8s.io/api/core/v1"
 	"testing"
 )
 
 func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled": "false",
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled": "false",
 		}),
 	)
 
 	for _, i := range albIngressResources {
-		require.False(t, helmChartParser.Contains(common.SearchResourceOption{
+		require.False(t, helmChartParser.Contains(SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -23,14 +23,14 @@ func TestShouldNotContainAlbIngressIfDisabled(t *testing.T) {
 }
 
 func TestAlbIngressShouldContainAllResources(t *testing.T) {
-	helmChartParser := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled": "true",
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled": "true",
 		}),
 	)
 
 	for _, i := range albIngressResources {
-		require.True(t, helmChartParser.Contains(common.SearchResourceOption{
+		require.True(t, helmChartParser.Contains(SearchResourceOption{
 			Name: i.Name,
 			Kind: i.Kind,
 		}))
@@ -38,130 +38,87 @@ func TestAlbIngressShouldContainAllResources(t *testing.T) {
 }
 
 func Test_checkSetAwsRegion(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":               "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "false",
-			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
+	helmChart := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled":               "true",
+			"aws-load-balancer-controller.autoDiscoverAwsRegion": "false",
+			"aws-load-balancer-controller.region":             "YOUR_EKS_CLUSTER_REGION",
 		}),
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
+	helmChart.Find(SearchResourceOption{
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-region=YOUR_EKS_CLUSTER_REGION")
 }
 
-func Test_checkAutoDiscoverAwsRegion(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":               "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsRegion": "true",
-			"aws-alb-ingress-controller.awsRegion":             "YOUR_EKS_CLUSTER_REGION",
-		}),
-	)
-
-	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
-		Kind: "Deployment",
-	}, &deployment)
-
-	require.NotContains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-region=YOUR_EKS_CLUSTER_REGION")
-}
-
 func Test_checkSetAwsVpcID(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":              "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "false",
-			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
+	helmChart := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled":              "true",
+			"aws-load-balancer-controller.vpcId":             "YOUR_EKS_CLUSTER_VPC_ID",
 		}),
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
+	helmChart.Find(SearchResourceOption{
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-vpc-id=YOUR_EKS_CLUSTER_VPC_ID")
 }
 
-func Test_checkAutoDiscoverAwsVpcID(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":              "true",
-			"aws-alb-ingress-controller.autoDiscoverAwsVpcID": "true",
-			"aws-alb-ingress-controller.awsVpcID":             "YOUR_EKS_CLUSTER_VPC_ID",
+func Test_checkSetServiceAnnotation(t *testing.T) {
+	helmChart := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled":              "true",
 		}),
 	)
+	var serviceAccount *corev1.ServiceAccount
+	helmChart.Find(SearchResourceOption{
+		Name: "pega-aws-load-balancer-controller",
+		Kind: "ServiceAccount",
+	}, &serviceAccount)
 
-	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
-		Kind: "Deployment",
-	}, &deployment)
-
-	require.NotContains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--aws-vpc-id=YOUR_EKS_CLUSTER_VPC_ID")
+	require.Contains(t, serviceAccount.ObjectMeta.Annotations["eks.amazonaws.com/role-arn"], "YOUR_IAM_ROLE_ARN")
 }
 
 func Test_checkSetClusterName(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":     "true",
-			"aws-alb-ingress-controller.clusterName": "YOUR_EKS_CLUSTER_NAME",
+	helmChart := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"aws-load-balancer-controller.enabled":     "true",
+			"aws-load-balancer-controller.clusterName": "YOUR_EKS_CLUSTER_NAME",
 		}),
 	)
 
 	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
+	helmChart.Find(SearchResourceOption{
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	}, &deployment)
 
 	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--cluster-name=YOUR_EKS_CLUSTER_NAME")
 }
 
-func Test_checkSetAccessKey(t *testing.T) {
-	helmChart := common.NewHelmConfigParser(
-		common.NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"aws-alb-ingress-controller.enabled":                        "true",
-			"aws-alb-ingress-controller.extraEnv.AWS_ACCESS_KEY_ID":     "YOUR_AWS_ACCESS_KEY_ID",
-			"aws-alb-ingress-controller.extraEnv.AWS_SECRET_ACCESS_KEY": "YOUR_AWS_SECRET_ACCESS_KEY",
-		}),
-	)
-
-	var deployment *v1.Deployment
-	helmChart.Find(common.SearchResourceOption{
-		Name: "release-name-aws-alb-ingress-controller",
-		Kind: "Deployment",
-	}, &deployment)
-
-	require.Equal(t, "AWS_ACCESS_KEY_ID", deployment.Spec.Template.Spec.Containers[0].Env[0].Name)
-	require.Equal(t, "YOUR_AWS_ACCESS_KEY_ID", deployment.Spec.Template.Spec.Containers[0].Env[0].Value)
-	require.Equal(t, "AWS_SECRET_ACCESS_KEY", deployment.Spec.Template.Spec.Containers[0].Env[1].Name)
-	require.Equal(t, "YOUR_AWS_SECRET_ACCESS_KEY", deployment.Spec.Template.Spec.Containers[0].Env[1].Value)
-}
-
-var albIngressResources = []common.SearchResourceOption{
+var albIngressResources = []SearchResourceOption{
 	{
-		Name: "release-name-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "ServiceAccount",
 	},
 	{
-		Name: "release-name-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller-role",
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "release-name-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller-rolebinding",
 		Kind: "ClusterRoleBinding",
 	},
 	{
-		Name: "release-name-aws-alb-ingress-controller",
+		Name: "pega-aws-load-balancer-controller",
 		Kind: "Deployment",
 	},
 }
