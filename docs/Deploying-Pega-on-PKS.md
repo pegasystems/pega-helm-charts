@@ -76,7 +76,7 @@ In order to login to your cluster, you must have the following information:
 
 - Whether any SSL information is required to authenticate your login.
 
-During deployment the required Kubernetes configuration file is copied into the cluster.
+During deployment the required Kubernetes configuration file is copied into the cluster and into your default ~/.kube directory.
 
 ### Creating a database resource
 
@@ -288,7 +288,7 @@ Your cluster name is displayed in the **Name** field.
 4. To use the pks CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-    $ pks get-credentials <cluster-name>`
+    $ pks get-credentials <cluster-name>
     Fetching credentials for cluster pega-platform.
     Context set for cluster pega-platform.
 ```
@@ -318,7 +318,7 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
 - To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
 
-    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only TKGI resources display. The dashboard does not display your TKGI cluster name or your resource name, which is expected behavior.
+    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your PKS cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 

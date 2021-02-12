@@ -355,7 +355,7 @@ $ kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole
 
 - To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
 
-    You can now view your deployment details using the Kubernetes dashboard. Use this dashboard to review the status of your deployment. Without a deployment, only GKE resources display. The dashboard does not display your GKE cluster name or your resource name, which is expected behavior.
+    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your GKE cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux shell open.
 
