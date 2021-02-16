@@ -57,7 +57,7 @@ spec:
           name: {{ .name }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes

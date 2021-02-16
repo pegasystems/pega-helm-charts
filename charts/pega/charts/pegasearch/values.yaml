@@ -7,7 +7,7 @@ replicas: 1
 # Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.
 minimumMasterNodes: 1
 # If externalURL is set to a value different from the name of the k8s service defined in pega-search-service.yaml,
-# no search nodes will be deployed automatically, and Pega will use this search node url.  
+# no search nodes will be deployed automatically, and Pega will use this search node url.
 externalURL: "http://pega-search"
 # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
 # Push the Elasticsearch image to your internal docker registry. This must be the same registry as the docker section above.
