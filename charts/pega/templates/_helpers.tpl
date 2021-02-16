@@ -1,8 +1,24 @@
-{{- define "pegaEnvironmentConfig" }}pega-environment-config{{- end }}
+
+{{- define "pegaEnvironmentConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-environment-config
+{{- end }}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
+
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
-{{- define "pegaCredentialsSecret" }}pega-credentials-secret{{- end }}
-{{- define "pegaRegistrySecret" }}pega-registry-secret{{- end }}
+
+{{- define "pegaCredentialsSecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-credentials-secret
+{{- end }}
+
+{{- define "pegaRegistrySecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-registry-secret
+{{- end }}
+
+
 {{- define "deployConfig" -}}deploy-config{{- end -}}
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
@@ -96,7 +112,7 @@
 - name: wait-for-pegasearch
   image: busybox:1.31.0
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
-  command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ .Values.pegasearch.externalURL }}); do echo Waiting for search to become live...; sleep 10; done;']
+  command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -244,4 +260,13 @@ true
     defaultMode: 420
 {{- end}}
 
-{{- define "environmentName" }}{{ $environmentNamePrefix := "pega-" }}{{ if (.Values.global.environment) }}{{ if (.Values.global.environment.name) }}{{ $environmentNamePrefix = .Values.global.environment.name }}{{ end }}{{ end }}{{ $environmentNamePrefix }}{{- end }}
+{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
+#As the pegasearch chart includes an externalURL value that is hardcoded to the name of the search service
+#it poses certain challenges if we want to rename the search service from something other than 'pega-search'
+#and still want to deploy pegasearch pods.
+{{- define "pegaSearchURL" -}}
+{{- $d1 := dict "overrideURL" $.Values.pegasearch.externalURL }}
+{{- $d2 := merge $ $d1 }}
+{{- template "searchURL" $d2 }}
+{{- end -}}

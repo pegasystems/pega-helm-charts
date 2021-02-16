@@ -1,4 +1,4 @@
-{{ $envName := printf "%s" (include "environmentName" $) }}
+{{ $depName := printf "%s" (include "deploymentName" $) }}
 
 {{ $kindName := "" }}
 {{ $apiVer := "" }}
@@ -37,6 +37,6 @@
 {{ end }}
 
 {{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "%s%s" $envName $dep.name) "tierName" $dep.name "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
+{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "%s-%s" $depName $dep.name) "tierName" $dep.name "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
 {{- end }}
 {{ end }}

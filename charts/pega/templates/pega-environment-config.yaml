@@ -3,7 +3,7 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ template "pegaEnvironmentConfig" }}
+  name: {{ template "pegaEnvironmentConfig" $ }}
   namespace: {{ .Release.Namespace }}
 data:
   # Database Type for installation
@@ -36,10 +36,10 @@ data:
   # Search deployment type so that the engine knows to connect to the search service
   PEGA_SEARCH_TYPE: "ExternalSearchService" 
   # URL to connect to Search and Reporting service
-  SEARCH_AND_REPORTING_SERVICE_URL: {{ .Values.pegasearch.externalURL }}
+  SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
 {{- else }}
   # URL to connect to Elastic Search
-  PEGA_SEARCH_URL: {{ .Values.pegasearch.externalURL }}
+  PEGA_SEARCH_URL: {{ include "pegaSearchURL" $ }}
 {{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"

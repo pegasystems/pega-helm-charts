@@ -1,9 +1,9 @@
-{{ $envName := printf "%s" (include "environmentName" $) }}
+{{ $depName := printf "%s" (include "deploymentName" $) }}
 
 {{ if (eq (include "performDeployment" $) "true") }}
 {{ range $dep := .Values.global.tier  }}
 {{ if ($dep.hpa) }}
-{{ template "pega.hpa" dict "root" $ "name" (printf "%s-hpa" (printf "%s%s" $envName $dep.name)) "deploymentName" (printf "%s%s" $envName $dep.name) "hpa" $dep.hpa }}
+{{ template "pega.hpa" dict "root" $ "name" (printf "%s-hpa" (printf "%s-%s" $depName $dep.name)) "deploymentName" (printf "%s-%s" $depName $dep.name) "hpa" $dep.hpa }}
 {{ end }}
 {{ end }}
 {{ end }}
