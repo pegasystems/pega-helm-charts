@@ -130,19 +130,23 @@ docker:
     imagePullPolicy: "Always"
 ```
 
-## Environment Name (Optional)
+## Deployment Name (Optional)
 
-Set the environment name to help differentiate this deployment from others.  The provided name will be used as a prefix to the various Pega tiers (and the k8s objects created on their behalf).  The environment name must consist of a DNS friendly name as it will be incorporated into the names of k8s objects. For example:
+Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
+
+This is meant as an alternative to renaming individual deployment tiers (see [Tiers of a Pega deployment](#tiers-of-a-pega-deployment)).
+
+For example:
 ```yaml
 global:
-  environment:
-    name: app1-dev-
+  deployment:
+    name: app1-dev
 ```
 will result in:
 ```
 >kubectl get pods -n test
 NAME                              READY   STATUS    RESTARTS   AGE
-pega-search-0                     1/1     Running   0          24m
+app1-dev-0                        1/1     Running   0          24m
 app1-dev-batch-86584dcd6b-dsvdd   1/1     Running   0          24m
 app1-dev-batch-86584dcd6b-lfwjg   1/1     Running   0          7m31s
 app1-dev-stream-0                 1/1     Running   0          24m
@@ -150,9 +154,7 @@ app1-dev-stream-1                 1/1     Running   0          18m
 app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
 app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
 ```
-(pega-search-0 is not renamed as it not a Pega tier as it doesn't host a Pega node.)
-
-The default value is "pega-" if it is unset.
+The default value is "pega" if it is unset.
 
 ## Tiers of a Pega deployment
 
