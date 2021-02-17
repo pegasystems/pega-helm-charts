@@ -7,8 +7,8 @@ global:
   provider: "YOUR_KUBERNETES_PROVIDER"
 
   deployment:
-    #The name specified will be used to prefix all of the Pega pods (replacing "pega").
-    #name: "myapp-dev"
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega").
+    # name: "myapp-dev"
     
   # Deploy Pega nodes
   actions:
