@@ -146,7 +146,7 @@ will result in:
 ```
 >kubectl get pods -n test
 NAME                              READY   STATUS    RESTARTS   AGE
-app1-dev-0                        1/1     Running   0          24m
+app1-dev-search-0                 1/1     Running   0          24m
 app1-dev-batch-86584dcd6b-dsvdd   1/1     Running   0          24m
 app1-dev-batch-86584dcd6b-lfwjg   1/1     Running   0          7m31s
 app1-dev-stream-0                 1/1     Running   0          24m
