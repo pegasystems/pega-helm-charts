@@ -25,7 +25,7 @@ provider: "k8s"
 
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system. These values are case-sensitive and must be lowercase.
 
-For additional, required installation parameters, see the [Installer section](#installation).
+For additional, required installation parameters, see the [Installer section](#installations).
 
 Value             | Action
 ---               | ---
