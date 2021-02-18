@@ -25,7 +25,7 @@ provider: "k8s"
 
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system. These values are case-sensitive and must be lowercase.
 
-For additional, required installation parameters, see the [Installer section](#install).
+For additional, required installation parameters, see the [Installer section](#installation).
 
 Value             | Action
 ---               | ---
@@ -44,7 +44,7 @@ action: "deploy"
 
 ## JDBC Configuration
 
-Use the `jdbc` section  of the values file to specify how to connect to the Pega database. *Pega must be installed to this database before deploying on Kubernetes*.  
+Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes.  
 
 ### URL and Driver Class
 These required connection details will point Pega to the correct database and provide the type of driver used to connect. Examples of the correct format to use are provided below. 
@@ -55,7 +55,9 @@ jdbc:
   url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
   driverClass: oracle.jdbc.OracleDriver
 ```
+
 Example for Microsoft SQL Server:
+
 ```yaml
 jdbc:
   url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
