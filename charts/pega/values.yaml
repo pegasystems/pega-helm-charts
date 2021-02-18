@@ -234,7 +234,6 @@ installer:
     # For Pega Platform 8.3 and later, to complete a zero-downtime patch, specify 'out-of-place';
     # For installations, leave this area set to the default values.
     upgradeType: "in-place"
-    # For Pega Platform 8.3 and later, to complete a zero-downtime patch, specify temporary, target rules
     # and data schemas required for migration and upgrade; for 8.3.x and later, the deployment 
     # automatically creates and names the schemas with the name you specify.
     # For deployments running Pega Infinity 8.2.1 through 8.2.7 only: You must create a new
