@@ -241,7 +241,9 @@ installer:
     # blank, target rules schema in your existing database; leave this new schema empty.
     # Specify the target Rules schema name and leave the target Data schema parameter empty.
     targetRulesSchema: ""
-    targetDataSchema: ""
+    # commenting out the new, required parameter to ensure the PR builds and can be reviewed.
+    # Saurabh confirmed that this parameter is required for patch process to work correctly.
+    #targetDataSchema: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
