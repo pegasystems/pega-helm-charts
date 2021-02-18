@@ -20,7 +20,7 @@ type pegaDbJob struct {
 var volDefaultMode int32 = 420
 var volDefaultModePointer = &volDefaultMode
 
-func TestPegaInstallerJob(t *testing.T) {
+	func TestPegaInstallerJob(t *testing.T) {
 
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
@@ -34,6 +34,7 @@ func TestPegaInstallerJob(t *testing.T) {
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 
@@ -48,7 +49,7 @@ func TestPegaInstallerJob(t *testing.T) {
 						if index == 1 {
 							expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}
 						} else if index == 2 {
-							expectedJob = pegaDbJob{"pega-db-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
+							expectedJob = pegaDbJob{"pega-zdt-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
 						} else if index == 3 {
 							expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config"}
 						}
@@ -61,7 +62,7 @@ func TestPegaInstallerJob(t *testing.T) {
 				if operation == "install" || operation == "install-deploy" {
 					assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config"}, options)
 				} else {
-					assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+					assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
 				}
 			}
 		}

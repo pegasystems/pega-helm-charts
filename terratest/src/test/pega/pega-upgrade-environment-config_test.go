@@ -33,9 +33,9 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 
 func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *helm.Options) {
 	var upgradeEnvConfigMap k8score.ConfigMap
+
 	UnmarshalK8SYaml(t, configYaml, &upgradeEnvConfigMap)
 	upgradeEnvConfigData := upgradeEnvConfigMap.Data
-
 	require.Equal(t, upgradeEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, upgradeEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, upgradeEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
