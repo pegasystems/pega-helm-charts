@@ -18,7 +18,7 @@
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
     />
-  {{ if .Env.JDBC_RO_URL }}
+  {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
     <Resource name="jdbc/PegaRULESReadOnly"
     auth="Container"
     type="javax.sql.DataSource"
@@ -34,10 +34,10 @@
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
     />
   
-  <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly"/>
-  <Environment name="prconfig/database/databases/PegaDATA/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly"/>
+  <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
+  <Environment name="prconfig/database/databases/PegaDATA/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
   {{ if .Env.CUSTOMERDATA_SCHEMA }}
-  <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly"/>
+  <Environment name="prconfig/database/databases/CustomerData/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
   {{ end }}
   {{ end }}
 
