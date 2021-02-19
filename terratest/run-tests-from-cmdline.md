@@ -5,7 +5,7 @@ The test can also be run from the command line which avoids needing to have a li
 ## Prerequisites
 - A local clone of this repo
 - Install an appropriate version go (v1.13+)
-- Install dep (```curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh```)
+- Install dep
 
 ## Setup
 Add {path to repo}/terratest to GOPATH environment variable.
@@ -16,7 +16,7 @@ Then:
 
 ## Running Tests
 
-Assuming that your in the {path to repo}/terratest/src/test, you can run the following commands. 
+Assuming that you're in the {path to repo}/terratest/src/test, you can run the following commands. 
 
 Note that you can drop the ```-v``` if you do not care about the output.
 
