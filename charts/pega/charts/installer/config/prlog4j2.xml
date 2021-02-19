@@ -122,7 +122,11 @@
 
 		<Logger name="com.pega.pegarules.deploy.external.maintenance.MaintenanceDownloader" level="info">
 		</Logger>
-	    
+
+		<Logger name="com.pega.hazelcast" additivity="false" level="info">
+			<AppenderRef ref="CLUSTER"/>
+		</Logger>
+
 	</Loggers>
 	
 </Configuration>
