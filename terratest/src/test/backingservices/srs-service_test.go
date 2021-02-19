@@ -54,6 +54,9 @@ func VerifySRSService(t *testing.T, serviceObj *k8score.Service) {
 	require.Equal(t, "rest", serviceObj.Spec.Ports[0].Name)
 	require.Equal(t, int32(8080), serviceObj.Spec.Ports[0].Port)
 	require.Equal(t, intstr.FromInt(8080), serviceObj.Spec.Ports[0].TargetPort)
+	require.Equal(t, "http80", serviceObj.Spec.Ports[1].Name)
+	require.Equal(t, int32(80), serviceObj.Spec.Ports[1].Port)
+	require.Equal(t, intstr.FromInt(8080), serviceObj.Spec.Ports[1].TargetPort)
 }
 
 func VerifySRSServiceWithEgress(t *testing.T, serviceObj *k8score.Service) {
@@ -62,4 +65,7 @@ func VerifySRSServiceWithEgress(t *testing.T, serviceObj *k8score.Service) {
 	require.Equal(t, "rest", serviceObj.Spec.Ports[0].Name)
 	require.Equal(t, int32(8080), serviceObj.Spec.Ports[0].Port)
 	require.Equal(t, intstr.FromInt(8080), serviceObj.Spec.Ports[0].TargetPort)
+	require.Equal(t, "http80", serviceObj.Spec.Ports[1].Name)
+	require.Equal(t, int32(80), serviceObj.Spec.Ports[1].Port)
+	require.Equal(t, intstr.FromInt(8080), serviceObj.Spec.Ports[1].TargetPort)
 }
