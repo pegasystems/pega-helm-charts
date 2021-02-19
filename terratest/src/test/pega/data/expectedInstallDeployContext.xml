@@ -17,7 +17,29 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-  />
+    />
+  {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
+    <Resource name="jdbc/PegaRULESReadOnly"
+    auth="Container"
+    type="javax.sql.DataSource"
+    driverClassName="{{ .Env.JDBC_CLASS }}"
+    url="{{ .Env.JDBC_RO_URL }}"
+    username="{{ .Env.DB_RO_USERNAME }}"
+    password="{{ .Env.DB_RO_PASSWORD }}"
+    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
+    minIdle="{{ .Env.JDBC_MIN_IDLE }}"
+    maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
+    maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
+    initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
+    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    />
+  
+  <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
+  <Environment name="prconfig/database/databases/PegaDATA/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
+  {{ if .Env.CUSTOMERDATA_SCHEMA }}
+  <Environment name="prconfig/database/databases/CustomerData/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
+  {{ end }}
+  {{ end }}
 
   <Environment name="url/initialization/explicittempdir" value="path" type="java.lang.String"/>
   <Environment name="prconfig/database/databases/PegaRULES/defaultSchema" value="{{ .Env.RULES_SCHEMA }}" type="java.lang.String" />
