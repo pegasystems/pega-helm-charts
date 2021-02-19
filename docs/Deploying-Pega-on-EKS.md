@@ -124,11 +124,12 @@ To import or create a new SSL certificate to support HTTPS, see [Importing Certi
 ```yaml
 ingress:
   tls:
-          # Enable TLS encryption
-          enabled: true
-          # secretName:
-          # useManagedCertificate: false
-            ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
+    # Enable TLS encryption
+    enabled: true
+    # secretName:
+    # useManagedCertificate: false
+    ssl_annotation: 
+      alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
 ```
 
 Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
