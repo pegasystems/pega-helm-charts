@@ -113,7 +113,6 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For an overview, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
 
-**TBD review following review comment from maracle6 EKS lab demos**
 To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, it is a recommend practice to specify an SSL certificate that you create or import into AWS Credential Manager. After you have one your Amazon Resource Name (ARN) credential using this certificate or multiple certificates uploaded to AWS Credential Manager, use one of the following choices for the `annotation` parameter of the web tier ingress configuration:
 
 - Leave it blank so that the deployment automatically associates the existing certificate with your ingress controller.
@@ -132,7 +131,7 @@ ingress:
       alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
 ```
 
-Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
+Where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx`, which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
 
 ### Making your Docker images available to your deployment
 
@@ -475,7 +474,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: "alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn>\"</li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
+   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate, where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn></li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
    | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
    | pegasearch.image: | Specify the Pega-provided Docker `search` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
@@ -565,5 +564,3 @@ To manually associate the host name of the pega-web tier ingress with the tier e
 For AWS Route53 Cloud DNS lookup service documentation details, see [What is Amazon Route 53?](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html). If not using AWS Route53 Cloud DNS lookup service, see the documentation for your DNS lookup service.
 
 With the ingress host name name associated with this DNS host host in your DNS service, you can log in to Pega Platform with a web browser using the URL: http://\<pega-web tier ingress host name>/prweb.
-
-! [](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
