@@ -1,0 +1,13 @@
+---
+global:
+  tier:
+    - name: "web"
+      hpa:
+        enabled: true
+        enableCpuTarget: false
+        enableMemoryTarget: true
+    - name: "batch"
+      hpa:
+        enabled: true
+        # enableCpuTarget should be true as default
+        enableMemoryTarget: false
