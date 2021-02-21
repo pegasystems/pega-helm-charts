@@ -242,6 +242,7 @@ installer:
     # blank, target rules schema in your existing database; leave this new schema empty.
     # Specify the target Rules schema name and leave the target Data schema parameter empty.
     targetRulesSchema: ""
+    # For Pega Platform 8.3 and later, to complete a zero-downtime patch, specify temporary, target rules
     # commenting out the new, required parameter to ensure the PR builds and can be reviewed.
     # Saurabh confirmed that this parameter is required for patch process to work correctly.
     # targetDataSchema: ""
