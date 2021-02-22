@@ -53,4 +53,9 @@
   {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
   <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
   {{ end }}
+
+  {{ if .Env.CONTEXT_XML_SNIPPET }}
+  {{ .Env.CONTEXT_XML_SNIPPET }}
+  {{ end }}
+
 </Context>
