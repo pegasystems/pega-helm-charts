@@ -10,6 +10,10 @@ data:
   DB_TYPE: {{ .Values.global.jdbc.dbType }}
   # JDBC URL of the DB where Pega is installed
   JDBC_URL: {{ .Values.global.jdbc.url }}
+{{- if .Values.global.jdbc.readerurl }}
+  # JDBC URL to configure Read Only Datasource
+  JDBC_RO_URL: {{ .Values.global.jdbc.readerurl }}
+{{- end }}
   # Class name of the DB's JDBC driver
   JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
 {{- if .Values.global.jdbc.driverUri }}
