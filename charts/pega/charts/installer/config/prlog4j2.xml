@@ -88,8 +88,18 @@
 				<SizeBasedTriggeringPolicy size="250 MB"/>
 			</Policies>
 			<DefaultRolloverStrategy max="20"/>
-		</RollingRandomAccessFile> 
-		
+		</RollingRandomAccessFile>
+
+		<!-- RollingFile Appender for PegaCLUSTER logs -->
+		<RollingRandomAccessFile  name="CLUSTER" fileName="${sys:pega.logdir}/PegaCLUSTER.log" filePattern="${sys:pega.logdir}/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
+			<PatternLayout>
+				<Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB"/>
+			</Policies>
+		</RollingRandomAccessFile>
 		
 	</Appenders>
 	
@@ -121,6 +131,10 @@
 	    </Logger>
 
 		<Logger name="com.pega.pegarules.deploy.external.maintenance.MaintenanceDownloader" level="info">
+		</Logger>
+
+		<Logger name="com.hazelcast" additivity="false" level="info">
+			<AppenderRef ref="CLUSTER"/>
 		</Logger>
 
 		<Logger name="com.pega.hazelcast" additivity="false" level="info">
