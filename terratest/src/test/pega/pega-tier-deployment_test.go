@@ -19,6 +19,7 @@ var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra"}
 func TestPegaTierDeployment(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -28,21 +29,25 @@ func TestPegaTierDeployment(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+    			fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-			yamlSplit := strings.Split(yamlContent, "---")			
-			assertWeb(t,yamlSplit[1],options)
-			assertBatch(t,yamlSplit[2],options)
-			assertStream(t,yamlSplit[3],options)
+	    		var options = &helm.Options{
+		    		SetValues: map[string]string{
+			    		"global.provider":        vendor,
+				    	"global.actions.execute": operation,
+				    	"global.deployment.name": depName,
+			 	    },
+		        }
 
+			    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+    			yamlSplit := strings.Split(yamlContent, "---")
+	    		assertWeb(t,yamlSplit[1],options)
+		    	assertBatch(t,yamlSplit[2],options)
+			    assertStream(t,yamlSplit[3],options)
+
+            }
 		}
 	}
 }
@@ -50,16 +55,17 @@ func TestPegaTierDeployment(t *testing.T){
 func assertStream(t *testing.T, streamYaml string, options *helm.Options){
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t,streamYaml,&statefulsetObj)
-	VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{"pega-stream", initContainers, "Stream", "900"},options)
+	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
+	VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{getObjName(options, "-stream"), initContainers, "Stream", "900"},options)
 }
-
 
 
 func assertBatch(t *testing.T, batchYaml string, options *helm.Options){
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t,batchYaml,&deploymentObj)
+	require.Equal(t, deploymentObj.ObjectMeta.Name, getObjName(options, "-batch"))
 	VerifyPegaDeployment(t, &deploymentObj,
-		pegaDeployment{"pega-batch", initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
+		pegaDeployment{getObjName(options, "-batch"), initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
 		options)
 	
 }
@@ -67,18 +73,17 @@ func assertBatch(t *testing.T, batchYaml string, options *helm.Options){
 func assertWeb(t *testing.T, webYaml string, options *helm.Options){
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t,webYaml,&deploymentObj)
-	VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{"pega-web", initContainers, "WebUser", "900"}, options)
-	
-	
+	require.Equal(t, deploymentObj.ObjectMeta.Name, getObjName(options, "-web"))
+	VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{getObjName(options, "-web"), initContainers, "WebUser", "900"}, options)
 }
 
 // VerifyPegaStatefulSet - Performs specific Pega statefulset assertions with the values as provided in default values.yaml
 func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment, options *helm.Options) {
-	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Name, "pega-stream")
+	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Name, getObjName(options, "-stream"))
 	require.Equal(t, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0], k8score.PersistentVolumeAccessMode("ReadWriteOnce"))
-	require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-stream")
+	require.Equal(t, statefulsetObj.Spec.ServiceName, getObjName(options, "-stream"))
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
-	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-stream")
+	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, getObjName(options, "-stream"))
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/pega/kafkadata")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].Name, "pega-volume-credentials")
 	require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].MountPath, "/opt/pega/secrets")
@@ -106,7 +111,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
 	require.Equal(t, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode, volumeDefaultModePtr)
 	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
-	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.SecretName, getObjName(options, "-credentials-secret"))
 	require.Equal(t, pod.Volumes[1].VolumeSource.Secret.DefaultMode, volumeDefaultModePtr)
 
 	actualInitContainers := pod.InitContainers
@@ -128,7 +133,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "PEGA_APP_CONTEXT_PATH")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "prweb")
-	if expectedSpec.name == "pega-web" || expectedSpec.name == "pega-stream" {
+	if expectedSpec.name == getObjName(options, "-web") || expectedSpec.name == getObjName(options, "-stream") {
 		envIndex++
 		require.Equal(t, pod.Containers[0].Env[envIndex].Name, "REQUESTOR_PASSIVATION_TIMEOUT")
 		require.Equal(t, expectedSpec.passivationTimeout, pod.Containers[0].Env[envIndex].Value)
@@ -150,7 +155,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	envIndex++
 	require.Equal(t, pod.Containers[0].Env[envIndex].Name, "MAX_HEAP")
 	require.Equal(t, pod.Containers[0].Env[envIndex].Value, "7168m")
-	require.Equal(t, pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, "pega-environment-config")
+	require.Equal(t, pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, getObjName(options, "-environment-config"))
 	require.Equal(t, "4", pod.Containers[0].Resources.Limits.Cpu().String())
 	require.Equal(t, "8Gi", pod.Containers[0].Resources.Limits.Memory().String())
 	require.Equal(t, "2", pod.Containers[0].Resources.Requests.Cpu().String())
@@ -177,14 +182,14 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromInt(8080))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
 
-	require.Equal(t, pod.ImagePullSecrets[0].Name, "pega-registry-secret")
+	require.Equal(t, pod.ImagePullSecrets[0].Name, getObjName(options, "-registry-secret"))
 	require.Equal(t, pod.RestartPolicy, k8score.RestartPolicy("Always"))
 	require.Equal(t, *pod.TerminationGracePeriodSeconds, int64(300))
 	require.Equal(t, pod.Containers[0].VolumeMounts[0].Name, "pega-volume-config")
 	require.Equal(t, pod.Containers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
 	require.Equal(t, pod.Volumes[0].Name, "pega-volume-config")
 	require.Equal(t, pod.Volumes[1].Name, "pega-volume-credentials")
-	require.Equal(t, pod.Volumes[1].Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, pod.Volumes[1].Secret.SecretName, getObjName(options, "-credentials-secret"))
 
 }
 

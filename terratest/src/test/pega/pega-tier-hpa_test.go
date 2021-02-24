@@ -16,6 +16,7 @@ import (
 func TestPegaTierHPA(t *testing.T){
 	var supportedVendors = []string{"k8s", "openshift", "eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,23 +26,25 @@ func TestPegaTierHPA(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
-			VerifyPegaHPAs(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
+                VerifyPegaHPAs(t, yamlContent, options)
+            }
 		}
 	}
-
-
 }
+
 // VerifyPegaHPAs - Splits the HPA object from the rendered template and asserts each HPA object
 func VerifyPegaHPAs(t *testing.T, yamlContent string, options *helm.Options) {
 	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
@@ -50,9 +53,9 @@ func VerifyPegaHPAs(t *testing.T, yamlContent string, options *helm.Options) {
 		if index >= 0 && index <= 1 {
 			UnmarshalK8SYaml(t, hpaInfo, &pegaHpaObj)
 			if index == 0 {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-web-hpa", "pega-web", "Deployment", "apps/v1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{getObjName(options, "-web-hpa"), getObjName(options, "-web"), "Deployment", "apps/v1"})
 			} else {
-				VerifyPegaHpa(t, &pegaHpaObj, hpa{"pega-batch-hpa", "pega-batch", "Deployment", "apps/v1"})
+				VerifyPegaHpa(t, &pegaHpaObj, hpa{getObjName(options, "-batch-hpa"), getObjName(options, "-batch"), "Deployment", "apps/v1"})
 			}
 		}
 	}
@@ -60,6 +63,7 @@ func VerifyPegaHPAs(t *testing.T, yamlContent string, options *helm.Options) {
 
 // VerifyPegaHpa - Performs Pega HPA assertions with the values as provided in default values.yaml
 func VerifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, expectedHpa hpa) {
+    //hpaObj.ObjectMeta.Name doesn't appear to get set
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Name, expectedHpa.targetRefName)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.Kind, expectedHpa.kind)
 	require.Equal(t, hpaObj.Spec.ScaleTargetRef.APIVersion, expectedHpa.apiversion)
