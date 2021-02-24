@@ -1,14 +1,14 @@
 # Running tests from the command line
 
-The test can also be run from the command line which avoids needing to have a license needed to use the IntelliJ plugin.
+The test can also be run from the command line which allows you to avoid complying with the IntelliJ plugin license requirements.
 
 ## Prerequisites
-- A local clone of this repo
-- Install an appropriate version go (v1.13+)
-- Install dep
+- You have a local clone of this repo
+- You have installed an appropriate go version (v1.13 or later)
+- You have installed dep
 
 ## Setup
-Add {path to repo}/terratest to GOPATH environment variable.
+Add {path to repo}/terratest to the GOPATH environment variable on your local system.
 
 Then:
 - cd to {path to repo}/terratest/src/test
@@ -16,9 +16,9 @@ Then:
 
 ## Running Tests
 
-Assuming that you're in the {path to repo}/terratest/src/test, you can run the following commands. 
+From {path to repo}/terratest/src/test, run the following commands. 
 
-Note that you can drop the `-v` if you do not care about the output.
+You can omit the `-v` flag to suppress the output.
 
 ### Running all tests
 `go test -v test`
