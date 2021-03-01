@@ -213,6 +213,11 @@ dds:
   port: "9042"
   username: "dnode_ext"
   password: "dnode_ext"
+  clientEncryption: false
+  trustStore: ""
+  trustStorePassword: ""
+  keystore: ""
+  keystorePassword: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
