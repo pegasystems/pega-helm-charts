@@ -5,7 +5,7 @@
 {{- end }}
 {{- end }}
 {{- if (eq (include "performUpgradeAndDeployment" .) "true") }}
-{{- if not (eq .Values.upgrade.upgradeType "zero-downtime") }}
-{{- fail "Upgrade Type value is not correct for upgrade-deploy action. Supported value is 'zero-downtime' "  }}
+{{- if not (or (eq .Values.upgrade.upgradeType "zero-downtime") (eq .Values.upgrade.upgradeType "out-of-place")) }}
+{{- fail "Upgrade Type value is not correct for upgrade-deploy action. Supported value is 'zero-downtime' and @deprecated 'out-of-place' "  }}
 {{- end }}
 {{- end }}
