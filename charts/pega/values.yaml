@@ -216,8 +216,8 @@ dds:
   clientEncryption: false
   trustStore: ""
   trustStorePassword: ""
-  keystore: ""
-  keystorePassword: ""
+  keyStore: ""
+  keyStorePassword: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
