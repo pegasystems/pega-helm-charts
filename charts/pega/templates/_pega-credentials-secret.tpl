@@ -15,10 +15,14 @@ data:
   CASSANDRA_USERNAME: {{ .Values.dds.username | b64enc }}
   # Base64 encoded password for connecting to cassandra
   CASSANDRA_PASSWORD: {{ .Values.dds.password | b64enc }}
+  {{ if .Values.dds.trustStorePassword -}}
   # Base64 encoded password for the cassandra trust store
   CASSANDRA_TRUSTSTORE_PASSWORD: {{ .Values.dds.trustStorePassword | b64enc }}
+  {{- end }}
+  {{ if .Values.dds.keyStorePassword -}}
   # Base64 encoded password for the cassandra key store
   CASSANDRA_KEYSTORE_PASSWORD: {{ .Values.dds.keyStorePassword | b64enc }}
+  {{- end }}
   {{ if $.Values.hazelcast.enabled }}
   # Base64 encoded username used for authentication in hazelcast client server mode
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
