@@ -44,7 +44,7 @@ elasticsearch:
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.
-  esJavaOpts: "-Xmx512m -Xms1024m"
+  esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
   resources:
     requests:
