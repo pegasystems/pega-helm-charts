@@ -10,7 +10,10 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
-func TestPegaCredentialsSecret(t *testing.T) {
+const trustStorePassword = "trustStore"
+const keyStorePassword = "keyStore"
+
+func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
 
@@ -27,6 +30,8 @@ func TestPegaCredentialsSecret(t *testing.T) {
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"dds.trustStorePassword": trustStorePassword,
+					"dds.keyStorePassword":   keyStorePassword,
 				},
 			}
 
@@ -44,6 +49,6 @@ func VerifyCredentialsSecret(t *testing.T, yamlContent string) {
 	secretData := secretobj.Data
 	require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
 	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
-	require.Equal(t, secretData["CASSANDRA_TRUSTSTORE_PASSWORD"], nil)
-	require.Equal(t, secretData["CASSANDRA_KEYSTORE_PASSWORD"], nil)
+	require.Equal(t, string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]), trustStorePassword)
+	require.Equal(t, string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]), keyStorePassword)
 }
