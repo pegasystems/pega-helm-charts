@@ -36,13 +36,13 @@ func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
-			VerifyCredentialsSecret(t, yamlContent)
+			verifyCredentialsSecret(t, yamlContent)
 		}
 	}
 
 }
 
-func VerifyCredentialsSecret(t *testing.T, yamlContent string) {
+func verifyCredentialsSecret(t *testing.T, yamlContent string) {
 
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)
