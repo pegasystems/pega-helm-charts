@@ -3,6 +3,7 @@ package pega
 import (
 	"fmt"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
@@ -36,19 +37,25 @@ func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
-			verifyCredentialsSecret(t, yamlContent)
+			verifyCredentialsSecret(t, yamlContent, operation)
 		}
 	}
 
 }
 
-func verifyCredentialsSecret(t *testing.T, yamlContent string) {
+func verifyCredentialsSecret(t *testing.T, yamlContent string, operation string) {
 
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)
 	secretData := secretobj.Data
-	require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
-	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
-	require.Equal(t, string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]), trustStorePassword)
-	require.Equal(t, string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]), keyStorePassword)
+	require.Equal(t, "YOUR_JDBC_USERNAME", string(secretData["DB_USERNAME"]))
+	require.Equal(t, "YOUR_JDBC_PASSWORD", string(secretData["DB_PASSWORD"]))
+	if strings.Contains(operation, "deploy") {
+		require.Equal(t, trustStorePassword, string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]))
+		require.Equal(t, keyStorePassword, string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]))
+	} else {
+		require.Equal(t, nil, string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]))
+		require.Equal(t, nil, string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]))
+	}
+
 }
