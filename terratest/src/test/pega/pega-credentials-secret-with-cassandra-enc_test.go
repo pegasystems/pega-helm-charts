@@ -54,8 +54,8 @@ func verifyCredentialsSecret(t *testing.T, yamlContent string, operation string)
 		require.Equal(t, trustStorePassword, string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]))
 		require.Equal(t, keyStorePassword, string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]))
 	} else {
-		require.Equal(t, nil, secretData["CASSANDRA_TRUSTSTORE_PASSWORD"])
-		require.Equal(t, nil, secretData["CASSANDRA_KEYSTORE_PASSWORD"])
+		require.Equal(t, "", string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]))
+		require.Equal(t, "", string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]))
 	}
 
 }

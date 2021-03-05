@@ -42,8 +42,8 @@ func VerifyCredentialsSecret(t *testing.T, yamlContent string) {
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)
 	secretData := secretobj.Data
-	require.Equal(t, string(secretData["DB_USERNAME"]), "YOUR_JDBC_USERNAME")
-	require.Equal(t, string(secretData["DB_PASSWORD"]), "YOUR_JDBC_PASSWORD")
-	require.Equal(t, secretData["CASSANDRA_TRUSTSTORE_PASSWORD"], nil)
-	require.Equal(t, secretData["CASSANDRA_KEYSTORE_PASSWORD"], nil)
+	require.Equal(t, "YOUR_JDBC_USERNAME", string(secretData["DB_USERNAME"]))
+	require.Equal(t, "YOUR_JDBC_PASSWORD", string(secretData["DB_PASSWORD"]))
+	require.Equal(t, "", string(secretData["CASSANDRA_TRUSTSTORE_PASSWORD"]))
+	require.Equal(t, "", string(secretData["CASSANDRA_KEYSTORE_PASSWORD"]))
 }
