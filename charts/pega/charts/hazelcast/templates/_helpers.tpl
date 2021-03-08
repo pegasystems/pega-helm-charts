@@ -14,4 +14,8 @@
 {{- define "generatedHazelcastServicePodAnnotations" }}
 {{- end }}
 
+# Override this template to generate additional service annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedHazelcastServiceAnnotations" }}
+{{- end }}
+
 
