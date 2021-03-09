@@ -91,9 +91,9 @@
 		</RollingRandomAccessFile>
 
 		<!-- RollingFile Appender for PegaCLUSTER logs -->
-		<RollingRandomAccessFile  name="CLUSTER" fileName="${sys:pega.logdir}/PegaCLUSTER.log" filePattern="${sys:pega.logdir}/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
+		<RollingRandomAccessFile  name="CLUSTER" fileName="@CURR_DIR/logs/PegaCLUSTER-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
 			<PatternLayout>
-				<Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+				<Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
 			</PatternLayout>
 			<Policies>
 				<TimeBasedTriggeringPolicy />
