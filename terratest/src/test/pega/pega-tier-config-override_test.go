@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestPegaTierConfig(t *testing.T) {
+func TestPegaTierConfigOverride(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
 
@@ -24,6 +24,7 @@ func TestPegaTierConfig(t *testing.T) {
 			fmt.Println(vendor + "-" + operation)
 
 			var options = &helm.Options{
+				ValuesFiles: []string{"data/pega-tier-config-override_values.yaml"},
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
@@ -31,26 +32,26 @@ func TestPegaTierConfig(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
-			VerifyTierConfg(t, yamlContent, options)
+			VerifyTierConfgOverrides(t, yamlContent, options)
 
 		}
 	}
 
 }
 
-// VerifyTierConfg - Performs the tier specific configuration assetions with the values as provided in default values.yaml
-func VerifyTierConfg(t *testing.T, yamlContent string, options *helm.Options) {
+// VerifyTierConfgOverrides - Performs the tier specific configuration assertions with the values
+func VerifyTierConfgOverrides(t *testing.T, yamlContent string, options *helm.Options) {
 	var pegaConfigMap k8score.ConfigMap
 	configSlice := strings.Split(yamlContent, "---")
 	for index, configData := range configSlice {
 		if index >= 1 && index <= 3 {
 			UnmarshalK8SYaml(t, configData, &pegaConfigMap)
 			pegaConfigMapData := pegaConfigMap.Data
-			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
-			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
-			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
-			require.Equal(t, "", pegaConfigMapData["server.xml"])
-			require.Equal(t, "", pegaConfigMapData["web.xml"])
+			require.Equal(t, "prconfig override", pegaConfigMapData["prconfig.xml"])
+			require.Equal(t, "context.xml override", pegaConfigMapData["context.xml.tmpl"])
+			require.Equal(t, "prlog4j2 override", pegaConfigMapData["prlog4j2.xml"])
+			require.Equal(t, "server.xml override", pegaConfigMapData["server.xml"])
+			require.Equal(t, "web.xml override", pegaConfigMapData["web.xml"])
 		}
 	}
 }
