@@ -114,6 +114,11 @@ global:
       # initialHeap: "4096m"
       # maxHeap: "7168m"
 
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
       hpa:
         enabled: true
 
@@ -135,8 +140,14 @@ global:
           maxUnavailable: 25%
         type: RollingUpdate
 
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
       hpa:
         enabled: true
+        enableMemoryTarget: false
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -168,6 +179,11 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
       replicas: 2
 
       volumeClaimTemplate:
@@ -197,6 +213,11 @@ dds:
   port: "9042"
   username: "dnode_ext"
   password: "dnode_ext"
+  clientEncryption: false
+  trustStore: ""
+  trustStorePassword: ""
+  keyStore: ""
+  keyStorePassword: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.

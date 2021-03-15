@@ -104,6 +104,8 @@ global:
 
       replicas: 1
       javaOpts: ""
+      # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
+      catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 
@@ -136,6 +138,7 @@ global:
 
       hpa:
         enabled: true
+        enableMemoryTarget: false
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -214,6 +217,7 @@ global:
 
       hpa:
         enabled: true
+        enableMemoryTarget: false
 
 # External services
 

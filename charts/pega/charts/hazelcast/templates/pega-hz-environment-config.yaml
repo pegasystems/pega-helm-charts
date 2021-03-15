@@ -9,6 +9,7 @@ data:
   NAMESPACE: {{ .Release.Namespace }}
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
   SERVICE_NAME: {{ template "hazelcastName" }}-service
+  CLUSTER_SIZE: {{ .Values.replicas | quote }}
 {{- if .Values.server.hz_health_monitoring_level }}
   HZ_HEALTH_MONITORING_LEVEL: {{ .Values.server.hz_health_monitoring_level | quote }}
 {{- end }}

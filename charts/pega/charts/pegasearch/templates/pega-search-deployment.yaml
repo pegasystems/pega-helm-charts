@@ -56,8 +56,10 @@ spec:
 {{- if ( .Values.imagePullPolicy ) }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
 {{- end }}
+{{- if ne .Values.global.provider "openshift" }}
         securityContext:
           runAsUser: {{ .Values.podSecurityContext.runAsUser | default 1000 }}
+{{- end }}
         env:
         - name: HOST_LIST
           value: {{ template "searchName" . }}-transport
