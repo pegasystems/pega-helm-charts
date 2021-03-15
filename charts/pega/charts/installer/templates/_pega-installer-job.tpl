@@ -6,7 +6,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
+{{- if and (eq .root.Values.waitForJobCompletion "true") (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
     # Forces Helm to wait for the install or upgrade to complete.
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "0"
