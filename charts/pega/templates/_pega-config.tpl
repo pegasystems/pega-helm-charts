@@ -34,10 +34,12 @@ data:
 {{ .root.Files.Get "config/deploy/context.xml.tmpl" | indent 6 }}
 {{- end }}
 
-{{- if $custom_config.serverXML }}
   # Pega deployment server.xml file
   server.xml: |-
+{{- if $custom_config.serverXML }}
 {{ $custom_config.serverXML | indent 6 }}
+{{ else }}
+{{ .root.Files.Get "config/deploy/server.xml" | indent 6 }}
 {{- end }}
 
 {{- if $custom_config.webXML }}
