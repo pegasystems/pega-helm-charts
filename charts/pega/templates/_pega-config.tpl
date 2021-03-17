@@ -46,6 +46,13 @@ data:
   # Pega deployment web.xml file
   web.xml: |-
 {{ $custom_config.webXML | indent 6 }}
+{{ else }}
+{{- $web := .root.Files.Glob "config/deploy/web.xml" }}
+{{ if $web }}
+  # Pega deployment web.xml file
+  web.xml: |-
+{{ .root.Files.Get "config/deploy/web.xml" | indent 6 }}
+{{- end }}
 {{- end }}
 {{- end }}
 ---
