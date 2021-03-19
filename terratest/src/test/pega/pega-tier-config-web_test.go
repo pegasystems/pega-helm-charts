@@ -4,18 +4,26 @@ import (
 	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
+	"io"
 	k8score "k8s.io/api/core/v1"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
-func TestPegaTierConfig(t *testing.T) {
+func TestPegaTierConfigWithWeb(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
+
+	webPath := filepath.Join(helmChartPath, "config", "deploy", "web.xml")
+
+	err = CopyFile("data/expectedInstallDeployWeb.xml", webPath)
+	require.NoError(t, err)
+	defer os.Remove(webPath)
 
 	for _, vendor := range supportedVendors {
 
@@ -31,15 +39,36 @@ func TestPegaTierConfig(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
-			VerifyTierConfg(t, yamlContent, options)
+			VerifyTierConfgWithWeb(t, yamlContent, options)
 
 		}
 	}
 
 }
 
+func CopyFile(src, dest string) (err error) {
+	in, err := os.Open(src)
+	if err != nil {
+		return err
+	}
+	defer in.Close()
+
+	out, err := os.Create(dest)
+	if err != nil {
+		return err
+	}
+	defer out.Close()
+
+	_, err = io.Copy(out, in)
+	if err != nil {
+		return err
+	}
+
+	return out.Close()
+}
+
 // VerifyTierConfg - Performs the tier specific configuration assetions with the values as provided in default values.yaml
-func VerifyTierConfg(t *testing.T, yamlContent string, options *helm.Options) {
+func VerifyTierConfgWithWeb(t *testing.T, yamlContent string, options *helm.Options) {
 	var pegaConfigMap k8score.ConfigMap
 	configSlice := strings.Split(yamlContent, "---")
 	for index, configData := range configSlice {
@@ -50,7 +79,7 @@ func VerifyTierConfg(t *testing.T, yamlContent string, options *helm.Options) {
 			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallDeployServer.xml")
-			require.Equal(t, "", pegaConfigMapData["web.xml"])
+			compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
 		}
 	}
 }

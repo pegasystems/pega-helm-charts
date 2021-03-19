@@ -48,6 +48,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, upgradeEnvConfigData["DB2ZOS_UDF_WLM"], "")
+	require.Equal(t, upgradeEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
 	require.Equal(t, upgradeEnvConfigData["TARGET_RULES_SCHEMA"], "")
 	require.Equal(t, upgradeEnvConfigData["TARGET_ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, upgradeEnvConfigData["MIGRATION_DB_LOAD_COMMIT_RATE"], "100")

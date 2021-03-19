@@ -109,6 +109,9 @@
     <Logger name="com.hazelcast" additivity="false" level="info">
         <AppenderRef ref="CLUSTER"/>
     </Logger>
+    <Logger name="com.pega.hazelcast" additivity="false" level="info">
+        <AppenderRef ref="CLUSTER"/>
+    </Logger>
     <Logger name="org.apache.ignite" additivity="false" level="info">
         <AppenderRef ref="CLUSTER"/>
     </Logger>
