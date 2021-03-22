@@ -40,7 +40,7 @@ $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
 pega/pega  	              1.2.0        	           	Pega installation on kubernetes
 pega/addons	              1.2.0        	1.0        	A Helm chart for Kubernetes 
-pega/backingservices          1.2.0        	                Helm Chart to provisioning backing services for Pega (eg. Search and Reporting Service)
+pega/backingservices      1.2.0        	            Helm Chart to provisioning backing services for Pega (eg. Search and Reporting Service)
 ```
 
 There are three charts available in this repository - addons, backingservices, and pega.

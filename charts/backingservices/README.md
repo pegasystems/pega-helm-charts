@@ -1,30 +1,27 @@
 # BackingServices Helm chart
 
-The Pega Infinity backing service is a feature which you can deploy as an independent service module. For example `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with one or more Pega Infinity environments.  
+The Pega Infinity backing service is a feature which you can deploy as an independent service module. For example `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with a Pega Infinity environment.  
 
-The backingservices chart supports deployment options for `Search and Reporting Service` (abbreviated as SRS). A backing service may be configured with one or more Pega deployments. 
-These backing services should be deployed in their own namespace and may be shared across multiple Pega Infinity environments.
+The backingservices chart supports deployment option for `Search and Reporting Service` (abbreviated as SRS). A backing service may be configured with a Pega deployments. 
+These backing services may be deployed in to the pega namespace and configured with the Pega Infinity Environment.
 
 **Example:**
 
 **_Single backing service shared across all pega environments:_**
-You can provision the backingservice `Search and Reporting Service` in its own namespace, with the service endpoint configured across dev, staging and production Pega Infinity environments. This service configuration provides isolation of data in a shared setup.
-
-**_Multiple backing service deployments:_**
-You can deploy more than one instance of backing service deployments, in case you want to host a separate deployment of 'Search and Reporting Service' for non-production and production deployments of Pega Infinity. You must configure each service endpoint appropriately for each Pega Infinity deployment.
+You can provision the backingservice `Search and Reporting Service` into your `pega` environment namespace, with the service endpoint configured with the Pega Infinity environment.
 
 ### Search and Reporting Service
 
 The Search and Reporting Service provides next generation search and reporting capabilities for Pega Infinity 8.6 and later. 
 
-This service replaces the legacy search module from the platform with an independently deployable and scalable service along with the built-in capabilities to support more than one Pega environments with its data isolation features. 
+This service replaces the legacy search module from the platform with an independently deployable and scalable service along with the built-in capabilities to support more than one Pega environments with its data isolation features in the later versions than Pega 8.6. 
 The service deployment provisions runtime service pods along with a dependency on a backing technology ElasticSearch service for storage and retrieval of data. 
 
 #### SRS Version compatibility matrix
 Pega Infinity version   | SRS version   | ElasticSearch version     | Description
 ---                     | ---           | ---                       | ---
 < 8.6                   | NA            | NA                        | SRS service can be used with Pega Infinity 8.6 and above
-\>= 8.6                 | \> 1.6.0      | 7.1.x                     | Pega Infinity 8.6 and above version may use SRS Image tag version 1.6.0 and above. Current SRS versions are certified to work with Elasticsearch version 7.1.x.
+\>= 8.6                 | \>= 1.9.0      | 7.1.x                     | Pega Infinity 8.6 and above version may use SRS Image tag version 1.6.0 and above. Current SRS versions are certified to work with Elasticsearch version 7.1.x.
 
 
 #### SRS service runtime configuration:
@@ -53,7 +50,7 @@ srs:
   srsRuntime:
     #srs-service values
     replicaCount: 2
-    srsImage: platform-services/search-n-reporting-service:1.6.1
+    srsImage: platform-services/search-n-reporting-service:1.9.0-4
     imagepullPolicy: IfNotPresent
     resources:
         limits:
