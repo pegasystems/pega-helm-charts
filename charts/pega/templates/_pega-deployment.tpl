@@ -182,19 +182,7 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
-        # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
-        {{- $startupProbe := .node.startupProbe }}
 {{- if (semverCompare ">=1.18" .root.Capabilities.KubeVersion.GitVersion) }}
-        startupProbe:
-          httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
-            scheme: HTTP
-          initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}
-          timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
-          periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
-          successThreshold: {{ $startupProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
@@ -219,6 +207,18 @@ spec:
           periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
+        # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
+        {{- $startupProbe := .node.startupProbe }}
+        startupProbe:
+          httpGet:
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            port: 8080
+            scheme: HTTP
+          initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}
+          timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
+          successThreshold: {{ $startupProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default 20 }}
 {{- else }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
@@ -239,11 +239,11 @@ spec:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 10 }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 30 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 5 }}
-          successThreshold: {{ $readinessProbe.successThreshold | default 3 }}
-          failureThreshold: {{ $readinessProbe.failureThreshold | default 9 }}
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
+          successThreshold: {{ $readinessProbe.successThreshold | default 2 }}
+          failureThreshold: {{ $readinessProbe.failureThreshold | default 6 }}
 {{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always
