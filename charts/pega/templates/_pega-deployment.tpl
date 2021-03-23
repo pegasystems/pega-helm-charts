@@ -184,6 +184,7 @@ spec:
           mountPath: "/opt/pega/secrets"
         # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
         {{- $startupProbe := .node.startupProbe }}
+{{- if (semverCompare ">=1.18" .root.Capabilities.KubeVersion.GitVersion) }}
         startupProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
@@ -194,6 +195,7 @@ spec:
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
           failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
+{{- end }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
@@ -201,7 +203,11 @@ spec:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: 8081
             scheme: HTTP
+{{- if (semverCompare ">=1.18" .root.Capabilities.KubeVersion.GitVersion) }}
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
+{{- else }}
+          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
+{{- end }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
           periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
@@ -213,7 +219,11 @@ spec:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: 8080
             scheme: HTTP
+{{- if (semverCompare ">=1.18" .root.Capabilities.KubeVersion.GitVersion) }}
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
+{{- else }}
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}
+{{- end }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 20 }}
           periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
