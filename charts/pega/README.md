@@ -399,7 +399,7 @@ tier:
 
 Notes:
 * `startupProbe` is only supported as of Kubernetes 1.18. If running a version older than 1.18, `startupProbe` will be ignored and different default values will be used for `livenessProbe` and `readinessProbe`.
-* `timeoutSeconds` cannot not be greater than `periodSeconds` in some GCP environments. See [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
+* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. See [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
 * Default values are listed below in order of liveness, readiness, and startup.
 
 Parameter           | Description    | Default - 1.18+ | Default - pre 1.18
