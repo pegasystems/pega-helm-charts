@@ -216,14 +216,15 @@ To customize this pega.yaml file, you must download it from the Pega-managed rep
 ```bash
   $ helm search repo pega
   NAME        CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega   1.2.0                           Pega installation on kubernetes
-  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
-  pega/backingservices  1.2.0                           Helm Chart to provisioning backing services for Pega (eg. Search and Reporting Service)
+  pega/pega             1.4.4                           Pega installation on kubernetes
+  pega/addons           1.4.4           1.0             A Helm chart for Kubernetes
+  pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
 There is no need to use the addons file for GKE environments, since your deployment will use the required Kubernetes resources that are native to your GKE environment, including the Google Cloud Load Balancer (GCLB), Google Cloud Operations suite for log aggregation, and a metrics server.
+The backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
 
-### Updating the backingservices.yaml Helm chart values (Applicable only when installing or upgrading to Pega 8.6 and later)
+### Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
 
 Adding the Pega configuration files to your Helm installation on your local system
@@ -264,10 +265,10 @@ To customize this backingservices.yaml file, you must download it from the Pega-
 | Chart parameter name              | Purpose                                   | Your setting |
 |:---------------------------------|:-------------------------------------------|:--------------|
 | global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
-| srs.deploymentName:        | specify unique name for the deployment based on org app and/or srs applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
-| srs.srsRuntime.srsImage: | Docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag. | srs.srsRuntime.srsImage: "platform-services/search-n-reporting-service:1.9.0-4"    |
-| srs.srsStorage.domain: port: protocol: requireInternetAccess: | Disabled by default. Enable only when `srs.srsStorage.provisionInternalESCluster` is false and configuring SRS to use an existing externally provisioned ES cluster.  | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li> srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li> <li> srs.srsStorage.requireInternetAccess: "\< set to true when external es cluster is hosted out of the current network and needs to be accessed over internet.\>"</li></ul>     |
-| elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least 3 times of your estimated search data size. | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
+| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or srs applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
+| srs.srsRuntime.srsImage: | Specify the Pega-provided srs-service image, services/search-n-reporting-service:dockerTag that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "platform-services/search-n-reporting-service:1.9.0-4"    |
+| srs.srsStorage.domain: port: protocol: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li> srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li> <li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
+| elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
 
 6. Save the file.
 
@@ -332,7 +333,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 3. [For Pega Platform 8.6 and later] Applicable only when backingservices chart is configured.
 
-For configuring the backingservices Search and Reporting Service with pega environment, add the below parameters to the pega.yaml file.
+For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
 
 Chart parameter name   | Purpose   | Your setting
 ---         | ---           | ---
@@ -490,8 +491,7 @@ ingress:
     ssl_annotation: kubernetes.io/ingress.global-static-ip-name: web-ip-address
 ```
 
-13. [For Pega Platform 8.6 and later] 
-To install the backingservices chart, which you updated in [Updating the backingservices.yaml Helm chart values (Applicable only when installing or upgrading to Pega 8.6 and later)](# Updating the backingservices.yaml Helm chart values (Applicable only when installing or upgrading to Pega 8.6 and later)), enter:
+13. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
 
    ```yaml
    $ helm install backingservices pega/backingservices --namespace mypega-gke-demo --values backingservices.yaml

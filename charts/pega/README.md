@@ -573,7 +573,10 @@ Use the `pegasearch` section to configure a deployment of ElasticSearch for sear
 
 ### For Pega Platform 8.6 and later:
 
-Pega recommends using the chart ['backingservices'](../backingservices) to enable the use of a search and reporting service in your deployment. This is an independently manageable search solution for Pega Platform that replaces the previously used Elasticsearch. To use this search and reporting service, you must follow the deployment instructions provided at [backingservices](../backingservices/README.md) to provision the service. The Search and Reporting Service (SRS) Url can be configured with the current Pega platform environment using the below configuration in values.yaml using the parameters mentioned below:
+Pega recommends using the chart ['backingservices'](../backingservices) to enable Pega Infinity backing service and to deploy the latest generation of search and reporting capabilities to your Pega applications that run independently on nodes provisioned exclusively to run these services.
+This is an independently manageable search solution that replaces the previous implementation of Elasticsearch. The SRS supports, but does not require you to enable, Elasticsearch for your Pega Infinity deployment searching capability.
+
+To use this search and reporting service, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy `pega` helm chart. You must configure the SRS URL for your Pega Infinity deployment using the parameter in values.yaml as shown the the following table and exmple:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
