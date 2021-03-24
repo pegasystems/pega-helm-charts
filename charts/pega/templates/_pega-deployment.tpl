@@ -182,7 +182,7 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
-{{- if (semverCompare ">=1.18" .root.Capabilities.KubeVersion.GitVersion) }}
+{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
