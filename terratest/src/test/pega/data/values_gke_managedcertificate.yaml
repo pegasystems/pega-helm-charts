@@ -109,11 +109,12 @@ global:
 
       # Optionally overridde default resource specifications
       # cpuRequest: 2
-      # memRequest: "6Gi"
+      # memRequest: "10Gi"
       # cpuLimit: 4
-      # memLimit: "8Gi"
+      # memLimit: "10Gi"
       # initialHeap: "4096m"
-      # maxHeap: "7168m"
+      # maxHeap: "8192m"
+      # maxMetaspace: "1024m"
 
       hpa:
         enabled: true

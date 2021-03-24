@@ -145,6 +145,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	envIndex++
 	require.Equal(t, "MAX_HEAP", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8192m", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "MAX_METASPACE", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "1024m", pod.Containers[0].Env[envIndex].Value)
 	require.Equal(t, "pega-environment-config", pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name)
 	require.Equal(t, "4", pod.Containers[0].Resources.Limits.Cpu().String())
 	require.Equal(t, "10Gi", pod.Containers[0].Resources.Limits.Memory().String())
