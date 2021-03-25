@@ -81,6 +81,7 @@ spec:
 {{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
         fsGroup: 0
+        supplementalGroups: [9002]
 {{- if .node.securityContext }}
         runAsUser: {{ .node.securityContext.runAsUser }}
 {{- else }}
