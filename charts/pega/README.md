@@ -361,8 +361,8 @@ Parameter       | Description                                            | Defau
 `replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
 `cpuRequest`    | Initial CPU request for pods in the current tier.      | `2`
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
-`memRequest`    | Initial memory request for pods in the current tier.   | `10Gi`
-`memLimit`      | Memory limit for pods in the current tier.             | `10Gi`
+`memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
 `initialHeap`   | This specifies the initial heap size of the JVM.       | `4096m`
 `maxHeap`       | This specifies the maximum heap size of the JVM.       | `8192m`
 

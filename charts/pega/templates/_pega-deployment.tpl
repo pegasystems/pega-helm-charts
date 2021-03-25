@@ -152,7 +152,7 @@ spec:
           {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
           {{- else }}
-            memory: "10Gi"
+            memory: "12Gi"
           {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
@@ -164,7 +164,7 @@ spec:
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"
           {{- else }}
-            memory: "10Gi"
+            memory: "12Gi"
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
