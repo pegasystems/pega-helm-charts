@@ -151,13 +151,6 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- else }}
   value: "8192m"
 {{- end }}
-# Maximum JVM metaspace, equivalent to XX:MaxMetaspaceSize
-- name: MAX_METASPACE
-{{- if .node.maxMetaspace }}
-  value: "{{ .node.maxMetaspace }}"
-{{- else }}
-  value: "1024m"
-{{- end }}
 {{- end -}}
 
 # Evaluate background node types based on cassandra enabled or not(internally or externally)
