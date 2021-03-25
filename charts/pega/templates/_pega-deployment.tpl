@@ -203,8 +203,8 @@ spec:
             port: 8080
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
         # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
@@ -242,8 +242,8 @@ spec:
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
-          successThreshold: {{ $readinessProbe.successThreshold | default 2 }}
-          failureThreshold: {{ $readinessProbe.failureThreshold | default 6 }}
+          successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
 {{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always

@@ -405,10 +405,10 @@ Notes:
 Parameter           | Description    | Default - 1.18+ | Default - pre 1.18
 ---                 | ---            | ---             | ---
 `initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0`, `0`, `10` | `200`, `30`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `20`, `10` | `20`, `10`
-`periodSeconds`       | How often (in seconds) to perform the probe. | `30`, `30`, `10` | `30`, `10`
-`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`, `1`, `1` | `1`, `2`
-`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`, `3`, `20` | `3`, `6`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `10`, `10` | `20`, `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30`, `10`, `10` | `30`, `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`, `1`, `1` | `1`, `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`, `3`, `20` | `3`, `3`
 
 Example:
 
