@@ -395,14 +395,14 @@ tier:
 
 ### Liveness, readiness, and startup probes
 
-[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
+Pega uses liveness, readiness, and startup probes to determine application health in your deployments. For an overview of these probes, see [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness. You can configure probes independently for each tier. If not explicitly configured, default probes are used during the deployment. Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
 
 Notes:
-* `startupProbe` is only supported as of Kubernetes 1.18. If running a version older than 1.18, `startupProbe` will be ignored and different default values will be used for `livenessProbe` and `readinessProbe`.
-* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. See [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
+* Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
+* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
 * Default values are listed below in order of liveness, readiness, and startup.
 
-Parameter           | Description    | Default - 1.18+ | Default - pre 1.18
+Parameter           | Description    | Default - 1.18+ | Default - pre-1.18
 ---                 | ---            | ---             | ---
 `initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0`, `0`, `10` | `200`, `30`
 `timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `10`, `10` | `20`, `10`
