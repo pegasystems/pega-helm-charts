@@ -31,10 +31,15 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
 4. To prepare your system for the patch process running in the background, disable rule creation in your current deployment. Depending on your version of Pega Platform, the steps are slightly different, but the same steps used in on-premises systems:
 
-   - For 8.4 and later, see [For High Availability: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-systems-preparing-cluster-patching)
+   - For 8.4 and later, see [For High Availability systems: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-systems-preparing-cluster-patching)
    - For 8.2 or 8.3, see [For High Availability 8.2 and 8.3 systems: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-82-and-83-systems-preparing-cluster-patching)
 
 5. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
+
+6. Re-enable rule creation in your current deployment. Depending on your version of Pega Platform, the steps are slightly different, but the same steps used in on-premises systems:
+
+   - For 8.4 and later, see [For systems configured for High Availability: Reverting the cluster settings](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/systems-configured-high-availability-reverting-cluster-settings).
+   - For 8.2 or 8.3, see [For systems configured for High Availability: Reverting the cluster settings](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/systems-configured-high-availability-reverting-cluster-settings).
 
 ## Assumptions and prerequisites
 
@@ -61,9 +66,8 @@ The Pega patch application process takes at most 120 minutes total.
 To complete a zero downtime patch, you must configure the following settings in your existing Pega configuration files for your Pega Platform deployment:
 
 - Specify action.execute: upgrade-deploy to invoke the zero-downtime patch process.
-- Specify the schema name or names that will be upgraded:
-  - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA")
-  - **For 8.2 and 8.3**: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (dbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave it blank).
+- Specify the schema name or names that will be upgraded. Since the process involves migrating rules to and from each schema (jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA").
+
 - Ensure one of the following:
   - You pushed the images for your patch to the same repository that you used for your installation repository and the credentials for your repository account are the same as those in your `pega` Helm chart.  
   - You pushed the images for your patch to a new repository and you update the parameters with your credentials for this new repository account in your `pega` Helm chart.
@@ -77,8 +81,7 @@ To complete a zero downtime patch, you must configure the following settings in 
 - In the installer section of the Helm chart, update the following: 
   - Update the tagging details, including the version and date of your Pega-provided `platform/installer` Docker image, that you downloaded to support your patch.
   - Specify an `out-of-place` upgrade to apply a patch using the zero-downtime patch process.
-  - Specify the new target rules schema name that you created in your existing database to support the patch process within the quotes.
-  - For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank).
+  - Specify a temporary rules schema name that the process creates in your existing database to support the patch process within the quotes.
 
 You can leave the existing customized parameters as is; the patch process will use the remaining existing settings in your deployment.
 
@@ -86,13 +89,13 @@ You can leave the existing customized parameters as is; the patch process will u
 
 Complete the following steps.
 
-1. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your EKS requirements:
+1. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your Kubernetes environment requirements:
 
    | Chart parameter name    | Purpose                                   | Your setting |
    |-------------------------|-------------------------------------------|--------------|
    | actions.execute: | To apply a patch using the zero-downtime patch process, specify an “upgrade-deploy” deployment type. | execute: "upgrade-deploy" |
    | jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"  | For any patch, specify the name of the existing rules schema from which the patch process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
-   | jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA"  | For patches to 8.4 and later, specify the name of the temporary data schema to which the patch process migrates the existing data structure from the existing data schema; if you are applying 8.2 or 8.3 Pega software patch, you can leave this value as is (do not leave it blank).  | dataSchema: "YOUR_DATA_SCHEMA"  |
+   | jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the temporary data schema to which the patch process migrates the existing data structure from the existing data schema  | dataSchema: "YOUR_DATA_SCHEMA"  |
    | docker.registry.url: username:  and password: | If using a new registry since you installed Pega Platform, update the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). You can skip this section if the registry is the same as your initial installation. | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. This image should match the version of the installer image with which you will apply your patch. | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | <ul><li>upgrade.kube-apiserver. serviceHost</li><li>upgrade.kube-apiserver.httpsServicePort</li></ul>  | For existing AKS and PKS deployments, for the service host and https service port of the Kubernetes API server. For EKS and GKE deployments, leave the existing text values (do not leave them blank).| <ul><li>upgrade.kube-apiserver.serviceHost: "API_SERVICE_ADDRESS" </li><li>upgrade.kube-apiserver.httpsServicePort: "SERVICE_PORT_HTTPS"</li></ul> |
@@ -100,8 +103,7 @@ Complete the following steps.
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
    | installer.upgrade.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
-   | installer.upgrade.targetRulesSchema   | Specify the new target rules schema name that you created in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
-   | installer.upgrade.targetDataSchema   | For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: ""   |
+   | installer.upgrade.targetRulesSchema   | Specify a new schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
 
 2. Save the file.
 
