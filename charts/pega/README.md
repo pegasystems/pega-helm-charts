@@ -393,17 +393,22 @@ tier:
     disktype: ssd
 ```
 
-### Liveness and readiness probes
+### Liveness, readiness, and startup probes
 
-[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
+Pega uses liveness, readiness, and startup probes to determine application health in your deployments. For an overview of these probes, see [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness. You can configure probes independently for each tier. If not explicitly configured, default probes are used during the deployment. Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
 
-Parameter           | Description    | Default value
----                 | ---            | ---
-`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
-`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
-`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`
-`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`
+Notes:
+* Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
+* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
+* Default values are listed below in order of liveness, readiness, and startup.
+
+Parameter           | Description    | Default - 1.18+ | Default - pre-1.18
+---                 | ---            | ---             | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0`, `0`, `10` | `200`, `30`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `10`, `10` | `20`, `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30`, `10`, `10` | `30`, `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`, `1`, `1` | `1`, `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`, `3`, `20` | `3`, `3`
 
 Example:
 
