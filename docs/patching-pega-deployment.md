@@ -62,7 +62,7 @@ To complete a zero downtime patch, you must configure the following settings in 
 
 - Specify action.execute: upgrade-deploy to invoke the zero-downtime patch process.
 - Specify the schema name or names that will be upgraded:
-  - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (dbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA")
+  - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA")
   - **For 8.2 and 8.3**: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (dbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave it blank).
 - Ensure one of the following:
   - You pushed the images for your patch to the same repository that you used for your installation repository and the credentials for your repository account are the same as those in your `pega` Helm chart.  

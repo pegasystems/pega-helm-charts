@@ -32,7 +32,8 @@ Value             | Action
 deploy            | Start the Pega containers using an existing Pega database installation.
 install           | Install Pega Platform into your database without deploying.
 install-deploy    | Install Pega Platform into your database and then deploy.
-
+upgrade           | Upgrade or patch Pega Platform in your database without deploying.
+upgrade-deploy    | Upgrade or patch Pega Platform in your database without deploying.
 <!--upgrade           | Upgrade the Pega Platform installation in your database.
 upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
 -->
@@ -657,8 +658,7 @@ To **apply a Pega Platform patch** with zero downtime to your existing Pega plat
 Upgrade type    | Description
 ---             | ---
 `in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  An in-place upgrade process will upgrade your environment as quickly as possible but pauses the deployment while and the process upgrades all of the rules of your Pega application.
-`out-of-place`  | An out-of-place upgrade uses a split-schema process to apply patches.  It places the rules into a read-only state, creates appropriate, temporary schemas in your current database, then migrates the rules to temporary rules and data schemas. The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. Depending on your release, specify the required schema name or names that will be upgraded: <ul><li>For 8.4 and later: specify both schema names, since the process involves migrating rules to and from each schema (dbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA")</li><li>For 8.2 and 8.3: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (dbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave it blank).</li>
-</ul>
+`out-of-place`  | An out-of-place upgrade uses a split-schema process to apply patches.  It places the rules into a read-only state, creates appropriate, temporary schemas in your current database, then migrates the rules to a temporary rules schema it creates when you specify `installer.targetRulesSchema: "rules_upgrade"`. The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. To apply a patch, specify `installer.upgradeType: out-of-place"` and `installer.targetRulesSchema: "rules_upgrade"`.
 
 Example:
 
@@ -668,7 +668,6 @@ installer:
   upgrade:
     upgradeType: "out-of-place"
     targetRulesSchema: "rules_upgrade"
-    targetDataSchema: "temp_data_schema" (leave blank for releases earlier than 8.4)
 ```
 
 ### Installer Pod Annotations
