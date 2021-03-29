@@ -40,7 +40,7 @@ spec:
 {{ toYaml .node.podAnnotations | indent 8 }}
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
-        revision: "{{ .root.Release.Revision }}"
+        config-tier-check: {{ include (print .root.Template.BasePath "/pega-tier-config.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
