@@ -1,4 +1,9 @@
 {{- define "pega.config" -}}
+{{ template "pega.config.inner" dict "root" .root "node" .dep "name" (printf "pega-%s" .dep.name) "mode" (include "deployConfig" .root) "custom" .dep.custom }}
+{{- end -}}
+
+
+{{- define "pega.config.inner" -}}
 {{- $arg := .mode -}}
 # Node type specific configuration for {{ .name }}
 kind: ConfigMap
