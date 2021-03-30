@@ -10,9 +10,9 @@ Useful links to Pega software patching information:
 
 ## Deployment process overview
 
-Pega supports client-managed cloud clients applying patches for releases 8.4 and later using a zero-time patch process to apply the latest cumulative bundle of bug and security fixes since the last minor release. For the latest Pega Community articles, see [About client managed cloud](https://community.pega.com/knowledgebase/articles/client-managed-cloud/85/about-client-managed-cloud).
+Pega supports client-managed cloud clients applying patches for releases 8.4 and later using a zero-downtime patch process to apply the latest cumulative bundle of bug and security fixes since the last minor release. For the latest Pega Community articles, see [About client managed cloud](https://community.pega.com/knowledgebase/articles/client-managed-cloud/85/about-client-managed-cloud).
 
-The Pega zero-downtime patch process uses the out-of-place patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary data schema and the patch migration script moves the rules between the appropriate schema and then performs the required rolling reboot of your deployment cluster. For a detailed overview of the process, see [Applying a patch without downtime](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/applying-patch-without-downtime).
+The Pega zero-downtime patch process uses the out-of-place patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary schema and the patch migration script moves the rules between the schemas and then performs the required rolling reboot of your deployment cluster. For a detailed overview of the process, see [Applying a patch without downtime](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/applying-patch-without-downtime).
 
 Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts in the same Pega repository that you used to install Pega Platform in a supported Kubernetes environment. The client-managed cloud patch process includes the following tasks:
 
@@ -29,17 +29,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
    Pega does not support quoted identifiers in database schema names, so do not wrap your schema name with single quotes.
 
-4. To prepare your system for the patch process running in the background, disable rule creation in your current deployment. Depending on your version of Pega Platform, the steps are slightly different, but the same steps used in on-premises systems:
-
-   - For 8.4 and later, see [For High Availability systems: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-systems-preparing-cluster-patching)
-   - For 8.2 or 8.3, see [For High Availability 8.2 and 8.3 systems: Preparing the cluster for patching](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/high-availability-82-and-83-systems-preparing-cluster-patching)
-
-5. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
-
-6. Re-enable rule creation in your current deployment. Depending on your version of Pega Platform, the steps are slightly different, but the same steps used in on-premises systems:
-
-   - For 8.4 and later, see [For systems configured for High Availability: Reverting the cluster settings](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/systems-configured-high-availability-reverting-cluster-settings).
-   - For 8.2 or 8.3, see [For systems configured for High Availability: Reverting the cluster settings](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/systems-configured-high-availability-reverting-cluster-settings).
+4. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
 
 ## Assumptions and prerequisites
 
@@ -66,7 +56,7 @@ The Pega patch application process takes at most 120 minutes total.
 To complete a zero downtime patch, you must configure the following settings in your existing Pega configuration files for your Pega Platform deployment:
 
 - Specify action.execute: upgrade-deploy to invoke the zero-downtime patch process.
-- Specify the schema name or names that will be upgraded. Since the process involves migrating rules to and from each schema (jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA").
+- Specify the schema name or names that will be upgraded. Since the process involves migrating rules to and from each schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.dataSchema: "YOUR_DATA_SCHEMA").
 
 - Ensure one of the following:
   - You pushed the images for your patch to the same repository that you used for your installation repository and the credentials for your repository account are the same as those in your `pega` Helm chart.  
@@ -94,17 +84,16 @@ Complete the following steps.
    | Chart parameter name    | Purpose                                   | Your setting |
    |-------------------------|-------------------------------------------|--------------|
    | actions.execute: | To apply a patch using the zero-downtime patch process, specify an “upgrade-deploy” deployment type. | execute: "upgrade-deploy" |
-   | jdbc.connectionProperties.rulesSchema: "YOUR_RULES_SCHEMA"  | For any patch, specify the name of the existing rules schema from which the patch process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
-   | jdbc.connectionProperties.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the temporary data schema to which the patch process migrates the existing data structure from the existing data schema  | dataSchema: "YOUR_DATA_SCHEMA"  |
+   | jdbc.rulesSchema: "YOUR_RULES_SCHEMA"  | For any patch, specify the name of the existing rules schema from which the patch process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
+   | jdbc.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the temporary data schema to which the patch process migrates the existing data structure from the existing data schema  | dataSchema: "YOUR_DATA_SCHEMA"  |
    | docker.registry.url: username:  and password: | If using a new registry since you installed Pega Platform, update the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). You can skip this section if the registry is the same as your initial installation. | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. This image should match the version of the installer image with which you will apply your patch. | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | <ul><li>upgrade.kube-apiserver. serviceHost</li><li>upgrade.kube-apiserver.httpsServicePort</li></ul>  | For existing AKS and PKS deployments, for the service host and https service port of the Kubernetes API server. For EKS and GKE deployments, leave the existing text values (do not leave them blank).| <ul><li>upgrade.kube-apiserver.serviceHost: "API_SERVICE_ADDRESS" </li><li>upgrade.kube-apiserver.httpsServicePort: "SERVICE_PORT_HTTPS"</li></ul> |
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
-   | installer.upgrade.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
-   | installer.upgrade.targetRulesSchema   | Specify a new schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
-
+   | installer.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
+   | installer.targetRulesSchema   | Specify a new schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
 2. Save the file.
 
 ### Patch your Pega Platform deployment using the command line
