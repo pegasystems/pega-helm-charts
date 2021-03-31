@@ -91,6 +91,7 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.Equal(t, appsv1.DeploymentStrategyType("RollingUpdate"), deploymentObj.Spec.Strategy.Type)
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Template.Labels["app"])
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
+	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-tier-check"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options)
 }
@@ -154,7 +155,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "pega-volume-config", pod.Containers[0].VolumeMounts[0].Name)
 	require.Equal(t, "/opt/pega/config", pod.Containers[0].VolumeMounts[0].MountPath)
 
-  //If these tests start failing, check if the K8s version has passed 1.18. If so,
+	//If these tests start failing, check if the K8s version has passed 1.18. If so,
 	//update the values to the 1.18 versions and also enable the StartupProbe test.
 	require.Equal(t, int32(200), pod.Containers[0].LivenessProbe.InitialDelaySeconds)
 	require.Equal(t, int32(20), pod.Containers[0].LivenessProbe.TimeoutSeconds)
@@ -173,8 +174,8 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "/prweb/PRRestService/monitor/pingService/ping", pod.Containers[0].ReadinessProbe.HTTPGet.Path)
 	require.Equal(t, intstr.FromInt(8080), pod.Containers[0].ReadinessProbe.HTTPGet.Port)
 	require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].ReadinessProbe.HTTPGet.Scheme)
-  
-  //require.Equal(t, int32(10), pod.Containers[0].StartupProbe.InitialDelaySeconds)
+
+	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.InitialDelaySeconds)
 	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.TimeoutSeconds)
 	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.PeriodSeconds)
 	//require.Equal(t, int32(1), pod.Containers[0].StartupProbe.SuccessThreshold)
