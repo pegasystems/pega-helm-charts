@@ -38,8 +38,8 @@ $ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 ```bash
 $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
-pega/pega  	              1.4.4        	           	Pega installation on kubernetes
-pega/addons	              1.4.4        	1.0        	A Helm chart for Kubernetes 
+pega/pega  	              1.4.4        	           	Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+pega/addons	              1.4.4        	1.0        	Helm chart to configure required supporting services and tools in your environment for your deployment.
 pega/backingservices      1.4.4        	            Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
@@ -98,7 +98,7 @@ $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 ```
 
-*To edit the charts and deploy using a local version of the pega/addons, pega/backingservices, or pega/pega charts, you must include the filepath to your local chart directory in your Helm chart reference.*
+To edit the charts and deploy using a local version of the pega/addons, pega/backingservices, or pega/pega charts, you must include the filepath to your local chart directory in your Helm chart reference.
 
 9. To delete your deployment of Pega nodes, enter the command (this will not delete your database):
 

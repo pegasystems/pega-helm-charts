@@ -415,8 +415,8 @@ To customize these files, you must download them from the source github reposito
 ```bash
   $ helm search repo pega
   NAME        CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega             1.4.4                           Pega installation on kubernetes
-  pega/addons           1.4.4           1.0             A Helm chart for Kubernetes
+  pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
   pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 

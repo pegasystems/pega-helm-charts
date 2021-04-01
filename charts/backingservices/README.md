@@ -7,7 +7,7 @@ The backingservices chart supports deployment options for Search and Reporting S
 **Example:**
 
 **_Single backing service shared across all pega environments:_**
-You can provision the backingservice `Search and Reporting Service` into your `pega` environment namespace, with the SRS service endpoint configured with the Pega Infinity environment. 
+You can provision the backingservice `Search and Reporting Service` into your `pega` environment namespace, with the SRS endpoint configured with the Pega Infinity environment. 
 When you include the SRS into your pega namespace, the service endpoint is included within your Pega Infinity environment network to ensure isolation of your application data.
 
 ### Search and Reporting Service
@@ -20,13 +20,13 @@ The service deployment provisions runtime service pods along with a dependency o
 #### SRS Version compatibility matrix
 Pega Infinity version   | SRS version   | ElasticSearch version     | Description
 ---                     | ---           | ---                       | ---
-< 8.6                   | NA            | NA                        | SRS service can be used with Pega Infinity 8.6 and later
+< 8.6                   | NA            | NA                        | SRS can be used with Pega Infinity 8.6 and later
 \>= 8.6                 | \>= 1.9.0     | 7.1.x                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.9.0 and later. Current SRS versions are certified to support Elasticsearch version 7.1.x.
 
 
-#### SRS service runtime configuration:
+#### SRS runtime configuration:
 
-The values.yaml provides configuration options to define the deployment resources along with option to either provision ElasticSearch cluster automatically for data storage, or you can choose to configure an existing managed elasticsearch cluster to use as a datastore with the SRS service runtime. 
+The values.yaml provides configuration options to define the deployment resources along with option to either provision ElasticSearch cluster automatically for data storage, or you can choose to configure an existing managed elasticsearch cluster to use as a datastore with the SRS runtime. 
 
 If an externally managed elasticsearch cluster is being used, make sure the service is accessible to the k8s cluster where SRS is deployed.
 
@@ -36,10 +36,10 @@ You may enable the component of [Elasticsearch](https://github.com/helm/charts/t
 Configuration                       | Usage
 ---                                 | ---
 `enabled`                           | Enable the Search and Reporting Service deployment as a backing service.
-`deploymentName`                    | The name of your SRS cluster.  Resources created will be prefixed with this string. This is also the service name for SRS.
-`srsRuntime`                        | This section defines the SRS service specific resource configuration options like image, replica count, cpu and memory resource settings etc.
-`elasticsearch`                     | Define the elasticsearch cluster configurations using this section. The chart from [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) is used for provisioning the cluster.
-`srsStorage.provisionInternalESCluster` | This setting when enabled will provision Elasticsearch cluster automatically with SRS runtime. Disable this to use an existing external ElasticSearch cluster with the SRS runtime.
+`deploymentName`                    | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.
+`srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
+`elasticsearch`                     | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for elasticsearch provisioning in the cluster.
+`srsStorage.provisionInternalESCluster` | Enable this parameter to provision an Elasticsearch cluster to be used with SRS. To use your own Elasticsearch service, disable this parameter and use the uncommented section to specify the connection details for your existing external ElasticSearch cluster that is available to your deployment that is using the SRS.
 
 Example:
 

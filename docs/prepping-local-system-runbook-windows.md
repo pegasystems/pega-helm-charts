@@ -394,9 +394,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
 
 After you push these three downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
 
-11. For Pega Infinity 8.6 and later, you can follow the below steps to configure `backingservices` and pull `platform-services/search-n-reporting-service:<version>`, to configure Search and reporting service feature as an alternate search solution to `platform/search`.
-
-12. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
+11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
  
 ```bash
 $ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4
@@ -404,10 +402,10 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4
 ```
 
-13. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
+12. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
 
    `$ docker tag pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4 <Registry host name:Port>/my-pega-srs:8.6.0`
 
-14. To push the retagged `my-pega-srs` image to your registry, enter:
+13. To push the retagged `my-pega-srs` image to your registry, enter:
 
    `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
