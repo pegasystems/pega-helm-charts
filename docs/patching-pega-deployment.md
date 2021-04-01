@@ -18,7 +18,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
 1. Prepare your Docker repository by downloading the latest three Pega Platform patch release images (platform/installer, platform/pega, and platform/search) in your release stream and pushing them into your preferred Docker image repository - [Downloading your images for the patch process – 20 minutes](#downloading-your-images-for-the-patch-process--20-minutes).
 
-2. Edit several specific parameters in your current pega Helm chart (to apply a patch you use the `actions.execute: "upgrade-deploy` parameter). - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero-downtime-pega-platform-patch-using-helm-charts--120-minutes).
+2. Edit several specific parameters in your current pega Helm chart (to apply a patch you use the `actions.execute: "upgrade-deploy"` parameter). - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero-downtime-pega-platform-patch-using-helm-charts--120-minutes).
 
 3. **For deployments running Pega Infinity 8.2.1 through 8.2.7 only:** Create a new blank rules schema in your existing database. Leave this new schema empty. If you are running Pega Infinity 8.3 or higher, you can skip this step, since the patch scripts in your deployment automate the creation of these blank schemas.
 
