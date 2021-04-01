@@ -33,7 +33,7 @@ deploy            | Start the Pega containers using an existing Pega database in
 install           | Install Pega Platform into your database without deploying.
 install-deploy    | Install Pega Platform into your database and then deploy.
 upgrade           | Upgrade or patch Pega Platform in your database without deploying.
-upgrade-deploy    | Upgrade or patch Pega Platform in your database without deploying.
+upgrade-deploy    | Upgrade or patch Pega Platform in your database and then deploy.
 <!--upgrade           | Upgrade the Pega Platform installation in your database.
 upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
 -->

@@ -18,7 +18,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
 1. Prepare your Docker repository by downloading the latest three Pega Platform patch release images (platform/installer, platform/pega, and platform/search) in your release stream and pushing them into your preferred Docker image repository - [Downloading your images for the patch process – 20 minutes](#downloading-your-images-for-the-patch-process--20-minutes).
 
-2. Edit the pega Helm chart by editing parameters to specify "upgrading" your software with the software contained in your provided patch image. - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero-downtime-pega-platform-patch-using-helm-charts--120-minutes).
+2. Edit several specific parameters in your current pega Helm chart (to apply a patch you use the `actions.execute: "upgrade-deploy` parameter). - [Applying a zero-downtime Pega Platform patch using Helm charts - 120-minutes](#applying-a-zero-downtime-pega-platform-patch-using-helm-charts--120-minutes).
 
 3. **For deployments running Pega Infinity 8.2.1 through 8.2.7 only:** Create a new blank rules schema in your existing database. Leave this new schema empty. If you are running Pega Infinity 8.3 or higher, you can skip this step, since the patch scripts in your deployment automate the creation of these blank schemas.
 
@@ -29,7 +29,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
    Pega does not support quoted identifiers in database schema names, so do not wrap your schema name with single quotes.
 
-4. Apply the patch by using the `helm upgrade-deploy` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
+4. Apply the patch by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
 
 ## Assumptions and prerequisites
 
@@ -71,7 +71,7 @@ To complete a zero downtime patch, you must configure the following settings in 
 - In the installer section of the Helm chart, update the following: 
   - Update the tagging details, including the version and date of your Pega-provided `platform/installer` Docker image, that you downloaded to support your patch.
   - Specify an `out-of-place` upgrade to apply a patch using the zero-downtime patch process.
-  - Specify a temporary rules schema name that the process creates in your existing database to support the patch process within the quotes.
+  - Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes.
 
 You can leave the existing customized parameters as is; the patch process will use the remaining existing settings in your deployment.
 
@@ -93,7 +93,7 @@ Complete the following steps.
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
    | installer.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
-   | installer.targetRulesSchema   | Specify a new schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
+   | installer.targetRulesSchema   | Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
 2. Save the file.
 
 ### Patch your Pega Platform deployment using the command line

@@ -103,7 +103,7 @@ $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 **Tip:** To delete your deployment of Pega nodes, enter the command (this will not delete your database):
 
 ```bash
-$ helm delete mypega
+$ helm delete release --namespace mypega
 ```
 
 # Staying current with a Pega Platform upgrade or patching
