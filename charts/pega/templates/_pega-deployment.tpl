@@ -188,7 +188,7 @@ spec:
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: 8081
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
@@ -225,7 +225,7 @@ spec:
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: 8081
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 200 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
