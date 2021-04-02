@@ -1,6 +1,6 @@
 language: python
 os: linux
-dist: xenial
+dist: bionic
 env:
   global:
     - HELM_URL=https://get.helm.sh
@@ -15,8 +15,6 @@ install:
   # Install YamlLint
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
   - nvm install --lts
-  - nvm use node
-  - npm -v
   - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
   - eval "$(gimme 1.13.1)"
