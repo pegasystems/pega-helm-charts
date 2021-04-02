@@ -16,7 +16,7 @@ install:
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
   - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
   - sudo apt install nodejs
-  - npm use 12.18.1
+  - nvm use 12.18.1
   - npm -v
   - which npm
   - echo $PATH
