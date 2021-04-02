@@ -14,12 +14,12 @@ install:
   - PATH=`pwd`/linux-amd64/:$PATH
   # Install YamlLint
   - sudo pip install yamllint=="${YAMLLINT_VERSION}"
-  - history | grep nodejs
-  - history | grep npm
   - curl -sL https://deb.nodesource.com/setup_12.x | sudo -E bash -
   - sudo apt install nodejs
+  - npm use 12.18.1
   - npm -v
   - which npm
+  - echo $PATH
   - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
   # Install Go
   - eval "$(gimme 1.13.1)"
