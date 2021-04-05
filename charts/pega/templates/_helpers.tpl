@@ -149,7 +149,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- if .node.maxHeap }}
   value: "{{ .node.maxHeap }}"
 {{- else }}
-  value: "7168m"
+  value: "8192m"
 {{- end }}
 {{- end -}}
 

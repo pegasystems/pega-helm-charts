@@ -102,8 +102,8 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+          maxSurge: 25%
+          maxUnavailable: 25%
         type: RollingUpdate
 
       # Optionally overridde default resource specifications
@@ -122,6 +122,18 @@ global:
       hpa:
         enabled: true
 
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
+
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
@@ -136,8 +148,8 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+          maxSurge: 25%
+          maxUnavailable: 25%
         type: RollingUpdate
 
       # To configure an alternative user for your custom image, set value for runAsUser
@@ -148,6 +160,18 @@ global:
       hpa:
         enabled: true
         enableMemoryTarget: false
+
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -190,6 +214,18 @@ global:
         resources:
           requests:
             storage: 5Gi
+
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
 
 # External services
 
