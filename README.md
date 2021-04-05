@@ -166,12 +166,12 @@ This is an open source project and contributions are welcome.  Please see the [c
 New versions of this Helm Chart may be released at any time. Versions are defined using [semantic versioning](https://semver.org/):
 
 1. Major: Pega introduces new features or functionality that results in breaking backwards compatibility with previous chart versions. Examples:
-  * The new values.yaml or maps (config/deploy) cannot be used to deploy previously released Docker image versions
-  * There is a new, required dependency on a specific Pega Platform version or dependent docker image
-2. Minor: Adds new functionality and maintains backwards compatibility. Examples:
+  * The new values.yaml or maps (config/deploy) cannot be used to deploy previously released Docker image versions.
+  * There is a new, required dependency on a specific Pega Platform version or dependent docker image.
+2. Minor: Pega adds new functionality and maintains backwards compatibility. Examples:
   * Pega adds new features while maintaining existing functionality.
-  * An opt-in configuration change is made
-3. Patch: Fixes bugs and maintains backwards compatibility. Examples:
-  * A bug or issue is fixed
-  * A security vulnerability is fixed
+  * Support for new, opt-in configurations.
+3. Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
+  * Pega fixes a bug or addresses known issues.
+  * Pega addresses a security vulnerability.
 
