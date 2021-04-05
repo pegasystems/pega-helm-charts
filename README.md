@@ -163,12 +163,15 @@ This is an open source project and contributions are welcome.  Please see the [c
 
 # Versioning
 
-New versions of this Helm Chart may be released at any time. Versions are defined as major.minor.patch, as follows:
+New versions of this Helm Chart may be released at any time. Versions are defined using [semantic versioning](https://semver.org/):
 
-1. Major: Used when there is no way to configure the values.yaml or the config maps (config/deploy) such that the generated K8S yaml can be used to deploy previously released Docker image versions.
-  - Example: A dependency on a specific Platform Version, or a dependency on either a required pega-web-ready or a pega-installer-ready change.
-2. Minor: Used when the older vaules.yaml or the config maps (config/deploy) cannot be provided as input to Helm for generating the K8S yaml without being updated to adopt the new functionality. Minor may also be used for new features.
-  - Example: A dependency on an optional pega-web-ready change or pega-installer-ready change.
-3. Patch: Any other change, such that enhancements are opt-in and bugs are fixed to behave in the expected manner.
-  - Example: A new optional parameter that defaults to a previously hard-coded value
+1. Major: Breaks backwards compatibility with previous chart versions. Examples:
+  a. The new values.yaml or maps (config/deploy) cannot be used to deploy previously released Docker image versions
+  b. There is a new, required dependency on a specific Platform or dependent docker image
+2. Minor: Adds new functionality and maintains backwards compatibility. Examples:
+  a. A new feature is added but existing functionality is maintained
+  b. An opt-in configuration change is made
+3. Patch: Fixes bugs and maintains backwards compatibility. Examples:
+  a. A bug or issue is fixed
+  b. A security vulnerability is fixed
 
