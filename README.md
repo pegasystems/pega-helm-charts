@@ -98,13 +98,24 @@ $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 ```
 
-*To edit the charts and deploy using a local version of the pega/addons, pega/backingservices, or pega/pega charts, you must include the filepath to your local chart directory in your Helm chart reference.*
+**Important**: To edit the charts and deploy using a local version of the pega/addons, pega/backingservices, or pega/pega charts, you must include the filepath to your local chart directory in your Helm chart reference.
 
-9. To delete your deployment of Pega nodes, enter the command (this will not delete your database):
+**Tip:** To delete your deployment of Pega nodes, enter the command (this will not delete your database):
 
 ```bash
-$ helm delete mypega
+$ helm delete release --namespace mypega
 ```
+
+# Staying current with a Pega Platform upgrade or patching
+
+## Upgrades
+
+To upgrade Pega Platform software deployed in a Kubernetes environment, you must download the latest Pega software from Pega Digital Software Delivery and then use the appropriate upgrade guide for Pega Platform from [Stay current with Pega](https://community.pega.com/upgrade). To upgrade your strategic application, use the latest Upgrade Guide available for your strategic application, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+
+## Patches
+
+To apply a Pega Platform patch with zero downtime to your existing Pega platform software, you must download the latest installer Docker images from Pega Digital Software Delivery and change several options in your Pega Helm chart. For details and helpful resources explaining the Pega Platform patch process, including the Pega Infinity patch policy, see [Applying the latest patch](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/applying-latest-patch). For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md).
+
 # Downloading Docker images for your deployment
 
 Clients with appropriate licenses can request access to several required images from the Pega-managed Docker image repository. With your access key, you can log in to the image repository and download these Docker images to install the Pega Platform onto your database. After you pull the images to your local system, you must push them into your private Docker registry.

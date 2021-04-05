@@ -20,8 +20,6 @@ adminPassword: ""
 assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
 bypassTruncateUpdatescache: "false"
-# JDBC custom connection properties
-jdbcCustomConnection: ""
 # Distribution kit URL
 distributionKitURL: ""
 # A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
