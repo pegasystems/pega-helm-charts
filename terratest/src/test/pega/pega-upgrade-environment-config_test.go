@@ -20,8 +20,9 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":               vendor,
+					"global.actions.execute":        operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 
@@ -43,7 +44,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
-	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "in-place")
+	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "zero-downtime")
 	require.Equal(t, upgradeEnvConfigData["MULTITENANT_SYSTEM"], "false")
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
