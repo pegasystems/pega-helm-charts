@@ -30,6 +30,7 @@ func TestPegaSearchService(t *testing.T){
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 			 	},
 		    }
 

@@ -25,6 +25,7 @@ func TestConstellation(t *testing.T) {
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"constellation.enabled":  "true",
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 	deploymentYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
