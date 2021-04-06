@@ -403,15 +403,24 @@ Pega uses liveness, readiness, and startup probes to determine application healt
 Notes:
 * Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
 * `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
-* Default values are listed below in order of liveness, readiness, and startup.
 
-Parameter           | Description    | Default - 1.18+ | Default - pre-1.18
----                 | ---            | ---             | ---
-`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0`, `0`, `10` | `200`, `30`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `10`, `10` | `20`, `10`
-`periodSeconds`       | How often (in seconds) to perform the probe. | `30`, `10`, `10` | `30`, `10`
-`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`, `1`, `1` | `1`, `1`
-`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`, `3`, `20` | `3`, `3`
+#### Kubernetes pre-1.18
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe`
+---                   | ---            | ---                     | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `200` | `30`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3`
+
+#### Kubernetes 1.18+
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe` | Default `startupProbe`
+---                   | ---            | ---                     | ---                      | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0` | `0` | `10`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3` | `20`
 
 Example:
 
