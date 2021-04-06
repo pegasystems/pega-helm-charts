@@ -28,10 +28,12 @@ spec:
       name: cpu
       {{- if .hpa.targetAverageCPUUtilization }}
       targetAverageUtilization: {{ .hpa.targetAverageCPUUtilization }}
-      {{- else }}
-      targetAverageUtilization: 70
       {{- end }}
-  {{- end }}
+      {{- if .hpa.targetAverageCPUValue }} 
+      targetAverageValue: {{ .hpa.targetAverageCPUValue }}
+      {{- else if not .hpa.targetAverageCPUUtilization }}
+      targetAverageValue: 2.8
+      {{- end }}
   {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget false) }}
   - type: Resource
     resource:
