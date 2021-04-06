@@ -30,7 +30,7 @@ If this command does not successfully return, install Helm 3 for your operating 
 1. Add the Pega repository to your Helm installation.
 
 ```bash
-$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
+$ helm repo add pega https://pegasystems.github.io/pega-helm-charts
 ```
 
 2. Verify the new repository by searching it.
