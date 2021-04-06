@@ -180,6 +180,9 @@ global:
       replicas: 2
       javaOpts: ""
 
+      livenessProbe:
+        port: 8081
+
       volumeClaimTemplate:
         resources:
           requests:

@@ -185,6 +185,9 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
+      livenessProbe:
+        port: 8081
+
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
