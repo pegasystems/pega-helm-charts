@@ -32,7 +32,7 @@ spec:
       targetAverageUtilization: 70
       {{- end }}
   {{- end }}
-  {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget true) }}
+  {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget false) }}
   - type: Resource
     resource:
       name: memory

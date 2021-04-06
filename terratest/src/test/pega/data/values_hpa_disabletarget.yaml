@@ -10,4 +10,4 @@ global:
       hpa:
         enabled: true
         # enableCpuTarget should be true as default
-        enableMemoryTarget: false
+        # enableMemoryTarget should be false as default
