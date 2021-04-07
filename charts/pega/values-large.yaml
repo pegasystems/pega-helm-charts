@@ -115,6 +115,9 @@ global:
           maxUnavailable: 0
         type: RollingUpdate
 
+      livenessProbe:
+        port: 8081
+
       hpa:
         enabled: true
 
@@ -135,6 +138,9 @@ global:
           maxSurge: 1
           maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -174,6 +180,9 @@ global:
       replicas: 2
       javaOpts: ""
 
+      livenessProbe:
+        port: 8081
+
       volumeClaimTemplate:
         resources:
           requests:
@@ -196,6 +205,9 @@ global:
           maxUnavailable: 0
         type: RollingUpdate
 
+      livenessProbe:
+        port: 8081
+
       hpa:
         enabled: true
 
@@ -214,6 +226,9 @@ global:
           maxSurge: 1
           maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true

@@ -160,3 +160,18 @@ These images do not expire, and you can keep them in your repository for as long
 # Contributing
 
 This is an open source project and contributions are welcome.  Please see the [contributing guidelines](./CONTRIBUTING.md) to get started.
+
+# Versioning
+
+New versions of this Helm Chart may be released at any time. Versions are defined using [semantic versioning](https://semver.org/):
+
+* Major: Pega introduces new features or functionality that results in breaking backwards compatibility with previous chart versions. Examples:
+  * The new values.yaml or maps (config/deploy) cannot be used to deploy previously released Docker image versions.
+  * A new, required dependency on a specific Pega Platform version or dependent docker image.
+* Minor: Pega adds new functionality and maintains backwards compatibility. Examples:
+  * Support for new features while maintaining existing functionality.
+  * Support for new, opt-in configurations.
+* Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
+  * Bug fixes or known issue resolutions.
+  * Security vulnerability enhancements.
+

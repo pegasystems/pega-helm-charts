@@ -188,7 +188,7 @@ spec:
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
@@ -200,7 +200,7 @@ spec:
         readinessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
@@ -212,7 +212,7 @@ spec:
         startupProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $startupProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}
           timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
@@ -225,7 +225,7 @@ spec:
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 200 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
@@ -237,7 +237,7 @@ spec:
         readinessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}

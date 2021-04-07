@@ -106,6 +106,9 @@ global:
           maxUnavailable: 0
         type: RollingUpdate
 
+      livenessProbe:
+        port: 8081
+
       # Optionally overridde default resource specifications
       # cpuRequest: 2
       # memRequest: "12Gi"
@@ -139,6 +142,9 @@ global:
           maxSurge: 1
           maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
@@ -178,6 +184,9 @@ global:
           # secretName:
           # useManagedCertificate: false
           # ssl_annotation:
+
+      livenessProbe:
+        port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
