@@ -1,7 +1,7 @@
 {{- define "pega.hpa" -}}
 {{- if .hpa.enabled -}}
 # The Horizontal Pod Autoscaler for {{ .deploymentName }} deployment
-apiVersion: autoscaling/v2beta1
+apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .name | quote}}
@@ -26,23 +26,29 @@ spec:
   - type: Resource
     resource:
       name: cpu
-      {{- if .hpa.targetAverageCPUUtilization }}
-      targetAverageUtilization: {{ .hpa.targetAverageCPUUtilization }}
-      {{- end }}
-      {{- if .hpa.targetAverageCPUValue }} 
-      targetAverageValue: {{ .hpa.targetAverageCPUValue }}
-      {{- else if not .hpa.targetAverageCPUUtilization }}
-      targetAverageValue: 2.8
-      {{- end }}
+      target:
+        {{- if .hpa.targetAverageCPUValue }} 
+        type: Value
+        averageValue: {{ .hpa.targetAverageCPUValue }}
+        {{- else if .hpa.targetAverageCPUUtilization }}
+        type: Utilization
+        averageUtilization: {{ .hpa.targetAverageCPUUtilization }}
+        {{- else if not .hpa.targetAverageCPUUtilization }}
+        type: Value
+        averageValue: 2.8
+        {{- end }}
+  {{- end }}
   {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget false) }}
   - type: Resource
     resource:
       name: memory
-      {{- if .hpa.targetAverageMemoryUtilization }}
-      targetAverageUtilization: {{ .hpa.targetAverageMemoryUtilization }}
-      {{- else }}
-      targetAverageUtilization: 85
-      {{- end }}
+      target:
+        type: Utilization
+        {{- if .hpa.targetAverageMemoryUtilization }}
+        averageUtilization: {{ .hpa.targetAverageMemoryUtilization }}
+        {{- else }}
+        averageUtilization: 85
+        {{- end }}
   {{- end }}
   
 ---
