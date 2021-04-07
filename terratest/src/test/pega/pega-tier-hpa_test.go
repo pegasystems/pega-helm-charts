@@ -13,8 +13,6 @@ import (
 	api "k8s.io/kubernetes/pkg/apis/core"
 )
 
-var defaultMemPercent = int32(85)
-
 func TestPegaTierHPA(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
