@@ -33,7 +33,7 @@ spec:
         {{- else if .hpa.targetAverageCPUUtilization }}
         type: Utilization
         averageUtilization: {{ .hpa.targetAverageCPUUtilization }}
-        {{- else if not .hpa.targetAverageCPUUtilization }}
+        {{- else }}
         type: Value
         averageValue: 2.8
         {{- end }}
