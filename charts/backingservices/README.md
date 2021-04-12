@@ -50,7 +50,7 @@ srs:
   srsRuntime:
     #srs-service values
     replicaCount: 2
-    srsImage: platform-services/search-n-reporting-service:1.9.0-4
+    srsImage: "YOUR_SRS_IMAGE:TAG"
     imagepullPolicy: IfNotPresent
     resources:
         limits:

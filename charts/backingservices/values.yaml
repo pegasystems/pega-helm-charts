@@ -8,7 +8,7 @@ global:
 srs:
   # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true
-  deploymentName: pega-shared-srs
+  deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   # srs-service configuration
   srsRuntime:
