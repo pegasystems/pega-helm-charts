@@ -95,6 +95,7 @@ deploy:
     skip_cleanup: true
     target_branch: gh-pages
     on:
+      branch: master
       repo: pegasystems/pega-helm-charts
       draft: true
   - provider: bintray
