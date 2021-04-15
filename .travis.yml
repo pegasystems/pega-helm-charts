@@ -95,6 +95,7 @@ deploy:
     skip_cleanup: true
     target_branch: gh-pages
     on:
+      repo: pegasystems/pega-helm-charts
       tags: true
   - provider: bintray
     file: descriptor.json
