@@ -42,7 +42,7 @@ script:
   - chmod 777 before_deploy.sh
 before_deploy:
   - ./before_deploy.sh  
-  # - make examples
+  - make examples
 deploy:
   - provider: releases
     api_key:
@@ -73,6 +73,7 @@ deploy:
       repo: pegasystems/pega-helm-charts
       tags: true
   - provider: pages
+    github-token: $GITHUB_TOKEN
     api_key:
       secure: >
         GuZqxcgBOueUOJWg6t5NaCTIssfkptgdAjwyWm/6SaVXqs9Kdgy
