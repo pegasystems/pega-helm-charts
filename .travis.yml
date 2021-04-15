@@ -96,7 +96,7 @@ deploy:
     target_branch: gh-pages
     on:
       repo: pegasystems/pega-helm-charts
-      tags: true
+      draft: true
   - provider: bintray
     file: descriptor.json
     user: bintrayautomation
