@@ -53,6 +53,8 @@ global:
     pega:
       image: "pegasystems/pega"
 
+  runWithRestrictedUserPermissions: "false"
+
   # Upgrade specific properties
   upgrade:
     # Configure only for aks/pks

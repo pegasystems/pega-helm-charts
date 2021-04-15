@@ -75,4 +75,4 @@ data:
   HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
 {{ end }}
-  RUN_AS_RESTRICTED_USER: {{ .Values.global.runWithRestrictedUserPermissions | default "false" }}
+  RUN_AS_RESTRICTED_USER: {{ .Values.global.runWithRestrictedUserPermissions | default "false" | quote }}

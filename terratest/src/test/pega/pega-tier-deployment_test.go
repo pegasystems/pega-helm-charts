@@ -19,6 +19,7 @@ var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra"}
 func TestPegaTierDeployment(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var useRestrictedRunAsUser = []string{"false", "true"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -27,21 +28,23 @@ func TestPegaTierDeployment(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-			fmt.Println(vendor + "-" + operation)
+            for _, runAsUser := range useRestrictedRunAsUser {
+                fmt.Println(vendor + "-" + operation)
 
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-				},
-			}
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.provider":        vendor,
+                        "global.runWithRestrictedUserPermissions": runAsUser,
+                        "global.actions.execute": operation,
+                    },
+                }
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-			yamlSplit := strings.Split(yamlContent, "---")
-			assertWeb(t, yamlSplit[1], options)
-			assertBatch(t, yamlSplit[2], options)
-			assertStream(t, yamlSplit[3], options)
-
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+                yamlSplit := strings.Split(yamlContent, "---")
+                assertWeb(t, yamlSplit[1], options)
+                assertBatch(t, yamlSplit[2], options)
+                assertStream(t, yamlSplit[3], options)
+            }
 		}
 	}
 }
@@ -193,6 +196,14 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "pega-volume-credentials", pod.Volumes[1].Name)
 	require.Equal(t, "pega-credentials-secret", pod.Volumes[1].Secret.SecretName)
 
+
+    if (options.SetValues["global.provider"] != "openshift" || options.SetValues["global.runWithRestrictedUserPermissions"] == "true") {
+        require.NotEmpty(t, pod.SecurityContext)
+        require.Equal(t, *pod.SecurityContext.RunAsUser, int64(9001))
+        require.Equal(t, *pod.SecurityContext.FSGroup, int64(0))
+	} else {
+	    require.Empty(t, pod.SecurityContext)
+	}
 }
 
 type pegaDeployment struct {
