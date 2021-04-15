@@ -147,7 +147,7 @@ Create an SQL instance that is available to your GKE cluster. In this example, t
 
     c. Select an appropriate **Region** and **Zone** for your database server. Select the same zone or region that you used to create your GKE cluster.
 
-    d. **Database version**, select **PostgreSQL 11**.
+    d. **Database version**, select **PostgreSQL 11 or 12**.
 
     e. **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP addresses to whitelist for this PostgreSQL database, and click **Done**.
     
@@ -209,7 +209,7 @@ To customize this pega.yaml file, you must download it from the Pega-managed rep
 
 1. To add the Pega repository to your Helm installation, enter:
 
-    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
 
 2. To verify the new repository, you can search it by entering:
 

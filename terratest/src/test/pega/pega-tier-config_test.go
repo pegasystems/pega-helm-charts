@@ -1,17 +1,14 @@
 package pega
 
-
-import(
+import (
+	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
-	"testing"
 	k8score "k8s.io/api/core/v1"
 	"path/filepath"
-	"fmt"
 	"strings"
-
+	"testing"
 )
-
 
 
 func TestPegaTierConfig(t *testing.T){
@@ -22,10 +19,9 @@ func TestPegaTierConfig(t *testing.T){
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
+	for _, vendor := range supportedVendors {
 
-	for _,vendor := range supportedVendors{
-
-		for _,operation := range supportedOperations{
+		for _, operation := range supportedOperations {
 
             for _, depName := range deploymentNames {
 
@@ -44,7 +40,6 @@ func TestPegaTierConfig(t *testing.T){
             }
 		}
 	}
-
 
 }
 
@@ -72,6 +67,8 @@ func VerifyTierConfg(t *testing.T, yamlContent string, options *helm.Options) {
 			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
 			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
+			compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallDeployServer.xml")
+			require.Equal(t, "", pegaConfigMapData["web.xml"])
 		}
 	}
 }

@@ -115,9 +115,12 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -136,13 +139,15 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
-        enableMemoryTarget: false
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -178,6 +183,9 @@ global:
       replicas: 2
       javaOpts: ""
 
+      livenessProbe:
+        port: 8081
+
       volumeClaimTemplate:
         resources:
           requests:
@@ -196,9 +204,12 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -215,13 +226,15 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
-        enableMemoryTarget: false
 
 # External services
 

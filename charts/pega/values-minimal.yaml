@@ -74,7 +74,7 @@ global:
       # Set resource consumption to minimal levels
       replicas: 1
       cpuRequest: 200m
-      memRequest: "5Gi"
+      memRequest: "6Gi"
       cpuLimit: 2
       memLimit: "6Gi"
       javaOpts: ""
