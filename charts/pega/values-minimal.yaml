@@ -54,6 +54,11 @@ global:
     pega:
       image: "pegasystems/pega"
 
+  # If set to "true", Pega pods will be run with a user having restricted permissions.
+  # See the readme for information if running on Openshift as there is additional
+  # required admin configuration required to leverage this feature.
+  runWithRestrictedUserPermissions: "false"
+
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
   tier:

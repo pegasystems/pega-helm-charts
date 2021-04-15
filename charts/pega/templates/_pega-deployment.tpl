@@ -2,7 +2,7 @@
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
-  annotations: 
+  annotations:
 {{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.annotations }}
 {{ toYaml .root.Values.global.pegaTier.annotations | indent 4 }}
 {{- end }}{{- end }}
@@ -78,7 +78,7 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if (ne .root.Values.global.provider "openshift") }}
+{{- if or (ne .root.Values.global.provider "openshift") (.root.Values.global.runWithRestrictedUserPermissions) }}
       securityContext:
         fsGroup: 0
 {{- if .node.securityContext }}

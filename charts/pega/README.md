@@ -133,6 +133,14 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Running Pega With Restricted Privileges
+
+You may opt to run Pega with a linux user whose permissions are constrained at an operating system level.  This is currently an opt-in feature.  Set the `global.runWithRestrictedUserPermissions` to true to enable this feature.
+
+```yaml
+runWithRestrictedUserPermissions: "true"
+```
+
 ## Tiers of a Pega deployment
 
 Pega supports deployment using a multi-tier architecture to separate processing and functions. Isolating processing in its own tier also allows for unique deployment configuration such as its own prconfig, resource allocations, or scaling characteristics.  Use the `tier` section in the helm chart to specify which tiers you wish to deploy and their logical tasks.  
