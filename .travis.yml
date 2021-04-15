@@ -90,7 +90,7 @@ deploy:
         3gmcgdLmM5MN9A5khwBzPYiF5oaWT1COxh/Rjdz5V0+jUvyRvc9
         a/rvc6hM6quXSmlAwA0U=
     file:
-        index.yaml
+        - index.yaml
     local_dir: pega-helm-charts
     skip_cleanup: true
     target_branch: gh-pages
