@@ -141,6 +141,17 @@ You may opt to run Pega with a linux user whose permissions are constrained at a
 runWithRestrictedUserPermissions: "true"
 ```
 
+### Running with Restricted Privileges on Openshift
+
+The Openshift platform contains additional default security features that will prevent the proper function of this feature.  It is generally recommended that Openshift users leverage Openshift's OOTB security features, but it is possible to configure Openshift and the Pega Helm Charts to use it.
+
+To leverage the this feature on Openshift:
+1. Set the `runWithRestrictedUserPermissions` to `true` as above.
+2. Create a service account for the Pega deployment: `oc create serviceaccount pega`.
+3. Allow this service account `anyuid` scc access: `oc adm policy add-scc-to-user anyuid -z pega --as system:admin` (requires admin access).
+4. For each Pega tier defined under `global.tier`, add a `custom.serviceAccountName` to `pega`.
+5. Perform `helm install` 
+
 ## Tiers of a Pega deployment
 
 Pega supports deployment using a multi-tier architecture to separate processing and functions. Isolating processing in its own tier also allows for unique deployment configuration such as its own prconfig, resource allocations, or scaling characteristics.  Use the `tier` section in the helm chart to specify which tiers you wish to deploy and their logical tasks.  
