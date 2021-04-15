@@ -42,7 +42,7 @@ script:
   - chmod 777 before_deploy.sh
 before_deploy:
   - ./before_deploy.sh  
-  - make examples
+  # - make examples
 deploy:
   - provider: releases
     api_key:
