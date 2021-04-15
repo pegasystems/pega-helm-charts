@@ -70,7 +70,7 @@ deploy:
       - pega-pivotal-pks-example.tar.gz
     skip_cleanup: true
     on:
-      repo: pegasystems/pega-helm-charts
+      repo: pegasystems/pega-helm-charts/tree/gh-pages
       tags: true
   - provider: bintray
     file: descriptor.json
