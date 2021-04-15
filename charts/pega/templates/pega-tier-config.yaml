@@ -1,5 +1,0 @@
-{{ if (eq (include "performDeployment" $) "true") }}
-{{ range $index, $dep := .Values.global.tier}}
-{{ template "pega.config" dict "root" $ "dep" $dep }}
-{{ end }}
-{{ end }}
