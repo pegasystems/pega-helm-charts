@@ -78,7 +78,7 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if or (ne .root.Values.global.provider "openshift") (.root.Values.global.runWithRestrictedUserPermissions) }}
+{{- if or (ne .root.Values.global.provider "openshift") (coalesce .root.Values.global.runWithRestrictedUserPermissions false) }}
       securityContext:
         fsGroup: 0
 {{- if .node.securityContext }}
