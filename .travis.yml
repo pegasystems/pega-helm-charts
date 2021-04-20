@@ -70,7 +70,7 @@ deploy:
       - pega-pivotal-pks-example.tar.gz
     skip_cleanup: true
     on:
-      repo: pegasystems/pega-helm-charts
+      repo: $TRAVIS_REPO_SLUG
       tags: true
   - provider: pages
     github-token: $GITHUB_TOKEN
@@ -94,30 +94,9 @@ deploy:
         - index.yaml
     skip_cleanup: true
     target_branch: gh-pages
+    keep_history: true
+    verbose: true
     on:
       all_branches: true
-      repo: pegasystems/pega-helm-charts
+      repo: $TRAVIS_REPO_SLUG
       draft: true
-  - provider: bintray
-    file: descriptor.json
-    user: bintrayautomation
-    key:
-      secure: >
-        M1CPmmjJ1OI2luWFRW9Aqregj3b4rQLSnP4ROurkHkewB+HwoZ+
-        QHAQ4JJD0B+br2AddaGKgN1rdzYpyvg0Cl7ZhWnMb96bE+lVbmD
-        zYnUc+Iwd8/PWXNoaFuB5sn5LPVESe8H/ZLdP0IyMbBknBDgdNg
-        KpD9XqH7/UrrNT9jvZSpGFAcMCwLVFiQ1auusnSLOYVr611Jadp
-        NZarx7QgPLBtlit+cfi/vEGy7GyYTtFzSbM86gBnm1kViSVM4w1
-        bE4cFs+14KVNiNiwpSzFzK/gBncqQVTz6yaD3bV48Cla5sz3/sD
-        kh3If7pUhcmMYyy9BPk35176TWTHKcqATv/5GxDvQpgaBMlyl0D
-        hwhb2d++ZZ6V+kYYj+Uf4m4NaxGV6WNrUnW+IPw9qlBWFHnw17u
-        80HU5GapXXNedUi2CjzrH25A0Y6DHqfZubDBXJh31RfWKz0r58b
-        LSGLYxdl96purfLUCeSrsKkZAWS59EmpXiR/f+zSbNmlpG+ryVB
-        sQIPG+cwdPSVUdGBGVp3QzEjVze6gABSQ/2GaMeRterjzBypi8a
-        b4vbIyxY905deoMAwcQHUcvybpNJfRcaowToK0BnMNhy8pn26KY
-        ct3oGLVxQe6rlGbQNZrFePSCyNd/ZfYlkWDcLh/j0OH0gdspHTd
-        Dfsy8dgS8QzvgNsNKRHk=
-    skip_cleanup: true
-    on:
-      all_branches: true
-      tags: true 
