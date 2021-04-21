@@ -168,7 +168,7 @@ To customize these files, you must download them from the repository to your loc
 
 1. To add the Pega repository to your Helm installation, enter:
 
-    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
 
 2. To verify the new repository, you can search it by entering:
 
@@ -207,7 +207,7 @@ Use the provided example addons.yaml file to configure the use of a the Traefik 
   
   1. To add the backingservices repository to your Helm installation, enter:
   
-      `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+      `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
       
   2. To verify the new repository, you can search it by entering:
       
