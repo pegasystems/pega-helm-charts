@@ -60,11 +60,11 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container, option
 			require.Equal(t, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://" + depName + "-search); do echo Waiting for search to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
-			//todo: update with depName?
+			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
-			//todo: update with depName?
+			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
