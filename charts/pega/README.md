@@ -133,9 +133,35 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Deployment Name (Optional)
+
+Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
+
+This is meant as an alternative to renaming individual deployment tiers (see [Tiers of a Pega deployment](#tiers-of-a-pega-deployment)).
+
+For example:
+```yaml
+global:
+  deployment:
+    name: app1-dev
+```
+will result in:
+```
+>kubectl get pods -n test
+NAME                              READY   STATUS    RESTARTS   AGE
+app1-dev-search-0                 1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-dsvdd   1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-lfwjg   1/1     Running   0          7m31s
+app1-dev-stream-0                 1/1     Running   0          24m
+app1-dev-stream-1                 1/1     Running   0          18m
+app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
+app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
+```
+The default value is "pega" if it is unset.
+
 ## Tiers of a Pega deployment
 
-Pega supports deployment using a multi-tier architecture to separate processing and functions. Isolating processing in its own tier also allows for unique deployment configuration such as its own prconfig, resource allocations, or scaling characteristics.  Use the `tier` section in the helm chart to specify which tiers you wish to deploy and their logical tasks.  
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
