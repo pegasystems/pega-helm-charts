@@ -262,9 +262,7 @@ true
 
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
-#As the pegasearch chart includes an externalURL value that is hardcoded to the name of the search service
-#it poses certain challenges if we want to rename the search service from something other than 'pega-search'
-#and still want to deploy pegasearch pods.
+
 {{- define "pegaSearchURL" -}}
 {{- $d1 := dict "overrideURL" $.Values.pegasearch.externalURL }}
 {{- $d2 := merge $ $d1 }}
