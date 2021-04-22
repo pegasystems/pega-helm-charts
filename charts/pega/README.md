@@ -161,7 +161,7 @@ The default value is "pega" if it is unset.
 
 ## Tiers of a Pega deployment
 
-Pega supports deployments that a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
