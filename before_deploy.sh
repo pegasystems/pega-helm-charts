@@ -2,7 +2,6 @@
 
 # CHART_VERSION is computed from the TAG details of the commit. Every Github release creates tag with the release name.
 # Release name (or) Tag name should be in vX.X.X format. Helm CHART_VERSION would be X.X.X
-export TRAVIS_TAG=v12.5.0
 export CHART_VERSION=$(expr ${TRAVIS_TAG:1})
 export PEGA_FILE_NAME=pega-${CHART_VERSION}.tgz
 export ADDONS_FILE_NAME=addons-${CHART_VERSION}.tgz
@@ -11,10 +10,10 @@ cat descriptor-template.json | jq '.files[0].includePattern=env.PEGA_FILE_NAME' 
 # Get the latest index.yaml from github.io
 curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
 # Clone the versions from gh-pages to a temp directory - xyz
-# The versions will be re-installed in gh-pages
-git clone -b gh-pages https://github.com/${TRAVIS_REPO_SLUG} xyz
-cp xyz/* .
-rm -rf xyz
+# The versions will be re-installed in g temporary directory - temp_gh_pages
+git clone -b gh-pages https://github.com/${TRAVIS_REPO_SLUG} temp_gh_pages
+cp temp_gh-pages/* .
+rm -rf temp_gh-pages
 # Package up the changed version
 helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
