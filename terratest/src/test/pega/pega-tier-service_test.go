@@ -16,6 +16,7 @@ import (
 func TestPegaTierService(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,19 +26,22 @@ func TestPegaTierService(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"installer.upgrade.upgradeType": "zero-downtime",
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
-			VerifyPegaServices(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
+                VerifyPegaServices(t, yamlContent, options)
+            }
 		}
 	}
 
@@ -50,10 +54,13 @@ func VerifyPegaServices(t *testing.T, yamlContent string, options *helm.Options)
 	for index, serviceInfo := range serviceSlice {
 		if index >= 1 && index <= 2 {
 			UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
+
 			if index == 1 {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}}, options)
+			    require.Equal(t, getObjName(options, "-web"), pegaServiceObj.ObjectMeta.Name)
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{getObjName(options, "-web"), int32(80), intstr.IntOrString{IntVal: 8080}}, options)
 			} else {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}}, options)
+			    require.Equal(t, getObjName(options, "-stream"), pegaServiceObj.ObjectMeta.Name)
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{getObjName(options, "-stream"), int32(7003), intstr.IntOrString{IntVal: 7003}}, options)
 			}
 		}
 	}

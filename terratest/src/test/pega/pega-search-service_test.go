@@ -15,6 +15,7 @@ import (
 func TestPegaSearchService(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -24,19 +25,22 @@ func TestPegaSearchService(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"installer.upgrade.upgradeType": "zero-downtime",
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-service.yaml"})
-			VerifySearchService(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-service.yaml"})
+                VerifySearchService(t, yamlContent, options)
+            }
 		}
 	}
 
@@ -46,8 +50,9 @@ func TestPegaSearchService(t *testing.T){
 func VerifySearchService(t *testing.T, yamlContent string, options *helm.Options) {
 	var searchServiceObj k8score.Service
 	helm.UnmarshalK8SYaml(t, yamlContent, &searchServiceObj)
+	require.Equal(t, searchServiceObj.ObjectMeta.Name, getObjName(options, "-search"))
 	require.Equal(t, searchServiceObj.Spec.Selector["component"], "Search")
-	require.Equal(t, searchServiceObj.Spec.Selector["app"], "pega-search")
+	require.Equal(t, searchServiceObj.Spec.Selector["app"], getObjName(options, "-search"))
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Name, "http")
 	require.Equal(t, searchServiceObj.Spec.Ports[0].Port, int32(80))
 	require.Equal(t, searchServiceObj.Spec.Ports[0].TargetPort, intstr.FromInt(9200))

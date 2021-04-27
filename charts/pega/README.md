@@ -133,9 +133,35 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Deployment Name (Optional)
+
+Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
+
+This is meant as an alternative to renaming individual deployment tiers (see [Tiers of a Pega deployment](#tiers-of-a-pega-deployment)).
+
+For example:
+```yaml
+global:
+  deployment:
+    name: app1-dev
+```
+will result in:
+```
+>kubectl get pods -n test
+NAME                              READY   STATUS    RESTARTS   AGE
+app1-dev-search-0                 1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-dsvdd   1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-lfwjg   1/1     Running   0          7m31s
+app1-dev-stream-0                 1/1     Running   0          24m
+app1-dev-stream-1                 1/1     Running   0          18m
+app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
+app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
+```
+The default value is "pega" if it is unset.
+
 ## Tiers of a Pega deployment
 
-Pega supports deployment using a multi-tier architecture to separate processing and functions. Isolating processing in its own tier also allows for unique deployment configuration such as its own prconfig, resource allocations, or scaling characteristics.  Use the `tier` section in the helm chart to specify which tiers you wish to deploy and their logical tasks.  
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
@@ -403,15 +429,24 @@ Pega uses liveness, readiness, and startup probes to determine application healt
 Notes:
 * Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
 * `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
-* Default values are listed below in order of liveness, readiness, and startup.
 
-Parameter           | Description    | Default - 1.18+ | Default - pre-1.18
----                 | ---            | ---             | ---
-`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0`, `0`, `10` | `200`, `30`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`, `10`, `10` | `20`, `10`
-`periodSeconds`       | How often (in seconds) to perform the probe. | `30`, `10`, `10` | `30`, `10`
-`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`, `1`, `1` | `1`, `1`
-`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`, `3`, `20` | `3`, `3`
+#### Kubernetes pre-1.18
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe`
+---                   | ---            | ---                     | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `200` | `30`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3`
+
+#### Kubernetes 1.18+
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe` | Default `startupProbe`
+---                   | ---            | ---                     | ---                      | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0` | `0` | `10`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3` | `20`
 
 Example:
 
@@ -435,10 +470,11 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
-`hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
+`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.8` which represents 2.8 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.8`
+`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (Can be set instead of `hpa.targetAverageCPUValue` to set the threshold as a percentage of the requested CPU) | 
+`hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 12Gi ) | `85`
 `hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
-`hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it  | true
+`hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
 ### Volume claim template
 
@@ -589,7 +625,10 @@ Use the `pegasearch` section to configure a deployment of ElasticSearch for sear
 
 ### For Pega Platform 8.6 and later:
 
-Pega recommends using the chart ['backingservices'](../backingservices) to enable the use of a search and reporting service in your deployment. This is a shareable and independently manageable search solution for Pega Platform that replaces the previously used Elasticsearch. To use this search and reporting service, you must follow the deployment instructions provided at [backingservices](../backingservices/README.md) to provision the service. The Search and Reporting Service (SRS) Url can be configured with the current Pega platform environment using the below configuration in values.yaml.
+Pega recommends using the chart ['backingservices'](../backingservices) to enable Pega Infinity backing service and to deploy the latest generation of search and reporting capabilities to your Pega applications that run independently on nodes provisioned exclusively to run these services.
+This is an independently manageable search solution that replaces the previous implementation of Elasticsearch. The SRS supports, but does not require you to enable, Elasticsearch for your Pega Infinity deployment searching capability.
+
+To use this search and reporting service, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy `pega` helm chart. You must configure the SRS URL for your Pega Infinity deployment using the parameter in values.yaml as shown the the following table and exmple:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---

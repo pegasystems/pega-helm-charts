@@ -6,6 +6,10 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "pega"
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -106,6 +110,9 @@ global:
           maxUnavailable: 0
         type: RollingUpdate
 
+      livenessProbe:
+        port: 8081
+
       # Optionally overridde default resource specifications
       # cpuRequest: 2
       # memRequest: "12Gi"
@@ -140,6 +147,9 @@ global:
           maxUnavailable: 0
         type: RollingUpdate
 
+      livenessProbe:
+        port: 8081
+
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
@@ -147,7 +157,6 @@ global:
 
       hpa:
         enabled: true
-        enableMemoryTarget: false
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -178,6 +187,9 @@ global:
           # secretName:
           # useManagedCertificate: false
           # ssl_annotation:
+
+      livenessProbe:
+        port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context

@@ -30,7 +30,7 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}      
-{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
@@ -79,6 +79,6 @@ spec:
 {{- end }}           
       restartPolicy: Never
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" }}
+      - name: {{ template "pegaRegistrySecret" .root }}
 ---
 {{- end -}}

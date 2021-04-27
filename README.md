@@ -30,7 +30,7 @@ If this command does not successfully return, install Helm 3 for your operating 
 1. Add the Pega repository to your Helm installation.
 
 ```bash
-$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
+$ helm repo add pega https://pegasystems.github.io/pega-helm-charts
 ```
 
 2. Verify the new repository by searching it.
@@ -38,9 +38,9 @@ $ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts
 ```bash
 $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
-pega/pega  	              1.2.0        	           	Pega installation on kubernetes
-pega/addons	              1.2.0        	1.0        	A Helm chart for Kubernetes 
-pega/backingservices          1.2.0        	                Helm Chart to provisioning backing services for Pega (eg. Search and Reporting Service)
+pega/pega  	              1.4.4        	           	Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+pega/addons	              1.4.4        	1.0        	Helm chart to configure required supporting services and tools in your environment for your deployment.
+pega/backingservices      1.4.4        	            Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
 There are three charts available in this repository - addons, backingservices, and pega.
@@ -160,3 +160,18 @@ These images do not expire, and you can keep them in your repository for as long
 # Contributing
 
 This is an open source project and contributions are welcome.  Please see the [contributing guidelines](./CONTRIBUTING.md) to get started.
+
+# Versioning
+
+New versions of this Helm Chart may be released at any time. Versions are defined using [semantic versioning](https://semver.org/):
+
+* Major: Pega introduces new features or functionality that results in breaking backwards compatibility with previous chart versions. Examples:
+  * The new values.yaml or maps (config/deploy) cannot be used to deploy previously released Docker image versions.
+  * A new, required dependency on a specific Pega Platform version or dependent docker image.
+* Minor: Pega adds new functionality and maintains backwards compatibility. Examples:
+  * Support for new features while maintaining existing functionality.
+  * Support for new, opt-in configurations.
+* Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
+  * Bug fixes or known issue resolutions.
+  * Security vulnerability enhancements.
+
