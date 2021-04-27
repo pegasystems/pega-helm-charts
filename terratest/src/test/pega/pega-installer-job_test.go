@@ -20,52 +20,53 @@ type pegaDbJob struct {
 var volDefaultMode int32 = 420
 var volDefaultModePointer = &volDefaultMode
 
-	func TestPegaInstallerJob(t *testing.T) {
+func TestPegaInstallerJob(t *testing.T) {
 
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-		    for _, depName := range deploymentNames {
-                var options = &helm.Options{
-                    SetValues: map[string]string{
-                        "global.deployment.name": depName,
-                        "global.provider":        vendor,
-                        "global.actions.execute": operation,
+			for _, depName := range deploymentNames {
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                    },
-                }
+					},
+				}
 
-                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
-                yamlSplit := strings.Split(yamlContent, "---")
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")
 
-			// If there are three slices, it means that it is a pega-upgrade-deploy job
-			if len(yamlSplit) == 4 {
-				var expectedJob pegaDbJob
-				for index, jobInfo := range yamlSplit {
-					if index >= 1 && index <= 3 {
-						if index == 1 {
-							expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}
-						} else if index == 2 {
-							expectedJob = pegaDbJob{"pega-zdt-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
-						} else if index == 3 {
-							expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config"}
+				// If there are three slices, it means that it is a pega-upgrade-deploy job
+				if len(yamlSplit) == 4 {
+					var expectedJob pegaDbJob
+					for index, jobInfo := range yamlSplit {
+						if index >= 1 && index <= 3 {
+							if index == 1 {
+								expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}
+							} else if index == 2 {
+								expectedJob = pegaDbJob{"pega-zdt-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
+							} else if index == 3 {
+								expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config"}
+							}
+
+							assertJob(t, jobInfo, expectedJob, options)
 						}
 
-                            assertJob(t, jobInfo, expectedJob, options)
-                        }
-
-				}
-			} else {
-				if operation == "install" || operation == "install-deploy" {
-					assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config"}, options)
+					}
 				} else {
-					assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+					if operation == "install" || operation == "install-deploy" {
+						assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config"}, options)
+					} else {
+						assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+					}
 				}
 			}
 		}
