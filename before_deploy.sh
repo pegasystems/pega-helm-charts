@@ -19,4 +19,4 @@ helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
 helm package --version ${CHART_VERSION} ./charts/backingservices/
 # and merge it
-helm repo index --merge index.yaml --url https://pegasystems.github.io/pega-helm-charts/ 
+helm repo index --merge index.yaml --url https://pegasystems.github.io/pega-helm-charts/ .
