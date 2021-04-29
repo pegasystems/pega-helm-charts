@@ -24,46 +24,50 @@ func TestPegaInstallerJob(t *testing.T) {
 
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-				},
-			}
+		    for _, depName := range deploymentNames {
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
-			yamlSplit := strings.Split(yamlContent, "---")
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+                yamlSplit := strings.Split(yamlContent, "---")
 
-			// If there are three slices, it means that it is a pega-upgrade-deploy job
-			if len(yamlSplit) == 4 {
-				var expectedJob pegaDbJob
-				for index, jobInfo := range yamlSplit {
-					if index >= 1 && index <= 3 {
-						if index == 1 {
-							expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}
-						} else if index == 2 {
-							expectedJob = pegaDbJob{"pega-db-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
-						} else if index == 3 {
-							expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config"}
-						}
+                // If there are three slices, it means that it is a pega-upgrade-deploy job
+                if len(yamlSplit) == 4 {
+                    var expectedJob pegaDbJob
+                    for index, jobInfo := range yamlSplit {
+                        if index >= 1 && index <= 3 {
+                            if index == 1 {
+                                expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config"}
+                            } else if index == 2 {
+                                expectedJob = pegaDbJob{"pega-db-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config"}
+                            } else if index == 3 {
+                                expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config"}
+                            }
 
-						assertJob(t, jobInfo, expectedJob, options)
-					}
+                            assertJob(t, jobInfo, expectedJob, options)
+                        }
 
-				}
-			} else {
-				if operation == "install" || operation == "install-deploy" {
-					assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config"}, options)
-				} else {
-					assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
-				}
-			}
+                    }
+                } else {
+                    if operation == "install" || operation == "install-deploy" {
+                        assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config"}, options)
+                    } else {
+                        assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+                    }
+                }
+            }
 		}
 	}
 }
@@ -78,7 +82,7 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	var containerPort int32 = 8080
 
 	require.Equal(t, jobSpec.Volumes[0].Name, "pega-volume-credentials")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Secret.SecretName, "pega-credentials-secret")
+	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Secret.SecretName, getObjName(options, "-credentials-secret"))
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Secret.DefaultMode, volDefaultModePointer)
 	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
 	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-installer-config")
@@ -93,7 +97,7 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
 
-	require.Equal(t, jobSpec.ImagePullSecrets[0].Name, "pega-registry-secret")
+	require.Equal(t, jobSpec.ImagePullSecrets[0].Name, getObjName(options, "-registry-secret"))
 
 	require.Equal(t, jobSpec.RestartPolicy, k8score.RestartPolicy("Never"))
 

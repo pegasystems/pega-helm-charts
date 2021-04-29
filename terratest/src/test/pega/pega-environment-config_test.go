@@ -14,6 +14,7 @@ import (
 func TestPegaEnvironmentConfig(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -23,28 +24,32 @@ func TestPegaEnvironmentConfig(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation + "-" +depName)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-			VerifyEnvironmentConfig(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+                VerifyEnvironmentConfig(t,yamlContent, options)
+            }
 		}
 	}
-
-
 }
 
 func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
 
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+
+	require.Equal(t, envConfigMap.ObjectMeta.Name, getObjName(options, "-environment-config"))
+
 	envConfigData := envConfigMap.Data
 	require.Equal(t, envConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, envConfigData["JDBC_URL"], "YOUR_JDBC_URL")
@@ -58,7 +63,7 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, envConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, envConfigData["JDBC_CONNECTION_PROPERTIES"], "")
-	require.Equal(t, envConfigData["PEGA_SEARCH_URL"], "http://pega-search")
+	require.Equal(t, envConfigData["PEGA_SEARCH_URL"], "http://" + getObjName(options, "-search"))
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")

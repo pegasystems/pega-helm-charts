@@ -6,6 +6,10 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "pega"
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -153,7 +157,6 @@ global:
 
       hpa:
         enabled: true
-        enableMemoryTarget: false
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
