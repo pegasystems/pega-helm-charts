@@ -3,7 +3,7 @@ def labels = ""
 
 node {
       stage("Init"){
-          if (env.CHANGE_ID) {
+          // if (env.CHANGE_ID) {
             pullRequest.labels.each{
             echo "label: $it"
             validateProviderLabel(it)
@@ -16,10 +16,10 @@ node {
             sh "curl -fsSL -o helm-v3.2.4-linux-amd64.tar.gz https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz"
             sh "tar -zxvf helm-v3.2.4-linux-amd64.tar.gz"
             sh "mv linux-amd64/helm /usr/local/bin/helm"
-          } else {
-            currentBuild.result = 'ABORTED'
-            throw new Exception("Aborting as this is not a PR job")
-         }
+         //  } else {
+         //    currentBuild.result = 'ABORTED'
+         //    throw new Exception("Aborting as this is not a PR job")
+         // }
       }
       stage ("Checkout and Package Charts") {
 
