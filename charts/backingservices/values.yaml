@@ -8,7 +8,7 @@ global:
 srs:
   # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true
-  deploymentName: pega-shared-srs
+  deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   # srs-service configuration
   srsRuntime:
@@ -23,11 +23,12 @@ srs:
       PublicKeyURL: ""
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
-    # srsStorage.provisionInternalESCluster true will provision an internal elasticsearch cluster with configuration
+    # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
     # specified in the `elasticsearch` section
     provisionInternalESCluster: true
+    # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
-    # make sure the endpoint is accessible from the kubernetes cluster pods.
+    # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
     # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
@@ -44,15 +45,15 @@ elasticsearch:
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.
-  esJavaOpts: "-Xmx512m -Xms512m"
+  esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
   resources:
     requests:
-      cpu: "500m"
-      memory: "1Gi"
-    limits:
       cpu: "1000m"
-      memory: "1Gi"
+      memory: "2Gi"
+    limits:
+      cpu: "2000m"
+      memory: "3Gi"
   volumeClaimTemplate:
     accessModes: ["ReadWriteOnce"]
     resources:
