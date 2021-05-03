@@ -75,7 +75,7 @@
                redirectPort="8443" />
 
     <!-- facilitates liveness check via separate port -->
-    <Connector port="8081" protocol="HTTP/1.1"
+    <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
 	       redirectPort="8443" 
 	       maxThreads="1"/>
