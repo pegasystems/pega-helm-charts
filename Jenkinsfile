@@ -42,18 +42,17 @@ node {
             withCredentials([usernamePassword(credentialsId: "helmautomation",
               passwordVariable: 'AUTOMATION_APIKEY', usernameVariable: 'AUTOMATION_USERNAME')]) {
 
-                sh "git clone https://pegaautomationuser:${AUTOMATION_APIKEY}@github.com/pegaautomationuser/helmcharts.git --branch=gh-pages gh-pages"
+                sh "git clone https://${AUTOMATION_USERNAME}:${AUTOMATION_APIKEY}@github.com/pegaautomationuser/helmcharts.git --branch=gh-pages gh-pages"
                 sh "mv pega-${chartVersion}.tgz gh-pages/"
                 sh "mv addons-${chartVersion}.tgz gh-pages/"
                 sh "mv backingservices-${chartVersion}.tgz gh-pages/"
                 dir("gh-pages") {
-                  sh "helm repo index --merge index.yaml --url https://pegaautomationuser.github.io/helmcharts/ ."
-                  sh "cat index.yaml"    
+                  sh "helm repo index --merge index.yaml --url https://pegaautomationuser.github.io/helmcharts/ ."   
                   sh "git config user.email pegaautomationuser@gmail.com"
                   sh "git config user.name ${AUTOMATION_USERNAME}"
                   sh "git add ."
                   sh "git commit -m \"Jenkins build to publish test artefacts of version ${chartVersion}\""
-                  sh "git push -u origin gh-pages"                                  
+                  sh "git push -u origin gh-pages --force"                                  
                 }
 
             } 
