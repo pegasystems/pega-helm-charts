@@ -14,7 +14,6 @@ func TestHazelcast(t *testing.T) {
 	var supportedOperations =  []string{"deploy","install-deploy"}
 	var useRestrictedRunAsUser = []string{"false", "true"}
 	var deploymentNames = []string{"pega","myapp-dev"}
-    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
