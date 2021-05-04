@@ -4,10 +4,12 @@ global:
     - name: "web"
       hpa:
         enabled: true
-        enableCpuTarget: false
+        enableCpuTarget: true
+        targetAverageCPUValue: 4.13
         enableMemoryTarget: true
+        targetAverageMemoryUtilization: 42
     - name: "batch"
       hpa:
         enabled: true
         # enableCpuTarget should be true as default
-        # enableMemoryTarget should be false as default
+        targetAverageCPUUtilization: 24

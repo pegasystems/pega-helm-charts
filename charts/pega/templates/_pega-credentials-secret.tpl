@@ -2,7 +2,7 @@
 kind: Secret
 apiVersion: v1
 metadata:
-  name: {{ template "pegaCredentialsSecret" }}
+  name: {{ template "pegaCredentialsSecret" $ }}
   namespace: {{ .Release.Namespace }}
 data:
   # Base64 encoded username for connecting to the Pega DB

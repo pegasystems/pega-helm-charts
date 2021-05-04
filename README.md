@@ -38,9 +38,9 @@ $ helm repo add pega https://pegasystems.github.io/pega-helm-charts
 ```bash
 $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
-pega/pega  	              1.2.0        	           	Pega installation on kubernetes
-pega/addons	              1.2.0        	1.0        	A Helm chart for Kubernetes 
-pega/backingservices          1.2.0        	                Helm Chart to provisioning backing services for Pega (eg. Search and Reporting Service)
+pega/pega  	              1.4.4        	           	Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+pega/addons	              1.4.4        	1.0        	Helm chart to configure required supporting services and tools in your environment for your deployment.
+pega/backingservices      1.4.4        	            Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
 There are three charts available in this repository - addons, backingservices, and pega.
