@@ -17,47 +17,76 @@ data:
 {{- $prbootstraptemplatePath := "config/prbootstrap.properties.tmpl" }}
 {{- $prpcUtilsPropertiestemplatePath := "config/prpcUtils.properties.tmpl" }}
 {{- $migrateSystempropertiestemplatePath := "config/migrateSystem.properties.tmpl" }}
+{{- $custom_config := .root.Values.custom }}
 
-{{ if $prconfigTemplate := .root.Files.Glob $prconfigTemplatePath }}
   # prconfigTemplate to be used by {{ .name }}
   prconfig.xml.tmpl: |-
+{{- if $custom_config.prconfig }}
+{{ $custom_config.prconfig | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $prconfigTemplatePath }}
 {{ .root.Files.Get $prconfigTemplatePath | indent 6 }}
 {{- end }}
+{{- end }}
 
-{{ if $setupDatabase := .root.Files.Glob $setupDatabasePath }}
   # setupDatabase to be used by {{ .name }}
   setupDatabase.properties: |-
+{{- if $custom_config.setupDatabase }}
+{{ $custom_config.setupDatabase | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $setupDatabasePath }}
 {{ .root.Files.Get $setupDatabasePath | indent 6 }}
 {{- end }}
+{{- end }}
 
-{{ if $setupDatabasetemplate := .root.Files.Glob $setupDatabasetemplatePath }}
   # setupDatabasetemplate to be used by {{ .name }}
   setupDatabase.properties.tmpl: |-
+{{- if $custom_config.setupDatabase }}
+{{ $custom_config.setupDatabase | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $setupDatabasetemplatePath }}
 {{ .root.Files.Get $setupDatabasetemplatePath | indent 6 }}
 {{- end }}
+{{- end }}
 
-{{ if $prbootstraptemplate := .root.Files.Glob $prbootstraptemplatePath }}
   # prbootstraptemplate to be used by {{ .name }}
   prbootstrap.properties.tmpl: |-
+{{- if $custom_config.prbootstrap }}
+{{ $custom_config.prbootstrap | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $prbootstraptemplatePath }}
 {{ .root.Files.Get $prbootstraptemplatePath | indent 6 }}
 {{- end }}
+{{- end }}
 
-{{ if $prpcUtilsPropertiestemplate := .root.Files.Glob $prpcUtilsPropertiestemplatePath }}
   # prpcUtilsPropertiestemplate to be used by {{ .name }}
   prpcUtils.properties.tmpl: |-
+{{- if $custom_config.prpcUtils }}
+{{ $custom_config.prpcUtils | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $prpcUtilsPropertiestemplatePath }}
 {{ .root.Files.Get $prpcUtilsPropertiestemplatePath | indent 6 }}
 {{- end }}
-
-{{ if $migrateSystempropertiestemplate := .root.Files.Glob $migrateSystempropertiestemplatePath }}
-  # migrateSystempropertiestemplate to be used by {{ .name }}
-  migrateSystem.properties.tmpl: |-
-{{ .root.Files.Get $migrateSystempropertiestemplatePath | indent 6 }}
 {{- end }}
 
-{{- $prlog4j2Path := "config/prlog4j2.xml" }}
+  # migrateSystempropertiestemplate to be used by {{ .name }}
+  migrateSystem.properties.tmpl: |-
+{{- if $custom_config.migrateSystem }}
+{{ $custom_config.migrateSystem | indent 6 }}
+{{ else }}
+{{ if .root.Files.Glob $migrateSystempropertiestemplatePath }}
+{{ .root.Files.Get $migrateSystempropertiestemplatePath | indent 6 }}
+{{- end }}
+{{- end }}
+
   # prlog4j2 file to be used by {{ .name }}
   prlog4j2.xml: |-
+{{- if $custom_config.prlog4j2 }}
+{{ $custom_config.prlog4j2 | indent 6 }}
+{{ else }}
+{{- $prlog4j2Path := "config/prlog4j2.xml" }}
 {{ .root.Files.Get $prlog4j2Path | indent 6 }}
+{{- end }}}
 
 {{- $dbType := .dbType }}
 {{- $postgresConfPath := "config/postgres/postgres.conf" }}
