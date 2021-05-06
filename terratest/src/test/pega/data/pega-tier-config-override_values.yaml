@@ -6,10 +6,6 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
-  deployment:
-    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
-    name: "pega"
-
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -106,12 +102,9 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+          maxSurge: 25%
+          maxUnavailable: 25%
         type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
 
       # Optionally overridde default resource specifications
       # cpuRequest: 2
@@ -129,6 +122,18 @@ global:
       hpa:
         enabled: true
 
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
+
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
@@ -143,12 +148,9 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
+          maxSurge: 25%
+          maxUnavailable: 25%
         type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
@@ -157,6 +159,18 @@ global:
 
       hpa:
         enabled: true
+
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -188,9 +202,6 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
-      livenessProbe:
-        port: 8081
-
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
@@ -202,6 +213,18 @@ global:
         resources:
           requests:
             storage: 5Gi
+
+      custom:
+        prconfig: |-
+          prconfig override
+        prlog4j2: |-
+          prlog4j2 override
+        contextXML: |-
+          context.xml override
+        serverXML: |-
+          server.xml override
+        webXML: |-
+          web.xml override
 
 # External services
 

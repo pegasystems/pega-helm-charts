@@ -1,4 +1,9 @@
 {{- define "pega.config" -}}
+{{ template "pega.config.inner" dict "root" .root "node" .dep "name" .name "mode" (include "deployConfig" .root) "custom" .dep.custom }}
+{{- end -}}
+
+
+{{- define "pega.config.inner" -}}
 {{- $arg := .mode -}}
 # Node type specific configuration for {{ .name }}
 kind: ConfigMap
@@ -32,6 +37,27 @@ data:
 {{ $custom_config.contextXML | indent 6 }}
 {{ else }}
 {{ .root.Files.Get "config/deploy/context.xml.tmpl" | indent 6 }}
+{{- end }}
+
+  # Pega deployment server.xml file
+  server.xml: |-
+{{- if $custom_config.serverXML }}
+{{ $custom_config.serverXML | indent 6 }}
+{{ else }}
+{{ .root.Files.Get "config/deploy/server.xml" | indent 6 }}
+{{- end }}
+
+{{- if $custom_config.webXML }}
+  # Pega deployment web.xml file
+  web.xml: |-
+{{ $custom_config.webXML | indent 6 }}
+{{ else }}
+{{- $web := .root.Files.Glob "config/deploy/web.xml" }}
+{{ if $web }}
+  # Pega deployment web.xml file
+  web.xml: |-
+{{ .root.Files.Get "config/deploy/web.xml" | indent 6 }}
+{{- end }}
 {{- end }}
 {{- end }}
 ---

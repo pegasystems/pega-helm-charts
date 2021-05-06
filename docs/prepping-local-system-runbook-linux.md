@@ -420,12 +420,16 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 `platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
 `platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
 `platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
+`platform-services/search-n-reporting-service` | [optional and compatible only with Pega version 8.6 and later] (Download required) Deploys the latest Pega generation of search and reporting capabilities in Pega Infinity on dedicated, backing service nodes. This Docker image contains Pega Search and Reporting Services and allows you to optimize Elasticsearch processing in your Pega deployment. To optimize Elasticsearch processing, you must deploy this image and the matching release of the platform/search image. For more information about this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md). | `<version>` |
 
 When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for each of the three images you download.
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
 For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
+
+The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](../charts/backingservices/charts/srs) under [backing services](../charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is optional and is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md).
+The docker image format is different for backing services and does not follow the datestamp pattern. For installations of or upgrades to Pega Infinity 8.6, you may configure Docker image `platform-services/search-n-reporting-service` with tag :1.9.0-4.
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
@@ -565,3 +569,20 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
    `$ docker push <Registry host name:Port>/my-pega-installer:8.4.0`
 
 After you push these three downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
+
+11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
+ 
+```bash
+$ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4
+Digest: <encryption verification>
+Status: Downloaded pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4
+```
+
+12. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
+
+   `$ docker tag pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:1.9.0-4 <Registry host name:Port>/my-pega-srs:8.6.0`
+
+13. To push the retagged `my-pega-srs` image to your registry, enter:
+
+   `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
+

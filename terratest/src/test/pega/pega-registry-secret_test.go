@@ -14,6 +14,7 @@ import (
 func TestPegaRegistrySecret(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"install","install-deploy", "upgrade", "upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -23,17 +24,21 @@ func TestPegaRegistrySecret(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
-			VerfiyRegistrySecret(t,yamlContent)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
+
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-registry-secret.yaml"})
+                VerfiyRegistrySecret(t, yamlContent, options)
+			}
 		}
 	}
 
@@ -41,9 +46,10 @@ func TestPegaRegistrySecret(t *testing.T){
 }
 
 // VerfiyRegistrySecret - Verifies the registry secret deployed with the values as provided in default values.yaml
-func VerfiyRegistrySecret(t *testing.T, yamlContent string) {
+func VerfiyRegistrySecret(t *testing.T, yamlContent string, options *helm.Options) {
 	var registrySecretObj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &registrySecretObj)
+	require.Equal(t, registrySecretObj.ObjectMeta.Name, getObjName(options, "-registry-secret"))
 	reqgistrySecretData := registrySecretObj.Data
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "YOUR_DOCKER_REGISTRY")
 	require.Contains(t, string(reqgistrySecretData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")

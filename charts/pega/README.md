@@ -1,6 +1,6 @@
 # Pega Helm chart
 
-The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable.
+The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm install --; you can run the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
 ## Supported providers
 
@@ -25,14 +25,15 @@ provider: "k8s"
 
 Use the `action` section in the helm chart to specify a deployment action.  The standard actions is to deploy against an already installed database, but you can also install a Pega system. These values are case-sensitive and must be lowercase.
 
-For additional, required installation parameters, see the [Installer section](#install).
+For additional, required installation parameters, see the [Installer section](#installations).
 
 Value             | Action
 ---               | ---
 deploy            | Start the Pega containers using an existing Pega database installation.
 install           | Install Pega Platform into your database without deploying.
 install-deploy    | Install Pega Platform into your database and then deploy.
-
+upgrade           | Upgrade or patch Pega Platform in your database without deploying.
+upgrade-deploy    | Upgrade or patch Pega Platform in your database and then deploy.
 <!--upgrade           | Upgrade the Pega Platform installation in your database.
 upgrade-deploy    | Upgrade the Pega Platform installation in your database, and then deploy.
 -->
@@ -44,7 +45,7 @@ action: "deploy"
 
 ## JDBC Configuration
 
-Use the `jdbc` section  of the values file to specify how to connect to the Pega database. *Pega must be installed to this database before deploying on Kubernetes*.  
+Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes.  
 
 ### URL and Driver Class
 These required connection details will point Pega to the correct database and provide the type of driver used to connect. Examples of the correct format to use are provided below. 
@@ -55,7 +56,9 @@ jdbc:
   url: jdbc:oracle:thin:@//YOUR_DB_HOST:1521/YOUR_DB_NAME
   driverClass: oracle.jdbc.OracleDriver
 ```
+
 Example for Microsoft SQL Server:
+
 ```yaml
 jdbc:
   url: jdbc:sqlserver://YOUR_DB_HOST:1433;databaseName=YOUR_DB_NAME;selectMethod=cursor;sendStringParametersAsUnicode=false
@@ -130,9 +133,35 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Deployment Name (Optional)
+
+Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
+
+This is meant as an alternative to renaming individual deployment tiers (see [Tiers of a Pega deployment](#tiers-of-a-pega-deployment)).
+
+For example:
+```yaml
+global:
+  deployment:
+    name: app1-dev
+```
+will result in:
+```
+>kubectl get pods -n test
+NAME                              READY   STATUS    RESTARTS   AGE
+app1-dev-search-0                 1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-dsvdd   1/1     Running   0          24m
+app1-dev-batch-86584dcd6b-lfwjg   1/1     Running   0          7m31s
+app1-dev-stream-0                 1/1     Running   0          24m
+app1-dev-stream-1                 1/1     Running   0          18m
+app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
+app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
+```
+The default value is "pega" if it is unset.
+
 ## Tiers of a Pega deployment
 
-Pega supports deployment using a multi-tier architecture to separate processing and functions. Isolating processing in its own tier also allows for unique deployment configuration such as its own prconfig, resource allocations, or scaling characteristics.  Use the `tier` section in the helm chart to specify which tiers you wish to deploy and their logical tasks.  
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
@@ -208,7 +237,19 @@ Example:
 requestor:
   passivationTimeSec: 900
 ```
+### Security context
 
+By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user. To configure an alternative user for your custom image, set value for `runAsUser`. Note that pegasystems/pega image works only with pegauser(9001).
+`runAsUser` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      runAsUser: RUN_AS_USER
+```
 ### service
 
 Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
@@ -344,16 +385,30 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
-Parameter       | Description    | Default value
----             | ---       | ---
-`replicas`      | Specify the number of Pods to deploy in the tier. | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.  | `2`
-`cpuLimit`      | CPU limit for pods in the current tier.  | `4`
-`memRequest`    | Initial memory request for pods in the current tier. | `6Gi`
-`memLimit`      | Memory limit for pods in the current tier. | `8Gi`
-`initialHeap`   | This specifies the initial heap size of the JVM.  | `4096m`
-`maxHeap`       | This specifies the maximum heap size of the JVM.  | `7168m`
+Parameter       | Description                                            | Default value
+---             | ---                                                    | ---
+`replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
+`cpuRequest`    | Initial CPU request for pods in the current tier.      | `2`
+`cpuLimit`      | CPU limit for pods in the current tier.                | `4`
+`memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
+### JVM Arguments
+You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
+Some of the Best-practice arguments for JVM tuning are included by default in `CATALINA_OPTS`.
+Pass the required JVM parameters as `catalinaOpts` attributes in respective `values.yaml` file.  
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    javaOpts: ""
+    catalinaOpts: "-XX:SomeJVMArg=XXX"
+```
+Note that some JVM arguments are non-overrideable i.e. baked in the Docker image. <br>
+Check [RecommendedJVMArgs.md](./RecommendedJVMArgs.md) for more details.
 ### nodeSelector
 
 Pega supports configuring certain nodes in your Kubernetes cluster with a label to identify its attributes, such as persistent storage. For such configurations, use the Pega Helm chart nodeSelector property to assign pods in a tier to run on particular nodes with a specified label. For more information about assigning Pods to Nodes including how to configure your Nodes with labels, see the [Kubernetes documentation on nodeSelector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector).
@@ -367,17 +422,31 @@ tier:
     disktype: ssd
 ```
 
-### Liveness and readiness probes
+### Liveness, readiness, and startup probes
 
-[Probes are used by Kubernetes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/) to determine application health.  Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed.  You can configure probes independently for each tier.  If not explicitly configured, default probes are used during the deployment.  Set the following parameters as part of a `livenessProbe` or `readinessProbe` configuration.
+Pega uses liveness, readiness, and startup probes to determine application health in your deployments. For an overview of these probes, see [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness. You can configure probes independently for each tier. If not explicitly configured, default probes are used during the deployment. Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
 
-Parameter           | Description    | Default value
----                 | ---            | ---
-`initialDelaySeconds` | Number of seconds after the container has started before liveness or readiness probes are initiated. | `300`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `20`
-`periodSeconds`       | How often (in seconds) to perform the probe. Some providers such as GCP require this value to be greater than the timeout value. | `30`
-`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1`
-`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3`
+Notes:
+* Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
+* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
+
+#### Kubernetes pre-1.18
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe`
+---                   | ---            | ---                     | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `200` | `30`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3`
+
+#### Kubernetes 1.18+
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe` | Default `startupProbe`
+---                   | ---            | ---                     | ---                      | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `0` | `0` | `10`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `20` | `10` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10` | `10`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3` | `20`
 
 Example:
 
@@ -401,8 +470,11 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (The default value is `70` which corresponds to 70% of 2) | `70`
-`hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 6Gi ) | `85`
+`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.8` which represents 2.8 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.8`
+`hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (Can be set instead of `hpa.targetAverageCPUValue` to set the threshold as a percentage of the requested CPU) | 
+`hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 12Gi ) | `85`
+`hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
+`hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
 ### Volume claim template
 
@@ -462,6 +534,8 @@ Parameter     | Description    | Default value
 `prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
 `prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
 `contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
+`serverXML`   | A complete server.xml file to inject  | See [server.xml](config/deploy/server.xml).
+`webXML`      | A complete web.xml file to inject  | No default provided, but if `config/deploy/web.xml` exists, it will be used as the default.
 
 
 Example:
@@ -478,15 +552,21 @@ tier:
 
       contextXML: |-
         ...
+
+      serverXML: |-
+        ...
+
+      webXML: |-
+        ...
 ```
 
 ### Pega diagnostic user
 
 While most cloud native deployments will take advantage of aggregated logging using a tool such as EFK, there may be a need to access the logs from Tomcat directly. In the event of a need to download the logs from tomcat, a username and password will be required.  You may set `pegaDiagnosticUser` and `pegaDiagnosticPassword` to set up authentication for Tomcat.
 
-## Cassandra and DDS deployment
+## Cassandra and Pega Customer Decision Hub deployments
 
-If you are planning to use Cassandra (usually as a part of Pega Decisioning), you may either point to an existing deployment or deploy a new instance along with Pega. 
+If you are planning to use Cassandra (usually as a part of Pega Customer Decision Hub), you may either point to an existing deployment or deploy a new instance along with Pega.
 
 ### Using an existing Cassandra deployment
 
@@ -509,7 +589,7 @@ dds:
 
 You may deploy a Cassandra instance along with Pega.  Cassandra is a separate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml).
 
-*Cassandra minimum resource requirements*
+#### Cassandra minimum resource requirements
 
 Deployment  | CPU     | Memory
 ---         | ---     | ---
@@ -545,7 +625,10 @@ Use the `pegasearch` section to configure a deployment of ElasticSearch for sear
 
 ### For Pega Platform 8.6 and later:
 
-Pega recommends using the chart ['backingservices'](../backingservices) to enable the use of a search and reporting service in your deployment. This is a shareable and independently manageable search solution for Pega Platform that replaces the previously used Elasticsearch. To use this search and reporting service, you must follow the deployment instructions provided at [backingservices](../backingservices/README.md) to provision the service. The Search and Reporting Service (SRS) Url can be configured with the current Pega platform environment using the below configuration in values.yaml.
+Pega recommends using the chart ['backingservices'](../backingservices) to enable Pega Infinity backing service and to deploy the latest generation of search and reporting capabilities to your Pega applications that run independently on nodes provisioned exclusively to run these services.
+This is an independently manageable search solution that replaces the previous implementation of Elasticsearch. The SRS supports, but does not require you to enable, Elasticsearch for your Pega Infinity deployment searching capability.
+
+To use this search and reporting service, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy `pega` helm chart. You must configure the SRS URL for your Pega Infinity deployment using the parameter in values.yaml as shown the the following table and exmple:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
@@ -588,14 +671,15 @@ pegasearch:
     - name: TZ
       value: "EST5EDT"
 ```
+
 ## Pega database installation and upgrades
 
 Pega requires a relational database that stores the rules, data, and work objects used and generated by Pega Platform. The [Pega Platform deployment guide](https://community.pega.com/knowledgebase/products/platform/deploy) provides detailed information about the requirements and instructions for installations and upgrades.  Follow the instructions for Tomcat and your environment's database server.
 
 The Helm charts also support an automated install or upgrade with a Kubernetes Job.  The Job utilizes an installation Docker image and can be activated with the `action` parameter in the Pega Helm chart.
  
-### Install
- 
+### Installations
+
 For installations of the Pega platform, you must specify the installer Docker image and an initial default password for the `administrator@pega.com` user.
 
 Example:
@@ -606,14 +690,19 @@ installer:
   adminPassword: "ADMIN_PASSWORD"
 ```
 
-### Upgrade
+### Upgrades and patches
 
-For upgrades of the Pega platform, you must specify the installer Docker image and the type of upgrade to execute.
+To **upgrade Pega Platform software** deployed in a Kubernetes environment, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and then use the appropriate upgrade guide:
+
+- Use the appropriate Pega Platform deployment Upgrade Guide available from the page, [Stay current with Pega](https://community.pega.com/upgrade).
+- Use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+
+To **apply a Pega Platform patch** with zero downtime to your existing Pega platform software, you must use `installer.upgrade.upgradeType "out-of-place"` option. A zero downtime patch allows you to continue working in your application while you patch your system. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
 
 Upgrade type    | Description
 ---             | ---
-`in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
-`out-of-place`  | An out-of-place upgrade involves more steps to minimize downtime.  It will place the rules into a read-only state, then migrate the rules to a new schema. Next it will upgrade the rules to the new version. Lastly it will separately upgrade the data.
+`in-place`      | An in-place upgrade will upgrade both rules and data using a single process. This process involves system downtime, which means you cannot use the system until you complete the upgrade.
+`out-of-place`  | Use the out-of-place upgrade option to apply a patch with zero-downtime.  This process uses a split-schema to apply patches. It creates a temporary schema, specified with the `installer.targetRulesSchema: "rules_upgrade"` parameter, in your current database then migrates the rules to it. To apply a patch, specify `installer.upgradeType: out-of-place"` and `installer.targetRulesSchema: "rules_upgrade"`.
 
 Example:
 

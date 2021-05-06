@@ -113,7 +113,6 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For an overview, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
 
-**TBD review following review comment from maracle6 EKS lab demos**
 To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, it is a recommend practice to specify an SSL certificate that you create or import into AWS Credential Manager. After you have one your Amazon Resource Name (ARN) credential using this certificate or multiple certificates uploaded to AWS Credential Manager, use one of the following choices for the `annotation` parameter of the web tier ingress configuration:
 
 - Leave it blank so that the deployment automatically associates the existing certificate with your ingress controller.
@@ -124,14 +123,15 @@ To import or create a new SSL certificate to support HTTPS, see [Importing Certi
 ```yaml
 ingress:
   tls:
-          # Enable TLS encryption
-          enabled: true
-          # secretName:
-          # useManagedCertificate: false
-            ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
+    # Enable TLS encryption
+    enabled: true
+    # secretName:
+    # useManagedCertificate: false
+    ssl_annotation: 
+      alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
 ```
 
-Where `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
+Where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx`, which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
 
 ### Making your Docker images available to your deployment
 
@@ -408,18 +408,19 @@ To customize these files, you must download them from the source github reposito
 
 1. To add the Pega repository to your Helm installation, enter:
 
-    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
 
 2. To verify the new repository, you can search it by entering:
 
 ```bash
   $ helm search repo pega
   NAME        CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega   1.2.0                           Pega installation on kubernetes
-  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+  pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
-These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your organization's EKS deployment of Pega Platform.
+The pega and addons charts in the /charts/pega folder require customization for your organization's EKS deployment of Pega Platform. The backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
 
 #### Updating the addons Helm chart values
 
@@ -438,6 +439,55 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 - Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
+
+
+### Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)
+
+
+Adding the Pega configuration files to your Helm installation on your local system
+----------------------------------------------------------------------------------
+Pega maintains a repository of Helm charts that are required to deploy Pega Platform and related resources using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these configuration files for your backing service deployment:
+
+- pega/backingservices - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
+
+1. To add the backingservices repository to your Helm installation, enter:
+
+    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
+    
+2. To verify the new repository, you can search it by entering:
+    
+```bash
+$ helm search repo pega
+NAME                	CHART VERSION	APP VERSION	DESCRIPTION                    
+pega/pega           	1.4.4        	           	Pega installation on kubernetes
+pega/addons         	1.4.4        	1.0        	A Helm chart for Kubernetes    
+pega/backingservices	1.4.4        	           	A Helm chart for Kubernetes
+```
+
+3. Download the values file for pega/backingservices.
+
+```bash
+$ helm inspect values pega/backingservices > backingservices.yaml
+```
+
+To customize this backingservices.yaml file, you must download it from the Pega-managed repository to your local system, edit it with a text editor, and then save it to your local system using the same filename.
+
+4. To download the backingservices.yaml Helm chart to the \<local filepath>\EKS-demo, enter:
+
+`$ helm inspect values pega/backingservices > <local filepath>/EKS-demo/backingservices.yaml`
+
+5. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your EKS requirements:
+
+
+| Chart parameter name              | Purpose                                   | Your setting |
+|:---------------------------------|:-------------------------------------------|:--------------|
+| global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
+| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or srs applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
+| srs.srsRuntime.srsImage: | Specify the Pega-provided srs-service image, services/search-n-reporting-service:dockerTag that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "platform-services/search-n-reporting-service:1.9.0-4"    |
+| srs.srsStorage.domain: port: protocol: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li> srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li> <li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
+| elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
+
+6. Save the file.
 
 #### Updating the pega Helm chart values
 
@@ -474,13 +524,32 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
-   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: "alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn>\"</li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
+   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate, where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn></li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
    | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
    | pegasearch.image: | Specify the Pega-provided Docker `search` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".     | adminPassword: "\<initial password\>"  |
 
-3. Save the file.
+3. [For Pega Platform 8.6 and later] Applicable only when backingservices chart is configured.
+
+For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
+
+Chart parameter name   | Purpose   | Your setting
+---         | ---           | ---
+`pegasearch.externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | true
+`pegasearch.externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `"http://<srs.deploymentName>.<namespace>.svc.cluster.local"` or `"http://<srs.deploymentName>.<namespace>"`
+
+Example:
+
+When backingservice is deployed into `mypega-EKS-demo` namespace and `pegasearch.externalSearchService` value is "srs-service", configure the `pegasearch` section in pega.yaml as below:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.mypega-EKS-demo.svc.cluster.local"
+```
+
+4. Save the file.
 
 ### Deploy Pega Platform using the command line
 
@@ -516,7 +585,14 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
    The `pegaaddons` namespace contains the deployment’s load balancer and the metric server configurations that you configured in the addons.yaml Helm chart. A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-4. Deploy Pega Platform for the first time by 
+4. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
+
+   ```yaml
+   $ helm install backingservices pega/backingservices --namespace mypega-EKS-demo --values backingservices.yaml
+   ```
+   The `mypega-EKS-demo` namespace used for pega deployment can also be used for backingservice deployment that you configured in backingservices.yaml helm chart.
+
+5. Deploy Pega Platform for the first time by 
 installing the pega Helm chart, which you updated in [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values). This installs Pega Platform software into the database you specified in the pega chart.
 
    ```yaml
@@ -527,19 +603,19 @@ installing the pega Helm chart, which you updated in [Updating the pega Helm cha
 
    A successful Pega deployment immediately returns details that show progress for your `mypega-EKS-demo` deployment.
 
-5. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
+6. Refresh the Kubernetes dashboard that you opened in the previous section. If you closed the dashboard, start the proxy server for the Kubernetes dashboard and then relaunch the web browser.
 
-6. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing.
+7. In the dashboard, in **Namespace** select the `mypega-EKS-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing.
 
     Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-7. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+8. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-8. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
+9. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-EKS-demo` namespace pods.
 
     A successful deployment does not show errors across the various workloads. The `mypega-EKS-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
@@ -564,5 +640,3 @@ To manually associate the host name of the pega-web tier ingress with the tier e
 For AWS Route53 Cloud DNS lookup service documentation details, see [What is Amazon Route 53?](https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html). If not using AWS Route53 Cloud DNS lookup service, see the documentation for your DNS lookup service.
 
 With the ingress host name name associated with this DNS host host in your DNS service, you can log in to Pega Platform with a web browser using the URL: http://\<pega-web tier ingress host name>/prweb.
-
-! [](media/25b18c61607e4e979a13f3cfc1b64f5c.png)
