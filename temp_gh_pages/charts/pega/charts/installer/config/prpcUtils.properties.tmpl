@@ -1,0 +1,41 @@
+# Properties file for use with PRPC Utilities.
+
+################### COMMON PROPERTIES - DB CONNECTION ##################
+########################################################################
+# CONNECTION INFORMATION
+pega.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
+pega.jdbc.driver.class={{ .Env.JDBC_CLASS }}
+pega.database.type={{ .Env.DB_TYPE }}
+pega.jdbc.url={{ .Env.JDBC_URL }}
+pega.jdbc.username={{ .Env.DB_USERNAME }}
+pega.jdbc.password={{ .Env.DB_PASSWORD }}
+
+# CUSTOM CONNECTION PROPERTIES
+jdbc.custom.connection.properties={{ .Env.JDBC_CUSTOM_CONNECTION }}
+
+# RULES SCHEMA NAME
+rules.schema.name={{ .Env.RULES_SCHEMA }}
+
+# DATA SCHEMA NAME
+data.schema.name={{ .Env.DATA_SCHEMA }}
+
+# CUSTOMER DATA SCHEMA NAME
+customerdata.schema.name={{ .Env.CUSTOMERDATA_SCHEMA }}
+
+# USER TEMP DIRECTORY
+# Will use default if not set to valid directory
+user.temp.dir=/opt/pega/temp
+
+############################### SETTINGS FOR CHANGING DYNAMIC SYSTEM SETTINGS ########
+######################################################################################
+dass.filepath=/opt/pega/kit/scripts/upgrade_dass_settings.json
+# Load from filesystem if BYPASS_LOAD_ENGINE_CLASSES is true
+{{  if isTrue .Env.BYPASS_LOAD_ENGINE_CLASSES }}
+pega.engine.classpath=filesystem
+pega.codeset.version={{ .Env.PRDEPLOY_CODESET_VERSION }}
+{{ else }}
+pega.engine.classpath=database
+{{ if .Env.ENGINE_CODESET_VERSION }}
+pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
+{{ end -}}
+{{ end -}}

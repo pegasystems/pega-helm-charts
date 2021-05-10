@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<pegarules>
+  <env name="Identification/SystemName" value="prpc" />
+  <env name="Initialization/usenativelibrary" value="false" />
+  <env name="initialization/explicittempdir" value="/opt/pega/temp/pr_temp" />
+  <env name="initialization/minimalStartup" value="true" />
+  <env name="initialization/productType" value="Standard" />
+  <env name="ruleresolution/useclassancestorjoin" value="false" />
+  <env name="ruleresolution/userulesetindexjoin" value="false" />
+  <env name="ruleresolution/usejoinsforallclasses" value="false" />
+  <env name="agent/enable" value="false" />
+  <env name="fua/enableAssemblyAvoidance" value="false" />
+  <env name="agent/masteragentenable" value="false" />
+  <env name="initialization/daemonenable" value="false" />
+  <env name="usage/usagetrackingenabled" value="false" />
+  <env name="asyncservices/enable" value="false" />
+  <env name="asyncExecutor/enable" value="false" />
+  <env name="passivation/SkipUpgradeCheckingDuringSave" value="true" />
+  <env name="database/baseTable/name" value="pr4_base" />
+  <env name="database/baseTable/schema" value="{{ .Env.RULES_SCHEMA }}" />
+  <env name="database/othertable/schema" value="{{ .Env.DATA_SCHEMA }}" />
+  <env name="database/storageVersion" value="6" />
+  <env name="database/drivers" value="{{ .Env.JDBC_CLASS }}" />
+  <env name="database/databases/PegaRULES/url" value="{{ .Env.JDBC_URL }}" />
+  <env name="database/databases/PegaRULES/userName" value="{{ .Env.DB_USERNAME }}" />
+  <env name="database/databases/PegaRULES/password" value="{{ .Env.DB_PASSWORD }}" />
+  <env name="database/databases/PegaRULES/defaultSchema" value="{{ .Env.RULES_SCHEMA }}" />
+  <env name="database/databases/PegaRULES/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/PegaRULES/forceComponentConnectionBroker" value="false" />
+  <env name="database/databases/PegaDATA/url" value="{{ .Env.JDBC_URL }}" />
+  <env name="database/databases/PegaDATA/userName" value="{{ .Env.DB_USERNAME }}" />
+  <env name="database/databases/PegaDATA/password" value="{{ .Env.DB_PASSWORD }}" />
+  <env name="database/databases/PegaDATA/defaultSchema" value="{{ .Env.DATA_SCHEMA }}" />
+  <env name="database/databases/PegaDATA/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/PegaDATA/forceComponentConnectionBroker" value="false" />
+  <env name="database/databases/PegaRULES/connectionPoolSize" value="30" />
+  <env name="database/databases/PegaDATA/connectionPoolSize" value="30" />
+  <env name="database/databases/CustomerData/url" value="{{ .Env.JDBC_URL }}" />
+  <env name="database/databases/CustomerData/userName" value="{{ .Env.DB_USERNAME }}" />
+  <env name="database/databases/CustomerData/password" value="{{ .Env.DB_PASSWORD }}" />
+  <env name="database/databases/CustomerData/defaultSchema" value="{{ .Env.CUSTOMERDATA_SCHEMA }}" />
+  <env name="database/databases/CustomerData/propertiesFile" value="/opt/pega/kit/scripts/config/{{ .Env.DB_TYPE }}/{{ .Env.DB_TYPE }}.conf" />
+  <env name="database/databases/CustomerData/forceComponentConnectionBroker" value="false" />
+  <env name="database/databases/CustomerData/connectionPoolSize" value="30" />
+  <env name="install/parallel/threadcount" value="-1" />
+  <env name="install/parallel/index/threadcount" value="-1" />
+  <env name="compiler/javasourcelevel" value="1.7" />
+  <env name="cluster/hazelcast/v4/enabled" value="true" type="java.lang.String"/>
+</pegarules>

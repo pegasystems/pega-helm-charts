@@ -1,0 +1,24 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+
+{{ if (eq (include "isExternalSearch" .) "true") }}
+# The deployment generates this file to deploy Elasticsearch internally when the external search URL is blank (or the default value is left) 
+# AND no search service is enabled.
+{{ else }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "searchName" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+    component: Pega
+    app: {{ template "searchName" . }}
+spec:
+  selector:
+    component: Search
+    app: {{ template "searchName" . }}
+  ports:
+  - name: http
+    port: 80
+    targetPort: 9200
+{{ end }}
+{{ end }}

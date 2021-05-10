@@ -1,0 +1,73 @@
+{{ if (eq (include "performUpgrade" .) "true") -}}
+# Config map used for common configuration between pre-upgrades, post-upgrades and upgrades
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "pegaUpgradeEnvironmentConfig" }}
+  namespace: {{ .Release.Namespace }}
+data:
+  # Database Type for installation
+  DB_TYPE: {{ .Values.global.jdbc.dbType }}
+  # JDBC URL of the DB where Pega is installed
+  JDBC_URL: {{ .Values.global.jdbc.url }}
+  # Class name of the DB's JDBC driver
+  JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
+{{- if .Values.global.jdbc.driverUri }}
+  # URI that the JDBC driver can be downloaded from
+  JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
+{{- end }}
+  # Rules schema of the Pega installation
+  RULES_SCHEMA: {{ .Values.global.jdbc.rulesSchema }}
+  # Data schema of the Pega installation
+  DATA_SCHEMA: {{ .Values.global.jdbc.dataSchema }}
+{{- if .Values.global.jdbc.customerDataSchema }}
+  # CustomerData schema of the Pega installation
+  CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
+{{- end }}
+{{- if .Values.global.jdbc.connectionProperties }}
+  # JDBC custom connection properties
+  JDBC_CUSTOM_CONNECTION: {{ .Values.global.jdbc.connectionProperties }}
+{{- end }}
+  # Type of Upgrade
+  UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
+  # Whether this is a Multitenant System ('true' if yes, 'false' if no)
+  MULTITENANT_SYSTEM: {{ .Values.multitenantSystem | quote}}
+  # UDF generation will be skipped if this property is set to true
+  BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
+  # Z/OS SITE-SPECIFIC PROPERTIES FILE
+  ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
+{{- if .Values.zos.db2zosUdfWlm }}
+  # Specify the workload manager to load UDFs into db2zos
+  DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
+{{- end }}
+{{- if .Values.upgrade.targetRulesSchema }}
+  # Target Rules Schema name
+  TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
+{{- end }}
+{{- if .Values.zos.zosProperties }}
+  # The location of the db2zos site specific properties file. Only used if the target system is a db2zos database
+  TARGET_ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
+{{- end }}
+  # The commit count to use when loading database tables
+  MIGRATION_DB_LOAD_COMMIT_RATE: {{ .Values.upgrade.dbLoadCommitRate | quote }}
+  # Update existing application will be run if this property is set to true
+  UPDATE_EXISTING_APPLICATIONS: {{ .Values.upgrade.updateExistingApplications | quote }}
+  # Runs the Update Applications Schema utility to update the cloned Rule, Data, Work and Work History tables with the schema changes in the latest base tables if this property is set to true
+  UPDATE_APPLICATIONS_SCHEMA: {{ .Values.upgrade.updateApplicationsSchema | quote }}
+  # Generate and execute an SQL script to clean old rulesets and their rules from the system if this property is set to true
+  RUN_RULESET_CLEANUP: {{ .Values.upgrade.runRulesetCleanup | quote }}
+  # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
+  REBUILD_INDEXES:  {{ .Values.upgrade.rebuildIndexes | quote }}
+{{- if .Values.distributionKitURL }}
+  # Distribution kit URL
+  DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
+{{- end }}
+{{- if .Values.bypassLoadEngineClasses }}
+  # Bypass loading engine classes into database during installation
+  BYPASS_LOAD_ENGINE_CLASSES: {{ .Values.bypassLoadEngineClasses | quote }}
+{{- end }}
+{{- if .Values.bypassLoadAssembledClasses }}
+  # Bypass loading assembly classes into database during installation
+  BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
+{{- end }}
+{{ end }}
