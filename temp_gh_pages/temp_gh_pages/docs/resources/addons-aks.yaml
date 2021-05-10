@@ -1,0 +1,73 @@
+---
+# When deploying on Azure AKS, set ingress-azure.enabled to true to install an Application Gateway Ingress Controller (AGIC).
+# The AGIC is a pod within your AKS cluster that monitors the Kubernetes Ingress resources, and creates and applies the 
+# Application Gateway config based on the status of the Kubernetes cluster. For details, see 
+# (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#azure-resource-manager-authentication).
+ingress-azure:
+  enabled: true
+  # Add required details about the Application Gateway you created.
+  appgw:
+    # Subscription ID of your Azure subscription.
+    subscriptionId: <YOUR-SUBSCRIPTION-ID>
+    # Resource group in which you created the Application Gateway.
+    resourceGroup: <RESOURCE-GROUP-NAME>
+    # Name of the Application Gateway you created.
+    name: <APPLICATION-GATEWAY-NAME>
+    # To restrict all Ingresses to be exposed over a private IP address.
+    usePrivateIP: true
+  # Authentication using which ingress controller authenticates with Azure Resource Manager.
+  armAuth:
+    # To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal
+    # that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result 
+    # to the `secretJSON` field. for details, see (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#using-a-service-principal).
+    #
+    # In Linux, use the command:
+    # $ az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true| base64 -w0
+    # copy the output and paste it in secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+    #
+    # In a Windows powershell, encode the command output with the following sequence of commands:
+    # PS C:\local-system> $Command = 'az ad sp create-for-rbac --subscription <YOUR-SUBSCRIPTION-ID> --sdk-auth true'
+    # PS C:\local-system> $Encoded = [convert]::ToBase64String([System.Text.encoding]::Unicode.GetBytes($command))
+    # PS C:\local-system> powershell.exe -encoded $Encoded
+    # copy the output and paste it in secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+    #
+    # When you deploy, the actual JSON values that were encoded in the previous step is copied into the "config" file in the C:\Users\XXXXX\.kube folder.
+    #
+    # As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access with the AGIC in your cluster via
+    # the Azure Resource Manager. For details, see (https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#set-up-aad-pod-identity).
+    #
+    # to add a AAD-Pod-Identity (https://github.com/Azure/aad-pod-identity).
+    #armAuth:
+    #   type: aadPodIdentity
+    #   identityResourceID: <identityResourceId>
+    #   identityClientID:  <identityClientId>
+    #
+    # and comment out the Service Principal parameters:
+    type: servicePrincipal
+    secretJSON: <SECRET_JSON_CREATED_USING_ABOVE_COMMAND>
+    #
+    # Configure your AKs cluster with RBAC enabled and enable it:
+  rbac:
+    enabled: true
+
+# The following parameters are not used in Azure AKS environments so they are set to false. Enable any of them if your deployment requires the use of one.
+
+traefik:
+  enabled: false
+
+aws-alb-ingress-controller:
+  enabled: false
+
+metrics-server:
+  enabled: false
+
+deploy_efk: &deploy_efk false
+
+elasticsearch:
+  enabled: *deploy_efk
+
+kibana:
+  enabled: *deploy_efk
+
+fluentd-elasticsearch:
+  enabled: *deploy_efk
