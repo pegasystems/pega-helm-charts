@@ -1,0 +1,82 @@
+# Properties File for use with migrateSystem.xml  Update this file 
+# before using migrate.bat/sh script.
+# Set the DB connection
+
+################### COMMON PROPERTIES - DB CONNECTION ##################
+########################################################################
+
+#The system where the tables/rules will be migrated from
+pega.source.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
+pega.source.jdbc.driver.class={{ .Env.JDBC_CLASS }}
+pega.source.database.type={{ .Env.DB_TYPE }}
+pega.source.jdbc.url={{ .Env.JDBC_URL }}
+pega.source.jdbc.username={{ .Env.DB_USERNAME }}
+pega.source.jdbc.password={{ .Env.DB_PASSWORD }}
+#Custom connection properties
+pega.source.jdbc.custom.connection.properties={{ .Env.JDBC_CUSTOM_CONNECTION }}
+
+pega.source.rules.schema={{ .Env.RULES_SCHEMA }}
+#Set the following property if the source system already contains a split schema.
+pega.source.data.schema={{ .Env.DATA_SCHEMA }}
+# Used for systems with a separate Customer Data Schema
+# The value of pega.source.data is the default value for pega.source.customerdata.schema
+pega.source.customerdata.schema={{ .Env.CUSTOMERDATA_SCHEMA }}
+
+#The system where the tables/rules will be migrated to
+pega.target.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
+pega.target.jdbc.driver.class={{ .Env.JDBC_CLASS }}
+pega.target.database.type={{ .Env.DB_TYPE }}
+pega.target.jdbc.url={{ .Env.JDBC_URL }}
+pega.target.jdbc.username={{ .Env.DB_USERNAME }}
+pega.target.jdbc.password={{ .Env.DB_PASSWORD }}
+#Custom connection properties
+pega.target.jdbc.custom.connection.properties={{ .Env.JDBC_CUSTOM_CONNECTION }}
+
+pega.target.rules.schema={{ .Env.TARGET_RULES_SCHEMA }}
+#Used to correctly schema qualify tables in stored procedures, views and triggers.
+#This property is not required if migrating before performing an upgrade.
+pega.target.data.schema={{ .Env.TARGET_DATA_SCHEMA }}
+# Used for systems with a separate Customer Data Schema
+# The value of pega.target.data is the default value for pega.target.customerdata.schema
+pega.target.customerdata.schema={{ .Env.TARGET_CUSTOMERDATA_SCHEMA }}
+
+#Set this property to bypass udf generation on the target system.
+pega.target.bypass.udf={{ .Env.BYPASS_UDF_GENERATION }}
+
+#The location of the db2zos site specific properties file. Only used if the target system is a db2zos database.
+pega.target.zos.properties=config/db2zos/DB2SiteDependent.properties
+
+#The commit count to use when loading database tables
+db.load.commit.rate={{ .Env.MIGRATION_DB_LOAD_COMMIT_RATE }}
+
+################### Migrate System Properties ###########################################
+#The directory where output from the bulk mover will be stored. This directory will be cleared when pega.bulkmover.unload.db is run.
+#This property must be set if either pega.bulkmover.unload.db or pega.bulkmover.load.db is set to true.
+pega.bulkmover.directory=/opt/pega/kit/scripts/upgrade/mover
+
+#The location where a temporary directory will be created for use by the migrate system utilities.
+pega.migrate.temp.directory=/opt/pega/kit/scripts/upgrade/migrate
+
+
+######## The operations to be run by the utility, they will only be run if the property is set to true.
+#Set to true if migrating before an upgrade. If true admin table(s) required
+#for an upgrade will be migrated with the rules tables.
+pega.move.admin.table={{ .Env.MOVE_ADMIN_TABLE }}
+#Generate an xml document containing the definitions of tables in the source system. It will be found in the schema directory of the
+#distribution image.
+pega.clone.generate.xml={{ .Env.CLONE_GENERATE_XML }}
+#Create ddl from the generated xml document. This ddl can be used to create copies of rule tables found on the source system.
+pega.clone.create.ddl={{ .Env.CLONE_CREATE_DDL }}
+#Apply the generated clone ddl to the target system.
+pega.clone.apply.ddl={{ .Env.CLONE_APPLY_DDL }}
+#Unload the rows from the rules tables on the source system into the pega.bulkmover.directory.
+pega.bulkmover.unload.db={{ .Env.BULKMOVER_UNLOAD_DB }}
+#Load the rows onto the target system from the pega.bulkmover.directory.
+pega.bulkmover.load.db={{ .Env.BULKMOVER_LOAD_DB }}
+
+### The following operations should only be run when migrating upgraded rules
+#Generate the rules schema objects (views, triggers, procedures, functions). The objects will be created in the pega.target.rules.schema
+#but will contain references to the pega.target.data.schema where appropriate.
+pega.rules.objects.generate={{ .Env.RULES_OBJECTS_GENERATE }}
+#Apply the rules schema objects (views, triggers, procedures, functions) to pega.target.rules.schema.
+pega.rules.objects.apply={{ .Env.RULES_OBJECTS_APPLY }}
