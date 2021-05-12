@@ -1,0 +1,116 @@
+---
+global:
+  # This values.yaml file is an example of a minimal Pega
+  # deployment configuration.  For more information about
+  # configuration options, see the project readme.
+
+  # Enter your Kubernetes provider.
+  provider: "k8s"
+
+  # Deploy Pega nodes
+  actions:
+    execute: "deploy"
+
+  # Provide JDBC connection information to the Pega relational database
+  #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
+  jdbc:
+    #   url	Valid values are:
+    #
+    #   Oracle              jdbc:oracle:thin:@//localhost:1521/dbName
+    #   IBM DB/2 z / OS 	jdbc:db2://localhost:50000/dbName
+    #   IBM DB/2            jdbc:db2://localhost:50000/dbName:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;
+    #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+    #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
+    #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
+    url: "YOUR_JDBC_URL"
+    #   driverClass 	-- jdbc class.  Valid values are:
+    #
+    #   Oracle              oracle.jdbc.OracleDriver
+    #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
+    #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
+    #   PostgreSQL          org.postgresql.Driver
+    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
+    dbType: "YOUR_DATABASE_TYPE"
+    #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
+    driverUri: "YOUR_JDBC_DRIVER_URI"
+    username: "YOUR_JDBC_USERNAME"
+    password: "YOUR_JDBC_PASSWORD"
+    # CUSTOM CONNECTION PROPERTIES
+    # Add a list of ; delimited connections properties. The list must end with ;
+    # For example: connectionProperties=user=usr;password=pwd;
+    connectionProperties: ""
+    rulesSchema: "YOUR_RULES_SCHEMA"
+    dataSchema: "YOUR_DATA_SCHEMA"
+    customerDataSchema: ""
+
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  docker:
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+      # Docker image information for the Pega docker image, containing the application server.
+    pega:
+      image: "pegasystems/pega"
+
+  # Specify the Pega tiers to deploy
+  # For a minimal deployment, use a single tier to reduce resource consumption.
+  tier:
+    - name: "minikube"
+      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+
+      service:
+        port: 80
+        targetPort: 8080
+        # Without a load balancer, use a direct NodePort instead.
+        serviceType: "NodePort"
+
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+
+      # Set resource consumption to minimal levels
+      replicas: 1
+      cpuRequest: 200m
+      memRequest: "6Gi"
+      cpuLimit: 2
+      memLimit: "6Gi"
+      javaOpts: ""
+      initialHeap: "4096m"
+      maxHeap: "4096m"
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
+
+# External services
+
+# Cassandra automatic deployment settings.
+# Disabled by default for minimal deployments.
+cassandra:
+  enabled: false
+
+# DDS (external Cassandra) connection settings.
+# These settings should only be modified if you are using a custom Cassandra deployment.
+dds:
+  externalNodes: ""
+  port: "9042"
+  username: "dnode_ext"
+  password: "dnode_ext"
+
+# Elasticsearch deployment settings.
+# Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
+# These search nodes will be deployed regardless of the Elasticsearch configuration above.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
+pegasearch:
+  image: "pegasystems/search"
+  memLimit: "3Gi"
+
+# Pega Installer settings
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  adminPassword: "ADMIN_PASSWORD"
