@@ -3,7 +3,45 @@ entries:
   addons:
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.237022-04:00"
+    created: "2021-05-10T15:04:41.213541038Z"
+    dependencies:
+    - condition: traefik.enabled
+      name: traefik
+      repository: https://charts.helm.sh/stable
+      version: 1.77.1
+    - condition: aws-load-balancer-controller.enabled
+      name: aws-load-balancer-controller
+      repository: https://aws.github.io/eks-charts
+      version: 1.1.0
+    - condition: elasticsearch.enabled
+      name: elasticsearch
+      repository: https://helm.elastic.co/
+      version: 7.8.1
+    - condition: fluentd-elasticsearch.enabled
+      name: fluentd-elasticsearch
+      repository: https://kiwigrid.github.io/
+      version: 9.6.0
+    - condition: kibana.enabled
+      name: kibana
+      repository: https://helm.elastic.co/
+      version: 7.8.1
+    - condition: metrics-server.enabled
+      name: metrics-server
+      repository: https://charts.helm.sh/stable
+      version: 2.8.4
+    - condition: ingress-azure.enabled
+      name: ingress-azure
+      repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
+      version: 1.2.0
+    description: A Helm chart for Kubernetes
+    digest: 7a889d2279a5c5237ae8fb610a89c0e3d9ed79234b83e4c4778e827e3fb1a649
+    name: addons
+    urls:
+    - https://pegasystems.github.io/pega-helm-charts/addons-1.5.2.tgz
+    version: 1.5.2
+  - apiVersion: v1
+    appVersion: "1.0"
+    created: "2021-05-10T06:47:31.449719392Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -41,7 +79,7 @@ entries:
     version: 1.5.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.229264-04:00"
+    created: "2021-05-10T06:47:31.440748988Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -79,7 +117,7 @@ entries:
     version: 1.4.6
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.22041-04:00"
+    created: "2021-05-10T06:47:31.430514964Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -117,7 +155,7 @@ entries:
     version: 1.4.5
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.212533-04:00"
+    created: "2021-05-10T06:47:31.419819738Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -155,7 +193,7 @@ entries:
     version: 1.4.4
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.204252-04:00"
+    created: "2021-05-10T06:47:31.411668809Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -193,7 +231,7 @@ entries:
     version: 1.4.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.195879-04:00"
+    created: "2021-05-10T06:47:31.401360576Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -231,7 +269,7 @@ entries:
     version: 1.4.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.186791-04:00"
+    created: "2021-05-10T06:47:31.391095353Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -269,7 +307,7 @@ entries:
     version: 1.3.5
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.17687-04:00"
+    created: "2021-05-10T06:47:31.383050441Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -307,7 +345,7 @@ entries:
     version: 1.3.4
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.164975-04:00"
+    created: "2021-05-10T06:47:31.372489547Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -345,7 +383,7 @@ entries:
     version: 1.3.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.156282-04:00"
+    created: "2021-05-10T06:47:31.362394352Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -383,7 +421,7 @@ entries:
     version: 1.3.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.148503-04:00"
+    created: "2021-05-10T06:47:31.354315108Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -421,7 +459,7 @@ entries:
     version: 1.3.1
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.14046-04:00"
+    created: "2021-05-10T06:47:31.343723985Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -459,7 +497,7 @@ entries:
     version: 1.3.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.080679-04:00"
+    created: "2021-05-10T06:47:31.269636783Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -497,7 +535,7 @@ entries:
     version: 1.2.11
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.074492-04:00"
+    created: "2021-05-10T06:47:31.259824099Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -535,7 +573,7 @@ entries:
     version: 1.2.10
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.133219-04:00"
+    created: "2021-05-10T06:47:31.333637686Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -573,7 +611,7 @@ entries:
     version: 1.2.9
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.126361-04:00"
+    created: "2021-05-10T06:47:31.326601243Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -611,7 +649,7 @@ entries:
     version: 1.2.8
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.119157-04:00"
+    created: "2021-05-10T06:47:31.316941871Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -649,7 +687,7 @@ entries:
     version: 1.2.7
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.113076-04:00"
+    created: "2021-05-10T06:47:31.309939941Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -687,7 +725,7 @@ entries:
     version: 1.2.6
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.106201-04:00"
+    created: "2021-05-10T06:47:31.300392957Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -721,7 +759,7 @@ entries:
     version: 1.2.5
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.10006-04:00"
+    created: "2021-05-10T06:47:31.291776294Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -755,7 +793,7 @@ entries:
     version: 1.2.4
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.093328-04:00"
+    created: "2021-05-10T06:47:31.285068291Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -789,7 +827,7 @@ entries:
     version: 1.2.3
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.087101-04:00"
+    created: "2021-05-10T06:47:31.276324407Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -823,7 +861,7 @@ entries:
     version: 1.2.2
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.066763-04:00"
+    created: "2021-05-10T06:47:31.252120766Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -857,7 +895,7 @@ entries:
     version: 1.2.1
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.060885-04:00"
+    created: "2021-05-10T06:47:31.243711839Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -891,7 +929,7 @@ entries:
     version: 1.2.0
   - apiVersion: v1
     appVersion: "1.0"
-    created: "2021-04-19T16:05:06.051801-04:00"
+    created: "2021-05-10T06:47:31.235074044Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -925,7 +963,22 @@ entries:
     version: 1.0.4
   backingservices:
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.258981-04:00"
+    created: "2021-05-10T15:04:41.21696327Z"
+    dependencies:
+    - condition: srs.srsStorage.provisionInternalESCluster
+      name: elasticsearch
+      repository: https://helm.elastic.co/
+      version: 7.9.3
+    description: Helm Chart to provision the latest Search and Reporting Service (SRS)
+      for your Pega Infinity deployment.
+    digest: 3e580fee84a90411746e73d3380e8a529e9fa58bff224407e519c21f8955c715
+    name: backingservices
+    type: application
+    urls:
+    - https://pegasystems.github.io/pega-helm-charts/backingservices-1.5.2.tgz
+    version: 1.5.2
+  - apiVersion: v1
+    created: "2021-05-10T06:47:31.473244695Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -939,7 +992,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.5.0.tgz
     version: 1.5.0
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.256409-04:00"
+    created: "2021-05-10T06:47:31.470747856Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -953,7 +1006,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.6.tgz
     version: 1.4.6
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.254009-04:00"
+    created: "2021-05-10T06:47:31.46829146Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -967,7 +1020,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.5.tgz
     version: 1.4.5
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.251312-04:00"
+    created: "2021-05-10T06:47:31.463329332Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -981,7 +1034,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.4.tgz
     version: 1.4.4
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.248029-04:00"
+    created: "2021-05-10T06:47:31.460867853Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -995,7 +1048,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.3.tgz
     version: 1.4.3
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.245688-04:00"
+    created: "2021-05-10T06:47:31.458368449Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -1009,7 +1062,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.2.tgz
     version: 1.4.2
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.243371-04:00"
+    created: "2021-05-10T06:47:31.455948572Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -1023,7 +1076,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/backingservices-1.4.1.tgz
     version: 1.4.1
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.240967-04:00"
+    created: "2021-05-10T06:47:31.453506288Z"
     dependencies:
     - condition: srs.srsStorage.provisionInternalESCluster
       name: elasticsearch
@@ -1038,7 +1091,25 @@ entries:
     version: 1.4.0
   pega:
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.390024-04:00"
+    created: "2021-05-10T15:04:41.221176535Z"
+    dependencies:
+    - condition: cassandra.enabled
+      name: cassandra
+      repository: https://charts.helm.sh/incubator
+      version: 0.13.3
+    description: Pega installation on kubernetes
+    digest: 630842710b61fd529d7eed87444384537bbc583131bd33b5d8a7dd3d79b645e4
+    home: http://www.pega.com
+    keywords:
+    - pega
+    - prpc
+    - kubernetes
+    name: pega
+    urls:
+    - https://pegasystems.github.io/pega-helm-charts/pega-1.5.2.tgz
+    version: 1.5.2
+  - apiVersion: v1
+    created: "2021-05-10T06:47:31.629354295Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1056,7 +1127,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.5.0.tgz
     version: 1.5.0
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.383329-04:00"
+    created: "2021-05-10T06:47:31.623061591Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1074,7 +1145,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.6.tgz
     version: 1.4.6
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.379659-04:00"
+    created: "2021-05-10T06:47:31.618972372Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1092,7 +1163,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.5.tgz
     version: 1.4.5
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.375447-04:00"
+    created: "2021-05-10T06:47:31.614978592Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1110,7 +1181,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.4.tgz
     version: 1.4.4
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.371819-04:00"
+    created: "2021-05-10T06:47:31.608428782Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1128,7 +1199,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.3.tgz
     version: 1.4.3
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.368129-04:00"
+    created: "2021-05-10T06:47:31.604424026Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1146,7 +1217,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.2.tgz
     version: 1.4.2
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.364079-04:00"
+    created: "2021-05-10T06:47:31.600409274Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1164,7 +1235,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.1.tgz
     version: 1.4.1
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.360712-04:00"
+    created: "2021-05-10T06:47:31.593888465Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1182,7 +1253,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.4.0.tgz
     version: 1.4.0
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.357381-04:00"
+    created: "2021-05-10T06:47:31.590048122Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1200,7 +1271,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.5.tgz
     version: 1.3.5
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.353545-04:00"
+    created: "2021-05-10T06:47:31.586255116Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1218,7 +1289,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.4.tgz
     version: 1.3.4
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.350312-04:00"
+    created: "2021-05-10T06:47:31.580525816Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1236,7 +1307,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.3.tgz
     version: 1.3.3
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.347201-04:00"
+    created: "2021-05-10T06:47:31.577035858Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1254,7 +1325,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.2.tgz
     version: 1.3.2
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.344047-04:00"
+    created: "2021-05-10T06:47:31.573525841Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1272,7 +1343,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.1.tgz
     version: 1.3.1
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.340215-04:00"
+    created: "2021-05-10T06:47:31.569868853Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1290,7 +1361,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.3.0.tgz
     version: 1.3.0
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.308438-04:00"
+    created: "2021-05-10T06:47:31.533299042Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1308,7 +1379,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.11.tgz
     version: 1.2.11
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.30516-04:00"
+    created: "2021-05-10T06:47:31.529828869Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1326,7 +1397,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.10.tgz
     version: 1.2.10
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.336665-04:00"
+    created: "2021-05-10T06:47:31.564076598Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1344,7 +1415,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.9.tgz
     version: 1.2.9
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.333196-04:00"
+    created: "2021-05-10T06:47:31.560673945Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1362,7 +1433,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.8.tgz
     version: 1.2.8
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.329758-04:00"
+    created: "2021-05-10T06:47:31.557330345Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1380,7 +1451,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.7.tgz
     version: 1.2.7
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.325831-04:00"
+    created: "2021-05-10T06:47:31.552773026Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1398,7 +1469,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.6.tgz
     version: 1.2.6
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.322452-04:00"
+    created: "2021-05-10T06:47:31.548442665Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1416,7 +1487,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.5.tgz
     version: 1.2.5
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.319111-04:00"
+    created: "2021-05-10T06:47:31.545098918Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1434,7 +1505,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.4.tgz
     version: 1.2.4
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.315797-04:00"
+    created: "2021-05-10T06:47:31.541736123Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1452,7 +1523,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.3.tgz
     version: 1.2.3
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.311783-04:00"
+    created: "2021-05-10T06:47:31.536461029Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1470,7 +1541,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.2.tgz
     version: 1.2.2
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.301612-04:00"
+    created: "2021-05-10T06:47:31.52641593Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1488,7 +1559,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.1.tgz
     version: 1.2.1
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.297947-04:00"
+    created: "2021-05-10T06:47:31.521108532Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1506,7 +1577,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.2.0.tgz
     version: 1.2.0
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.294952-04:00"
+    created: "2021-05-10T06:47:31.517998323Z"
     dependencies:
     - condition: cassandra.enabled
       name: cassandra
@@ -1524,7 +1595,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.0.4.tgz
     version: 1.0.4
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.291267-04:00"
+    created: "2021-05-10T06:47:31.514471664Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -1566,7 +1637,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.0.3.tgz
     version: 1.0.3
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.283166-04:00"
+    created: "2021-05-10T06:47:31.503770279Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -1608,7 +1679,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.0.2.tgz
     version: 1.0.2
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.274954-04:00"
+    created: "2021-05-10T06:47:31.49319052Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -1650,7 +1721,7 @@ entries:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.0.1.tgz
     version: 1.0.1
   - apiVersion: v1
-    created: "2021-04-19T16:05:06.267167-04:00"
+    created: "2021-05-10T06:47:31.484543177Z"
     dependencies:
     - condition: traefik.enabled
       name: traefik
@@ -1691,4 +1762,4 @@ entries:
     urls:
     - https://pegasystems.github.io/pega-helm-charts/pega-1.0.0.tgz
     version: 1.0.0
-generated: "2021-04-19T16:05:06.043163-04:00"
+generated: "2021-05-10T15:04:41.203141172Z"
