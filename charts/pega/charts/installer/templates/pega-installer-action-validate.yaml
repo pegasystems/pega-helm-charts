@@ -1,0 +1,6 @@
+{{- if (eq (include "performUpgrade" .) "true") }}
+{{- $validUpgradeType := list "in-place" "out-of-place" }}
+{{- if not (has .Values.upgrade.upgradeType $validUpgradeType) }}
+{{- fail "Upgrade Type  value is not correct. The valid values are 'in-place' 'out-of-place'" }}
+{{- end }}
+{{- end }}

@@ -1,0 +1,5 @@
+dependencies:
+- name: elasticsearch
+  version: "7.9.3"
+  repository: https://helm.elastic.co/
+  condition: srs.srsStorage.provisionInternalESCluster

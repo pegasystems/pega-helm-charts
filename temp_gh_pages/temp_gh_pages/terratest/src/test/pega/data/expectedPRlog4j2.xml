@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="warn">
+	<Appenders>
+	
+		<Console name="CONSOLE" target="SYSTEM_OUT">   						  
+			<PatternLayout pattern="%d [%20.20t] [%10.10X{pegathread}] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n"/>
+			<Filters>
+                <!--Deny message logged under ALERT log level-->
+                <ThresholdFilter level="ALERT" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>
+		</Console>
+		
+		<RollingRandomAccessFile  name="PEGA" fileName="@CURR_DIR/logs/PRPC-RuleInstaller-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PRPC-RuleInstaller-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout>
+				<Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+			</PatternLayout>
+			<Filters>
+                <!--Deny message logged under ALERT log level-->
+                <ThresholdFilter level="ALERT" onMatch="DENY" onMismatch="NEUTRAL"/>
+            </Filters>		
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile >   
+		
+		
+		<!-- RollingFile Appender for pegarules PERFORMANCE Alert logs -->
+		<RollingRandomAccessFile  name="ALERT" fileName="@CURR_DIR/logs/PRPC-RuleInstaller-ALERT-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PRPC-RuleInstaller-ALERT-%d{yyyy-MM-dd}.%i.log.gz">
+			<PatternLayout>
+				<Pattern>%m%n</Pattern>
+			</PatternLayout>
+			<ThreadContextMapFilter onMatch="DENY" onMismatch="NEUTRAL" operator="or">
+				<KeyValuePair key="alertType" value="security"/>
+			</ThreadContextMapFilter>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+		</RollingRandomAccessFile >
+
+		<!-- RollingFile Appender for PegaRULES-ALERTSECURITY logs -->
+		<RollingRandomAccessFile name="ALERTSECURITY" fileName="@CURR_DIR/logs/PRPC-RuleInstaller-ALERTSECURITY-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PRPC-RuleInstaller-ALERTSECURITY-%d{yyyy-MM-dd}-%i.log.gz">	
+			<PatternLayout>
+				<Pattern>%m%n</Pattern>
+			</PatternLayout>
+			<ThreadContextMapFilter onMatch="ACCEPT" onMismatch="DENY" operator="or">
+				<KeyValuePair key="alertType" value="security"/>
+			</ThreadContextMapFilter>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+		</RollingRandomAccessFile>
+		
+		<!-- Specific appenders for prdeploy project -->
+		<RollingRandomAccessFile  name="SERVICES-PAL" fileName="@CURR_DIR/logs/PRPC_RuleInstaller-SERVICES-PAL-${date:yyyy-MM-dd}.csv" filePattern="@CURR_DIR/logs/PRPC_RuleInstaller-SERVICES-PAL-%d{yyyy-MM-dd}-%i.csv.log.gz">
+			<PatternLayout>
+				<Pattern>%8r [%t] %-5p %c - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile> 
+		
+		<!-- Subsititute for upgrade appender -->
+		
+		<RollingRandomAccessFile  name="UPGRADE" fileName="@CURR_DIR/logs/PRPC-RuleUpgradeActions-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PRPC-RuleUpgradeActions-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout>
+				<Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile> 
+		
+		<RollingRandomAccessFile  name="SIBLINGCLEANER" fileName="@CURR_DIR/logs/PRPC-SupersededSiblings-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PRPC-SupersededSiblings-%d{yyyy-MM-dd}-%i.log.gz">
+			<PatternLayout>
+				<Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="250 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="20"/>
+		</RollingRandomAccessFile>
+
+		<!-- RollingFile Appender for PegaCLUSTER logs -->
+		<RollingRandomAccessFile  name="CLUSTER" fileName="@CURR_DIR/logs/PegaCLUSTER-${date:yyyy-MM-dd}.log" filePattern="@CURR_DIR/logs/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
+			<PatternLayout>
+				<Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy />
+				<SizeBasedTriggeringPolicy size="50 MB"/>
+			</Policies>
+		</RollingRandomAccessFile>
+		
+	</Appenders>
+	
+	<Loggers>
+		<asyncRoot>
+			<AppenderRef ref="CONSOLE"/>
+			<AppenderRef ref="PEGA"/>
+			<AppenderRef ref="ALERT" level="ALERT"/>		
+			<AppenderRef ref="ALERTSECURITY" level="ALERT"/>													
+		</asyncRoot>
+		
+		<Logger name="com.pega.pegarules.deploy.internal.util.SyncRptGenerator" level="info" additivity="false">
+	     <AppenderRef ref="UPGRADE"/>
+	    </Logger>
+	    
+	    <Logger name="com.pega.pegarules.deploy.internal.archive.importer.synchronization.SiblingRulesCleanupSynchronizer" level="info" additivity="false">
+	     <AppenderRef ref="SIBLINGCLEANER"/>
+	     <AppenderRef ref="CONSOLE"/>
+	    </Logger>
+	    
+	    <Logger name="ServicePAL" level="info" additivity="false">
+	     <AppenderRef ref="SERVICES-PAL"/>
+	    </Logger>
+	    
+	    <Logger name="com.pega.pegarules.engine.database.DatabasePreparedStatement" level="warn">
+	    </Logger>
+	    
+	    <Logger name="com.pega.pegarules.engine.database.ImpExpLog" level="info">
+	    </Logger>
+
+		<Logger name="com.pega.pegarules.deploy.external.maintenance.MaintenanceDownloader" level="info">
+		</Logger>
+
+		<Logger name="com.hazelcast" additivity="false" level="info">
+			<AppenderRef ref="CLUSTER"/>
+		</Logger>
+
+		<Logger name="com.pega.hazelcast" additivity="false" level="info">
+			<AppenderRef ref="CLUSTER"/>
+		</Logger>
+
+	</Loggers>
+	
+</Configuration>

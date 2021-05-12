@@ -1,0 +1,11 @@
+{{ if (eq (include "performInstall" .) "true") }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBInstall" .) "action" "install" }}
+{{ end }}
+{{ if (eq (include "performOnlyUpgrade" .) "true") }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" }}
+{{ end }}
+{{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaPostDBUpgrade" .) "action" "post-upgrade" "initContainers" (list "waitForPegaDBUpgrade" "waitForRollingUpdates") }}
+{{ end }}

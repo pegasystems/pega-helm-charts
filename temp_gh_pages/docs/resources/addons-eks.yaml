@@ -1,0 +1,38 @@
+---
+
+# When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+aws-load-balancer-controller:
+  enabled: true
+  ## Resources created by the ALB Ingress controller will be prefixed with this string.
+  clusterName: "YOUR_EKS_CLUSTER_NAME"
+  ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod.
+  region: "YOUR_EKS_CLUSTER_REGION"
+   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod.
+  VpcID: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
+  ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
+  ## and attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
+
+traefik:
+  enabled: false
+
+deploy_efk: &deploy_efk false
+
+elasticsearch:
+  enabled: *deploy_efk
+
+kibana:
+  enabled: *deploy_efk
+
+fluentd-elasticsearch:
+  enabled: *deploy_efk
+
+metrics-server:
+  enabled: false
+
+ingress-azure:
+  enabled: false
+

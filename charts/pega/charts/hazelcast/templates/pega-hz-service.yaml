@@ -1,0 +1,21 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isHazelcastEnabled" .) "true") }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "hazelcastName" . }}-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "hazelcastName" . }}
+    component: Pega
+  annotations:
+{{- include "generatedHazelcastServiceAnnotations" . | indent 8 }}
+spec:
+  ports:
+  - name: hazelcast
+    port: 5701
+    targetPort: 5701   
+  clusterIP: None
+  selector:
+    app: {{ template "hazelcastName" . }}
+    component: Hazelcast
+{{ end }}
