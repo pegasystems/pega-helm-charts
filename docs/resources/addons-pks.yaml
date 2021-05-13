@@ -1,0 +1,87 @@
+---
+# Traefik load balancer parameters - enable for deployments in Pivotal PKS environments.
+
+traefik:
+  enabled: true
+  # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
+  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
+  # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
+  serviceType: LoadBalancer
+  # If enabled is set to "true", ssl will be enabled for Traefik
+  ssl:
+    enabled: false
+  rbac:
+    enabled: true
+  service:
+    nodePorts:
+      # NodePorts for Traefik service.
+      http: 30080
+      https: 30443
+  resources:
+    requests:
+      # Enter the CPU Request for Traefik
+      cpu: 200m
+      # Enter the memory request for Traefik
+      memory: 200Mi
+    limits:
+      # Enter the CPU Limit for Traefik
+      cpu: 500m
+      # Enter the memory limit for Traefik
+      memory: 500Mi
+
+# Configure EFK stack for logging in Pivotal PKS environments:
+# For a complete EFK stack: elasticsearch, fluentd-elasticsearch, and kibana should all be enabled
+# Pega recommends deploying EFK only on k8s
+# On Openshift, see https://docs.openshift.com/container-platform/3.11/install_config/aggregate_logging.html
+# On EKS, see https://eksworkshop.com/logging/
+
+deploy_efk: &deploy_efk true
+
+elasticsearch:
+  enabled: *deploy_efk
+  # Set any additional elastic search parameters. These values will be used by elasticsearch helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml
+  #
+  # If you need to change this value then you will also need to replace the same
+  # part of the value within the following properties further below:
+  #
+  #   kibana.files.kibana.yml.elasticsearch.url
+  #   fluentd-elasticsearch.elasticsearch.host
+  #
+  fullnameOverride: "elastic-search"
+
+kibana:
+  enabled: *deploy_efk
+  # Set any additional kibana parameters. These values will be used by Kibana's helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/kibana/values.yaml
+  files:
+    kibana.yml:
+      elasticsearch.url: http://elastic-search-client:9200
+  service:
+    externalPort: 80
+  ingress:
+    # If enabled is set to "true", an ingress is created to access kibana.
+    enabled: true
+    # Enter the domain name to access kibana via a load balancer.
+    hosts:
+      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
+
+fluentd-elasticsearch:
+  enabled: *deploy_efk
+  # Set any additional fluentd-elasticsearch parameters. These values will be used by fluentd-elasticsearch's helm chart.
+  # See https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml
+  elasticsearch:
+    host: elastic-search-client
+    buffer_chunk_limit: 250M
+    buffer_queue_limit: 30
+
+# The following parameters are not used in Pivotal PKS environments so they are set to false. Enable any of them if your deployment requires the use of one.
+
+aws-alb-ingress-controller:
+  enabled: false
+
+metrics-server:
+  enabled: false
+
+ingress-azure:
+  enabled: false
