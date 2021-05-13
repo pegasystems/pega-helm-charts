@@ -14,6 +14,7 @@ curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
 git clone --single-branch --branch gh-pages https://github.com/${TRAVIS_REPO_SLUG} temp_gh_pages
 cp temp_gh_pages/* .
 rm -rf temp_gh_pages
+ls
 # Package up the changed version
 helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
