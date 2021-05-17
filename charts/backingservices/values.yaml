@@ -29,10 +29,18 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
+    # Currently the elasticsearch connection is supported with Basic Authentication  and AWS IAM Role based Authentication .
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
+    # If externally managed Elasticsearch cluster is authenticated with Basic Authentication then please set below srs.srsStorage.basicAuthentication's srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password values
+    # basicAuthentication:
+    #   username: "BASIC_AUTH_USERNAME"
+    #   password: "BASIC_AUTH_PASSWORD"
+    # If externally managed AWS Elasticsearch cluster is authenticated with AWS IAM Role then please set below srs.srsStorage.awsIAM's srs.srsStorage.awsIAM.region value
+    # awsIAM:
+    #   region: "AWS_ELASTICSEARCH_REGION"
+
 #    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
 #    requireInternetAccess: true
 
@@ -47,6 +55,24 @@ elasticsearch:
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
+  protocol: http
+  # This section specifies the elasticsearch cluster configuration for authentication.
+  esConfig:
+    elasticsearch.yml: |
+      xpack.security.enabled: true
+      xpack.security.transport.ssl.enabled: true
+  #Extra Environmental Variables for elasticsearch basic authentication , Values are read from Secrets
+  extraEnvs:
+    - name: ELASTIC_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: srs-elastic-credentials
+          key: password
+    - name: ELASTIC_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: srs-elastic-credentials
+          key: username
   resources:
     requests:
       cpu: "1000m"
