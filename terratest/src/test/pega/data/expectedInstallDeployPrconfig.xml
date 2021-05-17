@@ -15,4 +15,7 @@
         for this node.  This is useful for settings which are specific to this node and should not be shared by multiple nodes on this
         system. -->
 
+        <!-- Flag to notify that hazelcast version 4 is enabled -->
+        <env name="cluster/hazelcast/v4/enabled" value="true" type="java.lang.String"/>
+
 </pegarules>

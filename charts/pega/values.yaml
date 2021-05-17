@@ -6,6 +6,10 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "pega"
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -102,17 +106,25 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       # Optionally overridde default resource specifications
       # cpuRequest: 2
-      # memRequest: "6Gi"
+      # memRequest: "12Gi"
       # cpuLimit: 4
-      # memLimit: "8Gi"
+      # memLimit: "12Gi"
       # initialHeap: "4096m"
-      # maxHeap: "7168m"
+      # maxHeap: "8192m"
+
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -131,9 +143,17 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -168,6 +188,14 @@ global:
           # useManagedCertificate: false
           # ssl_annotation:
 
+      livenessProbe:
+        port: 8081
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
       replicas: 2
 
       volumeClaimTemplate:
@@ -197,10 +225,16 @@ dds:
   port: "9042"
   username: "dnode_ext"
   password: "dnode_ext"
+  clientEncryption: false
+  trustStore: ""
+  trustStorePassword: ""
+  keyStore: ""
+  keyStorePassword: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
@@ -219,3 +253,15 @@ installer:
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
+
+# Hazelcast settings (applicable from Pega 8.6)
+hazelcast:
+  image: "YOUR_HAZELCAST_IMAGE:TAG"
+  # Setting below to true will deploy the infinity in client server hazelcast mode
+  enabled: false
+  # No. of initial members to join
+  replicas: 3
+  # UserName to be used in client server hazelcast mode for authentication
+  username: ""
+  # Password to be used in client server hazelcast mode for authentication
+  password: ""

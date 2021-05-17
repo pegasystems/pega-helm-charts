@@ -103,17 +103,17 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
 
       # Optionally overridde default resource specifications
       # cpuRequest: 2
-      # memRequest: "6Gi"
+      # memRequest: "12Gi"
       # cpuLimit: 4
-      # memLimit: "8Gi"
+      # memLimit: "12Gi"
       # initialHeap: "4096m"
-      # maxHeap: "7168m"
+      # maxHeap: "8192m"
 
       hpa:
         enabled: true
@@ -132,8 +132,8 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
 
       hpa:

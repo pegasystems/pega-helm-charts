@@ -1,0 +1,25 @@
+---
+# Default values for srs-search.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+enabled: true
+deploymentName: pega-shared-srs
+
+# srs-service configuration
+srsRuntime:
+  replicaCount: 2
+  # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
+  srsImage: "YOUR_SRS_IMAGE:TAG"
+  imagepullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1300m
+      memory: "2Gi"
+    requests:
+      cpu: 650m
+      memory: "2Gi"
+  serviceType: "ClusterIP"
+  env:
+    # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
+    AuthEnabled: false
+    PublicKeyURL:

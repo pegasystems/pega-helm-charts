@@ -7,6 +7,10 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "pega"
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -104,14 +108,19 @@ global:
 
       replicas: 1
       javaOpts: ""
+      # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
+      catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -130,9 +139,12 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -171,6 +183,9 @@ global:
       replicas: 2
       javaOpts: ""
 
+      livenessProbe:
+        port: 8081
+
       volumeClaimTemplate:
         resources:
           requests:
@@ -189,9 +204,12 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -208,9 +226,12 @@ global:
 
       deploymentStrategy:
         rollingUpdate:
-          maxSurge: 25%
-          maxUnavailable: 25%
+          maxSurge: 1
+          maxUnavailable: 0
         type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
 
       hpa:
         enabled: true
@@ -241,6 +262,7 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"

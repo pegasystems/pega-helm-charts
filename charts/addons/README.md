@@ -44,30 +44,26 @@ traefik:
 
 ### Amazon ALB
 
-When deploying on EKS, you can use the native Amazon Load Balancer (ALB). In the Addons Helm chart: disable Traefik (set `traefik.enabled` to `false`) and enable ALB (set `aws-alb-ingress-controller.enabled` to `true`)
+When deploying on AWS EKS, set the parameters, install `aws-load-balancer-controller.enabled` and `metrics-server` to true, `traefik` to false and then fill in the remaining parameters with your EKS environment details.
 
 Configuration   | Usage
 ---             | ---
 `clusterName`   | The name of your EKS cluster.  Resources created by the ALB Ingress controller will be prefixed with this string.
-`autoDiscoverAwsRegion` | Auto discover awsRegion from ec2metadata, set this to true and omit awsRegion when ec2metadata is available.
-`awsRegion`     | AWS region of the EKS cluster. Required if if ec2metadata is unavailable from the controller Pod or if `autoDiscoverAwsRegion` is not `true`.
-`autoDiscoverAwsVpcID` | Auto discover awsVpcID from ec2metadata, set this to true and omit awsVpcID when ec2metadata is available.
-`awsVpcID`      | VPC ID of EKS cluster, required if ec2metadata is unavailable from controller pod. Required if if ec2metadata is unavailable from the controller Pod or if `autoDiscoverAwsVpcID` is not `true`.
-`extraEnv.AWS_ACCESS_KEY_ID` and `extraEnv.AWS_SECRET_ACCESS_KEY` | The access key and secret access key with access to configure AWS resources.
+`region`     | AWS region of the EKS cluster. Required if if ec2metadata is unavailable from the controller Pod.
+`vpcId`      | VPC ID of EKS cluster, required if ec2metadata is unavailable from controller pod.
+`serviceAccount.annotations`  | Annotate the service account with `eks.amazonaws.com/role-arn` IAM Role that provides access to AWS resources.
 
 Example:
 
 ```yaml
-aws-alb-ingress-controller:
-  enabled: false
+aws-load-balancer-controller:
+  enabled: true
   clusterName: "YOUR_EKS_CLUSTER_NAME"
-  autoDiscoverAwsRegion: true
-  awsRegion: "YOUR_EKS_CLUSTER_REGION"
-  autoDiscoverAwsVpcID: true
-  awsVpcID: "YOUR_EKS_CLUSTER_VPC_ID"
-  extraEnv:
-    AWS_ACCESS_KEY_ID: "YOUR_AWS_ACCESS_KEY_ID"
-    AWS_SECRET_ACCESS_KEY: "YOUR_AWS_SECRET_ACCESS_KEY"
+  region: "YOUR_EKS_CLUSTER_REGION"
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
 ```
 
 ### Azure AGIC

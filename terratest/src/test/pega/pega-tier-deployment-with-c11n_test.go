@@ -14,29 +14,32 @@ func TestConstellation(t *testing.T) {
 
 	var supportedVendors = []string{"k8s"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
-		helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-		require.NoError(t, err)
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-			var constellationOptions = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"constellation.enabled":  "true",
-				},
-			}
-	deploymentYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-	yamlSplit := strings.Split(deploymentYaml, "---")			
-	assertWeb(t,yamlSplit[1],constellationOptions)
-	assertBatch(t,yamlSplit[2],constellationOptions)
-	assertStream(t,yamlSplit[3],constellationOptions)
-	ingressYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
-	assertPegaTierIngress(t, ingressYaml, constellationOptions)
-	
-  }
- }
+		    for _, depName := range deploymentNames {
+                var constellationOptions = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                        "constellation.enabled":  "true",
+                    },
+                }
+                deploymentYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+                yamlSplit := strings.Split(deploymentYaml, "---")
+                assertWeb(t,yamlSplit[1],constellationOptions)
+                assertBatch(t,yamlSplit[2],constellationOptions)
+                assertStream(t,yamlSplit[3],constellationOptions)
+                ingressYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+                assertPegaTierIngress(t, ingressYaml, constellationOptions)
+	        }
+        }
+    }
 }
 
 func assertPegaTierIngress(t *testing.T, ingressYaml string, options *helm.Options ) {

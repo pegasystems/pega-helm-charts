@@ -1,3 +1,5 @@
+{{ $depName := printf "%s" (include "deploymentName" $) }}
+
 {{ $kindName := "" }}
 {{ $apiVer := "" }}
 {{ range $index, $dep := .Values.global.tier}}
@@ -9,9 +11,12 @@
 {{ $apiVer = "apps/v1" }}
 {{ end }}
 
+
 {{ $containerWaitList := list  }}
 {{ if (eq (include "performOnlyDeployment" $) "true") }}
+{{ if not $.Values.pegasearch.externalSearchService }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ end }}
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
 {{ end }}
@@ -19,7 +24,9 @@
 
 {{ if (eq (include "performInstallAndDeployment" $) "true") }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaDBInstall" }} 
+{{ if not $.Values.pegasearch.externalSearchService }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
+{{ end }}
 {{ if (eq (include "cassandraEnabled" $) "true" ) }}
 {{ $containerWaitList = append $containerWaitList "waitForCassandra" }}
 {{ end }}
@@ -30,6 +37,6 @@
 {{ end }}
 
 {{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
-{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "pega-%s" $dep.name) "tierName" $dep.name "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
+{{ template "pega.deployment" dict "root" $ "node" $dep "name" (printf "%s-%s" $depName $dep.name) "tierName" $dep.name "kind" $kindName "apiVersion" $apiVer "nodeType" $dep.nodeType "initContainers" $containerWaitList "custom" $dep.custom }}
 {{- end }}
 {{ end }}

@@ -16,6 +16,7 @@ import (
 func TestPegaTierIngress(t *testing.T){
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
 	var supportedVendors = []string{"k8s","eks","gke","aks","pks"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,18 +26,21 @@ func TestPegaTierIngress(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+                for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
-			VerifyPegaIngresses(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+                VerifyPegaIngresses(t, yamlContent, options)
+			}
 		}
 	}
 
@@ -52,11 +56,11 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 			UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}, 1020},
+					pegaIngress{getObjName(options, "-web"), intstr.IntOrString{IntVal: 80}, 1020},
 					options)
 			} else {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, 1020},
+					pegaIngress{getObjName(options, "-stream"), intstr.IntOrString{IntVal: 7003}, 1020},
 					options)
 			}
 
@@ -65,6 +69,7 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 }
 
 func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress, options *helm.Options) {
+    require.Equal(t, ingressObj.ObjectMeta.Name, expectedIngress.Name)
 	provider := options.SetValues["global.provider"]
 	if provider == "eks" {
 		VerifyEKSIngress(t, ingressObj, expectedIngress)
@@ -82,8 +87,8 @@ func VerifyEKSIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngr
 	require.Equal(t, "[{\"HTTP\": 80}, {\"HTTPS\": 443}]", ingressObj.Annotations["alb.ingress.kubernetes.io/listen-ports"])
 	require.Equal(t, "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}", ingressObj.Annotations["alb.ingress.kubernetes.io/actions.ssl-redirect"])
 	require.Equal(t, "internet-facing", ingressObj.Annotations["alb.ingress.kubernetes.io/scheme"])
-	expectedStickiness := fmt.Sprint("stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=", expectedIngress.AlbStickiness)
-	require.Equal(t, expectedStickiness,
+	expectedStickinessAndALBAlgo := fmt.Sprint("load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds=", expectedIngress.AlbStickiness)
+	require.Equal(t, expectedStickinessAndALBAlgo,
 		ingressObj.Annotations["alb.ingress.kubernetes.io/target-group-attributes"])
 	require.Equal(t, "ip", ingressObj.Annotations["alb.ingress.kubernetes.io/target-type"])
 	require.Equal(t, "ssl-redirect", ingressObj.Spec.Rules[0].HTTP.Paths[0].Backend.ServiceName)

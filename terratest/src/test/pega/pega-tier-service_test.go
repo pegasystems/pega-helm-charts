@@ -16,6 +16,7 @@ import (
 func TestPegaTierService(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,18 +26,21 @@ func TestPegaTierService(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
-			VerifyPegaServices(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
+                VerifyPegaServices(t, yamlContent, options)
+            }
 		}
 	}
 
@@ -49,10 +53,13 @@ func VerifyPegaServices(t *testing.T, yamlContent string, options *helm.Options)
 	for index, serviceInfo := range serviceSlice {
 		if index >= 1 && index <= 2 {
 			UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
+
 			if index == 1 {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-web", int32(80), intstr.IntOrString{IntVal: 8080}}, options)
+			    require.Equal(t, getObjName(options, "-web"), pegaServiceObj.ObjectMeta.Name)
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{getObjName(options, "-web"), int32(80), intstr.IntOrString{IntVal: 8080}}, options)
 			} else {
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{"pega-stream", int32(7003), intstr.IntOrString{IntVal: 7003}}, options)
+			    require.Equal(t, getObjName(options, "-stream"), pegaServiceObj.ObjectMeta.Name)
+				VerifyPegaService(t, &pegaServiceObj, pegaServices{getObjName(options, "-stream"), int32(7003), intstr.IntOrString{IntVal: 7003}}, options)
 			}
 		}
 	}
@@ -69,7 +76,7 @@ func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedServic
 		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
 	} else if provider == "gke" {
 		require.Equal(t, `{"ingress": true}`, serviceObj.Annotations["cloud.google.com/neg"])
-		var expectedBackendConfig = fmt.Sprintf(`{"ports": {"%d": "pega-backend-config"}}`, expectedService.Port)
+		var expectedBackendConfig = fmt.Sprintf(`{"ports": {"%d": "%s"}}`, expectedService.Port, expectedService.Name)
 		require.Equal(t, expectedBackendConfig, serviceObj.Annotations["beta.cloud.google.com/backend-config"])
 		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("NodePort"))
 	}

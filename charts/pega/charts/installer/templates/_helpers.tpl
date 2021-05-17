@@ -10,6 +10,8 @@
 {{- define "pegaUpgradeEnvironmentConfig" -}}pega-upgrade-environment-config{{- end -}}
 {{- define "pegaDistributionKitVolume" -}}pega-distribution-kit-volume{{- end -}}
 
+{{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
 {{- define "performInstall" }}
   {{- if or (eq .Values.global.actions.execute "install") (eq .Values.global.actions.execute "install-deploy") -}}
     true
@@ -54,6 +56,8 @@
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
+{{- $deploymentName := printf "%s-" (include "installerDeploymentName" $) -}}
+{{- $deploymentNameRegex := printf "%s- " (include "installerDeploymentName" $) -}}
 {{- $rolloutCommand := "" }}
 {{- $kindName := "" }}
 {{- $lastIndex := sub (len .Values.global.tier) 1 }}
@@ -64,14 +68,14 @@
 {{- else -}}
 {{- $kindName = "deployment" }}
 {{- end }}
-{{- $constructCommand := cat "kubectl rollout status" $kindName "/" "pega-" $dep.name "--namespace" $namespace }}
+{{- $constructCommand := cat "kubectl rollout status" $kindName "/" $deploymentName $dep.name "--namespace" $namespace }}
 {{- if ne $index $lastIndex }}
 {{- $rolloutCommand = cat $rolloutCommand $constructCommand "&&" }}
 {{- else }}
 {{- $rolloutCommand = cat $rolloutCommand $constructCommand }}
 {{- end }}
 {{- $rolloutCommand = regexReplaceAllLiteral " / " $rolloutCommand "/" }}
-{{- $rolloutCommand = regexReplaceAllLiteral "pega- " $rolloutCommand "pega-" }}
+{{- $rolloutCommand = regexReplaceAllLiteral $deploymentNameRegex $rolloutCommand $deploymentName }}
 {{- end -}}
 - name: wait-for-rolling-updates
   image: dcasavant/k8s-wait-for
