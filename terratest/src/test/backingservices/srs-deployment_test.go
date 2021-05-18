@@ -166,8 +166,17 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "ELASTICSEARCH_PROTO", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.elasticsearchEndPoint.protocol, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
-	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
+	require.Equal(t, "ELASTICSEARCH_AUTH_PROVIDER", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "none", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_REGION", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "NONE", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "NONE", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "NONE", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	require.Equal(t, "APPLICATION_PORT", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8080", pod.Containers[0].Env[envIndex].Value)
