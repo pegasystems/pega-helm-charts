@@ -182,6 +182,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.NotEmpty(t, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	}
+	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
+    require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
+    envIndex++
 	require.Equal(t, "APPLICATION_PORT", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8080", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
