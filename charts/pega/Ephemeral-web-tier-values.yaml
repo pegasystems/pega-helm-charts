@@ -8,7 +8,7 @@ global:
 
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
-    name: "pega"
+    name: "ephemeral"
 
   # Deploy Pega nodes
   actions:
@@ -162,8 +162,6 @@ global:
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
 # Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section
-#Search in not enabled for ephemeral web tier. Replicas should be zero.
 pegasearch:
   image: "pegasystems/search"
-  replicas: 0
-  externalURL: "http://pega-search"
+  replicas: 1
