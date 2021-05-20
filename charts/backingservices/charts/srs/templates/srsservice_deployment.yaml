@@ -43,11 +43,11 @@ spec:
               value:  {{ template "elasticsearch.protocol" . }}
             - name: ELASTICSEARCH_AUTH_PROVIDER
               value: {{ template "elasticsearch.authProvider" .}}
-            {{if eq (include "elasticsearch.authProvider" $) "aws-iam" }}
+            {{- if eq (include "elasticsearch.authProvider" $) "aws-iam" }}
             - name: ELASTICSEARCH_REGION
               value: {{ template "elasticsearch.region" .}}
-            {{end}}
-            {{if eq (include "elasticsearch.authProvider" $) "basic-authentication" }}
+            {{- end}}
+            {{- if eq (include "elasticsearch.authProvider" $) "basic-authentication" }}
             - name: ELASTICSEARCH_USERNAME
               valueFrom:
                 secretKeyRef:
@@ -58,7 +58,7 @@ spec:
                 secretKeyRef:
                   name: srs-elastic-credentials
                   key: password
-            {{end}}
+            {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
             - name: APPLICATION_PORT

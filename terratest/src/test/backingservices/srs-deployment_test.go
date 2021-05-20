@@ -169,12 +169,12 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "ELASTICSEARCH_AUTH_PROVIDER", pod.Containers[0].Env[envIndex].Name)
 	require.NotEmpty(t, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
-	if "aws-iam" == pod.Containers[0].Env[envIndex].Value {
+	if "aws-iam" == pod.Containers[0].Env[envIndex].Value.String() {
 	require.Equal(t, "ELASTICSEARCH_REGION", pod.Containers[0].Env[envIndex].Name)
 	require.NotEmpty(t,pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	}
-	if "basic-authentication" == pod.Containers[0].Env[envIndex].Value {
+	if "basic-authentication" == pod.Containers[0].Env[envIndex].Value.String() {
 	require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
 	require.NotEmpty(t, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
