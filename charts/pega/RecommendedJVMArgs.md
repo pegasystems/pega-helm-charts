@@ -55,21 +55,3 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **JVM default**: No GC logs will be emitted by default.<br>
 **Pega Recommendation**: Set to allow GC logs to be collected. Currently, the log rotation policy is set to 3 log files with maximum of 2MB each.<br>
 <br>
-##### Few more arguments:
-**Flag**: `-XX:MaxGCPauseMillis=n`<br>
-**Purpose**: Sets the peak pause time for GC to happen.<br>
-**JVM default**: 200 milliseconds<br>
-**Pega Recommendation**: Set to higher value for BATCH pods for better throughput.
-<br>
-
-**Flag**: `-XX:StringTableSize=n`<br>
-**Purpose**: Sets the number of hash-buckets to be used in string pool for accommodating Strings<br>
-**JVM default**: 65536, the default Hash bucket size of the JVM String pool <br>
-**Pega Recommendation**: Tune this based on requirements.<br>
-
-
-
-
-
-
-
