@@ -472,9 +472,7 @@ Parameter           | Description    | Default value
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
 `hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.8` which represents 2.8 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.8`
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (Can be set instead of `hpa.targetAverageCPUValue` to set the threshold as a percentage of the requested CPU) | 
-`hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 12Gi ) | `85`
-`hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
-`hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
+`hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true 
 
 ### Volume claim template
 

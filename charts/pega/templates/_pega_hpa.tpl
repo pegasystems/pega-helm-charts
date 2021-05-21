@@ -38,19 +38,7 @@ spec:
         averageValue: 2.8
         {{- end }}
   {{- end }}
-  {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget false) }}
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        {{- if .hpa.targetAverageMemoryUtilization }}
-        averageUtilization: {{ .hpa.targetAverageMemoryUtilization }}
-        {{- else }}
-        averageUtilization: 85
-        {{- end }}
-  {{- end }}
-  
+
 ---
 {{- end -}}
 {{- end -}}

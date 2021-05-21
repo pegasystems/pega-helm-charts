@@ -92,14 +92,6 @@ func TestPegaTierHPADisableTarget(t *testing.T) {
 			    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_disabletarget.yaml")
                 verifyPegaHPAs(t, yamlContent, options, []hpa{
                     {
-                        name:          getObjName(options, "-web-hpa"),
-                        targetRefName: getObjName(options, "-web"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        mem:           true,
-                        memPercent:    85,
-                    },
-                    {
                         name:          getObjName(options, "-batch-hpa"),
                         targetRefName: getObjName(options, "-batch"),
                         kind:          "Deployment",
@@ -141,16 +133,6 @@ func TestPegaTierOverrideValues(t *testing.T) {
 
                 yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_overridevalues.yaml")
                 verifyPegaHPAs(t, yamlContent, options, []hpa{
-                    {
-                        name:          getObjName(options, "-web-hpa"),
-                        targetRefName: getObjName(options, "-web"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuValue:      parseResourceValue(t, "4.13"),
-                        mem:           true,
-                        memPercent:    42,
-                    },
                     {
                         name:          getObjName(options, "-batch-hpa"),
                         targetRefName: getObjName(options, "-batch"),
@@ -200,13 +182,6 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 		}
 		currentMetricIndex++
 	}
-	if expectedHpa.mem {
-		require.Equal(t, api.ResourceName("memory"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
-		require.Equal(t, autoscaling.MetricTargetType("Utilization"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.Type)
-		require.Equal(t, expectedHpa.memPercent, *hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.AverageUtilization)
-		currentMetricIndex++
-	}
-
 	require.Equal(t, int32(5), hpaObj.Spec.MaxReplicas)
 }
 
@@ -218,17 +193,11 @@ type hpa struct {
 	cpu           bool
 	cpuValue      resource.Quantity
 	cpuPercent    int32
-	mem           bool
-	memPercent    int32
 }
 
 func (h hpa) expectedMetricCount() int {
 	result := 0
 	if h.cpu {
-		result++
-	}
-
-	if h.mem {
 		result++
 	}
 
