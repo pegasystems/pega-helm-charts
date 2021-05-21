@@ -126,18 +126,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "elasticsearch.authProvider" -}}
-{{- if  and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM ) -}}
+{{- if (.Values.srsStorage.provisionInternalESCluster) -}}
 {{- "basic-authentication" }}
-{{- else if and  (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM ) -}}
-{{- "basic-authentication" }}
-{{- else if and  (.Values.srsStorage.awsIAM)  (not .Values.srsStorage.basicAuthentication ) -}}
-{{- "aws-iam"}}
-{{- else if and  (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM )}}
-{{- "none" }}
-{{- else if and ( .Values.srsStorage.basicAuthentication ) ( .Values.srsStorage.awsIAM )}}
-{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.basicAuthentication/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
-{{- else}}
-{{- fail "Please disable/comment Values.srsStorage.basicAuthentication or Values.srsStorage.awsIAM when '.Values.srsStorage.provisionInternalESCluster' is true" | quote  }}
+    {{- else }}
+        {{- if and  (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM ) -}}
+        {{- "basic-authentication" }}
+        {{- else if and  (.Values.srsStorage.awsIAM)  (not .Values.srsStorage.basicAuthentication ) -}}
+        {{- "aws-iam"}}
+        {{- else if and  (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM )}}
+        {{- "none" }}
+        {{- else if and ( .Values.srsStorage.basicAuthentication ) ( .Values.srsStorage.awsIAM )}}
+        {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.basicAuthentication/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+        {{- else}}
+        {{- fail "Please disable/comment Values.srsStorage.basicAuthentication or Values.srsStorage.awsIAM when '.Values.srsStorage.provisionInternalESCluster' is true" | quote  }}
+    {{- end }}
 {{- end }}
 {{- end }}
 
@@ -160,7 +162,6 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- randAlphaNum 20 | b64enc}}
 {{- else if and (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM) }}
 {{- .Values.srsStorage.basicAuthentication.password | b64enc }}
-{{- else if and (.Values.srsStorage.basicAuthentication) ( .Values.srsStorage.awsIAM)}}
 {{- end }}
 {{- end}}
 
