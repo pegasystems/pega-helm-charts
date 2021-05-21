@@ -25,7 +25,7 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **Flag**: `-XX:MaxMetaspaceSize=SIZE` <br>
 **Purpose**: Sets the maximum value the JVM Metaspace can occupy. Beyond this "Metaspace OutOfMemoryError" is thrown.<br>
 **JVM default**: 18446744073709486080 Bytes or Unbounded <br>
-**Pega Recommendation**: Unbounded(default), to ensure that "Metaspace OutOfMemoryError" exceptions do not occur.<br>
+**Pega Recommendation**:  If left Unbounded (default) then there is a risk that the kernel will run out of physical memory, and when this occurs the system will hang without an error message, and therefore will be difficult to diagnose after recovery since there will be no logging detail to investigate.  Setting MaxMetaspaceSize to a minimum of 768m should be large enough to ensure that "Metaspace OutOfMemoryError" exceptions do not occur, and at the same time will prevent the kernel out of memory and resulting system hang without error messages.<br>
 
 **Flag**: `-XX:+UseStringDeduplication` <br>
 **Purpose**: Maintains a single copy of String literals *aka Deduplication*, in case multiple Strings have the same literal value<br>
