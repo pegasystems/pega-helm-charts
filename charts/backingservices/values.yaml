@@ -33,18 +33,18 @@ srs:
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
-    # To configure authentication for the externally managed Elasticsearch cluster to use Basic Authentication then uncomment
-    # add the parameters, srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
+#     To configure authentication for the externally managed Elasticsearch cluster to use Basic Authentication then uncomment
+#     add the parameters, srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
 #    basicAuthentication:
 #      username: "BASIC_AUTH_USERNAME"
 #      password: "BASIC_AUTH_PASSWORD"
-    # To configure authentication for the externally managed Elasticsearch cluster to use an AWS IAM Role then uncomment and
-    # add the parameters, srs.srsStorage.awsIAM and srs.srsStorage.awsIAM.region
-    # srs.srsStorage.awsIAM's srs.srsStorage.awsIAM.region value
+#     To configure authentication for the externally managed Elasticsearch cluster to use an AWS IAM Role then uncomment and
+#     add the parameters, srs.srsStorage.awsIAM and srs.srsStorage.awsIAM.region
+#     srs.srsStorage.awsIAM's srs.srsStorage.awsIAM.region value
 #    awsIAM:
 #      region: "AWS_ELASTICSEARCH_REGION"
 
-    # set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
+#     set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
 #    requireInternetAccess: true
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
