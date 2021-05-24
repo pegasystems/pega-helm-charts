@@ -1,13 +1,13 @@
 package pega
 
 import (
-	"path/filepath"
-	"testing"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
+	"path/filepath"
 	"strings"
+	"testing"
 )
 
 func TestConstellation(t *testing.T) {
@@ -28,6 +28,7 @@ func TestConstellation(t *testing.T) {
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
                         "constellation.enabled":  "true",
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
                 deploymentYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
