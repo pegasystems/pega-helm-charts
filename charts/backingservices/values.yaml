@@ -41,7 +41,7 @@ srs:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  imageTag: 7.1.1
+  imageTag: 7.9.3
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.

@@ -56,7 +56,9 @@ The Pega patch application process takes at most 120 minutes total.
 To complete a zero downtime patch, you must configure the following settings in your existing Pega configuration files for your Pega Platform deployment:
 
 - Specify action.execute: upgrade-deploy to invoke the zero-downtime patch process.
-- Specify the schema name or names that will be upgraded. Since the process involves migrating rules to and from each schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.dataSchema: "YOUR_DATA_SCHEMA").
+- Specify the schema name or names that will be upgraded:
+   - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.dataSchema: "YOUR_DATA_SCHEMA")
+   - **For 8.2 and 8.3**: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave it blank).
 
 - Ensure one of the following:
   - You pushed the images for your patch to the same repository that you used for your installation repository and the credentials for your repository account are the same as those in your `pega` Helm chart.  
@@ -72,7 +74,7 @@ To complete a zero downtime patch, you must configure the following settings in 
   - Update the tagging details, including the version and date of your Pega-provided `platform/installer` Docker image, that you downloaded to support your patch.
   - Specify an `out-of-place` upgrade to apply a patch using the zero-downtime patch process.
   - Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes.
-
+  - For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank).
 You can leave the existing customized parameters as is; the patch process will use the remaining existing settings in your deployment.
 
 ### Updating the Pega configuration files to your Helm installation on your local system
@@ -94,6 +96,7 @@ Complete the following steps.
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
    | installer.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
    | installer.targetRulesSchema   | Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
+   | installer.targetDataSchema   | For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
 2. Save the file.
 
 ### Patch your Pega Platform deployment using the command line

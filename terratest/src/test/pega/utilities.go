@@ -68,7 +68,7 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container, option
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
-			require.Equal(t, []string{"job", "pega-db-upgrade"}, container.Args)
+			require.Equal(t, []string{"job", "pega-zdt-upgrade"}, container.Args)
 			aksSpecificUpgraderDeployEnvs(t, options, container)
 		} else if name == "wait-for-pre-dbupgrade" {
 			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
