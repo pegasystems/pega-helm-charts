@@ -25,6 +25,7 @@ func TestConstellationDeployment(t *testing.T) {
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"constellation.enabled":  "true",
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/constellation/templates/clln-deployment.yaml"})

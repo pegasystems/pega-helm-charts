@@ -1,6 +1,11 @@
-{{- if (eq (include "performUpgrade" .) "true") }}
-{{- $validUpgradeType := list "in-place" "out-of-place" }}
+{{- if (eq (include "performOnlyUpgrade" .) "true") }}
+{{- $validUpgradeType := list "in-place" "out-of-place" "zero-downtime" "custom" "out-of-place-rules" "out-of-place-data"}}
 {{- if not (has .Values.upgrade.upgradeType $validUpgradeType) }}
-{{- fail "Upgrade Type  value is not correct. The valid values are 'in-place' 'out-of-place'" }}
+{{- fail "Upgrade Type value is not correct for upgrade action. The valid values are 'in-place' 'out-of-place' 'zero-downtime' 'custom' 'out-of-place-rules' 'out-of-place-data' "  }}
+{{- end }}
+{{- end }}
+{{- if (eq (include "performUpgradeAndDeployment" .) "true") }}
+{{- if not (or (eq .Values.upgrade.upgradeType "zero-downtime") (eq .Values.upgrade.upgradeType "out-of-place")) }}
+{{- fail "Upgrade Type value is not correct for upgrade-deploy action. Supported value is 'zero-downtime' and @deprecated 'out-of-place' "  }}
 {{- end }}
 {{- end }}

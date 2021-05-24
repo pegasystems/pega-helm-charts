@@ -26,6 +26,7 @@ func TestPegaGKEBackendConfig(t *testing.T) {
 				    "global.deployment.name": depName,
 					"global.provider":        "gke",
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 			 	},
 		    }
 
