@@ -55,3 +55,8 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **JVM default**: No GC logs will be emitted by default.<br>
 **Pega Recommendation**: Set to allow GC logs to be collected. Currently, the log rotation policy is set to 3 log files with maximum of 2MB each.<br>
 <br>
+
+**Flag**: `-Duser.timezone=TIMEZONE`<br>
+**Purpose**: Sets the timezone the JVM will use.<br>
+**JVM default**: By default, the JVM obtains time zone from the operating system.  The Pega docker image is configured to Etc/UTC.<br>
+**Pega Recommendation**: Pega requires the JVM timezone to be the same as the timezone used by the database.   Set this if your database is not Etc/UTC.
