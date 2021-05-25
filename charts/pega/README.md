@@ -120,7 +120,7 @@ Specify the location for the Pega Docker image.  This image is available on Dock
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
-If using the image from DockerHub, it is recommended to specify the absolute image version along with the image name like `pegasystems/pega:8.4.4` since Kubernetes will pull the image tagged `latest` from DockerHub. This may cause problems especially since image version `8.6` has significant differences in the bootstrap process compared to older versions and is incompatible with a DB configured for version `8.4`. For this reason, it is also recommended to use the `docker.pega.imagePullPolicy: "IfNotPresent"` option in production, since it will ensure that a new generic tagged image will not overwrite the locally cached version.
+When you pull images from DockerHub, Pega recommends that you specify the absolute image version for the image name like `pegasystems/pega:8.x.y` instead of using the `latest` tag. The Pega repository makes the latest images available; however, clients should not pull any image tagged with `latest`. Pega also recommends that clients pull images using the `docker.pega.imagePullPolicy: "IfNotPresent"` for their "Production" deployments, since this setting ensures that a new generic tagged image cannot overwrite the locally cached version.
 
 Example:
 
