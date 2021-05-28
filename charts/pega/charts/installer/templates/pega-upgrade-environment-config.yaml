@@ -6,6 +6,8 @@ metadata:
   name: {{ template "pegaUpgradeEnvironmentConfig" }}
   namespace: {{ .Release.Namespace }}
 data:
+  # Temporary password for administrator@pega.com that is used to login after upgrading Pega Platform
+  ADMIN_PASSWORD: {{ .Values.adminPassword }}
   # Database Type for installation
   DB_TYPE: {{ .Values.global.jdbc.dbType }}
   # JDBC URL of the DB where Pega is installed
