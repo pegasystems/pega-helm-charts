@@ -29,7 +29,8 @@ node {
             packageName = currentBuild.displayName
             prNumber = "${env.BRANCH_NAME}".split("-")[1]
             chartVersion = "${prNumber}.${env.BUILD_NUMBER}"
-            
+            deployConfigsFileName = "deploy-config-${chartVersion}.tgz"
+            installerConfigsFileName = "installer-config-${chartVersion}.tgz"
             // Perform Chart packaging
             sh "helm dependency update ./charts/pega/"
             sh "helm dependency update ./charts/addons/"
@@ -37,6 +38,8 @@ node {
             sh "helm package --version ${chartVersion} ./charts/pega/"
             sh "helm package --version ${chartVersion} ./charts/addons/"
             sh "helm package --version ${chartVersion} ./charts/backingservices/"
+            sh "tar -czvf ${deployConfigsFileName} --directory=./charts/pega/config/deploy context.xml.tmp server.xml prconfig.xml prlog4j2.xml"
+            sh "tar -czvf ${installerConfigsFileName} --directory=./charts/pega/charts/installer/config/ migrateSystem.properties.tmpl prbootstrap.properties.tmpl prconfig.xml.tmpl prlog4j2.xml prpcUtils.properties.tmpl setupDatabase.properties.tmpl"
             
             // Publish helm charts to test-automation GitHub Pages
             withCredentials([usernamePassword(credentialsId: "helmautomation",
@@ -46,6 +49,8 @@ node {
                 sh "mv pega-${chartVersion}.tgz gh-pages/"
                 sh "mv addons-${chartVersion}.tgz gh-pages/"
                 sh "mv backingservices-${chartVersion}.tgz gh-pages/"
+                sh "mv ${deployConfigsFileName} gh-pages/"
+                sh "mv ${installerConfigsFileName} gh-pages/"
                 dir("gh-pages") {
                   sh "helm repo index --merge index.yaml --url https://pegaautomationuser.github.io/helmcharts/ ."   
                   sh "git config user.email pegaautomationuser@gmail.com"
