@@ -6,7 +6,9 @@ export CHART_VERSION=$(expr ${TRAVIS_TAG:1})
 export PEGA_FILE_NAME=pega-${CHART_VERSION}.tgz
 export ADDONS_FILE_NAME=addons-${CHART_VERSION}.tgz
 export BACKINGSERVICES_FILE_NAME=backingservices-${CHART_VERSION}.tgz
-cat descriptor-template.json | jq '.files[0].includePattern=env.PEGA_FILE_NAME' | jq '.files[0].uploadPattern=env.PEGA_FILE_NAME' | jq '.files[1].includePattern=env.ADDONS_FILE_NAME' | jq '.files[1].uploadPattern=env.ADDONS_FILE_NAME' | jq '.files[2].includePattern=env.BACKINGSERVICES_FILE_NAME' | jq '.files[2].uploadPattern=env.BACKINGSERVICES_FILE_NAME' > descriptor.json
+export DEPLOY_CONFIGURATIONS_FILE_NAME=deploy-config-${CHART_VERSION}.tgz
+export INSTALLER_CONFIGURATIONS_FILE_NAME=installer-config-${CHART_VERSION}.tgz
+cat descriptor-template.json | jq '.files[0].includePattern=env.PEGA_FILE_NAME' | jq '.files[0].uploadPattern=env.PEGA_FILE_NAME' | jq '.files[1].includePattern=env.ADDONS_FILE_NAME' | jq '.files[1].uploadPattern=env.ADDONS_FILE_NAME' | jq '.files[2].includePattern=env.BACKINGSERVICES_FILE_NAME' | jq '.files[2].uploadPattern=env.BACKINGSERVICES_FILE_NAME' | jq '.files[3].includePattern=env.DEPLOY_CONFIGURATIONS_FILE_NAME' | jq '.files[3].uploadPattern=env.DEPLOY_CONFIGURATIONS_FILE_NAME' | jq '.files[4].includePattern=env.INSTALLER_CONFIGURATIONS_FILE_NAME' | jq '.files[4].uploadPattern=env.INSTALLER_CONFIGURATIONS_FILE_NAME'  > descriptor.json
 # Get the latest index.yaml from github.io
 curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
 # Clone the versions from gh-pages to a temp directory - xyz
@@ -19,5 +21,7 @@ ls
 helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
 helm package --version ${CHART_VERSION} ./charts/backingservices/
+tar -czvf ${DEPLOY_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/config/deploy context.xml.tmp server.xml prconfig.xml prlog4j2.xml
+tar -czvf ${INSTALLER_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/charts/installer/config/ migrateSystem.properties.tmpl prbootstrap.properties.tmpl prconfig.xml.tmpl prlog4j2.xml prpcUtils.properties.tmpl setupDatabase.properties.tmpl
 # and merge it
 helm repo index --merge index.yaml --url https://pegasystems.github.io/pega-helm-charts/ .
