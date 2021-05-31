@@ -28,7 +28,8 @@ node {
             branchName = "${scmVars.GIT_BRANCH}"
             packageName = currentBuild.displayName
             prNumber = "${env.BRANCH_NAME}".split("-")[1]
-            chartVersion = ${prNumber}.${env.BUILD_NUMBER}
+            chartVersionString = "${prNumber}.${env.BUILD_NUMBER}"
+            chartVersion = "${chartVersionString}".toDouble()
             deployConfigsFileName = "deploy-config-${chartVersion}.tgz"
             installerConfigsFileName = "installer-config-${chartVersion}.tgz"
             // Perform Chart packaging
