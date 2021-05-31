@@ -6,7 +6,7 @@ node {
           if (env.CHANGE_ID) {
             pullRequest.labels.each{
             echo "label: $it"
-            validateProviderLabel(it)
+            validateLabels(it)
             labels += "$it,"
             }
             labels = labels.substring(0,labels.length()-1)
@@ -21,7 +21,7 @@ node {
             throw new Exception("Aborting as this is not a PR job")
          }
       }
-      stage ("Checkout and Package Charts") {
+      stage ("Checkout and Package Charts and ConfigFiles") {
 
             // Checkout PR Code
             def scmVars = checkout scm
@@ -64,25 +64,34 @@ node {
       }
 
       stage("Setup Cluster and Execute Tests") {
-          
-          jobMap = [:]
-          jobMap["job"] = "../kubernetes-test-orchestrator/master"
-          jobMap["parameters"] = [
-                                  string(name: 'PROVIDERS', value: labels),
-                                  string(name: 'WEB_READY_IMAGE_NAME', value: ""),
-                                  string(name: 'HELM_CHART_VERSION', value: chartVersion),
-                              ]
-          jobMap["propagate"] = true
-          jobMap["quietPeriod"] = 0 
-          resultWrapper = build jobMap
-          currentBuild.result = resultWrapper.result
+          prLabels = labels.toString().split(",")
+          when {
+              expression {
+                  prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks")
+              }
+          }
+          steps {
+              script {
+                  jobMap = [:]
+                  jobMap["job"] = "../kubernetes-test-orchestrator/master"
+                  jobMap["parameters"] = [
+                          string(name: 'PROVIDERS', value: labels),
+                          string(name: 'WEB_READY_IMAGE_NAME', value: ""),
+                          string(name: 'HELM_CHART_VERSION', value: chartVersion),
+                  ]
+                  jobMap["propagate"] = true
+                  jobMap["quietPeriod"] = 0
+                  resultWrapper = build jobMap
+                  currentBuild.result = resultWrapper.result
+              }
+          }
       } 
   }
 
-def validateProviderLabel(String provider){
-    def validProviders = ["integ-all","integ-eks","integ-gke","integ-aks"]
-    def failureMessage = "Invalid provider label - ${provider}. valid labels are ${validProviders}"
-    if(!validProviders.contains(provider)){
+def validateLabels(String label){
+    def validLabels = ["integ-all","integ-eks","integ-gke","integ-aks","configs"]
+    def failureMessage = "Invalid label - ${label}. valid labels are ${validLabels}"
+    if(!validLabels.contains(label)){
         currentBuild.result = 'FAILURE'
         pullRequest.comment("${failureMessage}")
         throw new Exception("${failureMessage}")
