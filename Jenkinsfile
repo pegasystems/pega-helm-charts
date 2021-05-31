@@ -65,13 +65,9 @@ node {
 
       stage("Setup Cluster and Execute Tests") {
           prLabels = labels.toString().split(",")
-          when {
-              expression {
-                  prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks")
-              }
-          }
-          steps {
-              script {
+
+          if(prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks"))
+          {
                   jobMap = [:]
                   jobMap["job"] = "../kubernetes-test-orchestrator/master"
                   jobMap["parameters"] = [
@@ -83,7 +79,6 @@ node {
                   jobMap["quietPeriod"] = 0
                   resultWrapper = build jobMap
                   currentBuild.result = resultWrapper.result
-              }
           }
       } 
   }
