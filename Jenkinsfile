@@ -38,7 +38,7 @@ node {
             sh "helm package --version ${chartVersion} ./charts/pega/"
             sh "helm package --version ${chartVersion} ./charts/addons/"
             sh "helm package --version ${chartVersion} ./charts/backingservices/"
-            sh "tar -czvf ${deployConfigsFileName} --directory=./charts/pega/config/deploy context.xml.tmp server.xml prconfig.xml prlog4j2.xml"
+            sh "tar -czvf ${deployConfigsFileName} --directory=./charts/pega/config/deploy context.xml.tmpl server.xml prconfig.xml prlog4j2.xml"
             sh "mkdir -p ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/migrateSystem.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prbootstrap.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prconfig.xml.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prlog4j2.xml ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prpcUtils.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/setupDatabase.properties.tmpl ./charts/pega/charts/installer/config/installer && tar -czvf ${INSTALLER_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/charts/installer/config installer/migrateSystem.properties.tmpl installer/prbootstrap.properties.tmpl installer/prconfig.xml.tmpl installer/prlog4j2.xml installer/prpcUtils.properties.tmpl installer/setupDatabase.properties.tmpl"
 
             // Publish helm charts to test-automation GitHub Pages
