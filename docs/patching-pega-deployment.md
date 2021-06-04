@@ -30,7 +30,7 @@ Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts 
 
    Pega does not support quoted identifiers in database schema names, so do not wrap your schema name with single quotes.
 
-4. Apply the patch by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Deploy Pega Platform using the command line](#patch-your-pega-platform-deployment-using-the-command-line).
+4. Apply the patch by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Patching your Pega Platform deployment using the command line](#patching-your-pega-platform-deployment-using-the-command-line).
 
 ## Assumptions and prerequisites
 

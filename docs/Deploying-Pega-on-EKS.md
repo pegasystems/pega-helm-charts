@@ -80,7 +80,7 @@ To create access keys for an IAM user:
    - Access key ID: AKIAIOSFODNN7EXAMPLE
    - Secret access key: wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY
 
-   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons Helm chart values](#Updating-the-addons-Helm-chart-values).
+   You need these two details when you configure the load balancer for your deployment in the Helm addons configuration section, [Updating the addons.yaml Helm chart values](#Updating-the-addonsyaml-Helm-chart-values).
 
 6. To download the key pair, choose Download .csv file. Store the keys in a secure location. You will not have access to the secret access key again after this dialog box closes.
 
@@ -131,7 +131,7 @@ ingress:
       alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
 ```
 
-Where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx`, which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
+Where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx`, which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the addons.yaml Helm chart values](#Updating-the-addonsyaml-Helm-chart-values).
 
 ### Creating an Amazon EKS cluster
 
@@ -563,7 +563,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
    namespace/pegaaddons created
    ```
 
-3. Install the addons Helm chart, which you updated in [Updating the addons Helm chart values](#Updating-the-addons-Helm-chart-values).
+3. Install the addons Helm chart, which you updated in [Updating the addons.yaml Helm chart values](#Updating-the-addonsyaml-Helm-chart-values).
 
    ```yaml
    $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
@@ -578,8 +578,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
    ```
    The `mypega-EKS-demo` namespace used for pega deployment can also be used for backingservice deployment that you configured in backingservices.yaml helm chart.
 
-5. Deploy Pega Platform for the first time by 
-installing the pega Helm chart, which you updated in [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values). This installs Pega Platform software into the database you specified in the pega chart.
+5. Deploy Pega Platform for the first time by installing the pega Helm chart, which you updated in [Updating the addons.yaml Helm chart values](#Updating-the-addonsyaml-Helm-chart-values). This installs Pega Platform software into the database you specified in the pega chart.
 
    ```yaml
    helm install mypega-EKS-demo pega/pega --namespace mypega-EKS-demo --values pega.yaml --set global.actions.execute=install-deploy

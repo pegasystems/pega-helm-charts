@@ -51,7 +51,7 @@ Client-managed cloud clients use the Pega Kubernetes tools and Helm charts in th
 
 2. Create a new blank rules schema and a temporary data schema in your existing database. Leave these new schemas empty. Note the names you use, since you must specify each in your upgrade configuration file.
 
-3. Edit the pega Helm chart as directed in [Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes](#upgrading-pega-platform-with-zero--downtime-using-helm-charts--120-minutes).
+3. Edit the pega Helm chart as directed in [Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes](#upgrading-pega-platform-with-zero-downtime-using-helm-charts--120-minutes).
 
 4. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line).
 
