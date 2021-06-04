@@ -1,6 +1,6 @@
 # Deploying Pega Platform on an Amazon EKS cluster
 
-Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
+Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a EKS cluster without much experience in either EKS configurations or Pega Platform deployments.
 
@@ -45,7 +45,7 @@ The following account, resources, and application versions are required for use 
 
 - Pega Platform 8.3.1 or later.
 
-- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For details, see [Downloading Docker images for your deployment](https://github.com/pegasystems/pega-helm-charts#downloading-docker-images-for-your-deployment).
+- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -132,10 +132,6 @@ ingress:
 ```
 
 Where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx`, which you copy from the AWS console view of the load balancer configuration. You add these parameters when you complete the configuration of your Helm page chart. For details, see, [Updating the pega Helm chart values](#Updating-the-pega-Helm-chart-values).
-
-### Making your Docker images available to your deployment
-
-Clients with appropriate licenses can request access to several required Docker images from the Pega-managed image repository. Pega Platform requires you to download these images and then push them to a repository that is available to your EKS environment. After you make your Pega-provided Docker images available to your AWS account, you are ready to create your Amazon EKS cluster.
 
 ### Creating an Amazon EKS cluster
 
@@ -404,6 +400,8 @@ Pega maintains a repository of Helm charts that are required to deploy Pega Plat
 
 - pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
+- pega/backingservices - Use this chart to set customization parameters for the Pega-provided Search and Reporting Service (SRS) your deployment. You will modify this chart later in the deployment tasks.
+
 To customize these files, you must download them from the source github repository to your local system, edit them with a text editor, and then save them to your local system using the same filename.
 
 1. To add the Pega repository to your Helm installation, enter:
@@ -412,9 +410,9 @@ To customize these files, you must download them from the source github reposito
 
 2. To verify the new repository, you can search it by entering:
 
-```bash
+```
   $ helm search repo pega
-  NAME        CHART VERSION   APP VERSION     DESCRIPTION
+  NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
   pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
   pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
@@ -422,9 +420,9 @@ To customize these files, you must download them from the source github reposito
 
 The pega and addons charts in the /charts/pega folder require customization for your organization's EKS deployment of Pega Platform. The backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
 
-#### Updating the addons Helm chart values
+#### Updating the addons.yaml Helm chart values
 
-Use the provided example addons-eks.yaml file to configure the use of an Amazon AWS ALB ingress controller. Pega provides this example file as a convenient way to quickly configure your addons file appropriately for EKS deployments. You can use it in place of filing our the default values.yaml file in the /addons directory.
+To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml file, download the file in the charts/addons folder, edit it with a text editor, and then save it to your local system using the same filename.
 
 1. Download the example [addons-eks.yaml](./resources/addons-eks.yaml) to the \<local filepath\>/EKS-demo that will over-write the default pega/addons file.
 
@@ -440,58 +438,46 @@ Use the provided example addons-eks.yaml file to configure the use of an Amazon 
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
+#### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
-### Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)
+To configure the parameters in the backingservices.yaml file, download the file in the charts/backingservices folder, edit it with a text editor, and then save it to your local system using the same filename.
 
+1. To download the backingservices.yaml Helm chart to the \<local filepath>\eks-demo, enter:
 
-Adding the Pega configuration files to your Helm installation on your local system
-----------------------------------------------------------------------------------
-Pega maintains a repository of Helm charts that are required to deploy Pega Platform and related resources using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these configuration files for your backing service deployment:
+  `$ helm inspect values pega/backingservices > <local filepath>/eks-demo/backingservices.yaml`
 
-- pega/backingservices - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
-
-1. To add the backingservices repository to your Helm installation, enter:
-
-    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
-    
-2. To verify the new repository, you can search it by entering:
-    
-```bash
-$ helm search repo pega
-NAME                	CHART VERSION	APP VERSION	DESCRIPTION                    
-pega/pega           	1.4.4        	           	Pega installation on kubernetes
-pega/addons         	1.4.4        	1.0        	A Helm chart for Kubernetes    
-pega/backingservices	1.4.4        	           	A Helm chart for Kubernetes
-```
-
-3. Download the values file for pega/backingservices.
-
-```bash
-$ helm inspect values pega/backingservices > backingservices.yaml
-```
-
-To customize this backingservices.yaml file, you must download it from the Pega-managed repository to your local system, edit it with a text editor, and then save it to your local system using the same filename.
-
-4. To download the backingservices.yaml Helm chart to the \<local filepath>\EKS-demo, enter:
-
-`$ helm inspect values pega/backingservices > <local filepath>/EKS-demo/backingservices.yaml`
-
-5. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your EKS requirements:
-
+2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your EKS requirements:
 
 | Chart parameter name              | Purpose                                   | Your setting |
 |:---------------------------------|:-------------------------------------------|:--------------|
 | global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
-| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or srs applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
-| srs.srsRuntime.srsImage: | Specify the Pega-provided srs-service image, services/search-n-reporting-service:dockerTag that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "platform-services/search-n-reporting-service:<srs-version>". For `<srs-version>` tag (refer [compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix))     |
+| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
+| srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix).    |
 | srs.srsStorage.domain: port: protocol: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li> srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li> <li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
 | elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
 
-6. Save the file.
+3. Save the file.
 
-#### Updating the pega Helm chart values
+#### Add supported custom settings for Pega to your deployment
 
-To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \EKS-demo folder you have already created on your local system. 
+The Pega deployment model supports advanced configurations to fit most existing
+clients' needs. If you are a Pega client and have known, required customizations
+for your deployment and you already use the following files to add your known
+customizations, you can copy those configurations into the configuration files
+Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasystems/pega-helm-charts) repository folder, pega-helm-charts/charts/pega/config/deploy:
+
+- context.xml: add additional required data sources
+
+- prlog4j2.xml: modify your logging configuration, if required
+
+- prconfig.xml: adjust the standard Pega Platform configuration with known,
+    required settings
+
+Make these changes before you begin deploying Pega Platform using Helm charts.
+
+#### Updating the pega.yaml Helm chart values
+
+To configure the parameters in the pega.yaml fie, download the file in the charts/pega folder, edit it with a text editor, and then save it to your local system using the same filename.
 
 Configure the parameters so the pega.yaml Helm chart matches your deployment resources in these areas:
 
@@ -532,22 +518,22 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 3. [For Pega Platform 8.6 and later] Applicable only when backingservices chart is configured.
 
-For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
+   For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
 
-Chart parameter name   | Purpose   | Your setting
----         | ---           | ---
-`pegasearch.externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | true
-`pegasearch.externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `"http://<srs.deploymentName>.<namespace>.svc.cluster.local"` or `"http://<srs.deploymentName>.<namespace>"`
+   Chart parameter name   | Purpose   | Your setting
+   ---         | ---           | ---
+   `pegasearch.externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | true
+   `pegasearch.externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `"http://<srs.deploymentName>.<namespace>.svc.cluster.local"` or `"http://<srs.deploymentName>.<namespace>"`
 
-Example:
+   Example:
 
-When backingservice is deployed into `mypega-EKS-demo` namespace and `pegasearch.externalSearchService` value is "srs-service", configure the `pegasearch` section in pega.yaml as below:
+   When backingservice is deployed into `mypega-EKS-demo` namespace and `pegasearch.externalSearchService` value is "srs-service", configure the `pegasearch` section in pega.yaml as below:
 
-```yaml
-pegasearch:
-  externalSearchService: true
-  externalURL: "http://srs-service.mypega-EKS-demo.svc.cluster.local"
-```
+   ```yaml
+   pegasearch:
+     externalSearchService: true
+     externalURL: "http://srs-service.mypega-EKS-demo.svc.cluster.local"
+   ```
 
 4. Save the file.
 

@@ -692,30 +692,60 @@ installer:
 
 ### Upgrades and patches
 
-To **upgrade Pega Platform software** deployed in a Kubernetes environment, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and then use the appropriate upgrade guide:
+The pega Helm charts supports zero-downtime patch and upgrades processes which synchronizes the required update steps to minimize downtime. with these zero-downtime processes, you and your customers can continue to access and use their applications in your environment with minimal disruption while you patch or upgrade your system.
 
-- Use the appropriate Pega Platform deployment Upgrade Guide available from the page, [Stay current with Pega](https://community.pega.com/upgrade).
-- Use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.4.4 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
 
-To **apply a Pega Platform patch** with zero downtime to your existing Pega platform software, you must use `installer.upgrade.upgradeType "out-of-place"` option. A zero downtime patch allows you to continue working in your application while you patch your system. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
+To complete your Pega Infinity upgrade, after you upgrade your Pega Platform software, you must use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+
+To **apply a Pega Platform patch** with zero-downtime to your existing Pega platform software, you must use `installer.upgrade.upgradeType "out-of-place"` option. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
+
+Use the `installer` section  of the values file with the appropriate parameters to install, upgrade, or applied a patch to your Pega Platform software:
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
+`adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
+`upgrade.targetRulesSchema:` |Specify the name of the schema you created for the new rules schema. | `""`
+`upgrade.targetDataSchema:` |Specify the name of the schema you created for the temporary data.| `""`
 
 Upgrade type    | Description
 ---             | ---
 `in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
-`out-of-place` | `DEPRECATED`: If upgrading from 8.4.2 or later, use a 'zero-downtime' update type to complete an upgrade while continuing to work in your application; if upgrading from 8.4.1 or earlier, use any of the other supported upgrade types. The 'out-of-place' upgrade minimizes downtime, but still requires some downtime. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. With the new rules upgraded, it shuts down the application briefly and upgrades the data in the temporary data schema, and then redeploys your application using the new rules.
-`zero-downtime` |  If upgrading from 8.4.2 and later, use this option. A zero-downtime upgrade synchronizes the required update steps to minimize downtime and you and your customers can continue to access and use their applications in your environment with minimal disruption. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. After upgrading your rules schema to the new rules, the process performs a rolling reboot of your nodes and then upgrades the data in the temporary data schema. Finally, the process redeploys the application using the new rules.
+`out-of-place` | `Deprecated for software upgrades`: Use this upgrade type only for zero-downtime patches. The process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then patches only the rules that were changed in the patch to the new version. With the new rules patched, it performs a rolling reboot, upgrades the data in the temporary data schema, and then redeploys your application using the new rules.
+`zero-downtime` |  If upgrading from 8.4.2 and later, use this option. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. After upgrading your rules schema to the new rules, the process performs a rolling reboot of your nodes and then upgrades the data in the temporary data schema. Finally, the process redeploys the application using the new rules.
 `custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: enable_cluster_upgrade rules_migration rules_upgrade data_upgrade disable_cluster_upgrade. To specify which steps to include in your custom upgrade, include them in your values.yaml file within the custom text. For example, to complete a rules upgrade without a data upgrade, you specify: installer.upgradeType: "custom" and installer.upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade" custom upgrade can be used to configure upgrade in steps manner.
 `out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
 `out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
 
-Example:
+Install example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+```
+
+Zero-downtime upgrade example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  upgrade:
+    upgradeType: "zero-downtime"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
+```
+
+Zero-downtime patch example:
 
 ```yaml
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   upgrade:
     upgradeType: "out-of-place"
-    targetRulesSchema: "rules_upgrade"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
 ```
 
 ### Installer Pod Annotations

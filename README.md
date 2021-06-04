@@ -106,11 +106,21 @@ $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 $ helm delete release --namespace mypega
 ```
 
-# Staying current with a Pega Platform upgrade or patching
+# Staying current with a Pega Platform upgrade or patching in zero-downtime
 
 ## Upgrades
 
-To upgrade Pega Platform software deployed in a Kubernetes environment, you must download the latest Pega software from Pega Digital Software Delivery and then use the appropriate upgrade guide for Pega Platform from [Stay current with Pega](https://community.pega.com/upgrade). To upgrade your strategic application, use the latest Upgrade Guide available for your strategic application, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+To upgrade Pega Platform software deployed in a Kubernetes environment with a zero-downtime process, you must do the following:
+
+1. Download the latest Pega software from Pega Digital Software Delivery.
+2. Create a new blank rules schema and a temporary data schema in your existing database.
+3. Update your repository to use the latest Helm charts and add several parameters to your `pega.yaml` Helm chart.
+
+4. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+
+For complete details, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
+
+To upgrade your strategic application, use the latest Upgrade Guide available for your strategic application, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
 
 ## Patches
 
