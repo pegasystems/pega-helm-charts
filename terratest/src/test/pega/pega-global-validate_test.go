@@ -189,12 +189,8 @@ func verifyPRConfigGlobalData(t *testing.T, yamlContent string, options *helm.Op
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
 	pegaConfigMapData := envConfigMap.Data
-
 	compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallCustomPrconfig.xml")
-
-
-
-
+	
 }
 
 func verifyPRlog4j2GlobalData(t *testing.T, yamlContent string, options *helm.Options) {
@@ -202,11 +198,8 @@ func verifyPRlog4j2GlobalData(t *testing.T, yamlContent string, options *helm.Op
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
 	pegaConfigMapData := envConfigMap.Data
-
 	compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallCustomPrlog4j2.xml")
-
-
-
+	
 }
 
 
@@ -215,11 +208,8 @@ func verifyWebXMLGlobalData(t *testing.T, yamlContent string, options *helm.Opti
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
 	pegaConfigMapData := envConfigMap.Data
-
 	compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallCustomWeb.xml")
-
-
-
+	
 }
 
 
@@ -228,14 +218,8 @@ func verifyserverXMLGlobalData(t *testing.T, yamlContent string, options *helm.O
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
 	pegaConfigMapData := envConfigMap.Data
-	fmt.Print("==========")
-	fmt.Print(pegaConfigMapData["serverXML.xml"])
-	fmt.Print("++++++++++")
-
 	compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallCustomServer.xml")
-
-
-
+	
 }
 
 func verifyContextXMLGlobalData(t *testing.T, yamlContent string, options *helm.Options) {
@@ -243,11 +227,7 @@ func verifyContextXMLGlobalData(t *testing.T, yamlContent string, options *helm.
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
 	pegaConfigMapData := envConfigMap.Data
-
 	compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallCustomContext.xml")
-
-
-
-
+	
 }
 
