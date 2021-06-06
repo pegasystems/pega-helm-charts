@@ -8,15 +8,15 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-name: {{ .name }}
-namespace: {{ .root.Release.Namespace }}
+  name: {{ .name }}
+  namespace: {{ .root.Release.Namespace }}
 data:
 {{- if eq $arg "deploy-config" }}
 {{- $custom_config := .custom }}
 {{- $custom_global_config :=.root.Values.global.configurations }}
 
-# Pega deployment prconfig.xml file
-prconfig.xml: |-
+  # Pega deployment prconfig.xml file
+  prconfig.xml: |-
 {{- if $custom_config.prconfig }}
 {{ .custom.prconfig | indent 6 }}
 {{ else if $custom_global_config.prconfig }}
@@ -25,8 +25,8 @@ prconfig.xml: |-
 {{ .root.Files.Get "config/deploy/prconfig.xml" | indent 6 }}
 {{- end }}
 
-# Pega deployment prlog4j2.xml file
-prlog4j2.xml: |-
+  # Pega deployment prlog4j2.xml file
+  prlog4j2.xml: |-
 {{- if $custom_config.prlog4j2 }}
 {{ $custom_config.prlog4j2 | indent 6 }}
 {{ else if $custom_global_config.prlog4j2 }}
@@ -35,8 +35,8 @@ prlog4j2.xml: |-
 {{ .root.Files.Get "config/deploy/prlog4j2.xml" | indent 6 }}
 {{- end }}
 
-# Pega deployment contextXML template file
-context.xml.tmpl: |-
+  # Pega deployment contextXML template file
+  context.xml.tmpl: |-
 {{- if $custom_config.contextXML }}
 {{ $custom_config.contextXML | indent 6 }}
 {{ else if $custom_global_config.contextXML }}
@@ -45,8 +45,8 @@ context.xml.tmpl: |-
 {{ .root.Files.Get "config/deploy/context.xml.tmpl" | indent 6 }}
 {{- end }}
 
-# Pega deployment server.xml file
-server.xml: |-
+  # Pega deployment server.xml file
+  server.xml: |-
 {{- if $custom_config.serverXML }}
 {{ $custom_config.serverXML | indent 6 }}
 {{ else if $custom_global_config.serverXML }}
@@ -55,17 +55,18 @@ server.xml: |-
 {{ .root.Files.Get "config/deploy/server.xml" | indent 6 }}
 {{- end }}
 
+
+  # Pega deployment web.xml file
+  web.xml: |-
 {{- if $custom_config.webXML }}
-# Pega deployment web.xml file
-web.xml: |-
 {{ $custom_config.webXML | indent 6 }}
 {{ else if $custom_global_config.webXML }}
 {{ $custom_global_config.webXML  | indent 6 }}
 {{ else }}
 {{- $web := .root.Files.Glob "config/deploy/web.xml" }}
 {{ if $web }}
-# Pega deployment web.xml file
-web.xml: |-
+  # Pega deployment web.xml file
+  web.xml: |-
 {{ .root.Files.Get "config/deploy/web.xml" | indent 6 }}
 {{- end }}
 {{- end }}
