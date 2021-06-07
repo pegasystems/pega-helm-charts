@@ -1,0 +1,167 @@
+---
+global:
+  # This values.yaml file is an example.  For more information about
+  # each configuration option, see the project readme.
+
+  # Enter your Kubernetes provider.
+  provider: "YOUR_KUBERNETES_PROVIDER"
+
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "ephemeral"
+
+  # Deploy Pega nodes
+  actions:
+    execute: "deploy"
+
+  # Provide JDBC connection information to the Pega relational database
+  #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
+  jdbc:
+    #   url	Valid values are:
+    #
+    #   Oracle              jdbc:oracle:thin:@//localhost:1521/dbName
+    #   IBM DB/2 z / OS 	jdbc:db2://localhost:50000/dbName
+    #   IBM DB/2            jdbc:db2://localhost:50000/dbName:fullyMaterializeLobData=true;fullyMaterializeInputStreams=true;
+    #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
+    #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
+    #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
+    url: "YOUR_JDBC_URL"
+    #   driverClass 	-- jdbc class.  Valid values are:
+    #
+    #   Oracle              oracle.jdbc.OracleDriver
+    #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
+    #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
+    #   PostgreSQL          org.postgresql.Driver
+    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
+    dbType: "YOUR_DATABASE_TYPE"
+    #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
+    driverUri: "YOUR_JDBC_DRIVER_URI"
+    username: "YOUR_JDBC_USERNAME"
+    password: "YOUR_JDBC_PASSWORD"
+    # CUSTOM CONNECTION PROPERTIES
+    # Add a list of ; delimited connections properties. The list must end with ;
+    # For example: connectionProperties=user=usr;password=pwd;
+    connectionProperties: ""
+    rulesSchema: "YOUR_RULES_SCHEMA"
+    dataSchema: "YOUR_DATA_SCHEMA"
+    customerDataSchema: ""
+
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  docker:
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+      # Docker image information for the Pega docker image, containing the application server.
+    pega:
+      image: "pegasystems/pega"
+
+  # Upgrade specific properties
+  upgrade:
+    # Configure only for aks/pks
+    # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
+    # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
+    kube-apiserver:
+      serviceHost: "API_SERVICE_ADDRESS"
+      httpsServicePort: "SERVICE_PORT_HTTPS"
+
+  # Specify the Pega tiers to deploy
+  tier:
+    - name: "ephemeralweb"
+      # Create a an interactive tier for web users.  This tier uses
+      # the WebUser node type and will be exposed via a service to
+      # the load balancer.
+      nodeType: "WebUser"
+
+      # Pega requestor specific properties
+      requestor:
+        # Inactivity time after which requestor is passivated
+        passivationTimeSec: 900
+
+      service:
+        # For help configuring the service block, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
+        port: 80
+        targetPort: 8080
+        custom :
+          prconfig: |-
+            <?xml version="1.0" encoding="UTF-8"?>
+            <pegarules>
+             <!-- This is a minimum format prconfig.xml file.  Only the settings which are required to access settings in the database are included.
+             All other settings which were formerly located only in this file are now Data-Admin-System-Settings.      -->
+             <env name="initialization/settingsource" value="merged" />
+             <env name="database/databases/PegaRULES/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
+             <env name="database/databases/PegaDATA/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
+             <env name="security/urlaccesslog" value="NORMAL" />
+             <env name="security/urlaccessmode" value="WARN" />
+             <!-- Most nodes have a 'default' classification and for these nodes, no additional changes need to be made to this file.  However,
+             if this is node has a non-general purpose, for example: 'Agent', then the node classification setting should be added to this file. -->
+             <!--env name="initialization/nodeclassification" value="Agent" /  -->
+             <!-- Settings can still be put in this file.  If they are, then the value in this file will override the value in the database
+             for this node.  This is useful for settings which are specific to this node and should not be shared by multiple nodes on this
+              system. -->
+  
+             <env name="agent/enable" value="false" type="java.lang.String"/>
+             <env name="asyncExecutor/enable" value="false" type="java.lang.String"/>
+             <env name="agent/masteragentenable" value="false" type="java.lang.String"/>
+             <env name="usage/usagetrackingenabled" value="false" type="java.lang.String"/>
+             <env name="initServices/initFile" value="false" type="java.lang.String"/>
+             <env name="initServices/initEmail" value="false" type="java.lang.String"/>
+             <env name="database/databases/PegaDATA/defaultSchema" value="tempdata1" type="java.lang.String"/>
+             <env name="cluster/encryption/enabled" value="false" type="java.lang.String"/>
+  
+            </pegarules>
+
+      ingress:
+        # For help configuring the ingress block including TLS, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
+
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_WEB_NODE_DOMAIN"
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
+
+      replicas: 1
+      javaOpts: ""
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
+
+      # Optionally overridde default resource specifications
+      # cpuRequest: 2
+      # memRequest: "12Gi"
+      # cpuLimit: 4
+      # memLimit: "12Gi"
+      # initialHeap: "4096m"
+      # maxHeap: "8192m"
+
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
+      hpa:
+        enabled: true
+
+
+# Elasticsearch deployment settings.
+# Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
+# These search nodes will be deployed regardless of the Elasticsearch configuration above.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section
+pegasearch:
+  image: "pegasystems/search"
+  replicas: 1
