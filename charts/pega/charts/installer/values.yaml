@@ -51,6 +51,8 @@ upgrade:
   upgradeType: ""
   # Specify target rules schema for migration and upgrade
   targetRulesSchema: ""
+  # Specify target data schema for migration and upgrade
+  targetDataSchema: ""
   # The commit count to use when loading database tables
   dbLoadCommitRate: 100
   # Update existing application will be run if this property is set to true
