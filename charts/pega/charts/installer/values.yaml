@@ -47,7 +47,8 @@ zos:
 # Upgrade specific properties
 upgrade:
   # Type of upgrade
-  # Valid values are 'in-place' , 'out-of-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data'
+  # Valid values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data';
+  # 'out-of-place' is deprecated and supported only with Helm charts prior to version 1.4.
   upgradeType: ""
   # Specify target rules schema for migration and upgrade
   targetRulesSchema: ""
