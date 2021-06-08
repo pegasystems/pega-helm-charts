@@ -39,8 +39,6 @@ The Pega zero-downtime upgrade process for Client-managed cloud automates the Pe
 
 8. Reverts the high availability cluster settings to re-enable rule creation so your development team can create and extend rule creation.  
 
-9. Deletes the temporary data schema from your database.
-
 Pega software upgrades do not touch the infrastructure of your Kubernetes environment.
 
 ## Client-required steps
@@ -54,6 +52,8 @@ Client-managed cloud clients use the Pega Kubernetes tools and Helm charts in th
 3. Edit the pega Helm chart as directed in [Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes](#upgrading-pega-platform-with-zero-downtime-using-helm-charts--120-minutes).
 
 4. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line).
+
+5. Delete the temporary data schema from your database after you complete your upgrade.
 
 Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes
 
@@ -136,7 +136,7 @@ You can leave the existing customized parameters as is; the upgrade process will
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
    | installer.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
    | installer.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name that the upgrade process creates in your existing database to support the upgrade process within the quotes.  For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank).| targetRulesSchema: ""  |
-   | installer.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name that you created in your existing database to support the upgrade process within the quotes. For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
+   | installer.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name that you created in your existing database to support the upgrade process within the quotes and you delete from your database after you complete your upgrade. For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
 
 2. Save the file.
 

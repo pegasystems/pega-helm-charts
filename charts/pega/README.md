@@ -694,7 +694,7 @@ installer:
 
 The pega Helm charts supports zero-downtime patch and upgrades processes which synchronizes the required update steps to minimize downtime. with these zero-downtime processes, you and your customers can continue to access and use their applications in your environment with minimal disruption while you patch or upgrade your system.
 
-To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.4.4 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
+To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.6.1 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
 
 To complete your Pega Infinity upgrade, after you upgrade your Pega Platform software, you must use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
 
@@ -708,14 +708,14 @@ Parameter   | Description   | Default value
 `adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created for the new rules schema. | `""`
-`upgrade.targetDataSchema:` |Specify the name of the schema you created for the temporary data.| `""`
+`upgrade.targetDataSchema:` |Specify the name of the schema you created for the temporary data. After the upgrade, you must delete this temporary data schema from your database | `""`
 
 Upgrade type    | Description
 ---             | ---
 `in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
-`out-of-place` | `Deprecated for software upgrades`: Use this upgrade type only for zero-downtime patches. The process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then patches only the rules that were changed in the patch to the new version. With the new rules patched, it performs a rolling reboot, upgrades the data in the temporary data schema, and then redeploys your application using the new rules.
-`zero-downtime` |  If upgrading from 8.4.2 and later, use this option. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. After upgrading your rules schema to the new rules, the process performs a rolling reboot of your nodes and then upgrades the data in the temporary data schema. Finally, the process redeploys the application using the new rules.
-`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: enable_cluster_upgrade rules_migration rules_upgrade data_upgrade disable_cluster_upgrade. To specify which steps to include in your custom upgrade, include them in your values.yaml file within the custom text. For example, to complete a rules upgrade without a data upgrade, you specify: installer.upgradeType: "custom" and installer.upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade" custom upgrade can be used to configure upgrade in steps manner.
+`out-of-place` | `Deprecated and supported only with Helm charts prior to version 1.4`: For patches using Helm charts from 1.4 or earlier, you can use this process to apply your patch with zero-downtime; for upgrades from 1.4 or earlier this upgrade type minimizes downtime, but still requires some downtime. For patches or upgrades the process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", and then applies the patch only to changed rules or upgrades all of the rules. With the new rules in place, the process performs a rolling reboot, patches or upgrades the data, and then redeploys your application using the new rules.
+`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime so you and your customers can continue to access and use their applications in your environment with minimal disruption. This patch or upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and then patches only to changed rules or upgrades all of the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
+`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`. To specify which steps to include in your custom upgrade, include them in your values.yaml file within the custom text.
 `out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
 `out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
 
@@ -737,13 +737,25 @@ installer:
     targetDataSchema: "temporary_data_schema_name"
 ```
 
+Custom rules upgrade without a data upgrade example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  upgrade:
+    upgradeType: "custom"
+    installer.upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
+```
+
 Zero-downtime patch example:
 
 ```yaml
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   upgrade:
-    upgradeType: "out-of-place"
+    upgradeType: "zero-downtime"
     targetRulesSchema: "new_rules_schema_name"
     targetDataSchema: "temporary_data_schema_name"
 ```
