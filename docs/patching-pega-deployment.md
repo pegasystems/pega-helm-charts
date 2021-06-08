@@ -12,7 +12,7 @@ Useful links to Pega software patching information:
 
 Pega supports client-managed cloud clients applying patches for releases 8.4 and later using a zero-downtime patch process to apply the latest cumulative bundle of bug and security fixes since the last minor release. For the latest Pega Community articles, see [About client managed cloud](https://community.pega.com/knowledgebase/articles/client-managed-cloud/85/about-client-managed-cloud).
 
-The Pega zero-downtime patch process uses the out-of-place patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary data schema and the patch migration script moves the rules between the appropriate schema and then performs the required rolling reboot of your deployment cluster. For a detailed overview of the process, see [Applying a patch without downtime](https://community.pega.com/knowledgebase/articles/keeping-current-pega/86/applying-patch-without-downtime).
+The Pega zero-downtime patch process uses the zero-downtime patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary data schema and the patch migration script moves the rules between the appropriate schema and then performs the required rolling reboot of your deployment cluster. For a detailed overview of the process, see [Applying a patch without downtime](https://community.pega.com/knowledgebase/articles/keeping-current-pega/86/applying-patch-without-downtime).
 
 ## Client-required steps
 Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts in the same Pega repository that you used to install Pega Platform in a supported Kubernetes environment. The client-managed cloud patch process includes the following tasks:
@@ -64,7 +64,7 @@ To complete a zero downtime patch, you must configure the following settings in 
 
 - In the installer section of the Helm chart, update the following:
   - Update the tagging details, including the version and date of your Pega-provided `platform/installer` Docker image, that you downloaded to support your patch.
-  - Specify an `out-of-place` upgrade to apply a patch using the zero-downtime patch process.
+  - Specify an `zero-downtime` upgrade to apply a patch using the zero-downtime patch process.
   - Specify the new target rules schema name that you created in your existing database to support the patch process within the quotes.
   - For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank).
 
@@ -87,7 +87,7 @@ Complete the following steps.
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
-   | installer.upgradeType   | Specify an out-of-place upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "out-of-place"  |
+   | installer.upgradeType   | Specify an zero-downtime upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "zero-downtime"  |
    | installer.targetRulesSchema   | Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
    | installer.targetDataSchema   | For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
 2. Save the file.

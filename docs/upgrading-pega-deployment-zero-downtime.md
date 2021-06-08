@@ -6,18 +6,18 @@ For the latest Pega Community articles about Pega-provided docker images, see [A
 
 ## Kubernetes-based zero-downtime upgrade process overview
 
-Pega Infinity™ upgrades starting from version 8.4.2 feature a near-zero-downtime process, so your environment remains available you can continue working in your application during the upgrade. You complete a zero-downtime upgrade using Pega helm charts, which automate the Pega out-of-place upgrade process using the four schemas used in the version 8.4 and later Pega patch and upgrade processes:
+Pega Infinity™ upgrades starting from version 8.4.2 feature a near-zero-downtime process, so your environment remains available you can continue working in your application during the upgrade. You complete a zero-downtime upgrade using Pega helm charts, which automate the Pega zero-downtime upgrade process using the four schemas used in the version 8.4 and later Pega patch and upgrade processes:
 
 - Data schema – your existing data schema. This will be your data schema after the zero-downtime upgrade.
 - Rules schema – your existing rules schema. This schema is upgraded during the zero-downtime upgrade.
-- A temporary data schema (Dtmp) – a schema you create on the same database for temporarily staging the data during the upgrade. You discard this schema after the upgrade.
+- A temporary data schema (Dtmp) – a schema you create on the same database to host some required data-specific tables. You discard this schema after the upgrade.
 - New rules schema (Rn) – a rules schema you create on the same database for staging the rules during the upgrade. This schema will become the rules schema after the upgrade.
 
 Before beginning your upgrade, you must create empty schemas - the new rules schema and new temporary data schema  - in your existing database as shown in the image below.
 
    ![New rules schema and temporary data schemas](media/create-blank-schema.png "New rules schema and temporary data schemas")
 
-The Pega zero-downtime upgrade process for Client-managed cloud automates the Pega out-of-place upgrade scripts that copy and replace application rules and that copy data between these schemas appropriately. The process automates the following order of tasks, so clients only have to use the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line):
+The Pega zero-downtime upgrade process for Client-managed cloud automates the Pega zero-downtime upgrade scripts that copy and replace application rules and that copy data between these schemas appropriately. The process automates the following order of tasks, so clients only have to use the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line):
 
 1. Configures the high availability cluster settings, including disabling rule creation, so you and your customers can continue making rule changes while the upgrade processes run.
 
@@ -134,7 +134,7 @@ You can leave the existing customized parameters as is; the upgrade process will
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
-   | installer.upgradeType   | Specify an out-of-place upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
+   | installer.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
    | installer.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name that the upgrade process creates in your existing database to support the upgrade process within the quotes.  For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank).| targetRulesSchema: ""  |
    | installer.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name that you created in your existing database to support the upgrade process within the quotes. For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
 
