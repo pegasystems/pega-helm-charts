@@ -10,8 +10,8 @@ Pega Infinity™ upgrades starting from version 8.4.2 feature a near-zero-downti
 
 - Data schema – your existing data schema. This will be your data schema after the zero-downtime upgrade.
 - Rules schema – your existing rules schema. This schema is upgraded during the zero-downtime upgrade.
-- A temporary data schema (Dtmp) – a schema you create on the same database to host some required data-specific tables. You discard this schema after the upgrade.
-- New rules schema (Rn) – a rules schema you create on the same database for staging the rules during the upgrade. This schema will become the rules schema after the upgrade.
+- A temporary data schema (Dtmp) – a schema the process creates on the same database to host some required data-specific tables. You specify the name before the upgrade process and you must discard this schema after the upgrade.
+- New rules schema (Rn) – a rules schema the process creates on the same database for staging the rules during the upgrade. This schema will become the rules schema after the upgrade.
 
 Before beginning your upgrade, you must create empty schemas - the new rules schema and new temporary data schema  - in your existing database as shown in the image below.
 
@@ -21,7 +21,7 @@ The Pega zero-downtime upgrade process for Client-managed cloud automates the Pe
 
 1. Configures the high availability cluster settings, including disabling rule creation, so you and your customers can continue making rule changes while the upgrade processes run.
 
-2. Migrates the rules structure and content and data structure from the existing rules and data schemas to the new rules and temporary data schemas.
+2. Creates the target schemas and migrates the rules structure and content and data structure from the existing rules and data schemas to the new rules and temporary data schemas.
 
    ![Migrates the rules structure and content and data structure](media/migrate-rule-rnew-dtemp-schemas.png "Migrates the rules structure and content and data structure")
 
@@ -47,13 +47,11 @@ Client-managed cloud clients use the Pega Kubernetes tools and Helm charts in th
 
 1. Prepare your Docker repository by downloading the latest Pega-provided release images (platform/installer, platform/pega, and either platform/search or platform-services/search-n-reporting-service) in your release stream and pushing them into your preferred Docker image repository. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
 
-2. Create a new blank rules schema and a temporary data schema in your existing database. Leave these new schemas empty. Note the names you use, since you must specify each in your upgrade configuration file.
+2. Edit the pega Helm chart as directed in [Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes](#upgrading-pega-platform-with-zero-downtime-using-helm-charts--120-minutes).
 
-3. Edit the pega Helm chart as directed in [Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes](#upgrading-pega-platform-with-zero-downtime-using-helm-charts--120-minutes).
+3. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line).
 
-4. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command as directed in the deployment section - [Upgrading your Pega Platform deployment using the command line](#upgrading-your-pega-platform-deployment-using-the-command-line).
-
-5. Delete the temporary data schema from your database after you complete your upgrade.
+4. Delete the temporary data schema from your database after you complete your upgrade.
 
 Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes
 
@@ -63,17 +61,17 @@ The process to upgrade your deployment with zero-downtime assumes:
 
 - Your deployment is running Pega Platform 8.4.2 or later.
 
-- You use the Pega-provided Helm charts that support ZDT upgrades (version 1.4.4 and later).
+- You use the Pega-provided Helm charts that support ZDT upgrades (version 1.6.0 and later).
 
 ## Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes
 
 To keep your system current using the zero-downtime upgrade process by using Helm charts, you must customize your existing `pega` Helm chart with the specific, required or settings. This includes referencing the latest Pega-provided Docker images that are available for your release.
 
-The Pega zero-downtime upgrade process takes about 180 minutes total.
+The Pega zero-downtime upgrade process takes about 180 minutes total, but varies, depending on your deployment details.
 
 ### Updating the Pega configuration files to your Helm installation on your local system
 
-To complete an upgrade using the charts in the Pega-provided repository of Helm charts you must update the repository so you use chart version 1.4.4 or later.
+To complete an upgrade using the charts in the Pega-provided repository of Helm charts you must update the repository so you use chart version 1.6.0 and later.
 
 1. To update the Pega repository to your Helm installation, enter:
 
@@ -84,9 +82,9 @@ To complete an upgrade using the charts in the Pega-provided repository of Helm 
 ```
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
-  pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
+  pega/pega             1.6.0                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           1.6.0           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/backingservices  1.6.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
 #### Updating the pega.yaml Helm chart values
@@ -95,7 +93,7 @@ To configure the parameters in the pega.yaml Helm, download the file in the char
 
 To complete an upgrade with zero downtime,  configure the following settings in your pega.yaml:
 
-- Specify `action.execute: upgrade` to upgrade your application using the software version contained in your Pega-provided "installer" image in zero-downtime.
+- Specify `action.execute: upgrade` to upgrade your application using the software version contained in your Pega-provided "installer" image.
 - Specify the source schema names in your database:
   - `jdbc.rulesSchema: "YOUR_RULES_SCHEMA"`
   - `jdbc.dataSchema: "YOUR_DATA_SCHEMA"`
@@ -113,7 +111,7 @@ To complete an upgrade with zero downtime,  configure the following settings in 
 - In the installer section of the Helm chart, update the following:
 
   - Specify `installer.upgradeType: "Zero-downtime"` to use the zero-downtime upgrade process.
-  - Specify `installer.targetRulesSchema: "<target-rules-schema-name>"` and `installer.targetDataSchema: "<target-data-schema-name>"` for the new target and data schema name that you created in your existing database for the upgrade process.
+  - Specify `installer.targetRulesSchema: "<target-rules-schema-name>"` and `installer.targetDataSchema: "<target-data-schema-name>"` for the new target and data schema name that the process creates in your existing database for the upgrade process.
 
 You can leave the existing customized parameters as is; the upgrade process will use the remaining existing settings in your deployment.
 
@@ -128,15 +126,16 @@ You can leave the existing customized parameters as is; the upgrade process will
    | actions.execute: | To upgrade using the zero-downtime upgrade process, specify an “upgrade-deploy” deployment type. | execute: "upgrade-deploy" |
    | jdbc.rulesSchema: "YOUR_RULES_SCHEMA"  | Specify the name of the existing rules schema from which the upgrade process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
    | jdbc.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the temporary data schema to which the upgrade process migrates the existing data structure from the existing data schema  | dataSchema: "YOUR_DATA_SCHEMA"  |
+   | Optional: jdbc.customerDataSchema: "YOUR_DATA_SCHEMA"  | Optionally specify the name of a data schema separate from case data that is for your business and customer data. The `customerDataSchema` parameter defaults to the value of `dataSchema` if you leave this set to default value. | customerDataSchema : "YOUR_DATA_SCHEMA"  |
    | docker.registry.url: username:  and password: | If using a new registry since you installed Pega Platform, update the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). You can skip this section if the registry is the same as your initial installation. | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. This image should match the version of the installer image with which you complete the upgrade. | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | <ul><li>upgrade.kube-apiserver. serviceHost</li><li>upgrade.kube-apiserver.httpsServicePort</li></ul>  | For existing AKS and PKS deployments, for the service host and https service port of the Kubernetes API server. For EKS and GKE deployments, leave the existing text values (do not leave them blank).| <ul><li>upgrade.kube-apiserver.serviceHost: "API_SERVICE_ADDRESS" </li><li>upgrade.kube-apiserver.httpsServicePort: "SERVICE_PORT_HTTPS"</li></ul> |
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
-   | installer.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
-   | installer.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name that the upgrade process creates in your existing database to support the upgrade process within the quotes.  For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank).| targetRulesSchema: ""  |
-   | installer.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name that you created in your existing database to support the upgrade process within the quotes and you delete from your database after you complete your upgrade. For upgrades starting as earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
+   | installer.upgrade.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
+   | installer.upgrade.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process.| targetRulesSchema: ""  |
+   | installer.upgrade.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process. You must delete this schema from your database after you complete your upgrade. For upgrades starting at earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
 
 2. Save the file.
 
@@ -168,7 +167,7 @@ In this document, you specify that the Helm chart always “deploys” by using 
 
     You can follow the progress of your upgrade using the dashboard. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-5. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+5. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-zdt-upgrade** job, and click the logs icon on the right side of that row.
 
    After you open the logs view, you can click the icon for automatic refresh to see current updates to the upgrade log.
 

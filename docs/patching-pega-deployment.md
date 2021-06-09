@@ -50,8 +50,8 @@ To complete a zero downtime patch, you must configure the following settings in 
 
 - Specify action.execute: upgrade-deploy to invoke the zero-downtime patch process.
 - Specify the schema name or names that will be upgraded:
-  - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.dataSchema: "YOUR_DATA_SCHEMA")
-  - **For 8.2 and 8.3**: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave it blank).
+  - **For 8.4 and later**: specify both schema names, since the process involves migrating rules to and from each schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA" and jdbc.dataSchema: "YOUR_DATA_SCHEMA").
+  - **For 8.2 and 8.3**: specify the rules schema since the process only involves migrating rules to and from the existing rule schema (jdbc.rulesSchema: "YOUR_RULES_SCHEMA"); leave the existing "YOUR_RULES_SCHEMA" value (do not leave blank text).
 - Ensure one of the following:
   - You pushed the images for your patch to the same repository that you used for your installation repository and the credentials for your repository account are the same as those in your `pega` Helm chart.  
   - You pushed the images for your patch to a new repository and you update the parameters with your credentials for this new repository account in your `pega` Helm chart.
@@ -65,8 +65,7 @@ To complete a zero downtime patch, you must configure the following settings in 
 - In the installer section of the Helm chart, update the following:
   - Update the tagging details, including the version and date of your Pega-provided `platform/installer` Docker image, that you downloaded to support your patch.
   - Specify an `zero-downtime` upgrade to apply a patch using the zero-downtime patch process.
-  - Specify the new target rules schema name that you created in your existing database to support the patch process within the quotes.
-  - For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank).
+  - **For patches to 8.4 and later**, specify the new target new rules and temporary data schema names that the process creates in your existing database to support the patch process within the quotes. **For 8.2 or 8.3 Pega software patches**, you can leave this value empty, as is (do not leave blank text).
 
 You can leave the existing customized parameters as is; the patch process will use the remaining existing settings in your deployment.
 
@@ -87,9 +86,9 @@ Complete the following steps.
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
-   | installer.upgradeType   | Specify an zero-downtime upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "zero-downtime"  |
-   | installer.targetRulesSchema   | Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
-   | installer.targetDataSchema   | For patches to 8.4 and later, specify the new target data schema name that you created in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
+   | installer.upgrade.upgradeType   | Specify an zero-downtime upgrade to apply a patch using the zero-downtime patch process. | upgradeType: "zero-downtime"  |
+   | installer.upgrade.targetRulesSchema   | Specify a new rules schema name that the process creates in your existing database to support the patch process within the quotes. | targetRulesSchema: ""  |
+   | installer.upgrade.targetDataSchema   | For patches to 8.4 and later, specify a new target data schema name that the process creates in your existing database to support the patch process within the quotes. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not leave blank text). | targetDataSchema: "" |
 2. Save the file.
 
 ### Patching your Pega Platform deployment using the command line
@@ -120,7 +119,7 @@ In this document, you specify that the Helm chart always “deploys” by using 
 
     You can follow the progress of your patch using the dashboard. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-5. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+5. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-zdt-upgrade** job, and click the logs icon on the right side of that row.
 
    After you open the logs view, you can click the icon for automatic refresh to see current updates to the upgrade (patch) log.
 

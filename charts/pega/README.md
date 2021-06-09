@@ -1,6 +1,6 @@
 # Pega Helm chart
 
-The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm install --; you can run the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
+The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
 ## Supported providers
 
@@ -692,32 +692,33 @@ installer:
 
 ### Upgrades and patches
 
-The pega Helm charts supports zero-downtime patch and upgrades processes which synchronizes the required update steps to minimize downtime. with these zero-downtime processes, you and your customers can continue to access and use their applications in your environment with minimal disruption while you patch or upgrade your system.
+The Pega Helm charts support zero-downtime patch and upgrades processes which synchronize the required process steps to minimize downtime. With these zero-downtime processes, you and your customers can continue to access and use their applications in your environment with minimal disruption while you patch or upgrade your system.
 
-To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.6.1 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
+To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega-provided images for the version to which you are upgrading from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.6.0 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md). With earlier versions of the Pega Helm charts, you must use the Pega Platform upgrade guides. To obtain the latest upgrade guide, see [Stay current with Pega](https://community.pega.com/upgrade).
 
-To complete your Pega Infinity upgrade, after you upgrade your Pega Platform software, you must use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+To complete your Pega Infinity upgrade, after you upgrade your Pega Platform software using the Pega Helm charts and Docker images, you must use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
 
-To **apply a Pega Platform patch** with zero-downtime to your existing Pega platform software, you must use `installer.upgrade.upgradeType "out-of-place"` option. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
+To **apply a Pega Platform patch** with zero-downtime to your existing Pega platform software, you use the same "zero-downtime" parameters that you use for upgrades and use the Pega-provided `platform/installer` Docker image that you downloaded for your patch version. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
 
-Use the `installer` section  of the values file with the appropriate parameters to install, upgrade, or applied a patch to your Pega Platform software:
+Use the `installer` section  of the values file with the appropriate parameters to install, upgrade, or apply a patch to your Pega Platform software:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
 `adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
-`upgrade.targetRulesSchema:` |Specify the name of the schema you created for the new rules schema. | `""`
-`upgrade.targetDataSchema:` |Specify the name of the schema you created for the temporary data. After the upgrade, you must delete this temporary data schema from your database | `""`
+`upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
+`upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
+`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
 
 Upgrade type    | Description
 ---             | ---
-`in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
-`out-of-place` | `Deprecated and supported only with Helm charts prior to version 1.4`: For patches using Helm charts from 1.4 or earlier, you can use this process to apply your patch with zero-downtime; for upgrades from 1.4 or earlier this upgrade type minimizes downtime, but still requires some downtime. For patches or upgrades the process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", and then applies the patch only to changed rules or upgrades all of the rules. With the new rules in place, the process performs a rolling reboot, patches or upgrades the data, and then redeploys your application using the new rules.
-`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime so you and your customers can continue to access and use their applications in your environment with minimal disruption. This patch or upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and then patches only to changed rules or upgrades all of the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
-`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`. To specify which steps to include in your custom upgrade, include them in your values.yaml file within the custom text.
+`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime. This patch or upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and patches (only changed rules) or upgrades (all) the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
+`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`. To specify which steps to include in your custom upgrade, specify them in your pega.yaml file using the `upgrade.upgradeSteps` parameter.
 `out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
 `out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
+`in-place`      | Use this option to upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in application downtime.
+`out-of-place` | `Deprecated and supported only with Helm charts prior to version 1.4`: For patches using Helm charts from 1.4 or earlier, you can use this process to apply a patch with zero-downtime; for upgrades from 1.4 or earlier this upgrade type minimizes downtime, but still requires some downtime. For patches or upgrades the process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", and then applies the patch only to changed rules or upgrades all of the rules. With the new rules in place, the process performs a rolling reboot, patches or upgrades the data, and then redeploys your application using the new rules.
 
 Install example:
 
@@ -744,7 +745,7 @@ installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   upgrade:
     upgradeType: "custom"
-    installer.upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade"
+    upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade"
     targetRulesSchema: "new_rules_schema_name"
     targetDataSchema: "temporary_data_schema_name"
 ```
