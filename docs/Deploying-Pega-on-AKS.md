@@ -19,7 +19,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 2. Create an AKS cluster and an SQL database resource in your Azure account - [Prepare your AKS resources – 60 minutes](#prepare-your-aks-resources--60-minutes).
 
-3.  Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
+3. Customize a configuration file with your AKS details and use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your AKS cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
 4. Configure your network connections in the DNS management zone of your choice so you can log in to Pega Platform - [Logging in to Pega Platform – 10 minutes](#logging-in-to-pega-platform--10-minutes).
 
@@ -461,7 +461,9 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 
-`$ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml`
+```bash
+helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
+```
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your AKS requirements:
 
