@@ -25,7 +25,7 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **Flag**: `-XX:MaxMetaspaceSize=SIZE` <br>
 **Purpose**: Sets the maximum value the JVM Metaspace can occupy. Beyond this "Metaspace OutOfMemoryError" is thrown.<br>
 **JVM default**: 18446744073709486080 Bytes or Unbounded <br>
-**Pega Recommendation**: Unbounded(default), to ensure that "Metaspace OutOfMemoryError" exceptions do not occur.<br>
+**Pega Recommendation**:  If left Unbounded (default) then there is a risk that the kernel will run out of physical memory, and when this occurs the system will hang without an error message, and therefore will be difficult to diagnose after recovery since there will be no logging detail to investigate.  Setting MaxMetaspaceSize to a minimum of 768m should be large enough to ensure that "Metaspace OutOfMemoryError" exceptions do not occur, and at the same time will prevent the kernel out of memory and resulting system hang without error messages.<br>
 
 **Flag**: `-XX:+UseStringDeduplication` <br>
 **Purpose**: Maintains a single copy of String literals *aka Deduplication*, in case multiple Strings have the same literal value<br>
@@ -55,21 +55,8 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **JVM default**: No GC logs will be emitted by default.<br>
 **Pega Recommendation**: Set to allow GC logs to be collected. Currently, the log rotation policy is set to 3 log files with maximum of 2MB each.<br>
 <br>
-##### Few more arguments:
-**Flag**: `-XX:MaxGCPauseMillis=n`<br>
-**Purpose**: Sets the peak pause time for GC to happen.<br>
-**JVM default**: 200 milliseconds<br>
-**Pega Recommendation**: Set to higher value for BATCH pods for better throughput.
-<br>
 
-**Flag**: `-XX:StringTableSize=n`<br>
-**Purpose**: Sets the number of hash-buckets to be used in string pool for accommodating Strings<br>
-**JVM default**: 65536, the default Hash bucket size of the JVM String pool <br>
-**Pega Recommendation**: Tune this based on requirements.<br>
-
-
-
-
-
-
-
+**Flag**: `-Duser.timezone=TIMEZONE`<br>
+**Purpose**: Sets the timezone the JVM will use.<br>
+**JVM default**: By default, the JVM obtains time zone from the operating system.  The Pega docker image is configured to Etc/UTC.<br>
+**Pega Recommendation**: Pega requires the JVM timezone to be the same as the timezone used by the database.   Set this if your database is not Etc/UTC.
