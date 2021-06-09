@@ -8,7 +8,6 @@ export ADDONS_FILE_NAME=addons-${CHART_VERSION}.tgz
 export BACKINGSERVICES_FILE_NAME=backingservices-${CHART_VERSION}.tgz
 export DEPLOY_CONFIGURATIONS_FILE_NAME=deploy-config-${CHART_VERSION}.tgz
 export INSTALLER_CONFIGURATIONS_FILE_NAME=installer-config-${CHART_VERSION}.tgz
-cat descriptor-template.json | jq '.files[0].includePattern=env.PEGA_FILE_NAME' | jq '.files[0].uploadPattern=env.PEGA_FILE_NAME' | jq '.files[1].includePattern=env.ADDONS_FILE_NAME' | jq '.files[1].uploadPattern=env.ADDONS_FILE_NAME' | jq '.files[2].includePattern=env.BACKINGSERVICES_FILE_NAME' | jq '.files[2].uploadPattern=env.BACKINGSERVICES_FILE_NAME' | jq '.files[3].includePattern=env.DEPLOY_CONFIGURATIONS_FILE_NAME' | jq '.files[3].uploadPattern=env.DEPLOY_CONFIGURATIONS_FILE_NAME' | jq '.files[4].includePattern=env.INSTALLER_CONFIGURATIONS_FILE_NAME' | jq '.files[4].uploadPattern=env.INSTALLER_CONFIGURATIONS_FILE_NAME'  > descriptor.json
 # Get the latest index.yaml from github.io
 curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
 # Clone the versions from gh-pages to a temp directory - xyz
