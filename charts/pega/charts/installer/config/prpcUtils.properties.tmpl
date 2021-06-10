@@ -26,6 +26,10 @@ customerdata.schema.name={{ .Env.CUSTOMERDATA_SCHEMA }}
 # Will use default if not set to valid directory
 user.temp.dir=/opt/pega/temp
 
+# CUSTOM JVM ARGS
+# Any additional jvm arguments other than Max Heap Size
+custom.jvm.args={{ .Env.CUSTOM_JVM_ARGS }}
+
 ############################### SETTINGS FOR CHANGING DYNAMIC SYSTEM SETTINGS ########
 ######################################################################################
 dass.filepath=/opt/pega/kit/scripts/upgrade_dass_settings.json
