@@ -113,10 +113,8 @@ $ helm delete release --namespace mypega
 To upgrade Pega Platform software deployed in a Kubernetes environment with a zero-downtime process, you must do the following:
 
 1. Download the latest Pega software from Pega Digital Software Delivery.
-2. Create a new blank rules schema and a temporary data schema in your existing database.
-3. Update your repository to use the latest Helm charts and add several parameters to your `pega.yaml` Helm chart.
-
-4. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+2. Update your repository to use the latest Helm charts and add several parameters to your `pega.yaml` Helm chart.
+3. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
 
 For complete details, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
 
