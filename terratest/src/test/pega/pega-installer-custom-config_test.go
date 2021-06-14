@@ -22,7 +22,7 @@ func TestPegaInstallerCustomConfig(t *testing.T) {
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
-					"installer.custom.configurations.installer.prconfig": custom_config,
+					"installer.custom.configurations.prconfig": custom_config,
 				},
 			}
 
