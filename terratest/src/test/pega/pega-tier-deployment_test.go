@@ -37,6 +37,7 @@ func TestPegaTierDeployment(t *testing.T){
 			    		"global.provider":        vendor,
 				    	"global.actions.execute": operation,
 				    	"global.deployment.name": depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
 			 	    },
 		        }
 

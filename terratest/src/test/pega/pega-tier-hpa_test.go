@@ -34,6 +34,7 @@ func TestPegaTierHPA(t *testing.T) {
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
@@ -85,6 +86,7 @@ func TestPegaTierHPADisableTarget(t *testing.T) {
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
@@ -136,6 +138,7 @@ func TestPegaTierOverrideValues(t *testing.T) {
                     SetValues: map[string]string{
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
