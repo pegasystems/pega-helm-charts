@@ -120,6 +120,10 @@ Specify the location for the Pega Docker image.  This image is available on Dock
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
+When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `pegasystems/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
+
+For this reason, it is also recommended that you specify the `docker.pega.imagePullPolicy: "IfNotPresent"` option in production, since it will ensure that a new generic tagged image will not overwrite the locally cached version.
+
 Example:
 
  ```yaml
@@ -129,7 +133,7 @@ docker:
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
   pega:
-    image: "pegasystems/pega"
+    image: "pegasystems/pega:8.4.4"
     imagePullPolicy: "Always"
 ```
 
@@ -701,8 +705,12 @@ To **apply a Pega Platform patch** with zero downtime to your existing Pega plat
 
 Upgrade type    | Description
 ---             | ---
-`in-place`      | An in-place upgrade will upgrade both rules and data using a single process. This process involves system downtime, which means you cannot use the system until you complete the upgrade.
-`out-of-place`  | Use the out-of-place upgrade option to apply a patch with zero-downtime.  This process uses a split-schema to apply patches. It creates a temporary schema, specified with the `installer.targetRulesSchema: "rules_upgrade"` parameter, in your current database then migrates the rules to it. To apply a patch, specify `installer.upgradeType: out-of-place"` and `installer.targetRulesSchema: "rules_upgrade"`.
+`in-place`      | An in-place upgrade will upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in downtime.
+`out-of-place` | `DEPRECATED`: If upgrading from 8.4.2 or later, use a 'zero-downtime' update type to complete an upgrade while continuing to work in your application; if upgrading from 8.4.1 or earlier, use any of the other supported upgrade types. The 'out-of-place' upgrade minimizes downtime, but still requires some downtime. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. With the new rules upgraded, it shuts down the application briefly and upgrades the data in the temporary data schema, and then redeploys your application using the new rules.
+`zero-downtime` |  If upgrading from 8.4.2 and later, use this option. A zero-downtime upgrade synchronizes the required update steps to minimize downtime and you and your customers can continue to access and use their applications in your environment with minimal disruption. This upgrade type places the rules into a read-only state, migrates the rules to your designated "new rules schema", migrates the data to your designated "temporary data schema", and then upgrades all of the rules to the new version. After upgrading your rules schema to the new rules, the process performs a rolling reboot of your nodes and then upgrades the data in the temporary data schema. Finally, the process redeploys the application using the new rules.
+`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: enable_cluster_upgrade rules_migration rules_upgrade data_upgrade disable_cluster_upgrade. To specify which steps to include in your custom upgrade, include them in your values.yaml file within the custom text. For example, to complete a rules upgrade without a data upgrade, you specify: installer.upgradeType: "custom" and installer.upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade" custom upgrade can be used to configure upgrade in steps manner.
+`out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
+`out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
 
 Example:
 

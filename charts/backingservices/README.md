@@ -21,7 +21,7 @@ The service deployment provisions runtime service pods along with a dependency o
 Pega Infinity version   | SRS version   | ElasticSearch version     | Description
 ---                     | ---           | ---                       | ---
 < 8.6                   | NA            | NA                        | SRS can be used with Pega Infinity 8.6 and later
-\>= 8.6                 | \>= 1.9.0     | 7.1.x                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.9.0 and later. Current SRS versions are certified to support Elasticsearch version 7.1.x.
+\>= 8.6                 | \>= 1.12.0     | 7.9.3                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.12.0 and later. Current SRS versions are certified to support Elasticsearch version 7.9.3.
 
 
 #### SRS runtime configuration:
@@ -39,7 +39,7 @@ Configuration                       | Usage
 `deploymentName`                    | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.
 `srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
 `elasticsearch`                     | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for elasticsearch provisioning in the cluster.
-`srsStorage.provisionInternalESCluster` | Enable this parameter to provision an Elasticsearch cluster to be used with SRS. To use your own Elasticsearch service, disable this parameter and use the uncommented section to specify the connection details for your existing external ElasticSearch cluster that is available to your deployment that is using the SRS.
+`srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with SRS.</li><li>Disable this parameter to use your own Elasticsearch service with SRS. Use the uncommented section to specify the connection details for your existing external ElasticSearch cluster that is available to your deployment. For Elasticsearch clusters secured with Basic Authentication, use the commented section 'srsStorage.basicAuthentication' to provide access credentials. For AWS Elasticsearch clusters secured with IAM role based authentication, use 'srsStorage.awsIAM' to set the aws region where AWS Elasticsearch cluster is hosted.</li></ul>
 
 Example:
 
@@ -53,26 +53,30 @@ srs:
     srsImage: "YOUR_SRS_IMAGE:TAG"
     imagepullPolicy: IfNotPresent
     resources:
-        limits:
-            cpu: 1300m
-            memory: "2Gi"
-        requests:
-            cpu: 650m
-            memory: "2Gi"
+      limits:
+        cpu: 1300m
+        memory: "2Gi"
+      requests:
+        cpu: 650m
+        memory: "2Gi"
     serviceType: "ClusterIP"
     env:
-        #AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
-        AuthEnabled: false
-        PublicKeyURL:
-  
+      #AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
+      AuthEnabled: false
+      PublicKeyURL:
+
   srsStorage:
-    # srsStorage.provisionInternalESCluster true will provision an internal elasticsearch cluster with specified configuration
-    provisionInternalESCluster: true
-    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
-    # make sure the endpoint is accessible from the kubernetes cluster pods.
-    # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
-#    domain: managed-elasticsearch.acme.io
-#    port: 443
-#    protocol: https
-#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network and is available over internet
+    # To configure authentication for the externally managed Elasticsearch cluster to use Basic Authentication then uncomment
+    # add the parameters, srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
+    #    basicAuthentication:
+    #      username: "BASIC_AUTH_USERNAME"
+    #      password: "BASIC_AUTH_PASSWORD"
+    # To configure authentication for the externally managed Elasticsearch cluster to use an AWS IAM Role then uncomment and
+    # add the parameters, srs.srsStorage.awsIAM and srs.srsStorage.awsIAM.region
+    # srs.srsStorage.awsIAM's srs.srsStorage.awsIAM.region value
+    #    awsIAM:
+    #      region: "AWS_ELASTICSEARCH_REGION"
+
+    # set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
 #    requireInternetAccess: true
+```

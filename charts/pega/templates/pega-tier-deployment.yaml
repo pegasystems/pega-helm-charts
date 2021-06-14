@@ -33,7 +33,7 @@
 {{ end }}
 
 {{ if (eq (include "performUpgradeAndDeployment" $) "true") }}
-{{ $containerWaitList = append $containerWaitList "waitForPegaDBUpgrade" }}
+{{ $containerWaitList = append $containerWaitList "waitForPegaDBZDTUpgrade" }}
 {{ end }}
 
 {{- if or (eq (include "performOnlyDeployment" $) "true") (eq (include "performInstallAndDeployment" $) "true") (eq (include "performUpgradeAndDeployment" $) "true") }}
