@@ -20,11 +20,7 @@ data:
 {{- $custom_config := .root.Values.custom }}
 
 {{- if $custom_config.configurations }}
-{{- range $key, $value := $custom_config.configurations }}
-{{- if eq $key "installer" }}
-{{ $value | toYaml | nindent 2 -}}
-{{- end }}
-{{- end }}
+{{ $custom_config.configurations  | toYaml | nindent 2 -}}
 {{ else }}
 
 {{ if $prconfigTemplate := .root.Files.Glob $prconfigTemplatePath }}
