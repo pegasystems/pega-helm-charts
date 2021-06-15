@@ -253,6 +253,8 @@ installer:
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
+    # Specify target data schema for migration and upgrade
+    targetDataSchema: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
