@@ -50,7 +50,9 @@ upgrade:
   # Valid upgradeType values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data' .
   # 'out-of-place' is deprecated and supported only with Helm charts prior to version 1.4.
   upgradeType: ""
-  # In case of upgradeType: 'custom', provide upgrade steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`.
+  # In case of upgradeType: 'custom', specify the steps for your custom upgrade process using the upgradeSteps: parameter.
+  # Separate each step with a comma (,) and specify the order in which you want to initiate the steps.
+  # Supported upgrade steps are: enable_cluster_upgrade rules_migration rules_upgrade data_upgrade disable_cluster_upgrade.
   upgradeSteps: ""
   # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
   targetRulesSchema: ""
