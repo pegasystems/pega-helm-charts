@@ -274,9 +274,10 @@ installer:
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
-    # Valid values are 'in-place' , 'out-of-place'
+    # Valid values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data';
     upgradeType: "in-place"
     # Specify target rules schema for migration and upgrade
     targetRulesSchema: ""
     # Specify target data schema for migration and upgrade.
+    #Support for postgres db - 8.4.0 and later , oracle db - 8.4.3 and later
     targetDataSchema: ""

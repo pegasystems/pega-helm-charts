@@ -55,6 +55,7 @@ upgrade:
   # Specify target rules schema for migration and upgrade
   targetRulesSchema: ""
   # Specify target data schema for migration and upgrade
+  #Support for postgres db - 8.4.0 and later , oracle db - 8.4.3 and later
   targetDataSchema: ""
   # The commit count to use when loading database tables
   dbLoadCommitRate: 100
