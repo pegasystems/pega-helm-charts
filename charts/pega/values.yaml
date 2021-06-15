@@ -249,12 +249,13 @@ installer:
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
-    # Valid values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data';
+    # Valid upgradeType values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data' .
     upgradeType: "in-place"
-    # Specify target rules schema for migration and upgrade
+    # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
     targetRulesSchema: ""
-    # Specify target data schema for migration and upgrade
-    #Support for postgres db - 8.4.0 and later , oracle db - 8.4.3 and later
+    # Specify a name for a target data schema that the upgrade process creates for patches and upgrades.
+    # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
+    # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
