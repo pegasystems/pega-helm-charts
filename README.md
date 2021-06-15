@@ -106,15 +106,23 @@ $ helm install mypega pega/pega --namespace mypega --values pega.yaml
 $ helm delete release --namespace mypega
 ```
 
-# Staying current with a Pega Platform upgrade or patching
+# Staying current with a Pega Platform upgrade or patching in zero-downtime
 
 ## Upgrades
 
-To upgrade Pega Platform software deployed in a Kubernetes environment, you must download the latest Pega software from Pega Digital Software Delivery and then use the appropriate upgrade guide for Pega Platform from [Stay current with Pega](https://community.pega.com/upgrade). To upgrade your strategic application, use the latest Upgrade Guide available for your strategic application, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+To upgrade Pega Platform software deployed in a Kubernetes environment with a zero-downtime process, you must do the following:
+
+1. Download the latest Pega software from Pega Digital Software Delivery.
+2. Update your repository to use the latest Helm charts and add several parameters to your `pega.yaml` Helm chart.
+3. Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+
+For complete details, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md).
+
+To upgrade your strategic application, use the latest Upgrade Guide available for your strategic application, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
 
 ## Patches
 
-To apply a Pega Platform patch with zero downtime to your existing Pega platform software, you must download the latest installer Docker images from Pega Digital Software Delivery and change several options in your Pega Helm chart. For details and helpful resources explaining the Pega Platform patch process, including the Pega Infinity patch policy, see [Applying the latest patch](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/applying-latest-patch). For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md).
+To apply a Pega Platform patch with zero downtime to your existing Pega platform software, you must download the latest installer Docker images from Pega Digital Software Delivery and change several options in your Pega Helm chart. For details and helpful resources explaining the Pega Platform patch process, including the Pega Infinity patch policy, see [Applying the latest patch](https://community.pega.com/knowledgebase/articles/keeping-current-pega/86/applying-latest-patch). For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md).
 
 # Downloading Docker images for your deployment
 
