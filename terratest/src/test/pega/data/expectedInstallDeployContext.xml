@@ -17,6 +17,8 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
+    minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
     />
   {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
     <Resource name="jdbc/PegaRULESReadOnly"
@@ -32,6 +34,8 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
+    minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
     />
   
   <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
