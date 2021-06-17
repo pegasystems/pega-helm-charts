@@ -17,6 +17,11 @@ data:
 {{- $prbootstraptemplatePath := "config/prbootstrap.properties.tmpl" }}
 {{- $prpcUtilsPropertiestemplatePath := "config/prpcUtils.properties.tmpl" }}
 {{- $migrateSystempropertiestemplatePath := "config/migrateSystem.properties.tmpl" }}
+{{- $custom_config := .root.Values.custom }}
+
+{{- if $custom_config.configurations }}
+{{ $custom_config.configurations  | toYaml | nindent 2 -}}
+{{ else }}
 
 {{ if $prconfigTemplate := .root.Files.Glob $prconfigTemplatePath }}
   # prconfigTemplate to be used by {{ .name }}
@@ -58,6 +63,7 @@ data:
   # prlog4j2 file to be used by {{ .name }}
   prlog4j2.xml: |-
 {{ .root.Files.Get $prlog4j2Path | indent 6 }}
+{{- end }}
 
 {{- $dbType := .dbType }}
 {{- $postgresConfPath := "config/postgres/postgres.conf" }}
