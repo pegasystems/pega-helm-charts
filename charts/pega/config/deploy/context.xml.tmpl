@@ -29,10 +29,18 @@
     username="{{ .Env.DB_RO_USERNAME }}"
     password="{{ .Env.DB_RO_PASSWORD }}"
     maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
+    {{ if .Env.JDBC_RO_MIN_IDLE }}
+    minIdle="{{ .Env.JDBC_RO_MIN_IDLE }}"
+    {{ else }}
     minIdle="{{ .Env.JDBC_MIN_IDLE }}"
+    {{ end }}
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
+    {{ if .Env.JDBC_RO_INITIAL_SIZE }}
+    initialSize="{{ .Env.JDBC_RO_INITIAL_SIZE }}"
+    {{ else }}
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
+    {{ end }}
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
     timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
     minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
