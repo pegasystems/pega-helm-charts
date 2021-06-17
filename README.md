@@ -2,7 +2,7 @@
 
 This project provides Helm charts and basic examples for deploying Pega on Kubernetes. You will also need to download the required [installation kit](https://community.pega.com/knowledgebase/products/platform/deploy) from the Pega Community which includes rules and data to preload into your relational database. Deploying Pega on Kubernetes requires Pega Infinity 8.2 or newer.
 
-[![Build Status](https://travis-ci.org/pegasystems/pega-helm-charts.svg?branch=master)](https://travis-ci.org/pegasystems/pega-helm-charts)
+[![Build Status](https://travis-ci.com/pegasystems/pega-helm-charts.svg?branch=master)](https://travis-ci.com/pegasystems/pega-helm-charts)
 [![GitHub release](https://img.shields.io/github/release/pegasystems/pega-helm-charts.svg)](https://github.com/pegasystems/pega-helm-charts/releases)
 
 # Supported Kubernetes environments
