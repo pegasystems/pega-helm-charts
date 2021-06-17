@@ -182,4 +182,3 @@ New versions of this Helm Chart may be released at any time. Versions are define
 * Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
   * Bug fixes or known issue resolutions.
   * Security vulnerability enhancements.
-
