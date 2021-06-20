@@ -6,12 +6,19 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if and (eq .root.Values.waitForJobCompletion "true") (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
-    # Forces Helm to wait for the install or upgrade to complete.
-    "helm.sh/hook": post-install
+{{- if  (eq .root.Values.waitForJobCompletion "true")   }}
     "helm.sh/hook-weight": "0"
     "helm.sh/hook-delete-policy": before-hook-creation
+{{- if  (eq .root.Values.global.actions.execute "install") }}
+    # Forces Helm to wait for the install to complete.
+    "helm.sh/hook": post-install
 {{- end }}
+{{- if (eq .root.Values.global.actions.execute "upgrade") }}
+    # Forces Helm to wait for the upgrade to complete.
+    "helm.sh/hook": post-install, post-upgrade
+{{- end }}
+{{- end }}
+
 {{- if .root.Values.global.pegaJob }}{{- if .root.Values.global.pegaJob.annotations }}
 {{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
 {{- end }}{{- end }}
