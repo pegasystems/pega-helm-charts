@@ -6,7 +6,7 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
+{{- if and (eq .root.Values.waitForJobCompletion "true") (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
     # Forces Helm to wait for the install or upgrade to complete.
     "helm.sh/hook": post-install
     "helm.sh/hook-weight": "0"
@@ -30,7 +30,7 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}      
-{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
@@ -79,6 +79,6 @@ spec:
 {{- end }}           
       restartPolicy: Never
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" }}
+      - name: {{ template "pegaRegistrySecret" .root }}
 ---
 {{- end -}}

@@ -22,6 +22,7 @@ func TestPegaInstallerStatusRoleBinding(t *testing.T) {
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-status-rolebinding.yaml"})

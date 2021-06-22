@@ -1,14 +1,12 @@
-Deploying Pega Platform on a TKGI cluster
-===============================
+# Deploying Pega Platform on a TKGI cluster
 
-Deploy Pega Platform™ on a VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). TKGI was formerly knows Pivotal Container Service (PKS). If your TKGI cluster is deployed on a different cloud, the database steps may be different. These procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a TKGI cluster.
+Deploy Pega Platform™ on a VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). TKGI was formerly knows Pivotal Container Service (PKS). If your TKGI cluster is deployed on a different cloud, the database steps may be different. The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a TKGI cluster.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a TKGI cluster without much experience in either TKGI configurations or Pega Platform deployments.
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a TKGI cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a TKGI cluster with a PostgreSQL database instance and two clustered virtual machines (VMs).
 
-Deployment process overview
-------------------------
+## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a TKGI cluster that you create for the deployment:
 
@@ -27,8 +25,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
 
 To understand how Pega maps Kubernetes objects with Pega applications and services, see [Understanding the Pega deployment architecture](https://community.pega.com/knowledgebase/articles/client-managed-cloud/cloud/understanding-pega-deployment-architecture).
 
-Assumptions and prerequisites
------------------------------
+## Assumptions and prerequisites
 
 This guide assumes:
 
@@ -48,7 +45,7 @@ The following account, resources, and application versions are required for use 
 
 - Pega Platform 8.3.1 or later.
 
-- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For details, see [Downloading Docker images for your deployment](https://github.com/pegasystems/pega-helm-charts#downloading-docker-images-for-your-deployment).
+- Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -56,8 +53,7 @@ The following account, resources, and application versions are required for use 
 
 - PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
 
-Prepare your resources – 45 minutes
------------------------------------
+## Prepare your resources – 45 minutes
 
 This section covers the details necessary to obtain your TKGI credentials and
 configure the required PostgreSQL database in a GCP account. Pega supports
@@ -149,8 +145,7 @@ Create a PostgreSQL database in your new SQL instance for the Pega Platform inst
 
 With your SQL service IP address and your new database name, you are ready to continue to the next section.
 
-Installing and deploying Pega Platform using Helm charts – 90 minutes
----------------------------------------------------------------------
+## Installing and deploying Pega Platform using Helm charts – 90 minutes
 
 To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
 
@@ -160,42 +155,65 @@ An installation with deployment will take about 90 minutes total, because a Pega
 
 Pega maintains a repository of Helm charts that are required to deploy Pega Platform using Helm, including a generic version of the following charts. After you add the repository to your local system, you can customize these Pega configuration files for your Pega Platform deployment:
 
+- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment. With the instructions in this runbook, you deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+
 - pega/pega - Use this chart to set customization parameters for your deployment. You will modify this chart later in the deployment tasks.
 
-- pega/addons – Use this chart to install any supporting services and tools which your Kubernetes environment will require to support a Pega deployment: the required services, such as a load balancer or metrics server, that your deployment requires depend on your cloud environment. For instance you can specify whether you want to use a generic load-balancer or use one that is offered in your Kubernetes environment, such as in AKS or EKS. The runbooks provide instructions to deploy these supporting services once per Kubernetes environment when you install the addons chart, regardless of how many Pega Infinity instances are deployed.
+- pega/backingservices - Use this chart to set customization parameters for the Pega-provided Search and Reporting Service (SRS) your deployment. You will modify this chart later in the deployment tasks.
 
-To customize these files, you must download them from the repository to your local system, edit them with a text editor, and then save them to your local system using the same filename. In this set of tasks, you will focus on the pega/addons.yaml file; in the environment-specific runbook that you are using in the section, **Update the Helm chart values**, you will update the pega.yaml file.
+To customize these files, you must download them from the source github repository to your local system, edit them with a text editor, and then save them to your local system using the same filename.
 
 1. To add the Pega repository to your Helm installation, enter:
 
-    `$ helm repo add pega https://dl.bintray.com/pegasystems/pega-helm-charts`
+    `$ helm repo add pega https://pegasystems.github.io/pega-helm-charts`
 
 2. To verify the new repository, you can search it by entering:
 
-```bash
+```
   $ helm search repo pega
-  NAME        CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega   1.2.0                           Pega installation on kubernetes
-  pega/addons 1.2.0           1.0             A Helm chart for Kubernetes
+  NAME                  CHART VERSION   APP VERSION     DESCRIPTION
+  pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
-These two charts in this /charts/pega folder of the pega-helm-charts repository, pega and addons, require customization for your deployment of Pega Platform.
+The pega and addons charts require customization for your organization's TGKI deployment of Pega Platform. The backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
 
-### Updating the addons.yaml Helm chart values
+#### Updating the addons.yaml Helm chart values
 
-Use the provided example addons.yaml file to configure the use of a the Traefik load balancer and enabling EFK for log aggregation. You must disable the Pega metric server to ensure your deployment uses the Pivotal-supplied metrics server.
+To configure the use of a the Traefik load balancer and enable EFK for log aggregation in the addons.yaml file, download the file in the charts/addons folder, edit it with a text editor, and then save it to your local system using the same filename. You must disable the Pega metric server to ensure your deployment uses the TGKI-supplied metrics server.
 
 1. Download the example pega/addons [addons.yaml](./resources/addons-pks.yaml) to the \<local filepath\>/TKGI-demo.
 
    When you install the addons namespace, you will specify this example file for the configuration details.
 
-2. Review the settings for this file. The example addons file is configured to automatically deploy EFK for log aggregation. 
+2. Use a text editor to open the addons-aks.yaml file and update the following parameters in the chart based on your AKS requirements. The example addons file is configured to automatically deploy EFK for log aggregation. If you need to make customizations, add the appropriate parameters:
 
-  - To use the default EFK settings, you must set a domain name to access kibana from your load balancer using the `kibana.hosts: "YOUR_WEB.KIBANA.EXAMPLE.COM"` parameter.
+- To use the default EFK settings, you must set a domain name to access kibana from your load balancer using the `kibana.hosts: "YOUR_WEB.KIBANA.EXAMPLE.COM"` parameter.
+- If your TKGI deployment already has log aggregation capabilities configured, you must disable EFK deploy by setting the `deploy_efk: &deploy_efk false` parameter.
 
-  - If your TKGI deployment already has log aggregation capabilities configured, you must disable EFK deploy by setting the `deploy_efk: &deploy_efk false` parameter.
+3. Save the file.
 
-### Add any known, customized addons settings for Pega to your deployment
+#### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
+
+To configure the parameters in the backingservices.yaml file, download the file in the charts/backingservices folder, edit it with a text editor, and then save it to your local system using the same filename.
+  
+1. To download the backingservices.yaml Helm chart to the \<local filepath>\TKGI-demo, enter:
+  
+  `$ helm inspect values pega/backingservices > <local filepath>/TKGI-demo/backingservices.yaml`
+  
+2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your PKS requirements:
+  
+| Chart parameter name              | Purpose                                   | Your setting |
+|:---------------------------------|:-------------------------------------------|:--------------|
+| global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
+| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
+| srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. For an Elasticsearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS Elasticsearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS Elasticsearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li>     <li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li>     <li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
+| elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size. | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
+
+3. Save the file.
+
+#### Add any known, customized addons settings for Pega to your deployment
 
 The Pega deployment model supports advanced configurations to fit most existing
 clients' needs. If you are a Pega client and have known, required customizations
@@ -212,11 +230,11 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 Make these changes before you begin deploying Pega Platform using Helm charts.
 
-### Updating the pega.yaml Helm chart values
+#### Updating the pega.yaml Helm chart values
 
-To deploy Pega Platform, configure the parameters in the pega.yaml Helm chart to your deployment resource. Pega maintains a repository of Helm charts that are required to deploy Pega Platform by using Helm, including a generic version of this chart. To configure parameters this file, download it from the repository to your local system, edit it with a text editor, and then save it with the same filename. To simplify the instruction, you can download the file to the \gke-demo folder you have already created on your local system. 
+To configure the parameters in the pega.yaml fie, download the file in the charts/pega folder, edit it with a text editor, and then save it to your local system using the same filename.
 
-Configure the parameters so the pega.yaml Helm chart matches your deployment resources in these areas:
+Configure the following parameters so the pega.yaml Helm chart matches your deployment resources in these areas:
 
 - Specify that this is an TKGI deployment.
 
@@ -254,7 +272,26 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. |Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>"|
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
 
-3. Save the file.
+3. [For Pega Platform 8.6 and later] Applicable only when backingservices chart is configured.
+
+   For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
+
+   Chart parameter name   | Purpose   | Your setting
+   ---         | ---           | ---
+   `pegasearch.externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | true
+   `pegasearch.externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `"http://<srs.deploymentName>.<namespace>.svc.cluster.local"` or `"http://<srs.deploymentName>.<namespace>"`
+
+   Example:
+
+   When backingservice is deployed into `mypega-TKGI-demo` namespace and `pegasearch.externalSearchService` value is "srs-service", configure the `pegasearch` section in pega.yaml as below:
+
+   ```yaml
+   pegasearch:
+     externalSearchService: true
+     externalURL: "http://srs-service.mypega-TKGI-demo.svc.cluster.local"
+   ```
+
+4. Save the file.
 
 ### Deploying Pega Platform using the command line
 
@@ -373,7 +410,14 @@ ingress:
 
 A successful pegaaddons deployment returns details of deployment progress. For further verification of your deployment progress, you can refresh the Kubernetes dashboard and look in the `pegaaddons` **Namespace** view.
 
-15. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
+15. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
+
+   ```yaml
+   $ helm install backingservices pega/backingservices --namespace mypega-TKGI-demo --values backingservices.yaml
+   ```
+   The `mypega-TKGI-demo` namespace used for pega deployment can also be used for backingservice deployment that you configured in backingservices.yaml helm chart.
+
+16. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
     $ helm install mypega-TKGI-demo pega/pega --namespace mypega-TKGI-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -389,9 +433,9 @@ For subsequent Helm installs, use the command `helm install mypega-TKGI-demo peg
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-TKGI-demo` deployment.
 
-16. Refresh the Kubernetes dashboard that you opened in step 8. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 7, and relaunch the web browser as directed in Step 8.
+17. Refresh the Kubernetes dashboard that you opened in step 8. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 7, and relaunch the web browser as directed in Step 8.
 
-17. In the dashboard, in **Namespace** select the `mypega-TKGI-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
+18. In the dashboard, in **Namespace** select the `mypega-TKGI-demo` view and then click on the **Pods** view. Initially, you can some pods have a red status, which means they are initializing:
 
 ![](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -399,11 +443,11 @@ A successful Pega deployment immediately returns details that show progress for 
 
     To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-18. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
+19. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
 
     After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
 
-19. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-TKGI-demo` namespace pods.
+20. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-TKGI-demo` namespace pods.
 
 ![](media/f7779bd94bdf3160ca1856cdafb32f2b.png)
 
@@ -411,8 +455,7 @@ A successful deployment does not show errors across the various workloads. The `
 
 ![](media/0fb2d07a5a8113a9725b704e686fbfe6.png)
 
-Logging in to Pega Platform – 10 minutes
----------------------------------------
+## Logging in to Pega Platform – 10 minutes
 
 After you complete your deployment, as a best practice, associate the host name of the pega-web tier ingress with the IP address that the deployment load balancer assigned to the tier during deployment. The host name of the pega-web tier ingress used in this demo, **tkgi.web.dev.pega.io**, is set in the pega.yaml file in the following lines:
 
