@@ -1,5 +1,6 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
 {{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
+{{- define "pegaUpgradelConfig" }}pega-upgrade-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
 {{- define "pegaDBCustomUpgrade" -}}pega-db-custom-upgrade{{- end -}}
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
