@@ -1,3 +1,7 @@
-{{ if or (eq (include "performInstall" .) "true") (eq (include "performUpgrade" .) "true") }}
+{{ if (eq (include "performInstall" .) "true") }}
 {{ template "pega.installer.config" dict "root" $ "dbType" .Values.global.jdbc.dbType "name" (include "pegaInstallConfig" .) "mode" (include "installerConfig" .) }}
+{{ end }}
+
+{{ if (eq (include "performUpgrade" .) "true") }}
+{{ template "pega.installer.config" dict "root" $ "dbType" .Values.global.jdbc.dbType "name" (include "pegaUpgradelConfig" .) "mode" (include "installerConfig" .) }}
 {{ end }}
