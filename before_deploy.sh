@@ -13,7 +13,7 @@ curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
 # Clone the versions from gh-pages to a temp directory - xyz
 # The versions will be re-installed in temporary directory - temp_gh_pages
 git clone --single-branch --branch gh-pages https://github.com/${TRAVIS_REPO_SLUG} temp_gh_pages
-cp temp_gh_pages/* .
+cp temp_gh_pages/*.tgz .
 rm -rf temp_gh_pages
 ls
 # Package up the changed version
