@@ -129,6 +129,12 @@ global:
       hpa:
         enabled: true
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
@@ -157,6 +163,12 @@ global:
 
       hpa:
         enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -202,6 +214,12 @@ global:
         resources:
           requests:
             storage: 5Gi
+    
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
 # External services
 

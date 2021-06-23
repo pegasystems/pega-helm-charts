@@ -125,6 +125,12 @@ global:
       hpa:
         enabled: true
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
@@ -148,6 +154,12 @@ global:
 
       hpa:
         enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -191,6 +203,12 @@ global:
           requests:
             storage: 5Gi
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
     - name: "bix"
       # Create a background tier for BIX processing.  This tier uses
       # the BIX node type and will not be exposed to the load balancer.
@@ -214,6 +232,12 @@ global:
       hpa:
         enabled: true
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
     - name: "realtime"
       # Create a dedicated tier for real-time data grid processing.
       nodeType: "RealTime"
@@ -235,6 +259,12 @@ global:
 
       hpa:
         enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
 # External services
 
