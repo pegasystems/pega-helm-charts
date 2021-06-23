@@ -3,5 +3,5 @@
 {{ end }}
 
 {{ if (eq (include "performUpgrade" .) "true") }}
-{{ template "pega.installer.config" dict "root" $ "dbType" .Values.global.jdbc.dbType "name" (include "pegaUpgradelConfig" .) "mode" (include "installerConfig" .) }}
+{{ template "pega.installer.config" dict "root" $ "dbType" .Values.global.jdbc.dbType "name" (include "pegaUpgradeConfig" .) "mode" (include "installerConfig" .) }}
 {{ end }}
