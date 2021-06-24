@@ -44,6 +44,7 @@ spec:
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
