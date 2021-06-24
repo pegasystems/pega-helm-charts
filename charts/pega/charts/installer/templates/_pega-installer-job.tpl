@@ -41,7 +41,12 @@ spec:
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
-          name: {{ template "pegaInstallConfig"}}  
+      {{- if (eq .root.Values.global.actions.execute "install") }}
+          name: {{ template "pegaInstallConfig"}}
+      {{- end }}
+      {{- if (eq .root.Values.global.actions.execute "upgrade") }}
+          name: {{ template "pegaUpgradeConfig"}}
+      {{- end }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420          
       initContainers:
