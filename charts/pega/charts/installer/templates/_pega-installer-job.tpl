@@ -43,8 +43,7 @@ spec:
           # This name will be referred in the volume mounts kind.
       {{- if  (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "install-deploy") (eq .root.Values.global.actions.execute "deploy")) }}
           name: {{ template "pegaInstallConfig"}}
-      {{- end }}
-      {{- if  (or (eq .root.Values.global.actions.execute "upgrade") (eq .root.Values.global.actions.execute "upgrade-deploy")) }}
+      {{- else }}
           name: {{ template "pegaUpgradeConfig"}}
       {{- end }}
           # Used to specify permissions on files within the volume.
