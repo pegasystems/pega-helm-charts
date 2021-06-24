@@ -86,7 +86,12 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Secret.SecretName, getObjName(options, "-credentials-secret"))
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Secret.DefaultMode, volDefaultModePointer)
 	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
-	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-installer-config")
+        if(jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name=="pega-install-config") {
+            require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-install-config")
+	}
+	if(jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name=="pega-upgrade-config") {
+	    require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
+	}
 	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
 	require.Equal(t, jobContainers[0].Name, expectedJob.name)
