@@ -260,6 +260,14 @@ true
     defaultMode: 420
 {{- end}}
 
+{{- define "generatedDNSConfigAnnotations" }}
+{{ if (.Values.global.privateHostedZoneDomainName) }}
+dnsConfig:
+  searches:
+  - {{ .Values.global.privateHostedZoneDomainName }}
+{{- end }}
+{{- end }}
+
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 
