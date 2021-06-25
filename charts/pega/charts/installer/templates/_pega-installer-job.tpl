@@ -41,7 +41,7 @@ spec:
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
-     {{- if (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "install-deploy") )}}
+     {{- if or (eq $arg "install") (eq $arg "install-deploy") }}
           name: {{ template "pegaInstallConfig"}}
      {{- else }}
           name: {{ template "pegaUpgradeConfig"}}
