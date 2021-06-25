@@ -480,6 +480,16 @@ Parameter           | Description    | Default value
 `hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
+### Setting a Pod Disruption Budget (PDB)
+You can configure a Kubernetes `PodDisruptionBudget`on your tier by setting `pdb.enabled` to `true`.  For more details, see the Kubernetes 
+[Pod disruption budgets documentation] (https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).  
+The following parameters are mutually exclusive.  You may specifiy either `pdb.minAvailable` or `pdb.maxUnavailable` but not both.   
+
+Parameter             | Description    | Default value
+---                   | ---       | ---
+`pdb.minAvailable`    | The minimum number of pods in the tier that must remain available at all times  | `1`
+`pdb.maxUnavailable`  | The maximum number of pods in the tier that can be unavailable at one time      | Disabled when `pdb.minAvailable` is specified
+
 ### Volume claim template
 
 A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
