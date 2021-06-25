@@ -214,7 +214,7 @@ global:
         resources:
           requests:
             storage: 5Gi
-    
+
       # Set enabled to true to include a Pod Disruption Budget for this tier
       pdb:
         enabled: false
