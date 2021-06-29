@@ -481,7 +481,7 @@ Parameter           | Description    | Default value
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
 ### Setting a Pod Disruption Budget (PDB)
-You can configure a Kubernetes `PodDisruptionBudget`on your tier by setting `pdb.enabled` to `true`.  For more details, see the Kubernetes 
+You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true`.  For more details, see the Kubernetes 
 [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
 
 The following parameters are mutually exclusive.  You may specifiy either `pdb.minAvailable` or `pdb.maxUnavailable` but not both.   
