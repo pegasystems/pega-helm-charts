@@ -11,6 +11,7 @@ import (
 	"k8s.io/api/policy/v1beta1"
 )
 
+// TestPegaTierPDBEnabled - verify that a PodDisruptionBudget is created when global.tier.pdb.enabled=true
 func TestPegaTierPDBEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
@@ -64,6 +65,7 @@ func TestPegaTierPDBEnabled(t *testing.T) {
 	}
 }
 
+// TestPegaTierPDBDisabled - verify that a PodDisruptionBudget is not created when global.tier.pdb.enabled=false
 func TestPegaTierPDBDisabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
@@ -112,13 +114,11 @@ func verifyPegaPDBs(t *testing.T, yamlContent string, options *helm.Options, exp
 	}
 }
 
-// verifyPegaPdb - Performs Pega PDB assertions with the values as provided in default values.yaml
+// verifyPegaPdb - Performs Pega PDB assertions with the values as provided
 func verifyPegaPdb(t *testing.T, pegaPdbObj *v1beta1.PodDisruptionBudget, expectedPdb pdb) {
 	require.Equal(t, pegaPdbObj.TypeMeta.Kind, expectedPdb.kind)
 	require.Equal(t, pegaPdbObj.TypeMeta.APIVersion, expectedPdb.apiversion)
-
 	require.Equal(t, expectedPdb.minAvailable, pegaPdbObj.Spec.MinAvailable.IntVal)
-
 }
 
 type pdb struct {
