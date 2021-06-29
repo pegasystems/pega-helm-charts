@@ -484,7 +484,7 @@ Parameter           | Description    | Default value
 You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true`.  For more details, see the Kubernetes 
 [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
 
-The following parameters are mutually exclusive.  You may specifiy either `pdb.minAvailable` or `pdb.maxUnavailable` but not both.   
+The following parameters are mutually exclusive.  You must specify either `pdb.minAvailable` or `pdb.maxUnavailable` but not both.
 
 Parameter             | Description    | Default value
 ---                   | ---       | ---
