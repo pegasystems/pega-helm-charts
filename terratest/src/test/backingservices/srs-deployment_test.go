@@ -6,6 +6,7 @@ import (
 	k8score "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"testing"
+	"strings"
 )
 
 func TestSRSDeployment(t *testing.T){
@@ -65,6 +66,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
+			"srs.srsStorage.awsIAM.region": "us-east-1",
 			"srs.srsStorage.requireInternetAccess": "true",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
@@ -89,6 +91,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 				domain:   "es-id.managed.cloudiest.io",
 				port:     "443",
 				protocol: "https",
+				region: "us-east-1",
 			},
 		})
 }
@@ -166,9 +169,28 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "ELASTICSEARCH_PROTO", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.elasticsearchEndPoint.protocol, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
-	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
+	require.Equal(t, "ELASTICSEARCH_AUTH_PROVIDER", pod.Containers[0].Env[envIndex].Name)
+	require.NotEmpty(t, pod.Containers[0].Env[envIndex].Value)
+	var authProvider string = pod.Containers[0].Env[envIndex].Value
 	envIndex++
+	if strings.EqualFold("aws-iam", authProvider) {
+	require.Equal(t, "ELASTICSEARCH_REGION", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, expectedSpec.elasticsearchEndPoint.region, pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	}
+	if strings.EqualFold("basic-authentication", authProvider) {
+	require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+	require.Equal(t, "username", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+    require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	}
+	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
+    require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
+    envIndex++
 	require.Equal(t, "APPLICATION_PORT", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8080", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
@@ -217,4 +239,5 @@ type esDomain struct {
 	domain		string
 	port		string
 	protocol	string
+	region      string
 }

@@ -8,7 +8,7 @@ global:
 
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
-    name: "pega"
+    name: "ephemeral"
 
   # Deploy Pega nodes
   actions:
@@ -68,7 +68,7 @@ global:
 
   # Specify the Pega tiers to deploy
   tier:
-    - name: "web"
+    - name: "ephemeralweb"
       # Create a an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
@@ -84,6 +84,34 @@ global:
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
+        custom :
+          prconfig: |-
+            <?xml version="1.0" encoding="UTF-8"?>
+            <pegarules>
+             <!-- This is a minimum format prconfig.xml file.  Only the settings which are required to access settings in the database are included.
+             All other settings which were formerly located only in this file are now Data-Admin-System-Settings.      -->
+             <env name="initialization/settingsource" value="merged" />
+             <env name="database/databases/PegaRULES/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
+             <env name="database/databases/PegaDATA/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
+             <env name="security/urlaccesslog" value="NORMAL" />
+             <env name="security/urlaccessmode" value="WARN" />
+             <!-- Most nodes have a 'default' classification and for these nodes, no additional changes need to be made to this file.  However,
+             if this is node has a non-general purpose, for example: 'Agent', then the node classification setting should be added to this file. -->
+             <!--env name="initialization/nodeclassification" value="Agent" /  -->
+             <!-- Settings can still be put in this file.  If they are, then the value in this file will override the value in the database
+             for this node.  This is useful for settings which are specific to this node and should not be shared by multiple nodes on this
+              system. -->
+  
+             <env name="agent/enable" value="false" type="java.lang.String"/>
+             <env name="asyncExecutor/enable" value="false" type="java.lang.String"/>
+             <env name="agent/masteragentenable" value="false" type="java.lang.String"/>
+             <env name="usage/usagetrackingenabled" value="false" type="java.lang.String"/>
+             <env name="initServices/initFile" value="false" type="java.lang.String"/>
+             <env name="initServices/initEmail" value="false" type="java.lang.String"/>
+             <env name="database/databases/PegaDATA/defaultSchema" value="tempdata1" type="java.lang.String"/>
+             <env name="cluster/encryption/enabled" value="false" type="java.lang.String"/>
+  
+            </pegarules>
 
       ingress:
         # For help configuring the ingress block including TLS, see the Helm chart documentation
@@ -129,143 +157,11 @@ global:
       hpa:
         enabled: true
 
-    - name: "batch"
-      # Create a background tier for batch processing.  This tier uses
-      # a collection of background node types and will not be exposed to
-      # the load balancer.
-      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
-
-      replicas: 1
-      javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-
-      deploymentStrategy:
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
-        type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
-
-      # To configure an alternative user for your custom image, set value for runAsUser
-      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
-      #   runAsUser: 9001
-
-      hpa:
-        enabled: true
-
-    - name: "stream"
-      # Create a stream tier for queue processing.  This tier deploys
-      # as a stateful set to ensure durability of queued data. It may
-      # be optionally exposed to the load balancer.
-      nodeType: "Stream"
-
-      # Pega requestor specific properties
-      requestor:
-        # Inactivity time after which requestor is passivated
-        passivationTimeSec: 900
-
-      service:
-        port: 7003
-        targetPort: 7003
-
-      # If a nodeSelector is required for this or any tier, it may be specified here:
-      # nodeSelector:
-      #  disktype: ssd
-
-      ingress:
-        # Enter the domain name to access web nodes via a load balancer.
-        #  e.g. web.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
-        tls:
-          # Enable TLS encryption
-          enabled: true
-          # secretName:
-          # useManagedCertificate: false
-          # ssl_annotation:
-
-      livenessProbe:
-        port: 8081
-
-      # To configure an alternative user for your custom image, set value for runAsUser
-      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
-      #   runAsUser: 9001
-
-      replicas: 2
-
-      volumeClaimTemplate:
-        resources:
-          requests:
-            storage: 5Gi
-
-# External services
-
-# Cassandra automatic deployment settings.
-cassandra:
-  enabled: true
-  persistence:
-    enabled: true
-  resources:
-    requests:
-      memory: "4Gi"
-      cpu: 2
-    limits:
-      memory: "8Gi"
-      cpu: 4
-
-# DDS (external Cassandra) connection settings.
-# These settings should only be modified if you are using a custom Cassandra deployment.
-dds:
-  externalNodes: ""
-  port: "9042"
-  username: "dnode_ext"
-  password: "dnode_ext"
-  clientEncryption: false
-  trustStore: ""
-  trustStorePassword: ""
-  keyStore: ""
-  keyStorePassword: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
-# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
+# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section
 pegasearch:
   image: "pegasystems/search"
-  memLimit: "3Gi"
   replicas: 1
-
-# Pega Installer settings.
-installer:
-  image: "YOUR_INSTALLER_IMAGE:TAG"
-  # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
-  # The adminPassword value cannot start with "@".
-  adminPassword: "ADMIN_PASSWORD"
-  # Upgrade specific properties
-  upgrade:
-    # Type of upgrade
-    # Valid upgradeType values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data' .
-    upgradeType: "in-place"
-    # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
-    targetRulesSchema: ""
-    # Specify a name for a target data schema that the upgrade process creates for patches and upgrades.
-    # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
-    # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
-    targetDataSchema: ""
-
-# Hazelcast settings (applicable from Pega 8.6)
-hazelcast:
-  image: "YOUR_HAZELCAST_IMAGE:TAG"
-  # Setting below to true will deploy the infinity in client server hazelcast mode
-  enabled: false
-  # No. of initial members to join
-  replicas: 3
-  # UserName to be used in client server hazelcast mode for authentication
-  username: ""
-  # Password to be used in client server hazelcast mode for authentication
-  password: ""

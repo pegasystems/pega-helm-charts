@@ -6,11 +6,11 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
-{{- if and .root.Values.waitForJobCompletion (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
+{{- if and (eq .root.Values.waitForJobCompletion "true") (or (eq .root.Values.global.actions.execute "install") (eq .root.Values.global.actions.execute "upgrade")) }}
     # Forces Helm to wait for the install or upgrade to complete.
-    "helm.sh/hook": post-install
+    "helm.sh/hook":  post-install 
     "helm.sh/hook-weight": "0"
-    "helm.sh/hook-delete-policy": before-hook-creation
+    "helm.sh/hook-delete-policy": {{ if .root.Values.cleanAfterInstall -}} before-hook-creation,hook-succeeded {{- else -}} before-hook-creation {{- end }}
 {{- end }}
 {{- if .root.Values.global.pegaJob }}{{- if .root.Values.global.pegaJob.annotations }}
 {{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
