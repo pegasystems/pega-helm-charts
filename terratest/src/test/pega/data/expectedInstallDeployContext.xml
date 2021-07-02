@@ -31,13 +31,13 @@
 
   {{ if and .Env.DB_RW_USERNAME .Env.JDBC_RW_URL }}
     <Resource name="jdbc/PegaRULESLongRW"
-              auth="Container"
-              type="javax.sql.DataSource"
-              driverClassName="{{ .Env.JDBC_CLASS }}"
-              url="{{ .Env.JDBC_RW_URL }}"
-              username="{{ .Env.DB_RW_USERNAME }}"
-              password=""
-              maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
+    auth="Container"
+    type="javax.sql.DataSource"
+    driverClassName="{{ .Env.JDBC_CLASS }}"
+    url="{{ .Env.JDBC_RW_URL }}"
+    username="{{ .Env.DB_RW_USERNAME }}"
+    password=""
+    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
     {{ if .Env.JDBC_RO_MIN_IDLE }}
     minIdle="{{ .Env.JDBC_RO_MIN_IDLE }}"
     {{ else }}

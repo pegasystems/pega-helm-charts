@@ -97,7 +97,7 @@
     minEvictableIdleTimeMillis="60000"
     {{ end }}
     />
-  
+
   <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
   <Environment name="prconfig/database/databases/PegaDATA/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
   {{ if .Env.CUSTOMERDATA_SCHEMA }}
