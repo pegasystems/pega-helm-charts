@@ -13,6 +13,7 @@ metadata:
     app: {{ template "searchName" . }}
     component: Pega
 spec:
+  publishNotReadyAddresses: true
   ports:
   - port: 80
     targetPort: 9300
