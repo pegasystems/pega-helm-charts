@@ -481,17 +481,17 @@ Parameter           | Description    | Default value
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
 ### Ensure System Availability during Voluntary Disruptions by Using a Kubernetes Pod Disruption Budget (PDB)
-To safeguard your deployment by limiting the number of Pods running your Pega Platform application that can go down for planned "disruptions", 
-Pega allows you to enable a unique Kubernetes `PodDisruptionBudget` on a tier.  For more details on PDBs, see the Kubernetes [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
+To limit the number of Pods running your Pega Platform application that can go down for planned disruptions, 
+Pega allows you to enable a Kubernetes `PodDisruptionBudget` on a tier.  For more details on PDBs, see the Kubernetes [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
 
 You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true` in your values.yaml file.  By default, this value is
-set to `false.`  You must also specify at least one of the following parameters to configure the Pod Disruption Budget.  Keep in mind that these parameters
+set to `false.`  You must also specify exactly one of the following parameters to configure the Pod Disruption Budget.  These parameters
 are mutually exclusive, and thus only one may be set.  You may provide values that are expressed as percentages (% of pods) or integers (# of pods).  
 
 Parameter             | Description    | Default value
 ---                   | ---       | ---
 `pdb.minAvailable`    | The minimum number of pods in the tier that must remain available at all times  | `1`
-`pdb.maxUnavailable`  | The maximum number of pods in the tier that can be unavailable at one time      | `50%`
+`pdb.maxUnavailable`  | The maximum number of pods in the tier that can be unavailable at one time      | `50%` (disabled by default)
 
 ### Volume claim template
 
