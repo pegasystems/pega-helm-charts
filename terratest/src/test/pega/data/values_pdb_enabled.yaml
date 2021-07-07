@@ -129,11 +129,9 @@ global:
       hpa:
         enabled: true
 
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
+      # Set enabled to true to include a Pod Disruption Budget for this tier
       pdb:
-        enabled: false
+        enabled: true
         minAvailable: 1
         # maxUnavailable: "50%"
 
@@ -166,11 +164,9 @@ global:
       hpa:
         enabled: true
 
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
+      # Set enabled to true to include a Pod Disruption Budget for this tier
       pdb:
-        enabled: false
+        enabled: true
         minAvailable: 1
         # maxUnavailable: "50%"
 
@@ -219,11 +215,9 @@ global:
           requests:
             storage: 5Gi
 
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
+      # Set enabled to true to include a Pod Disruption Budget for this tier
       pdb:
-        enabled: false
+        enabled: true
         minAvailable: 1
         # maxUnavailable: "50%"
 
