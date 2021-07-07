@@ -3,7 +3,7 @@
     - install Go - version >=1.13 is required
     - install Dep 
     - make sure you have helm version <3.0 installed, as version 3.0. is conflicting with terratest framework for running test through Intellij
-- Install Go plugin for IntelliJ
+- Install Go plugin for IntelliJ (only available for IntelliJ IDEA Ultimate edition)
 - Go to settings (Ctrl + Alt + S)
 - Find option "Languages & Frameworks | Go | GOPATH"
 - In project GOPATH add {path to project}/terratest
