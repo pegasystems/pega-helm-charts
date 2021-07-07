@@ -480,6 +480,19 @@ Parameter           | Description    | Default value
 `hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
 
+### Ensure System Availability during Voluntary Disruptions by Using a Kubernetes Pod Disruption Budget (PDB)
+To limit the number of Pods running your Pega Platform application that can go down for planned disruptions, 
+Pega allows you to enable a Kubernetes `PodDisruptionBudget` on a tier.  For more details on PDBs, see the Kubernetes [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
+
+You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true` in your values.yaml file.  By default, this value is
+set to `false.`  You must also specify exactly one of the following parameters to configure the Pod Disruption Budget.  These parameters
+are mutually exclusive, and thus only one may be set.  You may provide values that are expressed as percentages (% of pods) or integers (# of pods).  
+
+Parameter             | Description    | Default value
+---                   | ---       | ---
+`pdb.minAvailable`    | The minimum number or percentage of pods in the tier that must be available.  If this minimum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy. | `1`
+`pdb.maxUnavailable`  | The maximum number or percentage of pods in the tier that can be unavailable.  If this maximum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy.      | `50%` (disabled by default)
+
 ### Volume claim template
 
 A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
