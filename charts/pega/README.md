@@ -490,8 +490,8 @@ are mutually exclusive, and thus only one may be set.  You may provide values th
 
 Parameter             | Description    | Default value
 ---                   | ---       | ---
-`pdb.minAvailable`    | The minimum number of pods in the tier that must remain available at all times  | `1`
-`pdb.maxUnavailable`  | The maximum number of pods in the tier that can be unavailable at one time      | `50%` (disabled by default)
+`pdb.minAvailable`    | The minimum number or percentage of pods in the tier that must be available.  If this minimum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy. | `1`
+`pdb.maxUnavailable`  | The maximum number or percentage of pods in the tier that can be unavailable.  If this maximum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy.      | `50%` (disabled by default)
 
 ### Volume claim template
 

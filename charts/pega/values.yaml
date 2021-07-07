@@ -130,7 +130,7 @@ global:
         enabled: true
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable 
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
       # value and comment out the other parameter.
       pdb:
         enabled: false
@@ -167,7 +167,7 @@ global:
         enabled: true
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable 
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
       # value and comment out the other parameter.
       pdb:
         enabled: false
@@ -220,7 +220,7 @@ global:
             storage: 5Gi
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable 
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
       # value and comment out the other parameter.
       pdb:
         enabled: false
