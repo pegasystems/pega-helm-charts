@@ -10,9 +10,6 @@ import (
 	"testing"
 )
 
-
-
-
 func TestPegaUpgradeJob(t *testing.T) {
 
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
