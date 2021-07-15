@@ -29,11 +29,21 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    # Currently the elasticsearch connection does not support any modes of authentication and should be es endpoint APIs' accessible without authentication.
+    # The elasticsearch connection supports two authentication methods: basic authentication or AWS IAM role-based authentication.
 #    domain: managed-elasticsearch.acme.io
 #    port: 443
 #    protocol: https
-#    set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
+#     To configure basic authentication to your externally-managed Elasticsearch cluster, uncomment and add the
+#     parameter details: srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
+#    basicAuthentication:
+#      username: "BASIC_AUTH_USERNAME"
+#      password: "BASIC_AUTH_PASSWORD"
+#     To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
+#     and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
+#    awsIAM:
+#      region: "AWS_ELASTICSEARCH_REGION"
+
+#     To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
 #    requireInternetAccess: true
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
@@ -41,12 +51,31 @@ srs:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  imageTag: 7.1.1
+  imageTag: 7.9.3
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
+  protocol: http
+  # This section specifies the elasticsearch cluster configuration for authentication.
+  esConfig:
+    elasticsearch.yml: |
+      xpack.security.enabled: true
+      xpack.security.transport.ssl.enabled: true
+  # Use this section to include additional, supported environmental variables for Elasticsearch basic authentication.
+  # The parameter values can be read from a specified secrets file.
+  extraEnvs:
+    - name: ELASTIC_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          name: srs-elastic-credentials
+          key: password
+    - name: ELASTIC_USERNAME
+      valueFrom:
+        secretKeyRef:
+          name: srs-elastic-credentials
+          key: username
   resources:
     requests:
       cpu: "1000m"

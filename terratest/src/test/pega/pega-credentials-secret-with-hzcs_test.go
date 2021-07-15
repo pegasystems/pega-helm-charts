@@ -30,6 +30,7 @@ func TestPegaCredentialsSecretWhenHazelcastIsEnabled(t *testing.T){
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 					"hazelcast.enabled": "true",
 					"hazelcast.username": HZ_CS_AUTH_USERNAME,
 					"hazelcast.password": HZ_CS_AUTH_PASSWORD,

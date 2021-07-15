@@ -125,6 +125,43 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
+{{- define "elasticsearch.authProvider" -}}
+{{- if (.Values.srsStorage.provisionInternalESCluster) -}}
+    {{- "basic-authentication" }}
+{{- else }}
+    {{- if and  (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM ) -}}
+    {{- "basic-authentication" }}
+    {{- else if and  (.Values.srsStorage.awsIAM)  (not .Values.srsStorage.basicAuthentication ) -}}
+    {{- "aws-iam"}}
+    {{- else if and  (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM )}}
+    {{- "none" }}
+    {{- else if and ( .Values.srsStorage.basicAuthentication ) ( .Values.srsStorage.awsIAM )}}
+    {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.basicAuthentication/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "elasticsearch.region" -}}
+{{- if  .Values.srsStorage.awsIAM -}}
+{{- .Values.srsStorage.awsIAM.region }}
+{{- end }}
+{{- end }}
+
+{{- define "elasticsearchBasicAuthNUsername" -}}
+{{- if  .Values.srsStorage.provisionInternalESCluster  }}
+{{- "elastic" |  b64enc }}
+{{- else if and (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM) }}
+{{- .Values.srsStorage.basicAuthentication.username | b64enc }}
+{{- end }}
+{{- end}}
+
+{{- define "elasticsearchBasicAuthNPassword" -}}
+{{- if  .Values.srsStorage.provisionInternalESCluster }}
+{{- randAlphaNum 20 | b64enc}}
+{{- else if and (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM) }}
+{{- .Values.srsStorage.basicAuthentication.password | b64enc }}
+{{- end }}
+{{- end}}
 
 {{/*
 Network policy: kube-dns

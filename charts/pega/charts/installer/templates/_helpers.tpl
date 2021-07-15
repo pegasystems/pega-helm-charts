@@ -1,7 +1,19 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
-{{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
+{{- define "pegaInstallConfig" }}pega-install-config{{- end }}
+{{- define "pegaUpgradeConfig" }}pega-upgrade-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
-{{- define "pegaDBUpgrade" -}}pega-db-upgrade{{- end -}}
+{{- define "pegaDBCustomUpgrade" -}}
+{{- if (contains "," .Values.upgrade.upgradeSteps) -}}
+    pega-db-custom-upgrade
+{{- else -}}
+{{- $jobName := printf "%s-%s" "pega-db-upgrade" .Values.upgrade.upgradeSteps -}}
+{{- $jobName | replace "_" "-" -}}
+{{- end -}}
+{{- end -}}
+{{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
+{{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
+{{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
+{{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
 {{- define "pegaPreDBUpgrade" -}}pega-pre-upgrade{{- end -}}
@@ -42,10 +54,10 @@
   args: [ 'job', '{{ template "pegaDBInstall" }}']
 {{- end }}
 
-{{- define "waitForPegaDBUpgrade" -}}
+{{- define "waitForPegaDBZDTUpgrade" -}}
 - name: wait-for-pegaupgrade
   image: dcasavant/k8s-wait-for
-  args: [ 'job', '{{ template "pegaDBUpgrade" }}']
+  args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
