@@ -1,125 +1,31 @@
-<?xml version='1.0' encoding='utf-8'?>
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one or more
+  contributor license agreements.  See the NOTICE file distributed with
+  this work for additional information regarding copyright ownership.
+  The ASF licenses this file to You under the Apache License, Version 2.0
+  (the "License"); you may not use this file except in compliance with
+  the License.  You may obtain a copy of the License at
+
+      http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+<!-- The contents of this file will be loaded for each web application -->
 <Context>
 
-  <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <!-- Default set of monitored resources. If one of these changes, the    -->
+    <!-- web application will be reloaded.                                   -->
+    <WatchedResource>WEB-INF/web.xml</WatchedResource>
+    <WatchedResource>WEB-INF/tomcat-web.xml</WatchedResource>
+    <WatchedResource>${catalina.base}/conf/web.xml</WatchedResource>
 
-  <Manager pathname="" />
-    <Resource name="jdbc/PegaRULES"
-    auth="Container"
-    type="javax.sql.DataSource"
-    driverClassName="{{ .Env.JDBC_CLASS }}"
-    url="{{ .Env.JDBC_URL }}"
-    username="{{ .Env.SECRET_DB_USERNAME }}"
-    password="{{ .Env.SECRET_DB_PASSWORD }}"
-    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
-    minIdle="{{ .Env.JDBC_MIN_IDLE }}"
-    maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
-    maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
-    initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-    {{ if .Env.JDBC_TIME_BETWEEN_EVICTIONS }}
-    timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
-    {{ else }}
-    timeBetweenEvictionRunsMillis="30000"
-    {{ end }}
-    {{ if .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}
-    minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
-    {{ else }}
-    minEvictableIdleTimeMillis="60000"
-    {{ end }}
-    />
-
-  {{ if and .Env.DB_RW_USERNAME .Env.JDBC_RW_URL }}
-    <Resource name="jdbc/PegaRULESLongRW"
-    auth="Container"
-    type="javax.sql.DataSource"
-    driverClassName="{{ .Env.JDBC_CLASS }}"
-    url="{{ .Env.JDBC_RW_URL }}"
-    username="{{ .Env.DB_RW_USERNAME }}"
-    password=""
-    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
-    {{ if .Env.JDBC_RO_MIN_IDLE }}
-    minIdle="{{ .Env.JDBC_RO_MIN_IDLE }}"
-    {{ else }}
-    minIdle="{{ .Env.JDBC_MIN_IDLE }}"
-    {{ end }}
-    maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
-    maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
-    {{ if .Env.JDBC_RO_INITIAL_SIZE }}
-    initialSize="{{ .Env.JDBC_RO_INITIAL_SIZE }}"
-    {{ else }}
-    initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    {{ end }}
-    connectionProperties="socketTimeout=1200;"
-    {{ if .Env.JDBC_TIME_BETWEEN_EVICTIONS }}
-    timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
-    {{ else }}
-    timeBetweenEvictionRunsMillis="30000"
-    {{ end }}
-    {{ if .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}
-    minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
-    {{ else }}
-    minEvictableIdleTimeMillis="60000"
-    {{ end }}
-    />
-  {{ end }}
-
-  {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
-    <Resource name="jdbc/PegaRULESReadOnly"
-    auth="Container"
-    type="javax.sql.DataSource"
-    driverClassName="{{ .Env.JDBC_CLASS }}"
-    url="{{ .Env.JDBC_RO_URL }}"
-    username="{{ .Env.DB_RO_USERNAME }}"
-    password="{{ .Env.DB_RO_PASSWORD }}"
-    maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
-    {{ if .Env.JDBC_RO_MIN_IDLE }}
-    minIdle="{{ .Env.JDBC_RO_MIN_IDLE }}"
-    {{ else }}
-    minIdle="{{ .Env.JDBC_MIN_IDLE }}"
-    {{ end }}
-    maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
-    maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
-    {{ if .Env.JDBC_RO_INITIAL_SIZE }}
-    initialSize="{{ .Env.JDBC_RO_INITIAL_SIZE }}"
-    {{ else }}
-    initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    {{ end }}
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-    {{ if .Env.JDBC_TIME_BETWEEN_EVICTIONS }}
-    timeBetweenEvictionRunsMillis="{{ .Env.JDBC_TIME_BETWEEN_EVICTIONS }}"
-    {{ else }}
-    timeBetweenEvictionRunsMillis="30000"
-    {{ end }}
-    {{ if .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}
-    minEvictableIdleTimeMillis="{{ .Env.JDBC_MIN_EVICTABLE_IDLE_TIME }}"
-    {{ else }}
-    minEvictableIdleTimeMillis="60000"
-    {{ end }}
-    />
-
-  <Environment name="prconfig/database/databases/PegaRULES/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
-  <Environment name="prconfig/database/databases/PegaDATA/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
-  {{ if .Env.CUSTOMERDATA_SCHEMA }}
-  <Environment name="prconfig/database/databases/CustomerData/dataSourceReadOnly" value="java:comp/env/jdbc/PegaRULESReadOnly" type="java.lang.String" />
-  {{ end }}
-  {{ end }}
-
-  <Environment name="url/initialization/explicittempdir" value="path" type="java.lang.String"/>
-  <Environment name="prconfig/database/databases/PegaRULES/defaultSchema" value="{{ .Env.RULES_SCHEMA }}" type="java.lang.String" />
-  <Environment name="prconfig/database/databases/PegaDATA/defaultSchema"  value="{{ .Env.DATA_SCHEMA }}"  type="java.lang.String" />
-  {{ if .Env.CUSTOMERDATA_SCHEMA }}
-  <Environment name="prconfig/database/databases/CustomerData/defaultSchema" value="{{ .Env.CUSTOMERDATA_SCHEMA }}" type="java.lang.String" />
-  {{ else }}
-  <Environment name="prconfig/database/databases/CustomerData/defaultSchema" value="{{ .Env.DATA_SCHEMA }}" type="java.lang.String" />
-  {{ end }}
-  <Environment name="prconfig/database/drivers" value="com.microsoft.sqlserver.jdbc.SQLServerDriver;oracle.jdbc.OracleDriver;org.postgresql.Driver;com.ibm.db2.jcc.DB2Driver" type="java.lang.String" />
-  {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
-  <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
-  {{ end }}
-
-  {{ if .Env.CONTEXT_XML_SNIPPET }}
-  {{ .Env.CONTEXT_XML_SNIPPET }}
-  {{ end }}
-
+    <!-- Uncomment this to disable session persistence across Tomcat restarts -->
+    <!--
+    <Manager pathname="" />
+    -->
 </Context>
