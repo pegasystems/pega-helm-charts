@@ -4,7 +4,7 @@ Deploy Pega Platform™ on a Red Hat OpenShift container platform cluster using
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto an OpenShift cluster without much experience in either OpenShift configurations or Pega Platform deployments.
 
-Create a deployment of Pega Platform on which you can implement a scalable Pega application in a OpenShift cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a OpenShift cluster with a PostgreSQL database instance.
+Create a deployment of Pega Platform on which you can implement a scalable Pega application in a OpenShift cluster using Red Hat OpenShift Container Platform (Self Managed). You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a OpenShift cluster with a PostgreSQL database instance.
 
 ## Deployment process overview
 
@@ -17,7 +17,7 @@ Use Kubernetes tools and the customized orchestration tools and Docker images to
    - To prepare a local Windows system, install required applications and configuration files -
    [Preparing your local Windows 10 system – 45 minutes](prepping-local-system-runbook-windows.md).
 
-2. Create a cluster and install Openshift. TBD details we need to add
+2. Create a cluster using your preferred cloud resources and install Red Hat OpenShift Container Platform (Self Managed) on the cluster. For details, see [OpenShift Documentation](https://docs.openshift.com/).
 
 3. Customize two configuration files with which you configure your OpenShift cluster to run Pega in a web application cluster and run backing services, including search, in a Pega search and reporting service cluster. In this section, you will use the command-line tools, kubectl and Helm, to install and then deploy Pega Platform onto your existing OpenShift cluster - [Deploying Pega Platform using Helm charts – 90 minutes](#installing-and-deploying-pega-platform-using-helm-charts--90-minutes).
 
@@ -35,17 +35,14 @@ This guide assumes:
 
 The following account, resources, and application versions are required for use in this document:
 
-- An  account with a payment method set up to pay for the GCP resources you create and appropriate GCP account permissions and knowledge to:
-
-  - Access an existing OpenShift project for your cluster resources.
-
-  - Create an SQL Instance.
-
+- An  account with a payment method set up to pay for the cloud infrastructure resources you create and appropriate account permissions and knowledge to:
   - Select an appropriate location to deploy your database resource and OpenShift cluster. The cluster and PostgreSQL database into which you install Pega Platform must be in the same location.
+  - Create an OpenShift project by installing OpenShift software on your cluster resources.
+  - Create an SQL instance using a cloud resource that is accessible to the pods in the Openshift deployment using a supported database. For support details, see [URL and Driver Class](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/pega).
 
-  You are responsible for any financial costs incurred for your GCP resources.
+  You are responsible for any financial costs incurred for your cloud infrastructure resources.
 
-- Pega Platform 8.6 or later.
+- Pega Platform 8.6 or later, which supports the latest Pega software feature support, including the Search and Reporting Service (SRS).
 
 - Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
 
@@ -88,7 +85,7 @@ Create an SQL instance that is available to your OpenShift cluster. In this exam
 
     d. **Database version**, select **PostgreSQL 11 or 12**.
 
-    e. **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP addresses to whitelist for this PostgreSQL database, and click **Done**.
+    e. **Configuration options \> Connectivity**, select **Public IP**, click **+ Add Network**, enter a **Name** and **Network** of one or more IP addresses to allow access to this PostgreSQL database, and click **Done**.
 
     As a best practice, add the following IP addresses: your local system from where you install helm, the worker nodes of the cluster. One method for finding the IP address for worker nodes of the cluster is to view the nodes in your OpenShift cluster with kubectl command-line tool and then use the command options, `kubectl describe nodes | grep ExternalIP`.
 
@@ -166,6 +163,23 @@ The addons charts is not required for OpenShift deployments of Pega Platform. Us
 
 To configure the parameters in the backingservices.yaml file, download the file in the charts/backingservices folder, edit it with a text editor, and then save it to your local system using the same filename.
 
+Configure the following parameters so the backingservices.yaml Helm chart matches your Elastic resources in these areas:
+
+- Your docker registry credentials.
+
+- Your deployment name with which the deployment appends the names of your SRS pods.
+
+- Your Pega-provided SRS Docker image in the repository to which you pushed the image.
+
+- Your choice to enable either:
+
+  - An ElasticSearch service that is defined at [Elasticsearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch) which the SRS provides to your deployment.
+  - Your Elasticsearch cluster for which you specify the required authentication details.
+
+- And additional, supported environmental variables for Elasticsearch basic authentication.
+
+- Three additional parameters that elasticSearch recommends for OpenShift deployments.
+
 1. To download the backingservices.yaml Helm chart to the \<local filepath>\openshift-demo, enter:
 
    `$ helm inspect values pega/backingservices > <local filepath>/openshift-demo/backingservices.yaml`
@@ -179,6 +193,7 @@ To configure the parameters in the backingservices.yaml file, download the file 
 | srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix).    |
 | srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. For an Elasticsearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS Elasticsearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS Elasticsearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li>     <li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li>     <li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
 | elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
+| Additional OpenShift-required parameters:<ul><li>securityContext:</li><li>podSecurityContext:</li><li>sysctlInitContainer:</li></ul> | Manually add ElasticSearch-recommended parameters to ensure that your SRS pods do not have a RunAsUser parameter and do not require an initialization container. For details, see [OpenShift](https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift). | <ul><li>securityContext.runAsUser: null</li><li>podSecurityContext.fsGroup: null</li><li>    podSecurityContext.runAsUser: null </li><li>sysctlInitContainer.enabled: false</li></ul> |
 
 3. Save the file.
 
@@ -207,9 +222,13 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Specify that this is an OpenShift deployment.
 
+- Specify to deploy your configuration to ensure that when you invoke this helm configuration file, it invokes a deployment, not an install or update.
+
 - Credentials for your DockerHub account in order to access the required Docker images.
 
-- Access your GCP SQL database.
+- Access your SQL database (in this example one configured in GCP).
+
+- Access to the ElasticSearch service deployed using SRS nodes.
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
@@ -236,30 +255,11 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 | upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. Pega supports specifying certificates for an ingress using the same methods that OpenShift supports. Note that if you configure both secrets and pre-shared certificates on the ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates. For details, see [Using multiple SSL certificates in HTTP(s) load balancing with Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).  | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
+| pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To use this service, you must enable its use and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-openshift-demo.svc.cluster.local </li></ul>
 | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>"|
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".  | adminPassword: "\<initial password\>"  |
 
-3. [For Pega Platform 8.6 and later] Applicable only when backingservices chart is configured.
-
-   For Pega Platform 8.6 and later installations in which you are configuring the backingservices Search and Reporting Service in your deployment, use a text editor to open the `pega.yaml` and update the following parameters in the chart based on your backing service configuration.
-
-   Chart parameter name   | Purpose   | Your setting
-   ---         | ---           | ---
-   `pegasearch.externalSearchService` | Set the `pegasearch.externalSearchService` as true to use Search and Reporting service as the search functionality provider to the Pega platform | true
-   `pegasearch.externalURL` | Set the `pegasearch.externalURL` value to the Search and Reporting Service endpoint url | `"http://<srs.deploymentName>.<namespace>.svc.cluster.local"` or `"http://<srs.deploymentName>.<namespace>"`
-
-   Example:
-
-   When backingservice is deployed into `mypega-openshift-demo` namespace and `pegasearch.externalSearchService` value is "srs-service", configure the `pegasearch` section in pega.yaml as below:
-
-   ```yaml
-   pegasearch:
-     externalSearchService: true
-     externalURL: "http://srs-service.mypega-openshift-demo.svc.cluster.local"
-   ```
-
-4. Save the file.
+3.  Save the file.
 
 ### Deploying Pega Platform using the command line
 
@@ -270,79 +270,42 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 1. Open a Linux bash shell and change the location to the top folder of your openshift-demo directory that you created in [Preparing your local Linux system](prepping-local-system-runbook-linux.md).
 
-`$ cd /home/<local filepath>/openshift-demo`
+   `$ cd /home/<local filepath>/openshift-demo`
 
 2. To use the oc command to establish authentication with your OpenShift cluster, login to your cluster, specifying the cluster IP address:
 
-```bash
-$ oc login (https:<cluster-IP-address>:<port>)
-Login successful.
-```
+   ```bash
+   $ oc login (https:<cluster-IP-address>:<port>)
+   Login successful.
+   ```
 
 3. To view the nodes in your OpenShift cluster, including cluster names and status, enter:
 
 ```bash
-    $ oc get nodes
-NAME                              STATUS    ROLES     AGE       VERSION
-os-runbook-zcbxd-master-0         Ready     master    47h       v1.20.0+87cc9a4
-os-runbook-zcbxd-master-1         Ready     master    47h       v1.20.0+87cc9a4
-os-runbook-zcbxd-master-2         Ready     master    47h       v1.20.0+87cc9a4
-os-runbook-zcbxd-worker-b-d8tsq   Ready     worker    47h       v1.20.0+87cc9a4
-os-runbook-zcbxd-worker-c-5jlct   Ready     worker    47h       v1.20.0+87cc9a4
-os-runbook-zcbxd-worker-d-rmrsz   Ready     worker    47h       v1.20.0+87cc9a4
-```
+   $ oc get nodes
+   NAME                              STATUS    ROLES     AGE       VERSION
+   os-runbook-zcbxd-master-0         Ready     master    47h       v1.20.0+87cc9a4
+   os-runbook-zcbxd-master-1         Ready     master    47h       v1.20.0+87cc9a4
+   os-runbook-zcbxd-master-2         Ready     master    47h       v1.20.0+87cc9a4
+   os-runbook-zcbxd-worker-b-d8tsq   Ready     worker    47h       v1.20.0+87cc9a4
+   os-runbook-zcbxd-worker-c-5jlct   Ready     worker    47h       v1.20.0+87cc9a4
+   os-runbook-zcbxd-worker-d-rmrsz   Ready     worker    47h       v1.20.0+87cc9a4
+   ```
 
-4. TBD...might be obsolete...To establish a required cluster role binding setting so that you can launch the Kubernetes dashboard, enter:
+4. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
 
-```bash
-$  TBD...might be obsolete...kubectl create clusterrolebinding dashboard-admin -n kube-system --clusterrole=cluster-admin --serviceaccount=kube-system:kubernetes-dashboard
-```
-
-7. TBD...might be obsolete... To start the proxy server for the Kubernetes dashboard, enter:
-
-    `$ kubectl proxy`
-
-8. TBD...might be obsolete... To access the Dashboard UI, open a web browser and navigate to the following URL:
-
-    `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
-
-9. TBD...might be obsolete... In the **Kubernetes Dashboard** sign in window, choose the appropriate authentication method:
-
-- To use a cluster Kubeconfig access credential file: select **Kubeconfig**, navigate to your \<local filepath\>/.kube directory and select the config file. Click **SIGN IN**.
-
-- To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
-
-    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your OpenShift cluster name or your resource name, which is expected behavior.
-
-    To continue using the Kubernetes dashboard to see the progress of your deployment, keep this Linux shell open.
-
-10. Open a new Linux bash shell and change the location to the top folder of your openshift-demo directory.
-
-    `$ cd /home/<local filepath>/openshift-demo`
-
-11. To create namespaces in preparation for the pega.yaml and backingservices.yaml deployments, enter:
-
-```bash
-    $ kubectl create namespace mypega-openshift-demo
-    namespace/mypega-openshift-demo created
-```
-
-12. REVIEWERS>>>Do we need to document how to set up SSL certificates to support https?? we need guidance.
-
-13. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
-
-   ```yaml
+ ```bash
    $ helm install backingservices pega/backingservices --namespace mypega-openshift-demo --values backingservices.yaml
    NAME: backingservices
-LAST DEPLOYED: Fri Jul 16 15:31:58 2021
-NAMESPACE: mypega-openshift-demo
-STATUS: deployed
-REVISION: 1
-   ```
+   LAST DEPLOYED: Fri Jul 16 15:31:58 2021
+   NAMESPACE: mypega-openshift-demo
+   STATUS: deployed
+   REVISION: 1
+```
 
 The `mypega-openshift-demo` namespace used for pega deployment can also be used for backingservice deployment that you configured in backingservices.yaml helm chart.
 
-14. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
+5. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
     $ helm install mypega-openshift-demo pega/pega --namespace mypega-openshift-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -358,23 +321,11 @@ For subsequent Helm installs, use the command `helm install mypega-openshift-dem
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-openshift-demo` deployment.
 
-14. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
+6. Refer to your OpenShift dashboard to follow the progress of or troubleshoot an installation. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-15. In the dashboard, in **Namespace** select the `mypega-openshift-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
+7. To view the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-openshift-demo` namespace pods.
 
-![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
-
-    Note: A deployment takes about 15 minutes for all resource configurations to initialize; however a full Pega Platform installation into the database can take up to an hour.
-
-    To follow the progress of an installation, use the dashboard. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
-
-16. To view the status of an installation, on the Kubernetes dashboard, select **Jobs**, locate the **pega-db-install** job, and click the logs icon on the right side of that row.
-
-    After you open the logs view, you can click the icon for automatic refresh to see current updates to the install log.
-
-17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-openshift-demo` namespace pods.
-
-A successful deployment does not show errors across the various workloads. The `mypega-openshift-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
+A successful deployment will not show errors across any various workloads.
 
 ## Logging in to Pega Platform – 10 minutes
 
