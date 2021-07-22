@@ -149,7 +149,7 @@ To customize these files, you must download them from the source github reposito
 
 2. To verify the new repository, you can search it by entering:
 
-```
+```bash
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             1.6.1                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
@@ -159,7 +159,7 @@ To customize these files, you must download them from the source github reposito
 
 The addons charts is not required for OpenShift deployments of Pega Platform. Use of the backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
 
-#### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
+### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
 To configure the parameters in the backingservices.yaml file, download the file in the charts/backingservices folder, edit it with a text editor, and then save it to your local system using the same filename.
 
@@ -172,13 +172,11 @@ Configure the following parameters so the backingservices.yaml Helm chart matche
 - Your Pega-provided SRS Docker image in the repository to which you pushed the image.
 
 - Your choice to enable either:
+  - An ElasticSearch service that is defined at [ElasticSearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch) which the SRS provides to your deployment.
+  - Your ElasticSearch cluster for which you specify the required authentication details.
+- Add additional, recommended environmental variables for ElasticSearch basic authentication. For details, see [Examples/openshift](https://github.com/elastic/helm-charts/blob/master/elasticsearch/examples/openshift/values.yaml).
 
-  - An ElasticSearch service that is defined at [Elasticsearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch) which the SRS provides to your deployment.
-  - Your Elasticsearch cluster for which you specify the required authentication details.
-
-- And additional, supported environmental variables for Elasticsearch basic authentication.
-
-- Three additional parameters that elasticSearch recommends for OpenShift deployments.
+- Three additional parameters that ElasticSearch recommends for OpenShift deployments.
 
 1. To download the backingservices.yaml Helm chart to the \<local filepath>\openshift-demo, enter:
 
@@ -186,18 +184,18 @@ Configure the following parameters so the backingservices.yaml Helm chart matche
 
 2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your OpenShift requirements:
 
-| Chart parameter name              | Purpose                                   | Your setting |
-|:---------------------------------|:-------------------------------------------|:--------------|
-| global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> 
-| srs.deploymentName:        | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
-| srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix).    |
-| srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. For an Elasticsearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS Elasticsearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS Elasticsearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li>     <li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li>     <li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
-| elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
-| Additional OpenShift-required parameters:<ul><li>securityContext:</li><li>podSecurityContext:</li><li>sysctlInitContainer:</li></ul> | Manually add ElasticSearch-recommended parameters to ensure that your SRS pods do not have a RunAsUser parameter and do not require an initialization container. For details, see [OpenShift](https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift). | <ul><li>securityContext.runAsUser: null</li><li>podSecurityContext.fsGroup: null</li><li>    podSecurityContext.runAsUser: null </li><li>sysctlInitContainer.enabled: false</li></ul> |
+| Chart parameter name    | Purpose                                   | Your setting |
+|-------------------------|-------------------------------------------|--------------|
+|global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul>|
+|srs.deploymentName:      | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"|
+|srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix). |
+|srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned ElasticSearch cluster. For an ElasticSearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS ElasticSearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS ElasticSearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li><li>srs.srsStorage.port: "\<external es port\>"</li><li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li><li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li><li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external ElasticSearch cluster is outside of the current network and the deployment must access it over the internet.\>"</li></ul> |
+|elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the ElasticSearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
+|Additional OpenShift-required parameters:<ul><li>securityContext:</li><li>podSecurityContext:</li><li>sysctlInitContainer:</li></ul> | Manually add ElasticSearch-recommended parameters to ensure that your SRS pods do not have a RunAsUser parameter and do not require an initialization container. For details, see [Examples/OpenShift](https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift). | <ul><li>securityContext.runAsUser: null</li><li>podSecurityContext.fsGroup: null</li><li>    podSecurityContext.runAsUser: null </li><li>sysctlInitContainer.enabled: false</li></ul> |
 
 3. Save the file.
 
-#### Add any known, customized settings for Pega to your deployment
+### Adding customized settings for Pega to your deployment
 
 The Pega deployment model supports advanced configurations to fit most existing
 clients' needs. If you are a Pega client and have known, required customizations
@@ -214,7 +212,7 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 Make these changes before you begin deploying Pega Platform using Helm charts.
 
-#### Updating the pega.yaml Helm chart values
+### Updating the pega.yaml Helm chart values
 
 To configure the parameters in the pega.yaml Helm, download the file in the charts/pega folder, edit it with a text editor, and then save it to your local system using the same filename.
 
@@ -236,7 +234,9 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/openshift-demo, enter:
 
-`$ helm inspect values pega/pega > /<local filepath>/openshift-demo/pega.yaml`
+   `$ helm inspect values pega/pega > /<local filepath>/openshift-demo/pega.yaml`
+
+   You can compare this file to the Pega-provided example Pega helm chart that was used to test an OpenShift deployment, [pega-openshift.yaml](./resources/pega-openshift.yaml) to help you see what parameters can be further customized for your OpenShift cluster.
 
 2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your OpenShift requirements:
 
@@ -259,7 +259,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>"|
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".  | adminPassword: "\<initial password\>"  |
 
-3.  Save the file.
+3. Save the file.
 
 ### Deploying Pega Platform using the command line
 
