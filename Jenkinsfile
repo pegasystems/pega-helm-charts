@@ -66,7 +66,7 @@ node {
       stage("Setup Cluster and Execute Tests") {
           prLabels = labels.toString().split(",")
 
-          if(prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks")) {
+          if(prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks") || prLabels.contains("integ-openshift")) {
                   jobMap = [:]
                   jobMap["job"] = "../kubernetes-test-orchestrator/master"
                   jobMap["parameters"] = [
@@ -85,7 +85,7 @@ node {
   }
 
 def validateLabels(String label){
-    def validLabels = ["integ-all","integ-eks","integ-gke","integ-aks","configs"]
+    def validLabels = ["integ-all","integ-eks","integ-gke","integ-aks","integ-openshift","configs"]
     def failureMessage = "Invalid label - ${label}. valid labels are ${validLabels}"
     if(!validLabels.contains(label)){
         currentBuild.result = 'FAILURE'
