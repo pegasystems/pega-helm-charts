@@ -39,7 +39,7 @@ func TestPegaUpgradeJob(t *testing.T) {
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
 
-						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-db-upgrade"}, options)
 
 
 					}
