@@ -37,7 +37,7 @@ The following account, resources, and application versions are required for use 
 
 - An  account with a payment method set up to pay for the cloud infrastructure resources you create and appropriate account permissions and knowledge to:
   - Select an appropriate location to deploy your database resource and OpenShift cluster. The cluster and PostgreSQL database into which you install Pega Platform must be in the same location.
-  - Create an OpenShift project by installing OpenShift software on your cluster resources.
+  - Create an Openshift cluster or use an existing cluster you can access.
   - Create an SQL instance using a cloud resource that is accessible to the pods in the Openshift deployment using a supported database. For support details, see [URL and Driver Class](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/pega).
 
   You are responsible for any financial costs incurred for your cloud infrastructure resources.
@@ -52,13 +52,13 @@ The following account, resources, and application versions are required for use 
 
 - openshift-cli - the OpenShift command-line tool that you use to connect to your OpenShift cluster.
 
-## Creating a Red Hat OpenShift project - 5 minutes
+## Creating a Red Hat OpenShift project - One hour
 
-To deploy Pega Platform to a OpenShift cluster, you must create a Google Cloud project in which you will create your Kubernetes cluster resources. What do we need to state here??
+There are multiple ways of creating an Openshift cluster. For an overview, see [OpenShift Container Platform installation overview](https://docs.openshift.com/container-platform/4.7/installing/index.html#ocp-installation-overview).
 
 ### Creating a database resource
 
-Pega Platform deployments on OpenShift require you to install Pega Platform software in an SQL database. After you create an SQL instance that is available to your OpenShift cluster, you must create a postSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address that you create in this procedure in order to add this information to your pega.yaml Helm chart.
+Pega Platform deployments on OpenShift require you to install Pega Platform software in an SQL database. After you create an SQL instance that is available to your OpenShift cluster, you must create a PostgreSQL database in which to install Pega Platform. When you are finished, you will need the database name and the SQL instance IP address that you create in this procedure in order to add this information to your pega.yaml Helm chart.
 
 #### Creating an SQL instance
 
@@ -292,7 +292,13 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
    os-runbook-zcbxd-worker-d-rmrsz   Ready     worker    47h       v1.20.0+87cc9a4
    ```
 
-4. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
+4. To create namespaces in preparation for the pega.yaml and backservices.yaml deployments, enter:
+
+```bash
+    $ kubectl create namespace mypega-openshift-demo
+```
+
+5. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
 
  ```bash
    $ helm install backingservices pega/backingservices --namespace mypega-openshift-demo --values backingservices.yaml
@@ -305,7 +311,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 The `mypega-openshift-demo` namespace used for pega deployment can also be used for backingservice deployment that you configured in backingservices.yaml helm chart.
 
-5. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
+6. To deploy Pega Platform for the first time by specifying to install Pega Platform into the database specified in the Helm chart when you install the pega.yaml Helm chart, enter:
 
 ```bash
     $ helm install mypega-openshift-demo pega/pega --namespace mypega-openshift-demo --values pega.yaml --set global.actions.execute=install-deploy
@@ -321,9 +327,9 @@ For subsequent Helm installs, use the command `helm install mypega-openshift-dem
 
 A successful Pega deployment immediately returns details that show progress for your `mypega-openshift-demo` deployment.
 
-6. Refer to your OpenShift dashboard to follow the progress of or troubleshoot an installation. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
+7. Refer to your OpenShift dashboard to follow the progress of or troubleshoot an installation. For subsequent deployments, you do not need to do this. Initially, while the resources make requests to complete the configuration, you will see red warnings while the configuration is finishing, which is expected behavior.
 
-7. To view the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-openshift-demo` namespace pods.
+8. To view the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-openshift-demo` namespace pods.
 
 A successful deployment will not show errors across any various workloads.
 
@@ -343,9 +349,9 @@ tier:
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-You can view the networking endpoints associated with your OpenShift deployment by using the Google Cloud Platform console. From the Navigation menu, go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress host name. Use the page filter to look at the pega-web resources in your cluster.
+You can view the networking endpoints associated with your OpenShift deployment by using the OpehShift dashboard. From the Navigation menu, go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress host name. Use the page filter to look at the pega-web resources in your cluster.
 
-![Initial view of pods during deploying](media/pega-web-networking.png)
+![Initial view of the pega-web network](media/openshift-pega-web-route.png)
 
 To manually associate the host name of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** that is configured to manage your DNS lookups, create a record set that specifies the pega-web tier the host name and add the IP address of the pega-web tier.
 
