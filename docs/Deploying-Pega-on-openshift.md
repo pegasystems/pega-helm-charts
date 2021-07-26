@@ -349,13 +349,15 @@ tier:
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
 
-You can view the networking endpoints associated with your OpenShift deployment by using the OpehShift dashboard. From the Navigation menu, go to the **Kubernetes Engine > Clusters > Services & Ingresses** page to display the IP address of this tier and the pega-web tier ingress host name. Use the page filter to look at the pega-web resources in your cluster.
+You can view the networking endpoints associated with your OpenShift deployment by using the OpenShift dashboard. From the Navigation menu, go to the **Networking > Routes** and in the `pega-web` page, in the **Router canonical hostname** area, you can see the pega-web tier ingress host name that Openshift creates based on the pega-web tier ingress host domain name that you set in the pega.yaml file.
 
 ![Initial view of the pega-web network](media/openshift-pega-web-route.png)
 
 To manually associate the host name of the pega-web tier ingress with the tier endpoint, use the DNS lookup management system of your choice. As an example, if your organization has a GCP **Cloud DNS** that is configured to manage your DNS lookups, create a record set that specifies the pega-web tier the host name and add the IP address of the pega-web tier.
 
 For GCP **Cloud DNS** documentation details, see [Quickstart](https://cloud.google.com/dns/docs/quickstart).
+
+For details from Openshift to use this generated canonical hostname, click the link, "Do you need to set up custom DNS?"
 
 ### Logging in by using the domain name of the web tier
 
