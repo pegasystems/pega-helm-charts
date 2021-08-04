@@ -281,7 +281,7 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
 3. To view the nodes in your OpenShift cluster, including cluster names and status, enter:
 
-```bash
+  ```bash
    $ oc get nodes
    NAME                              STATUS    ROLES     AGE       VERSION
    os-runbook-zcbxd-master-0         Ready     master    47h       v1.20.0+87cc9a4
