@@ -292,10 +292,10 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
    os-runbook-zcbxd-worker-d-rmrsz   Ready     worker    47h       v1.20.0+87cc9a4
    ```
 
-4. To create namespaces in preparation for the pega.yaml and backservices.yaml deployments, enter:
+4. To create namespaces in preparation for the pega.yaml and backingservices.yaml deployments, enter:
 
 ```bash
-    $ kubectl create namespace mypega-openshift-demo
+   $ kubectl create namespace mypega-openshift-demo
 ```
 
 5. For Pega Platform 8.6 and later installations, to install the backingservices chart that you updated in [Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)](#Updating the backingservices.yaml Helm chart values (Supported when installing or upgrading to Pega Infinity 8.6 and later)), enter:
