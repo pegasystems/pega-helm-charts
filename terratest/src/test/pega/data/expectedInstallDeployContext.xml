@@ -37,25 +37,25 @@
             connectionProperties="socketTimeout=1200;"
             timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS 30000}}"
             minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME 60000 }}"
-    />
+  />
   {{ end }}
 
   {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
-    <Resource name="jdbc/PegaRULESReadOnly"
-  auth="Container"
-  type="javax.sql.DataSource"
-  driverClassName="{{ .Env.JDBC_CLASS }}"
-  url="{{ .Env.JDBC_RO_URL }}"
-  username="{{ .Env.DB_RO_USERNAME }}"
-  password="{{ .Env.DB_RO_PASSWORD }}"
-  maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
-  minIdle="{{ default .Env.JDBC_RO_MIN_IDLE .Env.JDBC_MIN_IDLE }}"
-  maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
-  maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
-  initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE}}"
-  connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-  timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS 30000}}"
-  minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME 60000 }}"
+  <Resource name="jdbc/PegaRULESReadOnly"
+            auth="Container"
+            type="javax.sql.DataSource"
+            driverClassName="{{ .Env.JDBC_CLASS }}"
+            url="{{ .Env.JDBC_RO_URL }}"
+            username="{{ .Env.DB_RO_USERNAME }}"
+            password="{{ .Env.DB_RO_PASSWORD }}"
+            maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
+            minIdle="{{ default .Env.JDBC_RO_MIN_IDLE .Env.JDBC_MIN_IDLE }}"
+            maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
+            maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
+            initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE}}"
+            connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+            timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS 30000}}"
+            minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME 60000 }}"
   />
 
 
