@@ -1,5 +1,6 @@
+# FIXME - Needs updates to support latest version
 dependencies:
 - name: cassandra
-  version: "8.0.2"
-  repository: https://charts.bitnami.com/bitnami
+  version: "0.13.3"
+  repository: https://charts.helm.sh/incubator
   condition: cassandra.enabled

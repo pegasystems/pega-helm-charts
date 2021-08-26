@@ -15,8 +15,9 @@ dependencies:
   version: "11.15.0"
   repository: https://kokuwaio.github.io/helm-charts
   condition: fluentd-elasticsearch.enabled
+# FIXME - Needs updates to support latest version
 - name: kibana
-  version: "7.14.0"
+  version: "7.8.1"
   repository: https://helm.elastic.co/
   condition: kibana.enabled
 - name: metrics-server
