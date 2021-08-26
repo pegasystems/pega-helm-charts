@@ -1,10 +1,11 @@
 package addons
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func Test_shouldNotContainTraefikResourcesWhenDisabled(t *testing.T) {
@@ -40,8 +41,9 @@ func Test_shouldContainTraefikResourcesWhenEnabled(t *testing.T) {
 func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.serviceType": "LoadBalancer",
+			"traefik.enabled":         "true",
+			"traefik.service.enabled": "true",
+			"traefik.service.type":    "LoadBalancer",
 		}),
 	)
 
@@ -58,8 +60,9 @@ func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 func Test_shouldBeAbleToSetUpServiceTypeAsNodePort(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.serviceType": "NodePort",
+			"traefik.enabled":         "true",
+			"traefik.service.enabled": "true",
+			"traefik.service.type":    "NodePort",
 		}),
 	)
 

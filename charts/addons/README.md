@@ -17,19 +17,20 @@ Microsoft Azure Kubernetes Service (AKS)  | Application Gateway Ingress Controll
 
 ### Traefik
 
-Deploying Pega Platform with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/helm/charts/blob/master/stable/traefik/values.yaml).
+Deploying Pega Platform with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml).
 
 Example:
 
 ```yaml
 traefik:
   enabled: true
-  serviceType: NodePort
   ssl:
     enabled: false
   rbac:
     enabled: true
   service:
+    enabled: true
+    type: NodePort
     nodePorts:
       http: 30080
       https: 30443
