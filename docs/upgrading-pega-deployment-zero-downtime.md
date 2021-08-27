@@ -83,7 +83,7 @@ To complete an upgrade using the charts in the Pega-provided repository of Helm 
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             1.6.0                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.6.0           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/addons           1.6.0           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
   pega/backingservices  1.6.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
