@@ -72,6 +72,8 @@ $ helm inspect values pega/backingservices > backingservices.yaml
 * [Instructions to configure the Pega addons](charts/addons/README.md)
 * [Instructions to configure the Pega backingservices](charts/backingservices/README.md)
 
+When making customizations for your environment, verify that those changes are supported by your version of Pega. You can check this information in the [Pega Platform Support Guide Resources](https://community.pega.com/knowledgebase/articles/pega-platform-support-guide-resources).
+
 5. Create namespaces for your Pega deployment, backingservices and the addons (if applicable for your environment).
 
 ```bash
