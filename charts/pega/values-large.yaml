@@ -281,6 +281,8 @@ global:
 # Cassandra automatic deployment settings.
 cassandra:
   enabled: true
+  image:
+    tag: 3.11
   persistence:
     enabled: true
   resources:

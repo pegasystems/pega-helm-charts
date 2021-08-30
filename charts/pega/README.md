@@ -604,7 +604,7 @@ dds:
 
 ### Deploying Cassandra with Pega
 
-You may deploy a Cassandra instance along with Pega.  Cassandra is a separate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml).
+You may deploy a Cassandra instance along with Pega.  Cassandra is a separate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/cassandra).
 
 #### Cassandra minimum resource requirements
 
@@ -619,6 +619,8 @@ Example:
 cassandra:
   enabled: true
   # Set any additional Cassandra parameters. These values will be used by Cassandra's helm chart.
+  image:
+    tag: 3.11
   persistence:
     enabled: true
   resources:

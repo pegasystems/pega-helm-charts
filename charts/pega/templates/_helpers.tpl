@@ -118,8 +118,8 @@
 {{- define "waitForCassandra" -}}
   {{- if  eq (include "internalCassandraEnabled" .) "true" -}}
 - name: wait-for-cassandra
-  image: {{ .Values.cassandra.image.repo }}:{{ .Values.cassandra.image.tag}}
-  # Init container for waiting for Cassndra to initialize.  For each node, a copy of the until loop should be made to check each node.
+  image: {{ .Values.cassandra.image.repository }}:{{ .Values.cassandra.image.tag}}
+  # Init container for waiting for Cassandra to initialize.  For each node, a copy of the until loop should be made to check each node.
   # -u is username
   # -p is password
   # final 2 args for cqlsh are cassandra host and port respectively
@@ -129,7 +129,7 @@
 
 {{- define "getCassandraSubchartService" -}}
   {{- if  eq (include "internalCassandraEnabled" .) "true" -}}
-    {{- template "cassandra.fullname" dict "Values" .Values.cassandra "Release" .Release "Chart" (dict "Name" "cassandra") -}}
+    {{- template "common.names.fullname" dict "Values" .Values.cassandra "Release" .Release "Chart" (dict "Name" "cassandra") -}}
   {{- end -}}
 {{- end -}}
 

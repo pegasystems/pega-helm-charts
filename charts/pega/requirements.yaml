@@ -1,5 +1,5 @@
 dependencies:
 - name: cassandra
-  version: "0.13.3"
-  repository: https://charts.helm.sh/incubator
+  version: "8.0.2"
+  repository: https://charts.bitnami.com/bitnami
   condition: cassandra.enabled
