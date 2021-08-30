@@ -1,10 +1,11 @@
 package addons
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	"k8s.io/api/apps/v1beta2"
 	"k8s.io/api/extensions/v1beta1"
-	"testing"
 )
 
 func TestShouldNotContainDeploy_EFKIfDisabled(t *testing.T) {
@@ -72,9 +73,9 @@ func Test_shouldBeIngressDisabledForKibana(t *testing.T) {
 func Test_shouldBeHostForIngressKibana(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"kibana.enabled":         "true",
-			"kibana.ingress.enabled": "true",
-			"kibana.ingress.hosts":   "{YOUR_WEB.KIBANA.EXAMPLE.COM}",
+			"kibana.enabled":               "true",
+			"kibana.ingress.enabled":       "true",
+			"kibana.ingress.hosts[0].host": "TEST_WEB.KIBANA.EXAMPLE.COM",
 		}),
 	)
 
@@ -84,13 +85,13 @@ func Test_shouldBeHostForIngressKibana(t *testing.T) {
 		Kind: "Ingress",
 	}, &ingress)
 
-	require.Contains(t, ingress.Spec.Rules[0].Host, "YOUR_WEB.KIBANA.EXAMPLE.COM")
+	require.Contains(t, ingress.Spec.Rules[0].Host, "TEST_WEB.KIBANA.EXAMPLE.COM")
 
 }
 func Test_shouldBeHostForElasticsearch(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"fluentd-elasticsearch.enabled": "true",
+			"fluentd-elasticsearch.enabled":            "true",
 			"fluentd-elasticsearch.elasticsearch.host": "elasticsearch-master:9200",
 		}),
 	)
@@ -116,7 +117,7 @@ var deployEfkResources = []SearchResourceOption{
 	{
 		Name: "pega-kibana",
 		Kind: "Ingress",
-	},	
+	},
 	{
 		Name: "elasticsearch-master",
 		Kind: "StatefulSet",
