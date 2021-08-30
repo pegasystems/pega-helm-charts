@@ -87,7 +87,7 @@ kibana:
     hosts:
       - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
         paths:
-        - path: /
+          - path: /
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
