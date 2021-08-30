@@ -12,7 +12,7 @@
 - Click "Ok"
 - from the commandline, while being in {path to project}/terratest/src/test run "dep ensure" after you close the settings. 
   Run it and wait while it will be finished and IntelliJ reindex dependencies. (you should be able to see vendor directory created in in src/test directory)
-- Find  "Makefile" in the terratest directory and run the "helm dependency update ./charts/pega/" and "helm dependency update ./charts/addons/" from the commandline, 
+- Find  "Makefile" in the terratest directory and run the "helm dependency update ../charts/pega/" and "helm dependency update ../charts/addons/" from the commandline, 
   while being in the {path to project}/terratest to update the necessary helm dependencies;
 - In order to run all tests you can do the following
     - create "Go test" configuration with package test kind and use "test" as a package

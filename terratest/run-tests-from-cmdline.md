@@ -15,6 +15,8 @@ Then:
 - cd to {path to repo}/terratest/src/test
 - run `dep ensure` -- this may take a little while and log warnings.
 
+You must also download the chart dependencies. From the {path to project}/terratest, run `helm dependency update ../charts/pega/` and `helm dependency update ../charts/addons/` to update the necessary helm dependencies.
+
 ## Running Tests
 
 From {path to repo}/terratest/src/test, run the following commands. 

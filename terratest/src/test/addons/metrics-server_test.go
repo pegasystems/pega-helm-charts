@@ -1,9 +1,10 @@
 package addons
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	v1 "k8s.io/api/apps/v1"
-	"testing"
 )
 
 func Test_shouldNotContainMetricServerIfDisabled(t *testing.T) {
@@ -47,7 +48,7 @@ func Test_shouldContainCommandArgs(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args[1], "--logtostderr")
 }
 
 var metricServerResources = []SearchResourceOption{
@@ -56,19 +57,19 @@ var metricServerResources = []SearchResourceOption{
 		Kind: "ServiceAccount",
 	},
 	{
-		Name: "system:metrics-server-aggregated-reader",
+		Name: "pega-metrics-server",
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "system:pega-metrics-server",
+		Name: "pega-metrics-server-view",
 		Kind: "ClusterRole",
 	},
 	{
-		Name: "pega-metrics-server:system:auth-delegator",
+		Name: "pega-metrics-server-auth-delegator",
 		Kind: "ClusterRoleBinding",
 	},
 	{
-		Name: "system:pega-metrics-server",
+		Name: "pega-metrics-server",
 		Kind: "ClusterRoleBinding",
 	},
 	{
@@ -80,15 +81,7 @@ var metricServerResources = []SearchResourceOption{
 		Kind: "Service",
 	},
 	{
-		Name: "pega-metrics-server-test",
-		Kind: "Pod",
-	},
-	{
 		Name: "pega-metrics-server",
 		Kind: "Deployment",
-	},
-	{
-		Name: "v1beta1.metrics.k8s.io",
-		Kind: "APIService",
 	},
 }

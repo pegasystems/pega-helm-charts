@@ -47,13 +47,13 @@ func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 		}),
 	)
 
-	var service *v1.Service
+	var services *v1.ServiceList
 	helmChartParser.Find(SearchResourceOption{
 		Name: "pega-traefik",
-		Kind: "Service",
-	}, &service)
+		Kind: "List",
+	}, &services)
 
-	serviceType := service.Spec.Type
+	serviceType := services.Items[0].Spec.Type
 	require.Equal(t, "LoadBalancer", string(serviceType))
 }
 
@@ -66,16 +66,14 @@ func Test_shouldBeAbleToSetUpServiceTypeAsNodePort(t *testing.T) {
 		}),
 	)
 
-	var service *v1.Service
+	var services *v1.ServiceList
 	helmChartParser.Find(SearchResourceOption{
 		Name: "pega-traefik",
-		Kind: "Service",
-	}, &service)
+		Kind: "List",
+	}, &services)
 
-	serviceType := service.Spec.Type
+	serviceType := services.Items[0].Spec.Type
 	require.Equal(t, "NodePort", string(serviceType))
-	require.Equal(t, 30080, int(service.Spec.Ports[0].NodePort))
-	require.Equal(t, 30443, int(service.Spec.Ports[1].NodePort))
 }
 
 func Test_hasRoleWhenRbacEnabled(t *testing.T) {
@@ -113,43 +111,6 @@ func Test_noRoleWhenRbacDisabled(t *testing.T) {
 	require.False(t, helmChartParser.Contains(SearchResourceOption{
 		Name: "pega-traefik",
 		Kind: "ClusterRole",
-	}))
-}
-
-func Test_hasSecretWhenSSLEnabled(t *testing.T) {
-	helmChartParser := NewHelmConfigParser(
-		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "true",
-		}),
-	)
-
-	var deployment v12.Deployment
-	helmChartParser.Find(SearchResourceOption{
-		Name: "pega-traefik",
-		Kind: "Deployment",
-	}, &deployment)
-
-	require.True(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
-	}))
-
-	require.Equal(t, "ssl", deployment.Spec.Template.Spec.Volumes[1].Name)
-	require.Equal(t, "pega-traefik-default-cert", deployment.Spec.Template.Spec.Volumes[1].Secret.SecretName)
-}
-
-func Test_hasNoSecretWhenSSLEnabled(t *testing.T) {
-	helmChartParser := NewHelmConfigParser(
-		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "false",
-		}),
-	)
-
-	require.False(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
 	}))
 }
 
@@ -228,7 +189,7 @@ func Test_checkDefaultResourceLimits(t *testing.T) {
 var traefikResources = []SearchResourceOption{
 	{
 		Name: "pega-traefik",
-		Kind: "ConfigMap",
+		Kind: "ServiceAccount",
 	},
 	{
 		Name: "pega-traefik",
@@ -236,14 +197,10 @@ var traefikResources = []SearchResourceOption{
 	},
 	{
 		Name: "pega-traefik",
-		Kind: "Service",
+		Kind: "ClusterRole",
 	},
 	{
-		Name: "pega-traefik-test",
-		Kind: "Pod",
-	},
-	{
-		Name: "pega-traefik-test",
-		Kind: "ConfigMap",
+		Name: "pega-traefik",
+		Kind: "ClusterRoleBinding",
 	},
 }

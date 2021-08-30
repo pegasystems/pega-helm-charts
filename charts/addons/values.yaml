@@ -8,19 +8,13 @@
 traefik:
   enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
-  # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
-  serviceType: LoadBalancer
-  # If enabled is set to "true", ssl will be enabled for Traefik
-  ssl:
-    enabled: false
+  # See https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   rbac:
     enabled: true
   service:
-    nodePorts:
-      # NodePorts for Traefik service.
-      http: 30080
-      https: 30443
+    # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.service.type: "LoadBalancer".
+    type: LoadBalancer
+    # Traefik does not recommend exposing traefik ports (see https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml for details)
   resources:
     requests:
       # Enter the CPU Request for Traefik
@@ -106,17 +100,18 @@ fluentd-elasticsearch:
 metrics-server:
   enabled: false
   # Set any additional metrics-server parameters. These values will be used by metrics-server's helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml
-  args:
+  # See https://artifacthub.io/packages/helm/bitnami/metrics-server#metrics-server-parameters
+  extraArgs:
     - --logtostderr
 # The order in which to consider different Kubelet node address types when connecting to Kubelet.
-# Uncomment below arguemnt if host names are not resolvable from metrics server pod.
+# Uncomment below argument if host names are not resolvable from metrics server pod.
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-# - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
-# Uncomment below arguemnt to skip verifying Kubelet CA certificates.
+#    - --kubelet-preferred-address-types=InternalIP,Hostname,InternalDNS,ExternalDNS,ExternalIP
+# Uncomment below argument to skip verifying Kubelet CA certificates.
 # Not recommended for production usage, but can be useful in test clusters with self-signed Kubelet serving certificates.
 # This setting is not required for public cloud providers & openshift enterprise. It may be required for open-source Kubernetes.
-# - --kubelet-insecure-tls
+#    - --kubelet-insecure-tls
+
 # When deploying on Azure AKS, set ingress-azure.enabled to true to install an Application Gateway Ingress Controller (AGIC).
 # The AGIC is a pod within your AKS cluster that monitors the Kubernetes Ingress resources, and creates and applies the
 # Application Gateway config based on the status of the Kubernetes cluster. For details, see
