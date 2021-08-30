@@ -1,3 +1,6 @@
+# Pega does NOT actively update this Cassandra dependency. To leverage Cassandra, you should:
+# * Update the cassandra 'version' value, or
+# * Disable deploying cassandra by setting 'cassandra.enabled' to false.
 dependencies:
 - name: cassandra
   version: "0.13.3"
