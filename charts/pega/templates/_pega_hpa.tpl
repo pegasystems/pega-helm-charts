@@ -35,7 +35,7 @@ spec:
         averageUtilization: {{ .hpa.targetAverageCPUUtilization }}
         {{- else }}
         type: Value
-        averageValue: 2.8
+        averageValue: 2.55
         {{- end }}
   {{- end }}
   {{- if (hasKey .hpa "enableMemoryTarget" | ternary .hpa.enableMemoryTarget false) }}
