@@ -6,6 +6,10 @@ Pega helps enterprises and agencies quickly build business apps that deliver the
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a OpenShift cluster using Red Hat OpenShift Container Platform (Self Managed). You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a OpenShift cluster with a PostgreSQL database instance.
 
+## Supported Products
+
+Pegasystems supports deployment of Pega Platform using [OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift/container-platform) as a self managed solution. Managed solutions, other OpenShift products, and the IBM Cloud are not currently supported.
+
 ## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a OpenShift cluster that you create for the deployment:
