@@ -392,7 +392,7 @@ You can optionally configure the resource allocation and limits for a tier using
 Parameter       | Description                                            | Default value
 ---             | ---                                                    | ---
 `replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.      | `2`
+`cpuRequest`    | Initial CPU request for pods in the current tier.      | `3`
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
@@ -474,11 +474,24 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.8` which represents 2.8 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.8`
+`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.55` which represents 2.55 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.55`
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (Can be set instead of `hpa.targetAverageCPUValue` to set the threshold as a percentage of the requested CPU) | 
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 12Gi ) | `85`
 `hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
+
+### Ensure System Availability during Voluntary Disruptions by Using a Kubernetes Pod Disruption Budget (PDB)
+To limit the number of Pods running your Pega Platform application that can go down for planned disruptions, 
+Pega allows you to enable a Kubernetes `PodDisruptionBudget` on a tier.  For more details on PDBs, see the Kubernetes [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
+
+You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true` in your values.yaml file.  By default, this value is
+set to `false.`  You must also specify exactly one of the following parameters to configure the Pod Disruption Budget.  These parameters
+are mutually exclusive, and thus only one may be set.  You may provide values that are expressed as percentages (% of pods) or integers (# of pods).  
+
+Parameter             | Description    | Default value
+---                   | ---       | ---
+`pdb.minAvailable`    | The minimum number or percentage of pods in the tier that must be available.  If this minimum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy. | `1`
+`pdb.maxUnavailable`  | The maximum number or percentage of pods in the tier that can be unavailable.  If this maximum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy.      | `50%` (disabled by default)
 
 ### Volume claim template
 
@@ -592,6 +605,8 @@ dds:
 ### Deploying Cassandra with Pega
 
 You may deploy a Cassandra instance along with Pega.  Cassandra is a separate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml).
+
+Pega does **not** actively update the Cassandra dependency in `requirements.yaml`. When deploying Cassandra with Pega, you should update its `version` value in `requirements.yaml`.
 
 #### Cassandra minimum resource requirements
 

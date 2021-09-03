@@ -13,7 +13,7 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
 * Amazon Elastic Kubernetes Service (EKS) - see the [EKS runbook](docs/Deploying-Pega-on-EKS.md)
 * Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
-* Red Hat OpenShift
+* Red Hat OpenShift Container Platform (Self-managed) - see the [OpenShift runbook](docs/Deploying-Pega-on-openshift.md)
 * VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) - see the [TKGI runbook](docs/Deploying-Pega-on-PKS.md)
 
 # Getting started
@@ -39,13 +39,13 @@ $ helm repo add pega https://pegasystems.github.io/pega-helm-charts
 $ helm search repo pega
 NAME       	            CHART VERSION	APP VERSION	DESCRIPTION
 pega/pega  	              1.4.4        	           	Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-pega/addons	              1.4.4        	1.0        	Helm chart to configure required supporting services and tools in your environment for your deployment.
+pega/addons	              1.4.4        	1.0        	Helm chart to configure supporting services and tools in your environment for your deployment.
 pega/backingservices      1.4.4        	            Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
 There are three charts available in this repository - addons, backingservices, and pega.
 
-The addons chart installs a collection of supporting services and tools required for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
+The addons chart installs a collection of supporting services and tools for a Pega deployment. The services you will need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed.
 
 The backingservices chart installs services like 'Search and Reporting Service' (SRS) that you can configure with one or more Pega deployments. You can deploy these backing services in their own namespace; you can isolate the services to a single environment or share them across multiple Pega Infinity environments.
 
@@ -71,6 +71,8 @@ $ helm inspect values pega/backingservices > backingservices.yaml
 * [Instructions to configure the Pega chart](charts/pega/README.md)
 * [Instructions to configure the Pega addons](charts/addons/README.md)
 * [Instructions to configure the Pega backingservices](charts/backingservices/README.md)
+
+When making customizations for your environment, check the [Pega Platform Support Guide Resources](https://community.pega.com/knowledgebase/articles/pega-platform-support-guide-resources) to verify that those changes are supported by your Pega Platform version.
 
 5. Create namespaces for your Pega deployment, backingservices and the addons (if applicable for your environment).
 

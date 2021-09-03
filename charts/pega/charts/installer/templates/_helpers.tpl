@@ -1,7 +1,15 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
-{{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
+{{- define "pegaInstallConfig" }}pega-install-config{{- end }}
+{{- define "pegaUpgradeConfig" }}pega-upgrade-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
-{{- define "pegaDBCustomUpgrade" -}}pega-db-custom-upgrade{{- end -}}
+{{- define "pegaDBCustomUpgrade" -}}
+{{- if (contains "," .Values.upgrade.upgradeSteps) -}}
+    pega-db-custom-upgrade
+{{- else -}}
+{{- $jobName := printf "%s-%s" "pega-db-upgrade" .Values.upgrade.upgradeSteps -}}
+{{- $jobName | replace "_" "-" -}}
+{{- end -}}
+{{- end -}}
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
 {{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}

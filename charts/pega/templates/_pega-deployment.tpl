@@ -44,6 +44,7 @@ spec:
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
@@ -159,7 +160,7 @@ spec:
           {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
           {{- else }}
-            cpu: 2
+            cpu: 3
           {{- end }}
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"

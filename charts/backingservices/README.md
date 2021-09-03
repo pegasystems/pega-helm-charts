@@ -30,6 +30,10 @@ If an externally managed elasticsearch cluster is being used, make sure the serv
 
 You may enable the component of [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) in the backingservices by configuring the 'srs.srsStorage' section in values.yaml file to deploy ElasticSearch cluster automatically. For more configuration options available for each of the components, see their Helm Charts.
 
+Note: Pega does **not** actively update the elasticsearch dependency in `requirements.yaml`. To leverage SRS, you should:
+* Update the elasticsearch `version` value, or
+* Disable deploying elasticsearch by setting `srs.srsStorage.provisionInternalESCluster` to false.
+
 ### Configuration settings
 
 Configuration                       | Usage
