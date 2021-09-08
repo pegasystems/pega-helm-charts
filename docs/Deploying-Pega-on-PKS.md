@@ -212,6 +212,13 @@ To configure the parameters in the backingservices.yaml file, download the file 
 | elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size. | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
 
 3. Save the file.
+4. In case of using internal Elasticsearch cluster (`srs.srsStorage.requireInternetAccess:true`) please download `Makefile` from the [repository](https://github.com/pegasystems/pega-helm-charts) ( path from root : `pega-helm-charts/charts/backingservices/Makefile`) and replace `<YOUR_NAMESPACE> ` with `namespace` used for the deployment run
+
+   ```bash 
+   $ Make
+   or 
+   $ Make es-prerequisite
+   ```
 
 #### Add any known, customized addons settings for Pega to your deployment
 

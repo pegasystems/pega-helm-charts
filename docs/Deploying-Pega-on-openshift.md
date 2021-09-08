@@ -6,6 +6,10 @@ Pega helps enterprises and agencies quickly build business apps that deliver the
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a OpenShift cluster using Red Hat OpenShift Container Platform (Self Managed). You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a OpenShift cluster with a PostgreSQL database instance.
 
+## Supported Products
+
+Pegasystems supports deployment of Pega Platform using [OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift/container-platform) as a self managed solution. Managed solutions, other OpenShift products, and the IBM Cloud are not currently supported.
+
 ## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a OpenShift cluster that you create for the deployment:
@@ -195,6 +199,13 @@ Configure the following parameters so the backingservices.yaml Helm chart matche
 |Additional OpenShift-required parameters:<ul><li>securityContext:</li><li>podSecurityContext:</li><li>sysctlInitContainer:</li></ul> | Manually add ElasticSearch-recommended parameters to ensure that your SRS pods do not have a RunAsUser parameter and do not require an initialization container. For details, see [Examples/OpenShift](https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift). | <ul><li>securityContext.runAsUser: null</li><li>podSecurityContext.fsGroup: null</li><li>    podSecurityContext.runAsUser: null </li><li>sysctlInitContainer.enabled: false</li></ul> |
 
 3. Save the file.
+4. In case of using internal Elasticsearch cluster (`srs.srsStorage.requireInternetAccess:true`) please download `Makefile` from the [repository](https://github.com/pegasystems/pega-helm-charts) ( path from root : `pega-helm-charts/charts/backingservices/Makefile`) and replace `<YOUR_NAMESPACE> ` with `namespace` used for the deployment run
+
+   ```bash 
+   $ Make
+   or 
+   $ Make es-prerequisite
+   ```
 
 ### Adding customized settings for Pega to your deployment
 
