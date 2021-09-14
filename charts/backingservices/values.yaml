@@ -92,7 +92,8 @@ elasticsearch:
       requests:
         # configure volume size of the elasticsearch nodes based on search data storage requirements. The default storage size from elasticsearch is 30Gi.
         storage: 30Gi
-  # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret when elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is true.
+  # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret when
+  # elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is true.
   secretMounts:
     - name: elastic-certificates
       secretName: elastic-certificates
