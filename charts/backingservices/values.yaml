@@ -94,6 +94,7 @@ elasticsearch:
         storage: 30Gi
   # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret when
   # elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is true.
+  # Disable the below elasticsearch.secretMounts in case of elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is false
   secretMounts:
     - name: elastic-certificates
       secretName: elastic-certificates
