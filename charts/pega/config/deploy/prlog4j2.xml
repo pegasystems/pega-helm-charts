@@ -6,7 +6,7 @@
     </Console>
     <RollingRandomAccessFile  name="PEGA" fileName="${sys:pega.logdir}/PegaRULES.log" filePattern="${sys:pega.logdir}/PegaRULES-%d{MM-dd-yyyy}-%i.log.gz">
         <PatternLayout>
-            <Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+            <Pattern>%d [%20.20t] [%10.10X{pegathread}] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{RequestorId} %X{userid} - %m%n</Pattern>
         </PatternLayout>
         <Filters>
             <!--Deny message logged under ALERT log level-->
@@ -67,7 +67,7 @@
     <!-- RollingFile Appender for PegaCLUSTER logs -->
     <RollingRandomAccessFile  name="CLUSTER" fileName="${sys:pega.logdir}/PegaCLUSTER.log" filePattern="${sys:pega.logdir}/PegaCLUSTER-%d{MM-dd-yyyy}-%i.log.gz">
         <PatternLayout>
-            <Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{userid} - %m%n</Pattern>
+            <Pattern>%d [%20.20t] [%20.20X{tenantid}] [%20.20X{app}] (%30.30c{3}) %-5p %X{stack} %X{RequestorId} %X{userid} - %m%n</Pattern>
         </PatternLayout>
         <Policies>
             <TimeBasedTriggeringPolicy />
@@ -84,6 +84,41 @@
             <TimeBasedTriggeringPolicy />
             <SizeBasedTriggeringPolicy size="50 MB"/>
         </Policies>
+    </RollingRandomAccessFile>
+
+    <!-- RollingFile Appender for PegaMOBILE logs -->
+    <RollingRandomAccessFile name="MOBILE" fileName="${sys:pega.logdir}/PegaMOBILE.log" filePattern="${sys:pega.logdir}/PegaMOBILE-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+
+    <!-- RollingFile Appender for PegaMOBILEBUILD logs -->
+    <RollingRandomAccessFile name="MOBILEBUILD" fileName="${sys:pega.logdir}/PegaMOBILEBUILD.log" filePattern="${sys:pega.logdir}/PegaMOBILEBUILD-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+
+    <!-- RollingFile Appender for USAGEMETRICS logs -->
+    <!-- Added for Usage Metrics -->
+    <RollingRandomAccessFile  name="USAGEMETRICS" fileName="${sys:pega.logdir}/PegaUSAGE.json.log" filePattern="${sys:pega.logdir}/PegaUSAGE-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy />
+            <SizeBasedTriggeringPolicy size="250 MB"/>
+        </Policies>
+        <DefaultRolloverStrategy max="1"/>
     </RollingRandomAccessFile>
 </Appenders>
 <Loggers>
@@ -115,8 +150,18 @@
     <Logger name="org.apache.ignite" additivity="false" level="info">
         <AppenderRef ref="CLUSTER"/>
     </Logger>
+    <Logger name="com.pega.MobileLogger" additivity="false" level="info">
+        <AppenderRef ref="MOBILE"/>
+    </Logger>
+    <Logger name="com.pega.MobileBuildLogger" additivity="false" level="info">
+        <AppenderRef ref="MOBILEBUILD"/>
+    </Logger>
     <Logger name="com.pega.dsm.dnode.impl.dataflow.service.DataFlowDiagnosticsFileLogger" additivity="false" level="info">
         <AppenderRef ref="DATAFLOW"/>
     </Logger>
+    <!-- Added for Usage Metrics -->
+    <AsyncLogger name="com.pega.pegarules.session.internal.usagemetrics" additivity="false" level="USAGE">
+        <AppenderRef ref="USAGEMETRICS"/>
+    </AsyncLogger>
 </Loggers>
 </Configuration>
