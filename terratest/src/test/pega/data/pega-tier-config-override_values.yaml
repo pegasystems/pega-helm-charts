@@ -108,11 +108,11 @@ global:
 
       # Optionally overridde default resource specifications
       # cpuRequest: 2
-      # memRequest: "6Gi"
+      # memRequest: "12Gi"
       # cpuLimit: 4
-      # memLimit: "8Gi"
+      # memLimit: "12Gi"
       # initialHeap: "4096m"
-      # maxHeap: "7168m"
+      # maxHeap: "8192m"
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
@@ -159,7 +159,6 @@ global:
 
       hpa:
         enabled: true
-        enableMemoryTarget: false
 
       custom:
         prconfig: |-

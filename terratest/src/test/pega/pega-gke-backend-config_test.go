@@ -12,35 +12,41 @@ import (
 
 func TestPegaGKEBackendConfig(t *testing.T) {
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	for _,operation := range supportedOperations{
 
-			var options = &helm.Options{			
+        for _, depName := range deploymentNames {
+
+			var options = &helm.Options{
 				SetValues: map[string]string{
+				    "global.deployment.name": depName,
 					"global.provider":        "gke",
 					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 			 	},
 		    }
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
-			verifyBackendConfigs(t, yamlContent)
+			verifyBackendConfigs(t, yamlContent, options)
 		}
+	}
 }
 
-func verifyBackendConfigs(t *testing.T, yamlContent string) {
+func verifyBackendConfigs(t *testing.T, yamlContent string, options *helm.Options) {
 	var backendConfig v1beta1.BackendConfig
 	backendConfigSlice := strings.Split(yamlContent, "---")
 	for index, backendConfigStr := range backendConfigSlice {
 		if index >= 1 && index <= 2 {
 			UnmarshalK8SYaml(t, backendConfigStr, &backendConfig)
 			if index == 1 {
-				verifyBackendConfig(t, &backendConfig, "pega-web", 8080)
+				verifyBackendConfig(t, &backendConfig, getObjName(options, "-web"), 8080)
 			} else {
 				// web and stream health check will happen on 8080 port
-				verifyBackendConfig(t, &backendConfig, "pega-stream", 8080)
+				verifyBackendConfig(t, &backendConfig, getObjName(options, "-stream"), 8080)
 			}
 		}
 	}

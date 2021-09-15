@@ -66,14 +66,16 @@
          APR (HTTP/AJP) Connector: /docs/apr.html
          Define a non-SSL/TLS HTTP/1.1 Connector on port 8080
     -->
-    <Connector port="8080" protocol="HTTP/1.1"
-               connectionTimeout="20000"
-	       redirectPort="8443" />
+    <Connector port="8080" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
+               relaxedQueryChars="[ ]"
+               relaxedPathChars="[ ]"
+               maxHttpHeaderSize="16384"
+               maxSavePostSize="65536"
+               connectionTimeout="20000" />
 
     <!-- facilitates liveness check via separate port -->
-    <Connector port="8081" protocol="HTTP/1.1"
+    <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
-	       redirectPort="8443" 
 	       maxThreads="1"/>
     <!-- A "Connector" using the shared thread pool-->
     <!--

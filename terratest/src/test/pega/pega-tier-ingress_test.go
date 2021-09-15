@@ -16,6 +16,7 @@ import (
 func TestPegaTierIngress(t *testing.T){
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
 	var supportedVendors = []string{"k8s","eks","gke","aks","pks"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,18 +26,22 @@ func TestPegaTierIngress(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+                for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
-			VerifyPegaIngresses(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+                VerifyPegaIngresses(t, yamlContent, options)
+			}
 		}
 	}
 
@@ -52,11 +57,11 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 			UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{"pega-web", intstr.IntOrString{IntVal: 80}, 1020},
+					pegaIngress{getObjName(options, "-web"), intstr.IntOrString{IntVal: 80}, 1020},
 					options)
 			} else {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{"pega-stream", intstr.IntOrString{IntVal: 7003}, 1020},
+					pegaIngress{getObjName(options, "-stream"), intstr.IntOrString{IntVal: 7003}, 1020},
 					options)
 			}
 
@@ -65,6 +70,7 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 }
 
 func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress, options *helm.Options) {
+    require.Equal(t, ingressObj.ObjectMeta.Name, expectedIngress.Name)
 	provider := options.SetValues["global.provider"]
 	if provider == "eks" {
 		VerifyEKSIngress(t, ingressObj, expectedIngress)

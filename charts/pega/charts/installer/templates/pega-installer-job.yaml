@@ -1,11 +1,24 @@
 {{ if (eq (include "performInstall" .) "true") }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBInstall" .) "action" "install" }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBInstall" .) "action" "install" "containerName" (include "pegaDBInstall" .) }}
 {{ end }}
-{{ if (eq (include "performOnlyUpgrade" .) "true") }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" }}
+{{ if (and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "in-place"))  }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBInPlaceUpgrade" .) "action" "upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
 {{ end }}
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaPostDBUpgrade" .) "action" "post-upgrade" "initContainers" (list "waitForPegaDBUpgrade" "waitForRollingUpdates") }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBZDTUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaPostDBUpgrade" .) "action" "post-upgrade" "initContainers" (list "waitForPegaDBZDTUpgrade" "waitForRollingUpdates") "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ end }}
+{{ if ( and (eq (include "performOnlyUpgrade" .) "true") (or (eq .Values.upgrade.upgradeType "zero-downtime") (eq .Values.upgrade.upgradeType "out-of-place"))) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBZDTUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ end }}
+{{ if ( and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "custom")) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBCustomUpgrade" .) "action" "upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ end }}
+{{ if (and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "out-of-place-rules")) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPRulesUpgrade" .) "action" "upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
+{{ end }}
+{{ if (and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "out-of-place-data")) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPDataUpgrade" .) "action" "upgrade" "containerName" (include "pegaDBUpgradeContainer" .) }}
 {{ end }}

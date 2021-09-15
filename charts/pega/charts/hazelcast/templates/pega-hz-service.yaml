@@ -7,6 +7,8 @@ metadata:
   labels:
     app: {{ template "hazelcastName" . }}
     component: Pega
+  annotations:
+{{- include "generatedHazelcastServiceAnnotations" . | indent 8 }}
 spec:
   ports:
   - name: hazelcast

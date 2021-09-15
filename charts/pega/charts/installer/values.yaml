@@ -20,8 +20,6 @@ adminPassword: ""
 assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
 bypassTruncateUpdatescache: "false"
-# JDBC custom connection properties
-jdbcCustomConnection: ""
 # Distribution kit URL
 distributionKitURL: ""
 # A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
@@ -49,10 +47,19 @@ zos:
 # Upgrade specific properties
 upgrade:
   # Type of upgrade
-  # Valid values are 'in-place' , 'out-of-place'
+  # Valid upgradeType values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data' .
+  # 'out-of-place' is deprecated and supported only with Helm charts prior to version 1.4.
   upgradeType: ""
-  # Specify target rules schema for migration and upgrade
+  # In case of upgradeType: 'custom', specify the steps for your custom upgrade process using the upgradeSteps: parameter.
+  # Separate each step with a comma (,) and specify the order in which you want to initiate the steps.
+  # Supported upgrade steps are: enable_cluster_upgrade rules_migration rules_upgrade data_upgrade disable_cluster_upgrade.
+  upgradeSteps: ""
+  # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
   targetRulesSchema: ""
+  # Specify a name for a target data schema that the upgrade process creates for patches and upgrades.
+  # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
+  # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
+  targetDataSchema: ""
   # The commit count to use when loading database tables
   dbLoadCommitRate: 100
   # Update existing application will be run if this property is set to true

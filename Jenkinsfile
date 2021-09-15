@@ -1,15 +1,12 @@
 #!/usr/bin/env groovy
-def bintrayautomation = "bintrayautomation"
 def labels = ""
-def bintrayPackageVersion = "1.0.0" 
-def curlSuccessStatus = '{"message":"success"}'
 
 node {
       stage("Init"){
           if (env.CHANGE_ID) {
             pullRequest.labels.each{
             echo "label: $it"
-            validateProviderLabel(it)
+            validateLabels(it)
             labels += "$it,"
             }
             labels = labels.substring(0,labels.length()-1)
@@ -24,69 +21,73 @@ node {
             throw new Exception("Aborting as this is not a PR job")
          }
       }
-      stage ("Checkout and Package Charts") {
+      stage ("Checkout and Package Charts and ConfigFiles") {
 
             // Checkout PR Code
             def scmVars = checkout scm
             branchName = "${scmVars.GIT_BRANCH}"
             packageName = currentBuild.displayName
             prNumber = "${env.BRANCH_NAME}".split("-")[1]
-            
+            chartVersion = "${prNumber}.${env.BUILD_NUMBER}"
+            deployConfigsFileName = "deploy-config-${chartVersion}.tgz"
+            installerConfigsFileName = "installer-config-${chartVersion}.tgz"
             // Perform Chart packaging
             sh "helm dependency update ./charts/pega/"
             sh "helm dependency update ./charts/addons/"
-            sh "curl -o index.yaml https://dl.bintray.com/pegasystems/helm-test-automation/index.yaml"
-            sh "helm package --version ${prNumber}.${env.BUILD_NUMBER} ./charts/pega/"
-            sh "helm package --version ${prNumber}.${env.BUILD_NUMBER} ./charts/addons/"
-            sh "helm repo index --merge index.yaml --url https://dl.bintray.com/pegasystems/helm-test-automation/ ."
-            sh "cat index.yaml"
-            
-            // Publish helm charts to test-automation repository
-            withCredentials([usernamePassword(credentialsId: "bintrayautomation",
-              passwordVariable: 'BINTRAY_APIKEY', usernameVariable: 'BINTRAY_USERNAME')]) {
-                chartVersion = "${prNumber}.${env.BUILD_NUMBER}"
-                pega_chartName = "pega-${chartVersion}.tgz"
-                addons_chartName = "addons-${chartVersion}.tgz"
-                DELETE_STATUS_CODE = sh(script: "curl -X DELETE -u${BINTRAY_USERNAME}:${BINTRAY_APIKEY} https://api.bintray.com/content/pegasystems/helm-test-automation/index.yaml --write-out '%{http_code}'", returnStdout: true).trim()
-                PEGA_STATUS_CODE = sh(script: "curl -T ${pega_chartName} -u${BINTRAY_USERNAME}:${BINTRAY_APIKEY} https://api.bintray.com/content/pegasystems/helm-test-automation/helm-test-automation/${bintrayPackageVersion}/ --write-out '%{http_code}'", returnStdout: true).trim()
-                ADDONS_STATUS_CODE = sh(script: "curl -T ${addons_chartName} -u${BINTRAY_USERNAME}:${BINTRAY_APIKEY} https://api.bintray.com/content/pegasystems/helm-test-automation/helm-test-automation/${bintrayPackageVersion}/ --write-out '%{http_code}' ", returnStdout: true).trim()
-                UPDATE_STATUS_CODE = sh(script: "curl -T index.yaml -u${BINTRAY_USERNAME}:${BINTRAY_APIKEY} https://api.bintray.com/content/pegasystems/helm-test-automation/helm-test-automation/${bintrayPackageVersion}/ --write-out '%{http_code}'", returnStdout: true).trim()
-                PUBLISH_STATUS_CODE = sh(script: "curl -X POST -u${BINTRAY_USERNAME}:${BINTRAY_APIKEY} https://api.bintray.com/content/pegasystems/helm-test-automation/helm-test-automation/${bintrayPackageVersion}/publish --write-out '%{http_code}'", returnStdout: true).trim()
-                echo "DELETE_STATUS_CODE-- ${DELETE_STATUS_CODE}"
-                echo "PEGA_STATUS_CODE-- ${PEGA_STATUS_CODE}"
-                echo "ADDONS_STATUS_CODE-- ${ADDONS_STATUS_CODE}"
-                echo "UPDATE_STATUS_CODE-- ${UPDATE_STATUS_CODE}"
-                echo "PUBLISH_STATUS_CODE-- ${PUBLISH_STATUS_CODE}"
+            sh "helm dependency update ./charts/backingservices/"
+            sh "helm package --version ${chartVersion} ./charts/pega/"
+            sh "helm package --version ${chartVersion} ./charts/addons/"
+            sh "helm package --version ${chartVersion} ./charts/backingservices/"
+            sh "tar -czvf ${deployConfigsFileName} --directory=./charts/pega/config deploy/context.xml.tmpl deploy/server.xml deploy/prconfig.xml deploy/prlog4j2.xml"
+            sh "mkdir -p ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/migrateSystem.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prbootstrap.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prconfig.xml.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prlog4j2.xml ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prpcUtils.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/setupDatabase.properties.tmpl ./charts/pega/charts/installer/config/installer && tar -czvf ${installerConfigsFileName} --directory=./charts/pega/charts/installer/config installer/migrateSystem.properties.tmpl installer/prbootstrap.properties.tmpl installer/prconfig.xml.tmpl installer/prlog4j2.xml installer/prpcUtils.properties.tmpl installer/setupDatabase.properties.tmpl"
 
-                if ( "${DELETE_STATUS_CODE}" != "${curlSuccessStatus}"+"200" || "${PEGA_STATUS_CODE}" != "${curlSuccessStatus}"+"201" || "${ADDONS_STATUS_CODE}" != "${curlSuccessStatus}"+"201"
-                      || "${UPDATE_STATUS_CODE}" != "${curlSuccessStatus}"+"201" || "${PUBLISH_STATUS_CODE}" != '{"files":3}'+"200" ) {
-                    currentBuild.result = 'FAILURE'
-                    pullRequest.comment("Unable to publish helm charts to bintray repository. Please retry")
-                    error "This pipeline stops here! Unable to perform helm charts publish to bintray repository."
+            // Publish helm charts to test-automation GitHub Pages
+            withCredentials([usernamePassword(credentialsId: "helmautomation",
+              passwordVariable: 'AUTOMATION_APIKEY', usernameVariable: 'AUTOMATION_USERNAME')]) {
+
+                sh "git clone https://${AUTOMATION_USERNAME}:${AUTOMATION_APIKEY}@github.com/pegaautomationuser/helmcharts.git --branch=gh-pages gh-pages"
+                sh "mv pega-${chartVersion}.tgz gh-pages/"
+                sh "mv addons-${chartVersion}.tgz gh-pages/"
+                sh "mv backingservices-${chartVersion}.tgz gh-pages/"
+                sh "mv ${deployConfigsFileName} gh-pages/"
+                sh "mv ${installerConfigsFileName} gh-pages/"
+                dir("gh-pages") {
+                  sh "helm repo index --merge index.yaml --url https://pegaautomationuser.github.io/helmcharts/ ."   
+                  sh "git config user.email pegaautomationuser@gmail.com"
+                  sh "git config user.name ${AUTOMATION_USERNAME}"
+                  sh "git add ."
+                  sh "git commit -m \"Jenkins build to publish test artefacts of version ${chartVersion}\""
+                  sh "git push -u origin gh-pages --force"                                  
                 }
+
             } 
       }
 
       stage("Setup Cluster and Execute Tests") {
-          
-          jobMap = [:]
-          jobMap["job"] = "../kubernetes-test-orchestrator/master"
-          jobMap["parameters"] = [
-                                  string(name: 'PROVIDERS', value: labels),
-                                  string(name: 'WEB_READY_IMAGE_NAME', value: ""),
-                                  string(name: 'HELM_CHART_VERSION', value: chartVersion),
-                              ]
-          jobMap["propagate"] = true
-          jobMap["quietPeriod"] = 0 
-          resultWrapper = build jobMap
-          currentBuild.result = resultWrapper.result
+          prLabels = labels.toString().split(",")
+
+          if(prLabels.contains("integ-all") || prLabels.contains("integ-eks") || prLabels.contains("integ-gke") || prLabels.contains("integ-aks")) {
+                  jobMap = [:]
+                  jobMap["job"] = "../kubernetes-test-orchestrator/master"
+                  jobMap["parameters"] = [
+                          string(name: 'PROVIDERS', value: labels),
+                          string(name: 'WEB_READY_IMAGE_NAME', value: ""),
+                          string(name: 'HELM_CHART_VERSION', value: chartVersion),
+                  ]
+                  jobMap["propagate"] = true
+                  jobMap["quietPeriod"] = 0
+                  resultWrapper = build jobMap
+                  currentBuild.result = resultWrapper.result
+          } else {
+              echo "Skipping 'Setup Cluster and Execute Tests' stage based on PR labels: $prLabels"
+          }
       } 
   }
 
-def validateProviderLabel(String provider){
-    def validProviders = ["integ-all","integ-eks","integ-gke","integ-aks"]
-    def failureMessage = "Invalid provider label - ${provider}. valid labels are ${validProviders}"
-    if(!validProviders.contains(provider)){
+def validateLabels(String label){
+    def validLabels = ["integ-all","integ-eks","integ-gke","integ-aks","configs"]
+    def failureMessage = "Invalid label - ${label}. valid labels are ${validLabels}"
+    if(!validLabels.contains(label)){
         currentBuild.result = 'FAILURE'
         pullRequest.comment("${failureMessage}")
         throw new Exception("${failureMessage}")

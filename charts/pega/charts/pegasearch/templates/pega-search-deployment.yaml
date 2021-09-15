@@ -105,7 +105,7 @@ spec:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" }}
+      - name: {{ template "pegaRegistrySecret" $}}
   volumeClaimTemplates:
   - metadata:
       name: esstorage

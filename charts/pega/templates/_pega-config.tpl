@@ -1,5 +1,11 @@
 {{- define "pega.config" -}}
+{{ template "pega.config.inner" dict "root" .root "node" .dep "name" .name "mode" (include "deployConfig" .root) "custom" .dep.custom }}
+{{- end -}}
+
+
+{{- define "pega.config.inner" -}}
 {{- $arg := .mode -}}
+{{- $tiername := .node.name -}}
 # Node type specific configuration for {{ .name }}
 kind: ConfigMap
 apiVersion: v1
@@ -9,6 +15,15 @@ metadata:
 data:
 {{- if eq $arg "deploy-config" }}
 {{- $custom_config := .custom }}
+{{- $custom_global_config := .root.Values.global }}
+
+{{- if $custom_global_config.configurations }}
+{{- range $key, $value := $custom_global_config.configurations }}
+{{- if eq $key $tiername }}
+{{ $value | toYaml | nindent 2 -}}
+{{- end }}
+{{- end }}
+{{ else }}
 
   # Pega deployment prconfig.xml file
   prconfig.xml: |-
@@ -52,6 +67,7 @@ data:
   # Pega deployment web.xml file
   web.xml: |-
 {{ .root.Files.Get "config/deploy/web.xml" | indent 6 }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
