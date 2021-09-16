@@ -66,7 +66,7 @@ func VerifyTierConfg(t *testing.T, yamlContent string, options *helm.Options) {
 
 			pegaConfigMapData := pegaConfigMap.Data
 			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
-			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
+			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallDeployServer.xml")
 			require.Equal(t, "", pegaConfigMapData["web.xml"])
