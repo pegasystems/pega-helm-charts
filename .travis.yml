@@ -47,20 +47,20 @@ deploy:
   - provider: releases
     api_key:
       secure: >
-        RXH5TG6rk++JOOskmHSOMkU0q6UeDmKPHBrimryAINT+pfIlsVz
-        zpT7hCB9DTmhv5HFTScamL3tAMm+/rYHTwv+Ags8UJpo9pSuxZ1
-        2QeuepRuivEJCP4O095vk/mphOmrK7XXYndTaNn79kBL+w2WENI
-        4MgxVwki1jK1J1pEwzk8r521E7efx3KXCUdoqQxTO2NpbVEnYvT
-        7Ah3WgfKpZCsqSfnjUV8nSJb4Fkn/tG9/otRfhD7WeiNrrh9W/t
-        vVcjNzJXXoCdgoK0bTFRiwm+PSFmRVEfmXgI0W7FZjXTv6u6Y33
-        VhYQ/sDDo3TtDqb6NztFpXulNGilFeYvimF2LSydur6t/Lvj0Qd
-        cUyvpyIGyU/kZhcug8GDg9OxG8n0rpvbTiRP+dqYMNdo9CmBV4L
-        7wtsSYwOmjXSHgraSf+9xLHJBKmwIKJy1RH/H8SCDaDtlQiPWzb
-        d2k6UcOBOJIWsHkPNQcsClwdZo6In+UbAtmoeFivLf1sWfpQQq5
-        Qo405P31k3d8uiMtKpAmQ+KqWZ/Ju5HQocjRN7pNxERpGosKXcu
-        ZKiYUiJJJwwteFhwORrZKNQiQTmLeDz6Ho6J7u1PUw50JlRH0ZQ
-        q82JuinvnCKZ48mtVFKqZMx6/TE9JJ9u+DcCjJG5KO4dHcRyDYy
-        2xx9s1mUQFlgOf+Qxlak=
+        B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
+        YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
+        G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
+        3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
+        qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
+        tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
+        BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
+        XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
+        eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
+        +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
+        6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
+        xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
+        Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
+        s8HDDyvvaP0mhMvUou8I=
     file:
       - pega-kubernetes-example.tar.gz
       - pega-openshift-example.tar.gz
@@ -76,20 +76,20 @@ deploy:
     github-token: $GITHUB_TOKEN
     api_key:
       secure: >
-        RXH5TG6rk++JOOskmHSOMkU0q6UeDmKPHBrimryAINT+pfIlsVz
-        zpT7hCB9DTmhv5HFTScamL3tAMm+/rYHTwv+Ags8UJpo9pSuxZ1
-        2QeuepRuivEJCP4O095vk/mphOmrK7XXYndTaNn79kBL+w2WENI
-        4MgxVwki1jK1J1pEwzk8r521E7efx3KXCUdoqQxTO2NpbVEnYvT
-        7Ah3WgfKpZCsqSfnjUV8nSJb4Fkn/tG9/otRfhD7WeiNrrh9W/t
-        vVcjNzJXXoCdgoK0bTFRiwm+PSFmRVEfmXgI0W7FZjXTv6u6Y33
-        VhYQ/sDDo3TtDqb6NztFpXulNGilFeYvimF2LSydur6t/Lvj0Qd
-        cUyvpyIGyU/kZhcug8GDg9OxG8n0rpvbTiRP+dqYMNdo9CmBV4L
-        7wtsSYwOmjXSHgraSf+9xLHJBKmwIKJy1RH/H8SCDaDtlQiPWzb
-        d2k6UcOBOJIWsHkPNQcsClwdZo6In+UbAtmoeFivLf1sWfpQQq5
-        Qo405P31k3d8uiMtKpAmQ+KqWZ/Ju5HQocjRN7pNxERpGosKXcu
-        ZKiYUiJJJwwteFhwORrZKNQiQTmLeDz6Ho6J7u1PUw50JlRH0ZQ
-        q82JuinvnCKZ48mtVFKqZMx6/TE9JJ9u+DcCjJG5KO4dHcRyDYy
-        2xx9s1mUQFlgOf+Qxlak=
+        B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
+        YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
+        G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
+        3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
+        qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
+        tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
+        BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
+        XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
+        eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
+        +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
+        6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
+        xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
+        Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
+        s8HDDyvvaP0mhMvUou8I=
     file:
         - index.yaml
     skip_cleanup: true
