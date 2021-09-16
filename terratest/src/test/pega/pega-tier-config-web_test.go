@@ -77,7 +77,7 @@ func VerifyTierConfgWithWeb(t *testing.T, yamlContent string, options *helm.Opti
 			UnmarshalK8SYaml(t, configData, &pegaConfigMap)
 			pegaConfigMapData := pegaConfigMap.Data
 			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
-			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml")
+			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallDeployServer.xml")
 			compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
