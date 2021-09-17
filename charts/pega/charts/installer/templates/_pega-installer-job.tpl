@@ -52,7 +52,7 @@ spec:
 {{ include $val $.root | indent 6 }}
 {{- end }}
       containers:
-      - name: {{ .name }}
+      - name: {{ .containerName }}
         image: {{ .root.Values.image }}
         ports:
         - containerPort: 8080

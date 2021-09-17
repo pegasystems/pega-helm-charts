@@ -213,7 +213,7 @@ To customize these files, you must download them from the source github reposito
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.4.4           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/addons           1.4.4           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
   pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
@@ -225,9 +225,9 @@ To configure the parameters in the backingservices.yaml file, download the file 
 
 1. To download the backingservices.yaml Helm chart to the \<local filepath>\gke-demo, enter:
 
-   `$ helm inspect values pega/backingservices > <local filepath>/aks-demo/backingservices.yaml`
+   `$ helm inspect values pega/backingservices > <local filepath>/gke-demo/backingservices.yaml`
 
-2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your AKS requirements:
+2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your GKE requirements:
 
 | Chart parameter name              | Purpose                                   | Your setting |
 |:---------------------------------|:-------------------------------------------|:--------------|
@@ -290,7 +290,6 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | rulesSchema: "rules" dataSchema: "data" |
 | docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
 | docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
-| upgrade:    | Do not set for installations or deployments. | upgrade: for non-upgrade, keep the default value. |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. Pega supports specifying certificates for an ingress using the same methods GKE supports. Note that if you configure both secrets and pre-shared certificates on the ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates. For details, see [Using multiple SSL certificates in HTTP(s) load balancing with Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).  | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
 | pegasearch.image: | Specify the Pega-provided Docker `search` image you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>" 
@@ -483,7 +482,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 14. Refresh the Kubernetes dashboard that you opened in Step 11. If you closed the dashboard, start the proxy server for the Kubernetes dashboard as directed in Step 10, and relaunch the web browser as directed in Step 11.
 
-15. In the dashboard, in **Namespace** select the `mypega-pks-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
+15. In the dashboard, in **Namespace** select the `mypega-gke-demo` view and then click on the **Pods** view. Initially, some pods will have a red status, which means they are initializing:
 
 ![Initial view of pods during deploying](media/dashboard-mypega-pks-demo-install-initial.png)
 
@@ -497,7 +496,7 @@ A successful Pega deployment immediately returns details that show progress for 
 
 17. To see the final deployment in the Kubernetes dashboard after about 15 minutes, refresh the `mypega-gke-demo` namespace pods.
 
-A successful deployment does not show errors across the various workloads. The `mypega-pks-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
+A successful deployment does not show errors across the various workloads. The `mypega-gke-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
 ## Logging in to Pega Platform – 10 minutes
 
