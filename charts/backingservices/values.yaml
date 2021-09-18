@@ -58,7 +58,7 @@ elasticsearch:
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
   protocol: http
-  # This section specifies the elasticsearch cluster configuration for authentication.
+  # This section specifies the elasticsearch cluster configuration for authentication and TLS.
   esConfig:
     elasticsearch.yml: |
       xpack.security.enabled: true
@@ -92,14 +92,13 @@ elasticsearch:
       requests:
         # configure volume size of the elasticsearch nodes based on search data storage requirements. The default storage size from elasticsearch is 30Gi.
         storage: 30Gi
-  # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret when
-  # elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is true.
-  # Disable the below elasticsearch.secretMounts in case of elasticsearch.esConfig.elasticsearch.yml: | xpack.security.transport.ssl.enabled: is false
+  # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret.
   secretMounts:
     - name: elastic-certificates
       secretName: elastic-certificates
       path: /usr/share/elasticsearch/config/certs
-# In case of Openshift deployment please use the bellow custom values.
+# In case of Openshift deployment please use the bellow custom values. for more details
+# refer https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift .
 #  securityContext:
 #    runAsUser: null
 #  podSecurityContext:
