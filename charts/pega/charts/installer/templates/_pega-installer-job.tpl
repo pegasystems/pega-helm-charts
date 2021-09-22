@@ -35,7 +35,10 @@ spec:
       - name: {{ template "pegaDistributionKitVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
-{{- end }}      
+{{- end }}
+{{- if .root.Values.custom.volumeMounts }}
+{{ toYaml .root.Values.custom.volumeMounts | indent 6 }}          
+{{- end }}
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
@@ -86,7 +89,12 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
-{{- end }}           
+{{- end }}
+{{- if .custom }}
+{{- if .custom.sidecarContainers }}
+{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{- end }}
+{{- end }}                 
       restartPolicy: Never
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" .root }}
