@@ -427,7 +427,7 @@ To configure the parameters in the backingservices.yaml file, download the file 
 
 3. Save the file.
 
-4. To use an internal Elasticsearch cluster (srs.srsStorage.requireInternetAccess:true) for your deployment, you must download the Makefile file from the repository ( path from root : pega-helm-charts/charts/backingservices/Makefile) and replace <YOUR_NAMESPACE> with the namespace you used for the deployment, then run `$ make es-prerequisite`.
+4. To use an internal Elasticsearch cluster (srs.srsStorage.requireInternetAccess:true) for your deployment, you must download the Makefile file from the repository (path from root : pega-helm-charts/charts/backingservices/Makefile), replace `<YOUR_NAMESPACE>` with the namespace you used for the deployment, and then run `$ make es-prerequisite`.
 
 #### Add supported custom settings for Pega to your deployment
 
