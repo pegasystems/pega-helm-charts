@@ -158,7 +158,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, getObjName(options, "-environment-config"), pod.Containers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name)
 	require.Equal(t, "4", pod.Containers[0].Resources.Limits.Cpu().String())
 	require.Equal(t, "12Gi", pod.Containers[0].Resources.Limits.Memory().String())
-	require.Equal(t, "2", pod.Containers[0].Resources.Requests.Cpu().String())
+	require.Equal(t, "3", pod.Containers[0].Resources.Requests.Cpu().String())
 	require.Equal(t, "12Gi", pod.Containers[0].Resources.Requests.Memory().String())
 
 	require.Equal(t, "pega-volume-config", pod.Containers[0].VolumeMounts[0].Name)
