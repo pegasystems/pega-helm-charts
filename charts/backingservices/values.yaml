@@ -97,8 +97,8 @@ elasticsearch:
     - name: elastic-certificates
       secretName: elastic-certificates
       path: /usr/share/elasticsearch/config/certs
-# In case of Openshift deployment please use the bellow custom values. for more details
-# refer https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift .
+# For Openshift deployments, you must enable the following custom values. For details
+# refer to https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift.
 #  securityContext:
 #    runAsUser: null
 #  podSecurityContext:
