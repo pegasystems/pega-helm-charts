@@ -14,4 +14,10 @@ rules:
 - apiGroups: ["extensions"]
   resources: ["deployments"]
   verbs: ["get", "watch", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get" ,"list", "logs"]  
 {{ end }}
