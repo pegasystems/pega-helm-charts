@@ -12,4 +12,11 @@ subjects:
 - kind: ServiceAccount
   name: default
   namespace: {{ .Release.Namespace }}
+{{- if .custom }}
+{{- if .custom.serviceAccountName }}
+- kind: ServiceAccount
+  name:  {{ .custom.serviceAccountName }}
+  namespace: {{ .Release.Namespace }}
+{{ end }}  
+{{ end }}
 {{ end }}

@@ -30,6 +30,11 @@ spec:
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
 {{- end }}     
     spec:
+{{- if .custom }}
+{{- if .custom.serviceAccountName }}
+      serviceAccountName: {{ .custom.serviceAccountName }}
+{{- end }}
+{{- end }}    
       volumes:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
