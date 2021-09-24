@@ -30,9 +30,9 @@ spec:
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
 {{- end }}     
     spec:
-{{- if .custom }}
-{{- if .custom.serviceAccountName }}
-      serviceAccountName: {{ .custom.serviceAccountName }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.serviceAccountName }}
+      serviceAccountName: {{ .root.Values.custom.serviceAccountName }}
 {{- end }}
 {{- end }}    
       volumes:
