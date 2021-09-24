@@ -92,7 +92,7 @@ spec:
 {{- end }}
 {{- if .root.Values.custom }}
 {{- if .root.Values.custom.sidecarContainers }}
-{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{ toYaml .root.Values.custom.sidecarContainers | indent 6 }}
 {{- end }}
 {{- end }}                 
       restartPolicy: Never
