@@ -30,11 +30,10 @@ spec:
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
 {{- end }}     
     spec:
-{{- if .root.Values.custom }}
-{{- if .root.Values.custom.serviceAccountName }}
+      shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
+{{- if .root.Values.custom }}{{- if .root.Values.custom.serviceAccountName }}
       serviceAccountName: {{ .root.Values.custom.serviceAccountName }}
-{{- end }}
-{{- end }}    
+{{- end }}{{- end }}    
       volumes:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
@@ -95,11 +94,9 @@ spec:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
 {{- end }}
-{{- if .root.Values.custom }}
-{{- if .root.Values.custom.sidecarContainers }}
+{{- if .root.Values.custom }}{{- if .root.Values.custom.sidecarContainers }}
 {{ toYaml .root.Values.custom.sidecarContainers | indent 6 }}
-{{- end }}
-{{- end }}                 
+{{- end }}{{- end }}                 
       restartPolicy: Never
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" .root }}
