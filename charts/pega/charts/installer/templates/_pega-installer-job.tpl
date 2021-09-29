@@ -21,6 +21,8 @@ metadata:
 {{- if .root.Values.global.pegaJob }}{{- if .root.Values.global.pegaJob.annotations }}
 {{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
 {{- end }}{{- end }}
+  labels:
+    app: {{ .name }}
 spec:
   backoffLimit: 0
   template:
