@@ -51,11 +51,11 @@ func TestPegaInstallerJob(t *testing.T) {
 					for index, jobInfo := range yamlSplit {
 						if index >= 1 && index <= 3 {
 							if index == 1 {
-								expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-db-upgrade"}
+								expectedJob = pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer"}
 							} else if index == 2 {
-								expectedJob = pegaDbJob{"pega-zdt-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config", "pega-db-upgrade"}
+								expectedJob = pegaDbJob{"pega-zdt-upgrade", []string{"wait-for-pre-dbupgrade"}, "pega-upgrade-environment-config", "pega-installer"}
 							} else if index == 3 {
-								expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config", "pega-db-upgrade"}
+								expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config", "pega-installer"}
 							}
 
 							assertJob(t, jobInfo, expectedJob, options)
@@ -64,9 +64,9 @@ func TestPegaInstallerJob(t *testing.T) {
 					}
 				} else {
 					if operation == "install" || operation == "install-deploy" {
-						assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-db-install"}, options)
+						assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer"}, options)
 					} else {
-						assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-db-upgrade"}, options)
+						assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer"}, options)
 					}
 				}
 			}

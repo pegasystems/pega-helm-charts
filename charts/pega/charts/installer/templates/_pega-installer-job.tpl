@@ -59,7 +59,7 @@ spec:
 {{ include $val $.root | indent 6 }}
 {{- end }}
       containers:
-      - name: {{ .containerName }}
+      - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
         ports:
         - containerPort: 8080
