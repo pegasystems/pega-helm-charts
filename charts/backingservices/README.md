@@ -42,7 +42,7 @@ Configuration                       | Usage
 `deploymentName`                    | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.
 `srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
 `elasticsearch`                     | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for elasticsearch provisioning in the cluster.
-`srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS (Requires you to download the `Makefile` file from the [repository](https://github.com/pegasystems/pega-helm-charts) (path from root : `pega-helm-charts/charts/backingservices/Makefile`), edit the file to replace `<YOUR_NAMESPACE>` with `namespace` used for the deployment, and then run `$ make es-prerequisite`).</li><li>Disable this parameter to use your own Elasticsearch service with the SRS.</li></ul>
+`srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS (Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`).</li><li>Disable this parameter to use your own Elasticsearch service with the SRS.</li></ul>
 
 Example:
 
