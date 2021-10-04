@@ -33,18 +33,15 @@ spec:
 {{- end }}     
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
-{{- if .root.Values.custom }}{{- if .root.Values.custom.serviceAccountName }}
-      serviceAccountName: {{ .root.Values.custom.serviceAccountName }}
-{{- end }}{{- end }}    
+{{- if .root.Values.serviceAccountName }}
+      serviceAccountName: {{ .root.Values.serviceAccountName }}
+{{- end }}   
       volumes:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}
-{{- if .root.Values.custom }}{{- if .root.Values.custom.volumeMounts }}
-{{ toYaml .root.Values.custom.volumeMounts | indent 6 }}          
-{{- end }}{{- end }}
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
@@ -82,7 +79,10 @@ spec:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
-{{- end }}      
+{{- end }}
+{{- if .root.Values.custom }}{{- if .root.Values.custom.volumeMounts }}
+{{ toYaml .root.Values.custom.volumeMounts | indent 6 }}          
+{{- end }}{{- end }}   
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
         -  name: ACTION
@@ -96,9 +96,9 @@ spec:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
 {{- end }}
-{{- if .root.Values.custom }}{{- if .root.Values.custom.sidecarContainers }}
-{{ toYaml .root.Values.custom.sidecarContainers | indent 6 }}
-{{- end }}{{- end }}                 
+{{- if .root.Values.sidecarContainers }}
+{{ toYaml .root.Values.sidecarContainers | indent 6 }}
+{{- end }}                
       restartPolicy: Never
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" .root }}
