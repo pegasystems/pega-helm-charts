@@ -80,8 +80,8 @@ spec:
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
 {{- end }}
-{{- if .root.Values.custom }}{{- if .root.Values.custom.volumeMounts }}
-{{ toYaml .root.Values.custom.volumeMounts | indent 6 }}          
+{{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
+{{ toYaml .root.Values.custom.volumes | indent 6 }}          
 {{- end }}{{- end }}   
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
