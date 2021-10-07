@@ -17,8 +17,8 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-    timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS "30000" }}"
-    minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME "60000" }}"
+    timeBetweenEvictionRunsMillis="30000"
+    minEvictableIdleTimeMillis="60000"
     />
 
   {{ if and .Env.DB_RW_USERNAME .Env.JDBC_RW_URL }}
@@ -35,8 +35,8 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="socketTimeout=1200;"
-    timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS "30000" }}"
-    minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME "60000" }}"
+    timeBetweenEvictionRunsMillis="30000"
+    minEvictableIdleTimeMillis="60000"
     />
   {{ end }}
 
@@ -54,8 +54,8 @@
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE }}"
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
-    timeBetweenEvictionRunsMillis="{{ default .Env.JDBC_TIME_BETWEEN_EVICTIONS "30000" }}"
-    minEvictableIdleTimeMillis="{{ default .Env.JDBC_MIN_EVICTABLE_IDLE_TIME "60000" }}"
+    timeBetweenEvictionRunsMillis="30000"
+    minEvictableIdleTimeMillis="60000"
     />
 
 

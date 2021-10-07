@@ -21,6 +21,8 @@ metadata:
 {{- if .root.Values.global.pegaJob }}{{- if .root.Values.global.pegaJob.annotations }}
 {{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
 {{- end }}{{- end }}
+  labels:
+    app: {{ .name }}
 spec:
   backoffLimit: 0
   template:
@@ -30,12 +32,19 @@ spec:
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
 {{- end }}     
     spec:
+      shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
+{{- if .root.Values.serviceAccountName }}
+      serviceAccountName: {{ .root.Values.serviceAccountName }}
+{{- end }}   
       volumes:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
-{{- end }}      
+{{- end }}
+{{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
+{{ toYaml .root.Values.custom.volumes | indent 6 }}          
+{{- end }}{{- end }}  
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
@@ -52,7 +61,7 @@ spec:
 {{ include $val $.root | indent 6 }}
 {{- end }}
       containers:
-      - name: {{ .containerName }}
+      - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
         ports:
         - containerPort: 8080
@@ -73,7 +82,7 @@ spec:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
-{{- end }}      
+{{- end }} 
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
         -  name: ACTION
@@ -86,7 +95,10 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
-{{- end }}           
+{{- end }}
+{{- if .root.Values.sidecarContainers }}
+{{ toYaml .root.Values.sidecarContainers | indent 6 }}
+{{- end }}                
       restartPolicy: Never
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" .root }}
