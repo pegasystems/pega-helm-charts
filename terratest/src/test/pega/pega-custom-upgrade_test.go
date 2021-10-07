@@ -39,7 +39,7 @@ func TestPegaUpgradeJob(t *testing.T) {
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
 
-						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-db-upgrade"}, options)
+						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer"}, options)
 
 
 					}
@@ -68,7 +68,7 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
 	if(jobContainers[0].Name=="pega-db-upgrade-rules-migration" || jobContainers[0].Name=="pega-db-upgrade-rules-upgrade" || jobContainers[0].Name=="pega-db-upgrade-data-upgrade" ) {
-    	require.Equal(t, jobContainers[0].Name, "pega-db-upgrade")
+    	require.Equal(t, jobContainers[0].Name, "pega-installer")
 	}
 
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
