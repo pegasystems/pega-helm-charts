@@ -6,6 +6,10 @@ Pega helps enterprises and agencies quickly build business apps that deliver the
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a OpenShift cluster using Red Hat OpenShift Container Platform (Self Managed). You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a OpenShift cluster with a PostgreSQL database instance.
 
+## Supported Products
+
+Pegasystems supports deployment of Pega Platform using [OpenShift Container Platform](https://www.redhat.com/en/technologies/cloud-computing/openshift/container-platform) as a self managed solution. Managed solutions, other OpenShift products, and the IBM Cloud are not currently supported.
+
 ## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a OpenShift cluster that you create for the deployment:
@@ -153,7 +157,7 @@ To customize these files, you must download them from the source github reposito
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             1.6.1                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.6.1           1.0             Helm chart to configure required supporting services and tools in your environment for your deployment.
+  pega/addons           1.6.1           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
   pega/backingservices  1.6.1                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
 ```
 
@@ -190,11 +194,14 @@ Configure the following parameters so the backingservices.yaml Helm chart matche
 |srs.enabled:      | Enable the SRS to provision an internal ElasticSearch service within the SRS cluster that is defined at [ElasticSearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch).    | enabled: "true"|
 |srs.deploymentName:      | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"|
 |srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix). |
+| srs.srsStorage.provisionInternalESCluster: | Enabled by default to provision an Elasticsearch cluster. | <ul><li>Set srs.srsStorage.provisionInternalESCluster:`true` and run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`</li><li>Set srs.srsStorage.provisionInternalESCluster:`false` if you want to use an existing, externally provisioned ElasticSearch cluster. </li></ul> |
 |srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned ElasticSearch cluster. For an ElasticSearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS ElasticSearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS ElasticSearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li><li>srs.srsStorage.port: "\<external es port\>"</li><li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li><li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li><li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external ElasticSearch cluster is outside of the current network and the deployment must access it over the internet.\>"</li></ul> |
 |elasticsearch: <ul><li>esConfig: elasticsearch.yml: xpack.security.enabled: "true”</li><li>esConfig: elasticsearch.yml: xpack.security.transport.ssl.enabled: "true”</li><li>volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> | To run an internal ElasticSearch service (within your deployment), specify details for both the ElasticSearch security configuration and a cluster disk volume size. While the security pack should be enabled, the transport configuration should match whether an SSL certificate is available; by default it is enabled. For the disk volume size, the default is 30Gi; set this value to at least three times the size of your estimated search data size. | <ul><li>elasticsearch: esConfig: elasticsearch.yml: <ul><li>xpack.security.enabled: "true” </li><li>xpack.security.transport.ssl.enabled: "true” </li></ul></li><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
 |Additional OpenShift-required parameters:<ul><li>securityContext:</li><li>podSecurityContext:</li><li>sysctlInitContainer:</li></ul> | Manually add ElasticSearch-recommended parameters to ensure that your SRS pods do not have a RunAsUser parameter and do not require an initialization container. For details, see [Examples/OpenShift](https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift). | <ul><li>securityContext.runAsUser: null</li><li>podSecurityContext.fsGroup: null</li><li>    podSecurityContext.runAsUser: null </li><li>sysctlInitContainer.enabled: false</li></ul> |
 
 3. Save the file.
+
+4. To use an internal Elasticsearch cluster (srs.srsStorage.provisionInternalESCluster:true) for your deployment, you must run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.
 
 ### Adding customized settings for Pega to your deployment
 
@@ -227,7 +234,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Access your SQL database (in this example one configured in GCP).
 
-- Access to the ElasticSearch service deployed using SRS nodes.
+- Access your ElasticSearch service (For 8.6 and later, Pega recommends deploying your service using an SRS cluster).
 
 - Install the version of Pega Platform that you built into your Docker installation image.
 
@@ -255,7 +262,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 | docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
 | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. Pega supports specifying certificates for an ingress using the same methods that OpenShift supports. Note that if you configure both secrets and pre-shared certificates on the ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates. For details, see [Using multiple SSL certificates in HTTP(s) load balancing with Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).  | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul>|
 | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul>|
-| pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To use this service, you must enable its use and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-openshift-demo.svc.cluster.local </li></ul>
+| pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul>
 | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>"|
 | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".  | adminPassword: "\<initial password\>"  |
 

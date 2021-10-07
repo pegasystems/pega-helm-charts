@@ -1,3 +1,6 @@
+# Pega does NOT actively update this elasticsearch dependency. To leverage SRS, you should:
+# * Update the elasticsearch 'version' value, or
+# * Disable deploying elasticsearch by setting 'srs.srsStorage.provisionInternalESCluster' to false.
 dependencies:
 - name: elasticsearch
   version: "7.14.0"

@@ -1,3 +1,6 @@
+# Pega does NOT actively update these dependencies. For each dependency, you should:
+# * Update the dependency's 'version' value, or
+# * Disable the dependency by setting its condition value (for example, 'traefik.enabled') to false in values.yaml.
 dependencies:
 - name: traefik
   version: "10.3.1"

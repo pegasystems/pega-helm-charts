@@ -16,7 +16,7 @@ func TestPegaUpgradeJob(t *testing.T) {
 	var supportedOperations = []string{"upgrade"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
 	var upgradeType = []string{"custom"}
-	var upgradeSteps = []string{"rules-migration", "rules-upgrade", "data-upgrade"}
+	var upgradeSteps = []string{"rules_migration", "rules_upgrade", "data_upgrade"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -39,7 +39,7 @@ func TestPegaUpgradeJob(t *testing.T) {
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
 
-						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config"}, options)
+						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer"}, options)
 
 
 					}
@@ -67,14 +67,8 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 
 	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
-	if(jobContainers[0].Name=="pega-db-upgrade-rules-migration") {
-    	require.Equal(t, jobContainers[0].Name, "pega-db-upgrade-rules-migration")
-	}
-	if(jobContainers[0].Name=="pega-db-upgrade-rules-upgrade") {
-		require.Equal(t, jobContainers[0].Name, "pega-db-upgrade-rules-upgrade")
-	}
-	if(jobContainers[0].Name=="pega-db-upgrade-data-upgrade") {
-		require.Equal(t, jobContainers[0].Name, "pega-db-upgrade-data-upgrade")
+	if(jobContainers[0].Name=="pega-db-upgrade-rules-migration" || jobContainers[0].Name=="pega-db-upgrade-rules-upgrade" || jobContainers[0].Name=="pega-db-upgrade-data-upgrade" ) {
+    	require.Equal(t, jobContainers[0].Name, "pega-installer")
 	}
 
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
