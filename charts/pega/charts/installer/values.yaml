@@ -80,3 +80,10 @@ resources:
   limits:
     memory: "6Gi"
     cpu: 2
+
+shareProcessNamespace: false
+
+# Provide custom side car container configuration for installer
+# sidecarContainers:
+#  - name: <SIDECAR_CONTAINER_NAME>
+#    image: <SIDECAR_IMAGE>
