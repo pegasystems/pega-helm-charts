@@ -42,9 +42,9 @@ spec:
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}
-{{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
+{{- if and (.root.Values.custom) (.root.Values.custom.volumes) }}
 {{ toYaml .root.Values.custom.volumes | indent 6 }}          
-{{- end }}{{- end }}  
+{{- end }}
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
