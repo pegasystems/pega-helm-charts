@@ -72,6 +72,15 @@ upgrade:
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
 
+# Automatically install hotfixes as part of the Pega deployment
+automaticHotfixInstallation:
+  enabled: "false"
+  server: ""
+  user: ""
+  password: ""
+  hostFingerprint: ""
+  downloadPath: ""
+
 # Memory and CPU settings for installer
 resources:
   requests:
