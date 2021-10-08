@@ -80,13 +80,7 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
-{{- if .Values.automaticHotfixInstallation.enabled }}
-  # Automatically install hotfixes as part of the Pega deployment
-  AUTOMATIC_HOTFIX_INSTALLATION: {{ .Values.automaticHotfixInstallation.enabled | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_SERVER: {{ .Values.automaticHotfixInstallation.server | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_USER: {{ .Values.automaticHotfixInstallation.user | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_PASSWORD: {{ .Values.automaticHotfixInstallation.password | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_HOST_FINGERPRINT: {{ .Values.automaticHotfixInstallation.hostFingerprint | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_DOWNLOAD_PATH: {{ .Values.automaticHotfixInstallation.downloadPath | quote }}
+{{- if .Values.advancedProperties }}
+  ADVANCED_PROPERTIES: {{ .Values.advancedProperties }}
 {{- end }}
 {{ end }}

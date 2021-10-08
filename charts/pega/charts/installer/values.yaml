@@ -71,15 +71,10 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
-
-# Automatically install hotfixes as part of the Pega deployment
-automaticHotfixInstallation:
-  enabled: "false"
-  server: ""
-  user: ""
-  password: ""
-  hostFingerprint: ""
-  downloadPath: ""
+# Additional settings to pass in to setupDatabase.properties
+#advancedProperties: |-
+  #property.1=value
+  #property.2=value
 
 # Memory and CPU settings for installer
 resources:
