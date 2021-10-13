@@ -86,7 +86,12 @@ bypass.load.assembled.classes={{ .Env.BYPASS_LOAD_ASSEMBLED_CLASSES }}
 # Enable adminstrator user after upgrade by default.
 upgrade.enable.admin=true
 
-{{- if isTrue .Env.ADVANCED_PROPERTIES }}
-# Any additional properties included as property=value pairs
-{{ .Env.ADVANCED_PROPERTIES }}
+{{- if isTrue .Env.AUTOMATIC_HOTFIX_INSTALLATION }}
+# Automatically install hotfixes as part of the Pega deployment
+automated.maintenance.enabled={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION }}
+automated.maintenance.server={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION_SERVER }}
+automated.maintenance.user={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION_USER }}
+automated.maintenance.password={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION_PASSWORD }}
+automated.maintenance.hostFingerprint={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION_HOST_FINGERPRINT }}
+import.updates.full.path={{ .Env.AUTOMATIC_HOTFIX_INSTALLATION_DOWNLOAD_PATH }}
 {{- end }}
