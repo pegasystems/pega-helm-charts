@@ -71,12 +71,9 @@ data:
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
 {{- if .Values.automaticHotfixInstallation.enabled }}
-  # Automatically install hotfixes as part of the Pega deployment
-  AUTOMATIC_HOTFIX_INSTALLATION: {{ .Values.automaticHotfixInstallation.enabled | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_SERVER: {{ .Values.automaticHotfixInstallation.server | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_USER: {{ .Values.automaticHotfixInstallation.user | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_PASSWORD: {{ .Values.automaticHotfixInstallation.password | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_HOST_FINGERPRINT: {{ .Values.automaticHotfixInstallation.hostFingerprint | quote }}
-  AUTOMATIC_HOTFIX_INSTALLATION_DOWNLOAD_PATH: {{ .Values.automaticHotfixInstallation.downloadPath | quote }}
+  AUTOMATIC_HOTFIX_INSTALLATION: |-
+    {{- range $key, $val := .Values.automaticHotfixInstallation }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
 {{- end }}
 {{ end }}
