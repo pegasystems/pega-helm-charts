@@ -81,10 +81,13 @@ data:
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
 {{- if .Values.automaticHotfixInstallation.enabled }}
-  # Automatically install hotfixes as part of the Pega deployment
   AUTOMATIC_HOTFIX_INSTALLATION: |-
-    {{- range $key, $val := .Values.automaticHotfixInstallation }}
-    {{ $key }}: {{ $val | quote }}
-    {{- end }}
+{{- range $key, $val := .Values.automaticHotfixInstallation -}}
+{{ if eq $key "downloadPath" }}
+    import.updates.full.path={{ $val }}
+{{- else }}
+    automated.maintenance.{{ $key }}={{ $val }}
 {{- end }}
+{{- end }}
+{{ end }}
 {{ end }}
