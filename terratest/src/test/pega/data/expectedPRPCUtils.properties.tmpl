@@ -43,3 +43,5 @@ pega.engine.classpath=database
 pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
 {{ end -}}
 {{ end -}}
+
+{{ if .Env.PRPCUTILS_ADVANCED_SETTINGS }}{{ .Env.PRPCUTILS_ADVANCED_SETTINGS }}{{ end }}
