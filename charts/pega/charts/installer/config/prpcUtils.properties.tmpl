@@ -1,7 +1,5 @@
 # Properties file for use with PRPC Utilities.
 
-################### COMMON PROPERTIES - DB CONNECTION ##################
-########################################################################
 # CONNECTION INFORMATION
 pega.jdbc.driver.jar={{ .Env.DRIVER_JAR_PATH }}
 pega.jdbc.driver.class={{ .Env.JDBC_CLASS }}
@@ -43,3 +41,5 @@ pega.engine.classpath=database
 pega.codeset.version={{ .Env.ENGINE_CODESET_VERSION }}
 {{ end -}}
 {{ end -}}
+
+{{ if .Env.PRPCUTILS_ADVANCED_SETTINGS }}{{ .Env.PRPCUTILS_ADVANCED_SETTINGS }}{{ end }}
