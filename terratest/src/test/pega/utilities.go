@@ -26,7 +26,7 @@ func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName 
 		equal = true
 	} else {
 		println("Expected yaml contents:\n" + expectedFileData)
-		println("\nActual yaml contents:\n" + actualFileData)
+		println("Actual yaml contents:\n" + actualFileData)
 	}
 	require.Equal(t, true, equal)
 }
