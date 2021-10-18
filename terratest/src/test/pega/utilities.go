@@ -14,7 +14,6 @@ import (
 var volumeDefaultMode int32 = 420
 var volumeDefaultModePtr = &volumeDefaultMode
 
-
 // compareConfigMapData - Compares the config map deployed for each kind of tier with the excepted xml's
 func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName string) {
 	expectedFile, err := ioutil.ReadFile(expectedFileName)
@@ -25,6 +24,9 @@ func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName 
 	equal := false
 	if expectedFileData == actualFileData {
 		equal = true
+	} else {
+		println("Expected yaml contents:\n" + expectedFileData)
+		println("Actual yaml contents:\n" + actualFileData)
 	}
 	require.Equal(t, true, equal)
 }
@@ -43,7 +45,7 @@ func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, containe
 
 // VerifyInitContinerData - Verifies any possible initContainer that can occur in pega helm chart deployments
 func VerifyInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
-    var depName = getDeploymentName(options)
+	var depName = getDeploymentName(options)
 
 	if len(containers) == 0 {
 		println("no init containers")
@@ -83,15 +85,14 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container, option
 	}
 }
 
-
 func getDeploymentName(options *helm.Options) string {
-    var depName string = options.SetValues["global.deployment.name"]
-    if (depName == "") {
-        depName = "pega"
-    }
-    return depName
+	var depName string = options.SetValues["global.deployment.name"]
+	if depName == "" {
+		depName = "pega"
+	}
+	return depName
 }
 
 func getObjName(options *helm.Options, suffix string) string {
-    return getDeploymentName(options) + suffix
+	return getDeploymentName(options) + suffix
 }
