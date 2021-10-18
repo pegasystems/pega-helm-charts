@@ -70,14 +70,10 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
-{{- if .Values.automaticHotfixInstallation.enabled }}
-  AUTOMATIC_HOTFIX_INSTALLATION: |-
-{{- range $key, $val := .Values.automaticHotfixInstallation -}}
-{{ if eq $key "downloadPath" }}
-    import.updates.full.path={{ $val }}
-{{- else }}
-    automated.maintenance.{{ $key }}={{ $val }}
-{{- end }}
+{{- if .Values.advancedSettings }}
+  ADVANCED_SETTINGS: |-
+{{- range .Values.advancedSettings }}
+    {{ .name }}={{ .value }}
 {{- end }}
 {{ end }}
 {{ end }}
