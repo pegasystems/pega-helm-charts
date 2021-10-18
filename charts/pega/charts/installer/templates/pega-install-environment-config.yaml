@@ -70,4 +70,10 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
+{{- if .Values.advancedSettings }}
+  ADVANCED_SETTINGS: |-
+{{- range .Values.advancedSettings }}
+    {{ .name }}={{ .value }}
+{{- end }}
+{{ end }}
 {{ end }}

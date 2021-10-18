@@ -83,5 +83,7 @@ bypass.load.engine.classes={{ .Env.BYPASS_LOAD_ENGINE_CLASSES }}
 bypass.load.assembled.classes={{ .Env.BYPASS_LOAD_ASSEMBLED_CLASSES }}
 {{- end }}
 
-#Enable adminstrator user after upgrade by default.
+# Enable adminstrator user after upgrade by default.
 upgrade.enable.admin=true
+
+{{ .Env.ADVANCED_SETTINGS }}
