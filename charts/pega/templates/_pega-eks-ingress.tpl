@@ -1,7 +1,7 @@
 {{- define "pega.eks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -43,15 +43,19 @@ spec:
   - http:
       paths:
       - backend:
-          serviceName: ssl-redirect
-          servicePort: use-annotation
+          service:
+            name: ssl-redirect
+            port: 
+              name: use-annotation
   {{ else }}
   {{ if ( include "ingressTlsEnabled" . ) }}
   - http:
       paths:
       - backend:
-          serviceName: ssl-redirect
-          servicePort: use-annotation
+          service:
+            name: ssl-redirect
+            port: 
+              name: use-annotation
   {{ end }}
   {{ end }}
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
@@ -62,11 +66,15 @@ spec:
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
         backend:
-          serviceName: constellation
-          servicePort: 3000
+          service:
+            name: constellation
+            port: 
+              number: 3000
       {{ end }}
       - backend: 
-          serviceName: {{ .name }} 
-          servicePort: {{ .node.service.port }}
+          service:
+            name: {{ .name }} 
+            port: 
+              number: {{ .node.service.port }}
 ---
 {{- end }}
