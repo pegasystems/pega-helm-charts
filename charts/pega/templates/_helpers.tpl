@@ -276,3 +276,47 @@ dnsConfig:
 {{- $d2 := merge $ $d1 }}
 {{- template "searchURL" $d2 }}
 {{- end -}}
+
+{{- define "ingressApiVersion" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: extensions/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "ingressService" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port: 
+    number: {{ .node.service.port }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.service.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceC11n" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: constellation
+  port: 
+    number: 3000
+{{- else }}
+serviceName: constellation
+servicePort: 3000
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceSSLRedirect" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: ssl-redirect
+  port: 
+    name: use-annotation
+{{- else }}
+serviceName: ssl-redirect
+servicePort: use-annotation
+{{- end }}
+{{- end }}

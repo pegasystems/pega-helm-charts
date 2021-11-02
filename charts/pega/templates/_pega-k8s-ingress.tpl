@@ -1,7 +1,7 @@
 {{- define "pega.k8s.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: networking.k8s.io/v1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -29,15 +29,9 @@ spec:
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
         backend:
-          service:
-            name: constellation
-            port: 
-              number: 3000
+{{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
       - backend: 
-          service:
-            name: {{ .name }} 
-            port: 
-              number: {{ .node.service.port }}
+{{ include "ingressService" . | indent 10 }}
 ---     
 {{- end }}

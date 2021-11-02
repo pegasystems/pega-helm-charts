@@ -1,7 +1,7 @@
 {{- define "pega.gke.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: networking.k8s.io/v1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -32,12 +32,12 @@ spec:
 {{ end }}
 {{ end }}
 {{ end }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
   defaultBackend:
-    service:
-      name: {{ .name }}
-      service:
-        port: 
-          number: {{ .node.service.port }}
+{{ else }}
+  backend:
+{{ end }}
+{{ include "ingressService" . | indent 4 }}
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
   # To access the below service, along with {{ .node.domain }}, http/https port also has to be provided in the URL.
@@ -47,15 +47,9 @@ spec:
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
         backend:
-          service:
-            name: constellation
-            port: 
-              number: 3000
+{{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
       - backend: 
-          service:
-            name: {{ .name }} 
-            port:
-              number: {{ .node.service.port }}
+{{ include "ingressService" . | indent 10 }}
 ---
 {{- end }}
