@@ -55,9 +55,12 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, "2", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
 			require.Equal(t, "2Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
 			require.Equal(t, statefulsetSpec.Volumes[0].Name, "pega-volume-credentials")
+			require.Equal(t, statefulsetSpec.Volumes[1].Name, "heap-dumps")
             require.Equal(t, statefulsetSpec.Volumes[0].Secret.SecretName, "pega-credentials-secret")
             require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-credentials")
             require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/secrets")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "heap-dumps")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/logs/dumps")
 		}
 	}
 }
