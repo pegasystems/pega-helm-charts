@@ -27,10 +27,10 @@ spec:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
   {{- end }}
         volumeMounts:
-        - name: {{ template "pegaVolumeCredentials" }}
-          mountPath: "/opt/hazelcast/secrets"
         - name: logs
           mountPath: "/opt/hazelcast/logs"
+        - name: {{ template "pegaVolumeCredentials" }}
+          mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
             name: {{ template "hazelcastEnvironmentConfig" }}
@@ -60,10 +60,11 @@ spec:
             port: 5701
       restartPolicy: Always
       volumes:
-      # Volume used to mount secret files.
-      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+      # Volume used to mount logs folder
         - name: logs
           emptyDir: {}
+      # Volume used to mount secret files.
+      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" $ }}
 {{ end }}

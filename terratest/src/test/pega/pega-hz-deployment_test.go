@@ -54,13 +54,13 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Port)
 			require.Equal(t, "2", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
 			require.Equal(t, "2Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
-			require.Equal(t, statefulsetSpec.Volumes[0].Name, "pega-volume-credentials")
-            require.Equal(t, statefulsetSpec.Volumes[0].Secret.SecretName, "pega-credentials-secret")
-            require.Equal(t, statefulsetSpec.Volumes[1].Name, "logs")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "pega-volume-credentials")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/secrets")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "logs")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/logs")
+			require.Equal(t, statefulsetSpec.Volumes[0].Name, "logs")
+			require.Equal(t, statefulsetSpec.Volumes[1].Name, "pega-volume-credentials")
+            require.Equal(t, statefulsetSpec.Volumes[1].Secret.SecretName, "pega-credentials-secret")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "logs")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-volume-credentials")
+            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/secrets")
 		}
 	}
 }
