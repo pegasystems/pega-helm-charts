@@ -61,8 +61,8 @@ spec:
       restartPolicy: Always
       volumes:
       # Volume used to mount logs folder
-        - name: logs
-          emptyDir: {}
+      - name: logs
+        emptyDir: {}
       # Volume used to mount secret files.
       {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
