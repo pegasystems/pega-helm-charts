@@ -46,4 +46,7 @@ data:
 {{- if .Values.server.diagnostics_enabled }}
   DIAGNOSTICS_ENABLED: {{ .Values.server.diagnostics_enabled | quote }}
 {{- end }}
+{{- if .Values.server.diagnostic_log_file_size_mb }}
+  DIAGNOSTIC_LOG_FILE_SIZE_MB: {{ .Values.server.diagnostic_log_file_size_mb | quote }}
+{{- end }}
 {{ end }}
