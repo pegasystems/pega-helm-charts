@@ -23,7 +23,7 @@ client:
   clusterName: "PRPC"
 # Server side settings for hazelcast
 server:
-  java_opts: "-Dhazelcast.initial.min.cluster.size=3 -Dhazelcast.jmx=true -XX:MaxRAMPercentage=80.0"
+  java_opts: "-Dhazelcast.initial.min.cluster.size=3 -Dhazelcast.jmx=true -XX:MaxRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof"
   health_monitoring_level: "OFF"
   operation_generic_thread_count: ""
   operation_thread_count: ""
