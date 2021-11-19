@@ -37,4 +37,6 @@ server:
   service_dns_timeout: ""
   logging_level: "info"
   diagnostics_enabled: "true"
+  diagnostics_metric_level: "info"
   diagnostic_log_file_size_mb: "50"
+  diagnostics_file_count: "3"
