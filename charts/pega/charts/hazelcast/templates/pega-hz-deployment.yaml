@@ -34,8 +34,6 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "hazelcastEnvironmentConfig" }}
-        - configMapRef:
-            name: fluentd-config
         resources:
           requests:
             cpu: "{{ .Values.resources.requests.cpu }}"
