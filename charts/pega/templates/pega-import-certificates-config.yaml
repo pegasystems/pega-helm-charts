@@ -11,7 +11,7 @@ data:
 {{- if .Values.global.certificates }}
   # import certificates from values
 {{- range $k, $v := .Values.global.certificates}}
-  {{ $k }}.cer: {{ $v }}
+  {{ $k }}: {{ $v }}
 {{- end }}
 {{- end }}
 {{- end }}
