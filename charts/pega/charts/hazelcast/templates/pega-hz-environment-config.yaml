@@ -9,6 +9,12 @@ data:
   NAMESPACE: {{ .Release.Namespace }}
   SERVICE_NAME: {{ template "hazelcastName" }}-service
   CLUSTER_SIZE: {{ .Values.replicas | quote }}
+{{- if .Values.server.min_cluster_size }}
+  MIN_CLUSTER_SIZE: {{ .Values.server.min_cluster_size | quote }}
+{{- end }}
+{{- if .Values.server.jmx_enabled }}
+  JMX_ENABLED: {{ .Values.server.jmx_enabled | quote }}
+{{- end }}
 {{- if .Values.server.health_monitoring_level }}
   HEALTH_MONITORING_LEVEL: {{ .Values.server.health_monitoring_level | quote }}
 {{- end }}
