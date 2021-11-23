@@ -46,4 +46,13 @@ data:
 {{- if .Values.server.diagnostics_enabled }}
   DIAGNOSTICS_ENABLED: {{ .Values.server.diagnostics_enabled | quote }}
 {{- end }}
+{{- if .Values.server.diagnostics_metric_level }}
+  DIAGNOSTICS_METRIC_LEVEL: {{ .Values.server.diagnostics_metric_level | quote }}
+{{- end }}
+{{- if .Values.server.diagnostic_log_file_size_mb }}
+  DIAGNOSTIC_LOG_FILE_SIZE_MB: {{ .Values.server.diagnostic_log_file_size_mb | quote }}
+{{- end }}
+{{- if .Values.server.diagnostics_file_count }}
+  DIAGNOSTICS_FILE_COUNT: {{ .Values.server.diagnostics_file_count | quote }}
+{{- end }}
 {{ end }}
