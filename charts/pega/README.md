@@ -791,3 +791,15 @@ installer:
     annotation-name1: annotation-value1
     annotation-name2: annotation-value2
 ```
+### Mount the custom certificates into the Tomcat container
+
+You can optionally mount the custom certificates into the tomcat container, the certificates should be different formats of X.509 certificates such as PEM, DER, CER, CRT and are should be base64 encoded. Pass the required custom certificates under `certificates` attributes as a map in the `values.yaml` file.
+
+Example:
+
+```yaml
+certificates:
+    badssl.cer: |
+      "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
+
+```
