@@ -34,7 +34,7 @@ func TestPegaImportCertificatesConfig(t *testing.T) {
 					},
 				}
 
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-import-certificates-config.yaml"})
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-certificates-config.yaml"})
 				VerifyImportCertificatesConfig(t, yamlContent, options)
 			}
 		}

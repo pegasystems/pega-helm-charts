@@ -1,3 +1,4 @@
+{{- define "pegaCertificatesConfigTemplate" }}
 # Config map used for common configuration between Pega nodes
 {{ if (eq (include "performDeployment" .) "true") }}
 {{- if .Values.global.certificates }}
@@ -16,3 +17,4 @@ data:
 {{- end }}
 {{- end }}
 {{ end }}
+{{- end}}
