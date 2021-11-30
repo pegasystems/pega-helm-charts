@@ -793,7 +793,7 @@ installer:
 ```
 ### Mount the custom certificates into the Tomcat container
 
-You can optionally mount the custom certificates into the tomcat container, the certificates should be different formats of X.509 certificates such as PEM, DER, CER, CRT and are should be base64 encoded. Pass the required custom certificates under `certificates` attributes as a map in the `values.yaml` file.
+Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
 
 Example:
 
