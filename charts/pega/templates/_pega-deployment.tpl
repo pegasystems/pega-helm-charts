@@ -60,7 +60,7 @@ spec:
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
 
-{{- if .root.Values.global.certificates }}
+{{- if or .root.Values.global.certificates .root.Values.configurations.certificates }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{- end }}
 
@@ -188,7 +188,7 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
-{{- if .root.Values.global.certificates }}          
+{{- if or .root.Values.global.certificates .root.Values.configurations.certificates }}          
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{- end}}
