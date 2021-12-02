@@ -11,8 +11,10 @@ data:
   # cert Files
 {{- if .Values.global.certificates }}
   # import certificates from values
-{{- range $k, $v := .Values.global.certificates}}
-  {{ $k }}: {{ $v }}
+{{- range $k, $v := .Values.global }}
+  {{- if eq $k "certificates" }}
+  {{ $v | toYaml | nindent 2 -}}
+  {{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
