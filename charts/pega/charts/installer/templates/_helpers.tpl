@@ -1,7 +1,20 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
-{{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
+{{- define "pegaInstallConfig" }}pega-install-config{{- end }}
+{{- define "pegaUpgradeConfig" }}pega-upgrade-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
-{{- define "pegaDBUpgrade" -}}pega-db-upgrade{{- end -}}
+{{- define "pegaDBInstallerContainer" -}}pega-installer{{- end -}}
+{{- define "pegaDBCustomUpgrade" -}}
+{{- if (contains "," .Values.upgrade.upgradeSteps) -}}
+    pega-db-custom-upgrade
+{{- else -}}
+{{- $jobName := printf "%s-%s" "pega-db-upgrade" .Values.upgrade.upgradeSteps -}}
+{{- $jobName | replace "_" "-" -}}
+{{- end -}}
+{{- end -}}
+{{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
+{{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
+{{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
+{{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
 {{- define "pegaPreDBUpgrade" -}}pega-pre-upgrade{{- end -}}
@@ -9,6 +22,8 @@
 {{- define "pegaInstallEnvironmentConfig" -}}pega-install-environment-config{{- end -}}
 {{- define "pegaUpgradeEnvironmentConfig" -}}pega-upgrade-environment-config{{- end -}}
 {{- define "pegaDistributionKitVolume" -}}pega-distribution-kit-volume{{- end -}}
+
+{{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "performInstall" }}
   {{- if or (eq .Values.global.actions.execute "install") (eq .Values.global.actions.execute "install-deploy") -}}
@@ -40,10 +55,10 @@
   args: [ 'job', '{{ template "pegaDBInstall" }}']
 {{- end }}
 
-{{- define "waitForPegaDBUpgrade" -}}
+{{- define "waitForPegaDBZDTUpgrade" -}}
 - name: wait-for-pegaupgrade
   image: dcasavant/k8s-wait-for
-  args: [ 'job', '{{ template "pegaDBUpgrade" }}']
+  args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -54,6 +69,8 @@
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
+{{- $deploymentName := printf "%s-" (include "installerDeploymentName" $) -}}
+{{- $deploymentNameRegex := printf "%s- " (include "installerDeploymentName" $) -}}
 {{- $rolloutCommand := "" }}
 {{- $kindName := "" }}
 {{- $lastIndex := sub (len .Values.global.tier) 1 }}
@@ -64,14 +81,14 @@
 {{- else -}}
 {{- $kindName = "deployment" }}
 {{- end }}
-{{- $constructCommand := cat "kubectl rollout status" $kindName "/" "pega-" $dep.name "--namespace" $namespace }}
+{{- $constructCommand := cat "kubectl rollout status" $kindName "/" $deploymentName $dep.name "--namespace" $namespace }}
 {{- if ne $index $lastIndex }}
 {{- $rolloutCommand = cat $rolloutCommand $constructCommand "&&" }}
 {{- else }}
 {{- $rolloutCommand = cat $rolloutCommand $constructCommand }}
 {{- end }}
 {{- $rolloutCommand = regexReplaceAllLiteral " / " $rolloutCommand "/" }}
-{{- $rolloutCommand = regexReplaceAllLiteral "pega- " $rolloutCommand "pega-" }}
+{{- $rolloutCommand = regexReplaceAllLiteral $deploymentNameRegex $rolloutCommand $deploymentName }}
 {{- end -}}
 - name: wait-for-rolling-updates
   image: dcasavant/k8s-wait-for

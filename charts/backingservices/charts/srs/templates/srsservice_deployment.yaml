@@ -41,6 +41,24 @@ spec:
               value: {{ template "elasticsearch.port" . }}
             - name: ELASTICSEARCH_PROTO
               value:  {{ template "elasticsearch.protocol" . }}
+            - name: ELASTICSEARCH_AUTH_PROVIDER
+              value: {{ template "elasticsearch.authProvider" .}}
+            {{- if eq (include "elasticsearch.authProvider" $) "aws-iam" }}
+            - name: ELASTICSEARCH_REGION
+              value: {{ template "elasticsearch.region" .}}
+            {{- end}}
+            {{- if eq (include "elasticsearch.authProvider" $) "basic-authentication" }}
+            - name: ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: srs-elastic-credentials
+                  key: username
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: srs-elastic-credentials
+                  key: password
+            {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
             - name: APPLICATION_PORT
@@ -51,4 +69,31 @@ spec:
               value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
-{{ end }}
+  {{- if .Values.srsStorage.provisionInternalESCluster }}
+      initContainers:
+      - name: wait-for-internal-es-cluster
+        image: busybox:1.31.0
+        args:
+          - until $(wget -q -S --spider --timeout=2 -O /dev/null $ELASTICSEARCH_PROTO://$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD@$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT ); do echo Waiting for Elasticsearch cluster to become live...; sleep 10; done;
+        command:
+          - sh
+          - -c
+        env:
+          - name: ELASTICSEARCH_PROTO
+            value: {{ template "elasticsearch.protocol" . }}
+          - name: ELASTICSEARCH_HOST
+            value: {{ template "elasticsearch.domain" . }}
+          - name: ELASTICSEARCH_PORT
+            value: {{ template "elasticsearch.port" . }}
+          - name: ELASTICSEARCH_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: srs-elastic-credentials
+                key: username
+          - name: ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: srs-elastic-credentials
+                key: password
+  {{ end }}
+  {{ end }}

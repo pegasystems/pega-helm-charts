@@ -6,6 +6,8 @@ metadata:
   name: {{ template "pegaUpgradeEnvironmentConfig" }}
   namespace: {{ .Release.Namespace }}
 data:
+  # Temporary password for administrator@pega.com that is used to login after upgrading Pega Platform
+  ADMIN_PASSWORD: {{ .Values.adminPassword }}
   # Database Type for installation
   DB_TYPE: {{ .Values.global.jdbc.dbType }}
   # JDBC URL of the DB where Pega is installed
@@ -24,8 +26,16 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
+{{- if .Values.global.jdbc.connectionProperties }}
+  # JDBC custom connection properties
+  JDBC_CUSTOM_CONNECTION: {{ .Values.global.jdbc.connectionProperties }}
+{{- end }}
   # Type of Upgrade
   UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
+  # custom upgrade steps
+{{- if .Values.upgrade.upgradeSteps }}
+  UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
+{{- end }}
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
   MULTITENANT_SYSTEM: {{ .Values.multitenantSystem | quote}}
   # UDF generation will be skipped if this property is set to true
@@ -39,6 +49,10 @@ data:
 {{- if .Values.upgrade.targetRulesSchema }}
   # Target Rules Schema name
   TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
+{{- end }}
+{{- if .Values.upgrade.targetDataSchema }}
+  # Target Data Schema name
+  TARGET_DATA_SCHEMA: {{ .Values.upgrade.targetDataSchema }}
 {{- end }}
 {{- if .Values.zos.zosProperties }}
   # The location of the db2zos site specific properties file. Only used if the target system is a db2zos database
@@ -66,4 +80,10 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
+{{- if .Values.advancedSettings }}
+  ADVANCED_SETTINGS: |-
+{{- range .Values.advancedSettings }}
+    {{ .name }}={{ .value }}
+{{- end }}
+{{ end }}
 {{ end }}

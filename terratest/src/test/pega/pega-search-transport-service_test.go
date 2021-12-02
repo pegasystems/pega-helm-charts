@@ -15,6 +15,7 @@ import (
 func TestPegaSearchTransportService(t *testing.T){
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
 	var supportedVendors = []string{"k8s", "openshift", "eks","gke","aks","pks"}
+    var deploymentNames = []string{"pega","myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -24,18 +25,22 @@ func TestPegaSearchTransportService(t *testing.T){
 
 		for _,operation := range supportedOperations{
 
-			fmt.Println(vendor + "-" + operation)
+            for _, depName := range deploymentNames {
 
-			var options = &helm.Options{			
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-			 	},
-		    }
+                fmt.Println(vendor + "-" + operation)
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-transport-service.yaml"})
-			VerifySearchTransportService(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+                    },
+                }
 
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/pegasearch/templates/pega-search-transport-service.yaml"})
+                VerifySearchTransportService(t, yamlContent, options)
+            }
 		}
 	}
 
@@ -45,9 +50,9 @@ func TestPegaSearchTransportService(t *testing.T){
 func VerifySearchTransportService(t *testing.T, yamlContent string, options *helm.Options) {
 	var transportSearchServiceObj k8score.Service
     UnmarshalK8SYaml(t, yamlContent, &transportSearchServiceObj)
-
+    require.Equal(t, transportSearchServiceObj.ObjectMeta.Name, getObjName(options, "-search-transport"))
 	require.Equal(t, transportSearchServiceObj.Spec.Selector["component"], "Search")
-	require.Equal(t, transportSearchServiceObj.Spec.Selector["app"], "pega-search")
+	require.Equal(t, transportSearchServiceObj.Spec.Selector["app"], getObjName(options, "-search"))
 	require.Equal(t, transportSearchServiceObj.Spec.ClusterIP, "None")
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Name, "transport")
 	require.Equal(t, transportSearchServiceObj.Spec.Ports[0].Port, int32(80))

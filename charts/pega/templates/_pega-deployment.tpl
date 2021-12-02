@@ -40,10 +40,11 @@ spec:
 {{ toYaml .node.podAnnotations | indent 8 }}
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
-        revision: "{{ .root.Release.Revision }}"
+        config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
@@ -57,7 +58,7 @@ spec:
           name: {{ .name }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-{{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -140,7 +141,7 @@ spec:
           value: {{ .tierName }}
         envFrom:
         - configMapRef:
-            name: {{ template "pegaEnvironmentConfig" }}
+            name: {{ template "pegaEnvironmentConfig" .root }}
         resources:
           # Maximum CPU and Memory that the containers for {{ .name }} can use
           limits:
@@ -152,19 +153,19 @@ spec:
           {{- if .node.memLimit }}
             memory: "{{ .node.memLimit }}"
           {{- else }}
-            memory: "8Gi"
+            memory: "12Gi"
           {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
           {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
           {{- else }}
-            cpu: 2
+            cpu: 3
           {{- end }}
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"
           {{- else }}
-            memory: "6Gi"
+            memory: "12Gi"
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
@@ -182,14 +183,15 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
+{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 300 }}
+          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
           periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
@@ -199,13 +201,51 @@ spec:
         readinessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: 8080
+            port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 300 }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 30 }}
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
+        # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
+        {{- $startupProbe := .node.startupProbe }}
+        startupProbe:
+          httpGet:
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            port: {{ $startupProbe.port | default 8080 }}
+            scheme: HTTP
+          initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}
+          timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
+          successThreshold: {{ $startupProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default 20 }}
+{{- else }}
+        # LivenessProbe: indicates whether the container is live, i.e. running.
+        {{- $livenessProbe := .node.livenessProbe }}
+        livenessProbe:
+          httpGet:
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            port: {{ $livenessProbe.port | default 8080 }}
+            scheme: HTTP
+          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 200 }}
+          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
+          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
+          successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
+        # ReadinessProbe: indicates whether the container is ready to service requests.
+        {{- $readinessProbe := .node.readinessProbe }}
+        readinessProbe:
+          httpGet:
+            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            port: {{ $readinessProbe.port | default 8080 }}
+            scheme: HTTP
+          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
+          successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
+          failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
+{{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always
       # Amount of time in which container has to gracefully shutdown.
@@ -213,7 +253,7 @@ spec:
       # Secret which is used to pull the image from the repository.  This secret contains docker login details for the particular user.
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" }}
+      - name: {{ template "pegaRegistrySecret" .root }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:
