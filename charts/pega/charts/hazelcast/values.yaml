@@ -13,10 +13,10 @@ password: ""
 # Memory and CPU settings for HZ service
 resources:
   requests:
-    memory: "2Gi"
-    cpu: 2
+    memory: "1Gi"
+    cpu: 1
   limits:
-    memory: "4Gi"
+    memory: "1Gi"
     cpu: 2
 # client settings for hazelcast
 client:
