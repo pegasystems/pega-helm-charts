@@ -4,6 +4,22 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
+{{- define "pegaImportCertificatesConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-import-certificates-config
+{{- end }}
+
+{{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
+
+{{- define "pegaImportCertificatesTemplate" }}
+- name: {{ template "pegaVolumeImportCertificates" }}
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaImportCertificatesConfig" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
