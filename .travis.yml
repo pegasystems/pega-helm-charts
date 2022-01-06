@@ -3,100 +3,96 @@ os: linux
 dist: bionic
 env:
   global:
-    - HELM_URL=https://get.helm.sh
-    - HELM_TGZ=helm-v3.2.4-linux-amd64.tar.gz
-    - YAMLLINT_VERSION=1.15.0
-    - TRAVIS_GO_VERSION=1.13.1
+  - HELM_URL=https://get.helm.sh
+  - HELM_TGZ=helm-v3.2.4-linux-amd64.tar.gz
+  - YAMLLINT_VERSION=1.15.0
+  - TRAVIS_GO_VERSION=1.13.1
+  - secure: UOq/NpS9NHpX09oMI3JC3LuyDR/QsDCDLqwDL2svzyGMUIjHnjdKFe2bnYbNzO+apyKa7P1UHXMkT7y4oJIdhHUBT+eQJ+cIT5gmbkn1Q4/EG7mPqbOgkaTIazhQ5l0dzy+4ZJpW1IJsSp3AHNbcnucSfOZ5SjIRAFwwFaobRzWT+xfGFubUTD8sIRHH7vrwWIKhqZzrCPbiC8D6rnI67//oDZLqMBQMNOuGqsbgF6hFjK2+bFPjXhrlavl6gZSyJtoCBMA+Q9NCTRQzPdtvbzSr2b6DmrWcq3YallBsJzAxZVmrt8TZryB9/DUPpxZrELKxrVu1rBnG17NjyHPCOen5usiECwt1dWHjEmqVLObDfSkFWul8/PTIjznK/zhWL8m3OtmmkAlaLqFsBRoA1zSoLmblmuF+wA9XmgDsXyausmqOYPihnLH5tYn36OY8jai4iA2SN9xzvCsmgjPHUveWZzYmQl4LsE8WOYwwK+tzo3h60cNEUyLlrclQjcbyjJ2bJwkre1Ecz3aZIl9DiCKYEulCjQwSeTvHN0znxxFDQXO1rKOZsuR1Lttjd7qbbDIfv0Wjy8tTGK/Af0CwPuCQHMVDT9NlaHG6Stcz+ub2N23w+anrep3nBLCCBwqJt0C42YjJSZPo98T/fJPQhL9SaxlNGeTUB1anKUVuO24=
 install:
-  # Install Helm
-  - wget -q ${HELM_URL}/${HELM_TGZ}
-  - tar xzf ${HELM_TGZ}
-  - PATH=`pwd`/linux-amd64/:$PATH
-  # Install YamlLint
-  - sudo pip install yamllint=="${YAMLLINT_VERSION}"
-  - nvm install --lts
-  - npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
-  # Install Go
-  - eval "$(gimme 1.13.1)"
-  - export  PATH=$PATH:/usr/local/go/bin
+- wget -q ${HELM_URL}/${HELM_TGZ}
+- tar xzf ${HELM_TGZ}
+- PATH=`pwd`/linux-amd64/:$PATH
+- sudo pip install yamllint=="${YAMLLINT_VERSION}"
+- nvm install --lts
+- npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links
+  remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide
+  remark-lint
+- eval "$(gimme 1.13.1)"
+- export  PATH=$PATH:/usr/local/go/bin
 script:
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
-  - yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
-  - remark -i .remark_ignore -f -u validate-links .
-  # Now load the helm dependencies
-  - make dependencies
-  # Run GO helm unit tests
-  - mkdir $TRAVIS_BUILD_DIR/terratest/bin
-  - export GOPATH=$TRAVIS_BUILD_DIR/terratest
-  - curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-  - export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
-  - cd terratest/src/test
-  - dep ensure
-  # grep -v command.go:158 - hack for filter unnecessary logs. 
-  # It's needed because of lack ability to disable debug output in terratest for helm chart
-  #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
-  - go test test/pega | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
-  - go test test/addons | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
-  - go test test/backingservices | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
-  - cd $TRAVIS_BUILD_DIR
-  - chmod 777 before_deploy.sh
+- yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
+- yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+- remark -i .remark_ignore -f -u validate-links .
+- make dependencies
+- mkdir $TRAVIS_BUILD_DIR/terratest/bin
+- export GOPATH=$TRAVIS_BUILD_DIR/terratest
+- curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+- export PATH=$PATH:$TRAVIS_BUILD_DIR/terratest/bin
+- cd terratest/src/test
+- dep ensure
+- go test test/pega | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
+- go test test/addons | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq 0
+- go test test/backingservices | grep -v command.go:158 ; test ${PIPESTATUS[0]} -eq
+  0
+- cd $TRAVIS_BUILD_DIR
+- chmod 777 before_deploy.sh
 before_deploy:
-  - ./before_deploy.sh  
-  - make examples
+- "./before_deploy.sh"
+- make examples
 deploy:
-  - provider: releases
-    api_key:
-      secure: >
-        B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
-        YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
-        G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
-        3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
-        qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
-        tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
-        BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
-        XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
-        eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
-        +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
-        6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
-        xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
-        Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
-        s8HDDyvvaP0mhMvUou8I=
-    file:
-      - pega-kubernetes-example.tar.gz
-      - pega-openshift-example.tar.gz
-      - pega-azure-aks-example.tar.gz
-      - pega-aws-eks-example.tar.gz
-      - pega-google-gke-example.tar.gz
-      - pega-pivotal-pks-example.tar.gz
-    skip_cleanup: true
-    on:
-      repo: $TRAVIS_REPO_SLUG
-      tags: true
-  - provider: pages
-    github-token: $GITHUB_TOKEN
-    api_key:
-      secure: >
-        B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
-        YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
-        G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
-        3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
-        qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
-        tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
-        BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
-        XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
-        eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
-        +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
-        6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
-        xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
-        Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
-        s8HDDyvvaP0mhMvUou8I=
-    file:
-        - index.yaml
-    skip_cleanup: true
-    target_branch: gh-pages
-    keep_history: true
-    verbose: true
-    on:
-      all_branches: true
-      repo: $TRAVIS_REPO_SLUG
-      draft: true
+- provider: releases
+  api_key:
+    secure: >
+      B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
+      YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
+      G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
+      3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
+      qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
+      tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
+      BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
+      XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
+      eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
+      +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
+      6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
+      xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
+      Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
+      s8HDDyvvaP0mhMvUou8I=
+  file:
+  - pega-kubernetes-example.tar.gz
+  - pega-openshift-example.tar.gz
+  - pega-azure-aks-example.tar.gz
+  - pega-aws-eks-example.tar.gz
+  - pega-google-gke-example.tar.gz
+  - pega-pivotal-pks-example.tar.gz
+  skip_cleanup: true
+  on:
+    repo: "$TRAVIS_REPO_SLUG"
+    tags: true
+- provider: pages
+  github-token: "$GITHUB_TOKEN"
+  api_key:
+    secure: >
+      B5F4dCPvLmAP2pSCNLptl4vR9hk8AW+vrwsO6wlHsjGwmlKTs2w
+      YTWjPWA9SEFHO4OouxxsJv96ndPQ+i7TtKNjAJ65Ll1saztsIcn
+      G+Si567swtSPU4dEq4VhvabXmfZ1+1b/7zjP+fSAnmj41QZzLjI
+      3V5bQSTgyvVM7Xrol4OYJKX6iiX6p5noo7ysXGXL3iXn3vR+mya
+      qGIldsM9Bw2NyKeueu070dWq7hPJ4jEl8ObAzKVCjm5C7xqhN47
+      tl9yPBnicGbsD6qKzMtI97oCTCRz4sxLcbwhPsGg/1T+EpJDvBq
+      BSkA7OVdJ9Oi7hY+V47aBw9B4s9ABiIDQTTwz38Yu77FcJIMW8K
+      XH4Pez0xlDg7JD4wmrC07dHNtsz+d9wm4OKvdZnce7bUZ+LYCiL
+      eX1RPrfcVzTRsmiPyzAHNC6KOUtCrcIS6Jl8Eoq0aZfUjhE/cqy
+      +q6m6eVEGbt/rz/WVnxeQRjauoPnyCnueREuxndJ+zLMJc21a6Y
+      6tEZ9Y8DkOVxIL3v8SsCrf2/j0E5zctPpkODzuCY/jtaDjX92i/
+      xvWna69SRrwUu+66INfT1joG4NgPXCTqpovKcVPSM8YjGGiRbjp
+      Q2mfeqFIphhDH5ZWEWKgJz8hrGtiVpKho3G4J2qBQgacF1X1lvC
+      s8HDDyvvaP0mhMvUou8I=
+  file:
+  - index.yaml
+  skip_cleanup: true
+  target_branch: gh-pages
+  keep_history: true
+  verbose: true
+  on:
+    all_branches: true
+    repo: "$TRAVIS_REPO_SLUG"
+    draft: true
