@@ -16,7 +16,6 @@ global:
         sidecarContainers:
           - name: test-sidecar
             image: test/sidecar
-      # End values for test - web
     - name: "batch"
       nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
       replicas: 1
@@ -28,9 +27,8 @@ global:
       # Values for test - batch
       custom:
         sidecarContainers:
-        - name: test-sidecar
-          image: test/sidecar
-      # End values for test - batch
+          - name: test-sidecar
+            image: test/sidecar
     - name: "stream"
       nodeType: "Stream"
       requestor:
@@ -43,6 +41,5 @@ global:
       # Values for test - stream
       custom:
         sidecarContainers:
-        - name: test-sidecar
-          image: test/sidecar
-      # End values for test - stream
+          - name: test-sidecar
+            image: test/sidecar
