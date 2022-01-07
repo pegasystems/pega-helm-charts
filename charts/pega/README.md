@@ -531,7 +531,7 @@ tier:
 
 ### Sidecar Containers
 
-If the pod needs to run with one or more [sidecar containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers), you can specify custom 'sidecarContainers' for your deployment tier.
+If the pod needs to run with one or more [sidecar containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers), you can specify custom 'sidecarContainers' for your deployment tier. Each sidecar container must include a complete container definition, including a name, image, resources, etc.
 
 Example:
 
@@ -542,6 +542,10 @@ tier:
       sidecarContainers:
         - name: SIDECAR_NAME
           image: SIDECAR_IMAGE_URL
+          ...
+        - name: SIDECAR_NAME_2
+          image: SIDECAR_IMAGE_URL_2
+          ...
 ```
 
 ### Custom Annotations for Pods
