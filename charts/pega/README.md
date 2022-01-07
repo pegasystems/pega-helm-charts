@@ -540,8 +540,8 @@ tier:
   - name: my-tier
     custom:
       sidecarContainers:
-      - name: SIDECAR_NAME
-        image: SIDECAR_IMAGE_URL
+        - name: SIDECAR_NAME
+          image: SIDECAR_IMAGE_URL
 ```
 
 ### Custom Annotations for Pods
