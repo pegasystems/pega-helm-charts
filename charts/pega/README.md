@@ -529,6 +529,21 @@ tier:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
 ```
 
+### Sidecar Containers
+
+If the pod needs to run with one or more [sidecar containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers), you can specify custom 'sidecarContainers' for your deployment tier.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      sidecarContainers:
+      - name: SIDECAR_NAME
+        image: SIDECAR_IMAGE_URL
+```
+
 ### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
