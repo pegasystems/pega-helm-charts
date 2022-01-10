@@ -252,6 +252,12 @@ spec:
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
 {{- end }}
+{{- if .custom }}
+{{- if .custom.sidecarContainers }}
+      # Additional custom sidecar containers
+{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{- end }}
+{{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always
       # Amount of time in which container has to gracefully shutdown.
