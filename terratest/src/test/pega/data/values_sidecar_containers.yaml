@@ -11,6 +11,8 @@ global:
           maxSurge: 1
           maxUnavailable: 0
         type: RollingUpdate
+      livenessProbe:
+        port: 8081
       # Values for test - web
       custom:
         sidecarContainers:
@@ -24,6 +26,8 @@ global:
           maxSurge: 1
           maxUnavailable: 0
         type: RollingUpdate
+      livenessProbe:
+        port: 8081
       # Values for test - batch
       custom:
         sidecarContainers:
@@ -38,6 +42,8 @@ global:
         resources:
           requests:
             storage: 5Gi
+      livenessProbe:
+        port: 8081
       # Values for test - stream
       custom:
         sidecarContainers:
