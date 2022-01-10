@@ -91,5 +91,5 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 	}
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
-	VerifyInitContinerData(t, actualInitContainers, options)
+	VerifyInitContainerData(t, actualInitContainers, options)
 }
