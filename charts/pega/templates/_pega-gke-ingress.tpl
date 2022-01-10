@@ -46,10 +46,12 @@ spec:
       paths: 
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
+        pathType: ImplementationSpecific
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - backend: 
+      - pathType: ImplementationSpecific
+        backend: 
 {{ include "ingressService" . | indent 10 }}
 ---
 {{- end }}
