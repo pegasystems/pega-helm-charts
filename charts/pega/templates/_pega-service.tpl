@@ -25,7 +25,7 @@ metadata:
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
-    beta.cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
+    {{ if (semverCompare "< 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}beta.{{ end -}}cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
   {{ end }}
 {{- end }}
 spec:
