@@ -3,7 +3,6 @@ global:
   certificates:
     testcert.cer: |
       ----THIS IS MY CERT----
-
   tier:
     - name: "web"
       nodeType: "WebUser"
@@ -50,4 +49,3 @@ global:
         port: 8081
       # Values for test - stream
       custom:
-

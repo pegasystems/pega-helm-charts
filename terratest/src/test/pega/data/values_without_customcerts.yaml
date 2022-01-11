@@ -1,7 +1,6 @@
 ---
 global:
   certificates:
-
   tier:
     - name: "web"
       nodeType: "WebUser"
@@ -48,4 +47,3 @@ global:
         port: 8081
       # Values for test - stream
       custom:
-        certificates:
