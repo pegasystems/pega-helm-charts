@@ -16,9 +16,6 @@ global:
         port: 8081
       # Values for test - web
       custom:
-        sidecarContainers:
-          - name: test-sidecar
-            image: test/sidecar
     - name: "batch"
       nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
       replicas: 1
@@ -31,9 +28,6 @@ global:
         port: 8081
       # Values for test - batch
       custom:
-        sidecarContainers:
-          - name: test-sidecar
-            image: test/sidecar
     - name: "stream"
       nodeType: "Stream"
       requestor:
@@ -47,4 +41,3 @@ global:
         port: 8081
       # Values for test - stream
       custom:
-        
