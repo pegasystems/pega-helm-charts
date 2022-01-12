@@ -1,7 +1,7 @@
 {{- define "pega.aks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: extensions/v1beta1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -29,8 +29,8 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
-      - backend:
-          serviceName: {{ .name }}
-          servicePort: {{ .node.service.port }}
+      - pathType: ImplementationSpecific
+        backend:
+{{ include "ingressService" . | indent 10 }}
 ---     
 {{- end }}
