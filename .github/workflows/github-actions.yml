@@ -1,10 +1,10 @@
 name: GitHub Actions for pega helm chart
 
 env:
-  HELM_URL:https://get.helm.sh
-  HELM_TGZ:helm-v3.2.4-linux-amd64.tar.gz
-  YAMLLINT_VERSION:1.15.0
-  TRAVIS_GO_VERSION:1.13.1
+  HELM_URL: https://get.helm.sh
+  HELM_TGZ: helm-v3.2.4-linux-amd64.tar.gz
+  YAMLLINT_VERSION: 1.15.0
+  TRAVIS_GO_VERSION: 1.13.1
 
 
 on:
@@ -21,11 +21,11 @@ jobs:
     steps:
       - name: Install Helm
         run: |
-          wget -q ${HELM_URL}/${HELM_TGZ}
-          tar xzf ${HELM_TGZ}
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
           PATH=`pwd`/linux-amd64/:$PATH
       - name: Install Helm
         run: |
-          sudo pip install yamllint=="${YAMLLINT_VERSION}"
+          sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
           nvm install --lts
           npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
