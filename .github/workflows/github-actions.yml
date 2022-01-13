@@ -20,10 +20,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Install Helm
-        run: wget -q ${HELM_URL}/${HELM_TGZ}
-        run: tar xzf ${HELM_TGZ}
-        run: PATH=`pwd`/linux-amd64/:$PATH
+        run: |
+          wget -q ${HELM_URL}/${HELM_TGZ}
+          tar xzf ${HELM_TGZ}
+          PATH=`pwd`/linux-amd64/:$PATH
       - name: Install Helm
-        run: sudo pip install yamllint=="${YAMLLINT_VERSION}"
-        run: nvm install --lts
-        run: npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+        run: |
+          sudo pip install yamllint=="${YAMLLINT_VERSION}"
+          nvm install --lts
+          npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
