@@ -24,8 +24,17 @@ jobs:
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
           PATH=`pwd`/linux-amd64/:$PATH
-      - name: Install Helm
+      - name: Install yamllint
         run: |
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
-          nvm install --lts
-          npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+      - name: Install Node
+        uses: actions/setup-node@v2.5.1
+        with:
+          node-version: lts
+          cache: 'npm'
+      - run: npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+      - name: Install GO
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.TRAVIS_GO_VERSION }}
+      - run: export  PATH=$PATH:/usr/local/go/bin
