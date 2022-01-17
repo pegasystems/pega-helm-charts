@@ -71,10 +71,7 @@ jobs:
           dep ensure
           # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
           #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
-
-      - name: Run go test on pega
-        run: |
-          go test terratest/src/test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+          go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
       
       - name: Run go test on addons 
         run: |
