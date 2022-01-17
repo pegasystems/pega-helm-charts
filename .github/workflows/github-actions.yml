@@ -24,7 +24,7 @@ jobs:
         uses: Azure/setup-kubectl@v2.0
         with:
           # Version of kubectl
-          version: v1.17
+          version: v1.18.0
 
       - run: |
           kubectl version
