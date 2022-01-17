@@ -30,6 +30,8 @@ jobs:
       - name: Install nvm
         run: |
           # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+      - name: Install node and dependencies
+        run: |    
           nvm install --lts
           npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
       - name: Install GO
