@@ -27,13 +27,13 @@ jobs:
       - name: Install yamllint
         run: |
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
-      - name: Install nvm
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-          source ~/.bash_profile
-      - name: Install node and dependencies
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts
+          cache: 'npm'
+      - name: Install npm dependencies
         run: |    
-          nvm install --lts
           npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
       - name: Install GO
         uses: actions/setup-go@v2
