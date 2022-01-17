@@ -29,7 +29,7 @@ jobs:
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
       - name: Install nvm
         run: |
-          # curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
       - name: Install node and dependencies
         run: |    
           nvm install --lts
