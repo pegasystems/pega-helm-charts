@@ -29,7 +29,8 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
-      - backend:
+      - pathType: ImplementationSpecific
+        backend:
 {{ include "ingressService" . | indent 10 }}
 ---     
 {{- end }}

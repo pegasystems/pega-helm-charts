@@ -43,8 +43,8 @@ func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, containe
 	}
 }
 
-// VerifyInitContinerData - Verifies any possible initContainer that can occur in pega helm chart deployments
-func VerifyInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
+// VerifyInitContainerData - Verifies any possible initContainer that can occur in pega helm chart deployments
+func VerifyInitContainerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 	var depName = getDeploymentName(options)
 
 	if len(containers) == 0 {
