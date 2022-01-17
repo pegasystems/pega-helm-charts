@@ -46,6 +46,9 @@ jobs:
     needs: install-softwares
     steps:
       - run: |
+          pwd
+          ls
+      - run: |
           yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
           yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
           remark -i .remark_ignore -f -u validate-links .
