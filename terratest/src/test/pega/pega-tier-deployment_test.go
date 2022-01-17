@@ -174,7 +174,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, intstr.FromInt(8081), pod.Containers[0].LivenessProbe.HTTPGet.Port)
 	require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].LivenessProbe.HTTPGet.Scheme)
 
-	require.Equal(t, int32(30), pod.Containers[0].ReadinessProbe.InitialDelaySeconds)
+	require.Equal(t, int32(0), pod.Containers[0].ReadinessProbe.InitialDelaySeconds)
 	require.Equal(t, int32(10), pod.Containers[0].ReadinessProbe.TimeoutSeconds)
 	require.Equal(t, int32(10), pod.Containers[0].ReadinessProbe.PeriodSeconds)
 	require.Equal(t, int32(1), pod.Containers[0].ReadinessProbe.SuccessThreshold)
