@@ -74,15 +74,17 @@ jobs:
 
       - name: Run go test on pega
         run: |
-          pwd
+          cd terratest/src/test
           go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
       
       - name: Run go test on addons 
         run: |
+          cd terratest/src/test
           go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
 
       - name: Run go test on backingservices 
         run: |
+          cd terratest/src/test
           go test test/backingservices  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
 
       - name: before deploy step 1
