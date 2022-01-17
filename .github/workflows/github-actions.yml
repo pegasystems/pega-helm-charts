@@ -61,7 +61,7 @@ jobs:
         run: |
           make dependencies
       
-      - name: Run GO helm unit tests
+      - name: Prepare for GO helm unit tests
         run: |
           mkdir $GITHUB_WORKSPACE/terratest/bin
           export GOPATH=$GITHUB_WORKSPACE/terratest
@@ -69,4 +69,29 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           dep ensure
+          # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
+          #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
+
+      - name: Run go test on pega
+        run: |
+          go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+      
+      - name: Run go test on addons 
+        run: |
+          go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: Run go test on backingservices 
+        run: |
+          go test test/backingservices  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: before deploy step 1
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 before_deploy.sh
+          ./before_deploy.sh
+
+      - name: before deploy step 2
+        run: |
+          make examples
+
 
