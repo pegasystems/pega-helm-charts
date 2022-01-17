@@ -88,7 +88,7 @@ jobs:
       - name: run go test
         if: always()
         run: go test test/backingservices  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-        working-directory: $GITHUB_WORKSPACE/terratest/src/test
+        working-directory: terratest/src/test
 
       - name: before deploy step 1
         run: |
