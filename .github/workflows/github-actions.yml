@@ -74,6 +74,7 @@ jobs:
 
       - name: Run go test on pega
         run: |
+          pwd
           go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
       
       - name: Run go test on addons 
