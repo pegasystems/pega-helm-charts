@@ -44,6 +44,15 @@ jobs:
         with:
           go-version: ${{ env.GO_VERSION }}
       - run: export  PATH=$PATH:/usr/local/go/bin
+      
+      - name: Kubectl tool installer
+        uses: Azure/setup-kubectl@v2.0
+        with:
+          # Version of kubectl
+          version: 1.17.16
+      
+      - run: |
+          kubectl version
 
       - name: Check out repository code
         uses: actions/checkout@v2
@@ -61,8 +70,6 @@ jobs:
         run: |
           make dependencies
 
-      - run: |
-          kubectl version
       
       - name: Prepare for GO helm unit tests
         run: |
