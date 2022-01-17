@@ -68,7 +68,8 @@ jobs:
       - name: Now load the helm dependencies
         run: |
           make dependencies
-
+          
+      - run: kubectl version
       
       - name: Prepare for GO helm unit tests
         run: |
