@@ -16,46 +16,51 @@ on:
   #   - cron:  '0 12 * * *'
 
 jobs:
-  install-softwares:
+  run-build-job:
     runs-on: ubuntu-18.04
+    if: always()
     steps:
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
           PATH=`pwd`/linux-amd64/:$PATH
+      
       - name: Install yamllint
         run: |
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
+      
       - name: Install node
         uses: actions/setup-node@v2
         with:
           node-version: lts/*
+      
       - name: Install npm dependencies
         run: |    
           npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+      
       - name: Install GO
         uses: actions/setup-go@v2
         with:
           go-version: ${{ env.GO_VERSION }}
       - run: export  PATH=$PATH:/usr/local/go/bin
 
-  run-scripts:
-    runs-on: ubuntu-latest
-    if: always()
-    needs: install-softwares
-    steps:
       - name: Check out repository code
         uses: actions/checkout@v2
+      
       - run: |
           ls
-      - run: |
+      
+      - name: run yamllint
+        run: |
           yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
           yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
           remark -i .remark_ignore -f -u validate-links .
+      
       - name: Now load the helm dependencies
         run: |
           make dependencies
+      
       - name: Run GO helm unit tests
         run: |
           mkdir $GITHUB_WORKSPACE/terratest/bin
