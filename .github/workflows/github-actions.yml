@@ -24,10 +24,8 @@ jobs:
         uses: Azure/setup-kubectl@v2.0
         with:
           # Version of kubectl
-          version: v1.18.0
+          version: v1.17.0
 
-      - run: |
-          kubectl version
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
