@@ -22,6 +22,7 @@ jobs:
     steps:
       - run: helm version
       - run: sudo rm /usr/local/bin/kubectl
+      - run: sudo rm /usr/local/bin/helm
       - run: sudo rm -rf ~/.kube  
       - run: |
           echo $PATH
