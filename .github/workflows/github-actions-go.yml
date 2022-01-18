@@ -20,22 +20,17 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
-      - run: helm version
-      - run: sudo rm /usr/local/bin/kubectl
       - run: sudo rm /usr/local/bin/helm
-      - run: sudo rm -rf ~/.kube  
-      - run: |
-          echo $PATH
-          cd /usr/local/bin
-          ls
+      
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
           ls -l
           mv linux-amd64/helm /usr/local/bin/helm
-          PATH=`pwd`/linux-amd64/:$PATH
+
       - run: helm version
+      
       - name: Install GO
         uses: actions/setup-go@v2
         with:
@@ -45,9 +40,6 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       
-      - run: |
-          ls
-            
       - name: Now load the helm dependencies
         run: |
           make dependencies
@@ -65,12 +57,12 @@ jobs:
           #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
           # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
           # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-      - run: kubectl version
+
       - name: run go test
         if: always()
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
-          go test -v test/pega -run TestConstellation
-          # go test test/pega  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+          # go test -v test/pega -run TestConstellation
+          go test test/pega  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
         working-directory: terratest/src/test
