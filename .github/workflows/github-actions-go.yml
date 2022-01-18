@@ -20,6 +20,7 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
+      - run: helm version
       - run: sudo rm /usr/local/bin/kubectl
       - run: sudo rm -rf ~/.kube  
       - run: |
@@ -31,7 +32,7 @@ jobs:
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
           PATH=`pwd`/linux-amd64/:$PATH
-      
+      - run: helm version
       - name: Install GO
         uses: actions/setup-go@v2
         with:
