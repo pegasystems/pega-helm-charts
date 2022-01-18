@@ -20,6 +20,9 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
+      - run: |
+          echo "ABC" | false | true
+          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]} ${PIPESTATUS[2]}
       - run: sudo rm /usr/local/bin/helm
       
       - name: Install Helm
