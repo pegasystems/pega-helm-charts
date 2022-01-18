@@ -47,25 +47,31 @@ jobs:
         run: |
           make dependencies
                 
-      - name: Prepare for GO helm unit tests
-        if: always()
-        run: |
-          mkdir $GITHUB_WORKSPACE/terratest/bin
-          export GOPATH=$GITHUB_WORKSPACE/terratest
-          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
-          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
-          cd terratest/src/test
-          dep ensure
-          # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
-          #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
-          # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-          # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+      # - name: Prepare for GO helm unit tests
+      #   if: always()
+      #   run: |
+      #     mkdir $GITHUB_WORKSPACE/terratest/bin
+      #     export GOPATH=$GITHUB_WORKSPACE/terratest
+      #     curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+      #     export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+      #     cd terratest/src/test
+      #     dep ensure
+      #     # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
+      #     #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
+      #     # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
+      #     # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
 
-      - name: run go test
-        if: always()
+      # - name: run go test
+      #   if: always()
+      #   run: |
+      #     export GOPATH=$GITHUB_WORKSPACE/terratest
+      #     export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+      #     cd terratest/src/test
+      #     # go test -v test/pega
+      #     go test test/pega
+
+      - name: before deploy step 1
         run: |
-          export GOPATH=$GITHUB_WORKSPACE/terratest
-          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
-          cd terratest/src/test
-          # go test -v test/pega
-          go test test/pega  | grep "FAIL" -A 8
+          cd $GITHUB_WORKSPACE
+          chmod 777 before_deploy.sh
+          ./before_deploy.sh

@@ -20,17 +20,14 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
-      - name: Kubectl tool installer
-        uses: Azure/setup-kubectl@v2.0
-        with:
-          # Version of kubectl
-          version: v1.17.0
-
       - name: Install Helm
         run: |
+          sudo rm /usr/local/bin/helm
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
-          PATH=`pwd`/linux-amd64/:$PATH
+          mv linux-amd64/helm /usr/local/bin/helm
+
+      - run: helm version
       
       - name: Install yamllint
         run: |
@@ -56,9 +53,6 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v2
       
-      - run: |
-          ls
-      
       - name: run yamllint
         run: |
           yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
@@ -69,8 +63,6 @@ jobs:
         run: |
           make dependencies
           
-      - run: kubectl version
-      
       - name: Prepare for GO helm unit tests
         if: always()
         run: |
@@ -87,8 +79,12 @@ jobs:
       
       - name: run go test
         if: always()
-        run: go test test/backingservices  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-        working-directory: terratest/src/test
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          # go test -v test/pega
+          go test test/pega  | grep "FAIL" -A 8
 
       - name: before deploy step 1
         run: |
