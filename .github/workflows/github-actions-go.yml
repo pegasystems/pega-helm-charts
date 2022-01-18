@@ -21,13 +21,7 @@ jobs:
     if: always()
     steps:
       - run: sudo rm /usr/local/bin/kubectl
-      - run: kubectl version
-      - name: Kubectl tool installer
-        uses: Azure/setup-kubectl@v2.0
-        with:
-          # Version of kubectl
-          version: v1.17.0
-      
+        
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
@@ -63,7 +57,7 @@ jobs:
           #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
           # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
           # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-      
+      - run: kubectl version
       - name: run go test
         if: always()
         run: |
