@@ -21,7 +21,11 @@ jobs:
     if: always()
     steps:
       - run: sudo rm /usr/local/bin/kubectl
-        
+      - run: sudo rm -rf ~/.kube  
+      - run: |
+          echo $PATH
+          cd /usr/local/bin
+          ls
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
