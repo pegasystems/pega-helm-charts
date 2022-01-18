@@ -32,6 +32,8 @@ jobs:
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
           tar xzf ${{ env.HELM_TGZ }}
+          ls -l
+          mv linux-amd64/helm /usr/local/bin/helm
           PATH=`pwd`/linux-amd64/:$PATH
       - run: helm version
       - name: Install GO
