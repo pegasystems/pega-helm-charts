@@ -63,6 +63,6 @@ jobs:
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
           go test -v test/pega -run TestConstellation
           # go test -v test/pega  | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-        working-directory: terratest/src/test
