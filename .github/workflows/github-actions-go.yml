@@ -21,6 +21,7 @@ jobs:
     if: always()
     steps:
       - run: sudo rm /usr/local/bin/kubectl
+      - run: kubectl version
       - name: Kubectl tool installer
         uses: Azure/setup-kubectl@v2.0
         with:
