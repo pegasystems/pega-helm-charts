@@ -20,6 +20,12 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
+      - name: Kubectl tool installer
+        uses: Azure/setup-kubectl@v2.0
+        with:
+          # Version of kubectl
+          version: v1.17.0
+      
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
