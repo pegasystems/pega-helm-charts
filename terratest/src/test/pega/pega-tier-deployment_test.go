@@ -165,7 +165,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 
 	//If these tests start failing, check if the K8s version has passed 1.18. If so,
 	//update the values to the 1.18 versions and also enable the StartupProbe test.
-	require.Equal(t, int32(200), pod.Containers[0].LivenessProbe.InitialDelaySeconds)
+	require.Equal(t, int32(20), pod.Containers[0].LivenessProbe.InitialDelaySeconds)
 	require.Equal(t, int32(20), pod.Containers[0].LivenessProbe.TimeoutSeconds)
 	require.Equal(t, int32(30), pod.Containers[0].LivenessProbe.PeriodSeconds)
 	require.Equal(t, int32(1), pod.Containers[0].LivenessProbe.SuccessThreshold)
