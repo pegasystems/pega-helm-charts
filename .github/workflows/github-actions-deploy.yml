@@ -19,8 +19,19 @@ jobs:
   run-deploy-job:
     runs-on: ubuntu-18.04
     steps:
+      - name: Install Helm
+        run: |
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
+          ls -l
+          mv linux-amd64/helm /usr/local/bin/helm
+          
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Now load the helm dependencies
+        run: |
+          make dependencies
 
       - name: before deploy step 1
         run: |
