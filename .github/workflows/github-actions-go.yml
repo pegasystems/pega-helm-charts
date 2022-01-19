@@ -20,11 +20,6 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
-      - run: |
-          echo "ABC" | grep "FAIL" -A 8 || true
-          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]}
-      - run: sudo rm /usr/local/bin/helm
-      
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
@@ -58,14 +53,27 @@ jobs:
           dep ensure
           # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
           #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
-          # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-          # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
 
-      - name: run go test
+      - name: run go tests on pega
         if: always()
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-          # go test -v test/pega
           go test test/pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: run go tests on addons
+        if: always()
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          go test test/addons | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: run go tests on backing services
+        if: always()
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          go test test/backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
