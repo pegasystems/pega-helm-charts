@@ -21,8 +21,8 @@ jobs:
     if: always()
     steps:
       - run: |
-          echo "ABC" | false | true
-          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]} ${PIPESTATUS[2]}
+          echo "ABC" | grep "FAIL" -A 8
+          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]}
       - run: sudo rm /usr/local/bin/helm
       
       - name: Install Helm
