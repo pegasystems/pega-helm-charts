@@ -20,6 +20,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: always()
     steps:
+      - run: |
+          echo "ABC" | (( grep "FAIL" -A 8 || true ))
+          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]}
+      - run: sudo rm /usr/local/bin/helm
+      
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
