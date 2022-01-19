@@ -68,5 +68,4 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           # go test -v test/pega
-          go test test/pega
-          grep "FAIL" -A 8
+          go test test/pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
