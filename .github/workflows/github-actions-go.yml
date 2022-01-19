@@ -22,7 +22,7 @@ jobs:
     steps:
       - run: |
           echo "ABC" | { grep "FAIL" -A 8 || true }
-          echo ${PIPESTATUS[0]} ${PIPESTATUS[1]}
+          echo ${PIPESTATUS[0]}
       - run: sudo rm /usr/local/bin/helm
       
       - name: Install Helm
