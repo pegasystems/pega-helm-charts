@@ -44,10 +44,10 @@ jobs:
           make examples 
 
       - name: deploy on github releases
-        # on:
-        #   push:
-        #     tags:
-        #       - '*'
+        on:
+          push:
+            tags:
+              - '*'
         uses: marvinpinto/action-automatic-releases@latest
         with:
           files: |
