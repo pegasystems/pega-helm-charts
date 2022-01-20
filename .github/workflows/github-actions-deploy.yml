@@ -46,6 +46,7 @@ jobs:
           make examples 
 
       - run: ls
+      - run: git branch
       - run: git diff
       - run: cat index.yaml
 
@@ -62,11 +63,7 @@ jobs:
       #       pega-pivotal-pks-example.tar.gz
       #     repo_token: ${{ secrets.NEW_SECRET }}
 
-      - name: deploy on github pages
-        uses: crazy-max/ghaction-github-pages@v2
-        with:
-          target_branch: gh-pages
-          keep_history: true
-          verbose: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+      # - name: deploy on github pages
+      #   run: ./bin/update-gh-pages
+      #     env:
+      #       GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
