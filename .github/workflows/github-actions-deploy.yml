@@ -45,6 +45,8 @@ jobs:
         run: |
           make examples 
 
+      - run: ls
+
       # - name: deploy on github releases
       #   uses: marvinpinto/action-automatic-releases@latest
       #   with:
