@@ -47,7 +47,7 @@ jobs:
 
       - run: ls
       - run: git branch
-      - run: git diff
+      - run: git status
       - run: cat index.yaml
 
       # - name: deploy on github releases
