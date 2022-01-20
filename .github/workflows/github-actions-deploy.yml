@@ -46,6 +46,8 @@ jobs:
           make examples 
 
       - run: ls
+      - run: git diff
+      - run: cat index.yaml
 
       # - name: deploy on github releases
       #   uses: marvinpinto/action-automatic-releases@latest
