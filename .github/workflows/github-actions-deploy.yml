@@ -47,6 +47,7 @@ jobs:
 
       - run: ls
       - run: git branch
+      - run: git fetch
       - run: git checkout gh-pages
       - run: git status
       - run: cat index.yaml
