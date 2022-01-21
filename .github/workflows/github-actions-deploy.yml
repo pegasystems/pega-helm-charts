@@ -45,12 +45,6 @@ jobs:
         run: |
           make examples 
 
-      - run: ls
-      - run: git branch
-      - run: git fetch
-      - run: git checkout gh-pages
-      - run: git status
-      - run: cat index.yaml
 
       # - name: deploy on github releases
       #   uses: marvinpinto/action-automatic-releases@latest
