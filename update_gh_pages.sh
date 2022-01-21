@@ -1,7 +1,9 @@
 #!/bin/bash
 
 set -eu
-
+echo "${GITHUB_REF}"
+echo "${GITHUB_REPOSITORY}"
+echo "${GITHUB_TOKEN}"
 repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 remote_name="origin"
 main_branch="master"
