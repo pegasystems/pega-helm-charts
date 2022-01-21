@@ -1,4 +1,4 @@
-name: GitHub Actions for pega helm chart
+name: GitHub Actions - Build for pega helm chart
 
 env:
   HELM_URL: https://get.helm.sh
@@ -7,18 +7,11 @@ env:
   GO_VERSION: 1.13.1
 
 
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-  # schedule:
-  #   - cron:  '0 12 * * *'
+on: push
 
 jobs:
   run-build-job:
     runs-on: ubuntu-18.04
-    if: always()
     steps:
       - name: Install Helm
         run: |
@@ -100,15 +93,3 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           go test test/backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
-
-      # - name: before deploy step 1
-      #   run: |
-      #     cd $GITHUB_WORKSPACE
-      #     chmod 777 before_deploy.sh
-      #     ./before_deploy.sh
-
-      # - name: before deploy step 2
-      #   run: |
-      #     make examples 
-
-

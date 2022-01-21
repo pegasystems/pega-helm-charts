@@ -13,10 +13,15 @@ on:
       - '*'
     tags:
       - '*'
+  workflow_run:
+    workflows: ["GitHub Actions - Build for pega helm chart"]
+    types:
+      - completed
 
 jobs:
   run-deploy-job:
     runs-on: ubuntu-18.04
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Install Helm
         run: |
