@@ -287,8 +287,8 @@ installer:
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
-  # Setting below to true will deploy the infinity in client server hazelcast mode
-  enabled: false
+  # By default, infinity runs in C/S hazelcast mode. Setting below to false will deploy the infinity in embedded hazelcast mode.
+  enabled: true
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client server hazelcast mode for authentication
