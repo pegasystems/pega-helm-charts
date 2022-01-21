@@ -153,3 +153,4 @@ jobs:
           ./update_gh_pages.sh
         env:
           GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+          
