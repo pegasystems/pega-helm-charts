@@ -1,5 +1,5 @@
 #!/bin/bash
-
+set -e
 
 echo "${GITHUB_REF}"
 echo "${GITHUB_REPOSITORY}"
@@ -25,6 +25,10 @@ cd "$tmp_build_dir"
 
 echo "Copying the files to the temporary build directory"
 rsync -rl --exclude .git --delete "$GITHUB_WORKSPACE/" .
+
+pwd
+ls
+git branch
 
 echo "preparing to commit to gh-pages"
 git add -A
