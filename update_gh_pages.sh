@@ -1,12 +1,10 @@
 #!/bin/bash
 set -e
 
-# echo "${GITHUB_REF}"
-# echo "${GITHUB_REPOSITORY}"
-# echo "${GITHUB_TOKEN}"
-GITHUB_REPOSITORY = "smootherbug/pega-helm-charts"
-GITHUB_TOKEN = "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"
-GITHUB_WORKSPACE = "/home/runner/work/pega-helm-charts"
+echo "${GITHUB_REF}"
+echo "${GITHUB_REPOSITORY}"
+echo "${GITHUB_TOKEN}"
+
 
 repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 remote_name="origin"
