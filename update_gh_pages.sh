@@ -4,7 +4,7 @@ set -e
 echo "${GITHUB_REF}"
 echo "${GITHUB_REPOSITORY}"
 echo "${GITHUB_TOKEN}"
-
+echo "${GITHUB_ACTOR}"
 
 repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
 remote_name="origin"
@@ -29,7 +29,7 @@ cd "$tmp_build_dir"
 echo "Copying the files to the temporary build directory"
 rsync -rl --exclude .git --delete "$GITHUB_WORKSPACE/" .
 
-pwd
+echo $(pwd)
 ls
 git branch
 
