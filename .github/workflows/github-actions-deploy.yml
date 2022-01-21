@@ -62,7 +62,7 @@ jobs:
       - name: deploy on github pages
         run: |
           cd $GITHUB_WORKSPACE
-          chmod 777 before_deploy.sh
+          chmod 777 update_gh_pages.sh
           ./update_gh_pages.sh
         env:
           GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
