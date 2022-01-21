@@ -10,7 +10,7 @@ repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}
 remote_name="origin"
 main_branch="master"
 target_branch="gh-pages"
-tmp_build_dir="/home/vagrant/pega git/smootherbug/tmpdir2/"
+tmp_build_dir="/tmp/build_dir"
 
 cd "$GITHUB_WORKSPACE"
 
