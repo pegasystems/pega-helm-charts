@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eu
+
 echo "${GITHUB_REF}"
 echo "${GITHUB_REPOSITORY}"
 echo "${GITHUB_TOKEN}"
