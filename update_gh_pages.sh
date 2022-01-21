@@ -14,9 +14,6 @@ tmp_build_dir="/tmp/build_dir"
 
 cd "$GITHUB_WORKSPACE"
 
-git config user.name "$GITHUB_ACTOR"
-git config user.email "${GITHUB_ACTOR}@bots.github.com"
-
 echo "Creating a temporary directory to build"
 mkdir -p "$tmp_build_dir"
 
