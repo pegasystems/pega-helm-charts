@@ -67,5 +67,5 @@ jobs:
 
       - name: deploy on github pages
         run: ./update-gh-pages.sh
-          env:
-            GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
