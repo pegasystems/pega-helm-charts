@@ -12,8 +12,8 @@ on:
     branches: [ master ]
     # tags:
     #   - '*'
-  pull_request:
-    branches: [ master ]
+  # pull_request:
+  #   branches: [ master ]
   # schedule:
   #   - cron:  '0 12 * * *'
 
@@ -65,7 +65,7 @@ jobs:
       #       pega-pivotal-pks-example.tar.gz
       #     repo_token: ${{ secrets.NEW_SECRET }}
 
-      # - name: deploy on github pages
-      #   run: ./bin/update-gh-pages
-      #     env:
-      #       GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+      - name: deploy on github pages
+        run: ./update-gh-pages.sh
+          env:
+            GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
