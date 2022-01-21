@@ -11,16 +11,17 @@ traefik:
   # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
   serviceType: LoadBalancer
-  # If enabled is set to "true", ssl will be enabled for Traefik
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
-    nodePorts:
-      # NodePorts for Traefik service.
-      http: 30080
-      https: 30443
+    serviceType: NodePorts
+  ports:
+    web: 
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
   resources:
     requests:
       # Enter the CPU Request for Traefik
