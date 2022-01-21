@@ -1,4 +1,4 @@
-name: GitHub Actions - Build for pega helm chart
+name: GitHub Actions for pega helm chart
 
 env:
   HELM_URL: https://get.helm.sh
@@ -7,7 +7,14 @@ env:
   GO_VERSION: 1.13.1
 
 
-on: push
+on: 
+  push:
+    branches:
+      - '*'
+    tags:
+      - '*'
+    branches-ignore:
+      - gh-pages
 
 jobs:
   run-build-job:
@@ -93,3 +100,55 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           go test test/backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+  run-deploy-job:
+    runs-on: ubuntu-18.04
+    needs: run-build-job
+    steps:
+      - name: Install Helm
+        run: |
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
+          ls -l
+          mv linux-amd64/helm /usr/local/bin/helm
+          
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Now load the helm dependencies
+        run: |
+          make dependencies
+
+      - name: before deploy step 1
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 before_deploy.sh
+          ./before_deploy.sh
+
+      - name: before deploy step 2
+        run: |
+          make examples 
+
+
+      - name: deploy on github releases
+        if: |
+          github.ref == 'refs/heads/master' && startsWith(github.ref, 'refs/tags/v')
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          prerelease: false
+          files: |
+            pega-kubernetes-example.tar.gz
+            pega-openshift-example.tar.gz
+            pega-azure-aks-example.tar.gz
+            pega-aws-eks-example.tar.gz
+            pega-google-gke-example.tar.gz
+            pega-pivotal-pks-example.tar.gz
+          repo_token: ${{ secrets.NEW_SECRET }}
+
+      - name: deploy on github pages
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 update_gh_pages.sh
+          ./update_gh_pages.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
