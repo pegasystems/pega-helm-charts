@@ -73,5 +73,7 @@ data:
 {{- end }}
   # Hostname of hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+{{- else }}
+  HZ_CLIENT_MODE: "false"
 {{- end }}
 {{ end }}
