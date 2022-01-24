@@ -92,7 +92,9 @@ kibana:
     enabled: true
     # Enter the domain name to access kibana via a load balancer.
     hosts:
-      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
+      - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
+        paths:
+          - path: /
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
