@@ -1,4 +1,4 @@
-{{ if and (eq (include "performDeployment" .) "true") (eq (include "isHazelcastEnabled" .) "true") }}
+{{ if (eq (include "performDeployment" .) "true") }}
 kind: Service
 apiVersion: v1
 metadata:

@@ -26,7 +26,6 @@ func TestHazelcast(t *testing.T) {
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                        "hazelcast.enabled":  "true",
                     },
                 }
                 deploymentYaml := RenderTemplate(t, hazelcastOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})

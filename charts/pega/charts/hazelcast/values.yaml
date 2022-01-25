@@ -3,8 +3,6 @@ image: "YOUR_HAZELCAST_IMAGE:TAG"
 imagePullPolicy: "Always"
 # Enter the number of initial members in hazelcast cluster.
 replicas: 3
-# By default, infinity runs in C/S hazelcast mode. Setting below to false will deploy the infinity in embedded hazelcast mode.
-enabled: true
 # username to be used in client server hazelcast mode for authentication
 username: ""
 # password to be used in client server hazelcast mode for authentication

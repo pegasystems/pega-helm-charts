@@ -27,12 +27,10 @@ data:
   # Base64 encoded password for the cassandra key store
   CASSANDRA_KEYSTORE_PASSWORD: {{ .Values.dds.keyStorePassword | b64enc }}
   {{- end }}
-  {{ if $.Values.hazelcast.enabled }}
   # Base64 encoded username used for authentication in hazelcast client server mode
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
   # Base64 encoded password used for authentication in hazelcast client server mode
   HZ_CS_AUTH_PASSWORD: {{ .Values.hazelcast.password | b64enc }}
-  {{ end }}
   {{ range $index, $dep := .Values.global.tier}}
   {{ if and ($dep.pegaDiagnosticUser) (eq $dep.name "web") }}
   # Base64 encoded username for a Tomcat user that will be created with the PegaDiagnosticUser role

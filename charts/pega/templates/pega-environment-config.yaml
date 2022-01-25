@@ -64,7 +64,6 @@ data:
   PEGA_STREAM_URL: {{ .Values.stream.url }}
 {{- end }}
 {{- end }}
-{{ if .Values.hazelcast.enabled }}
   HZ_DISCOVERY_K8S: "true"
   HZ_CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}
@@ -73,7 +72,4 @@ data:
 {{- end }}
   # Hostname of hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
-{{- else }}
-  HZ_CLIENT_MODE: "false"
-{{- end }}
 {{ end }}

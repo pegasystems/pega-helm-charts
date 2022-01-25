@@ -28,7 +28,6 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
-					"hazelcast.enabled": "true",
 				},
 			}
 
