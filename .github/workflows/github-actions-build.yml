@@ -157,7 +157,7 @@ jobs:
             pega-aws-eks-example.tar.gz
             pega-google-gke-example.tar.gz
             pega-pivotal-pks-example.tar.gz
-          repo_token: ${{ secrets.NEW_SECRET }}
+          repo_token: ${{ secrets.GITHUB_ACTIONS_SECRET }}
 
       - name: deploy on github pages
         run: |
@@ -165,4 +165,4 @@ jobs:
           chmod 777 update_gh_pages.sh
           ./update_gh_pages.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_ACTIONS_SECRET }}
