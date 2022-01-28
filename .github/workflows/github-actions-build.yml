@@ -89,10 +89,6 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           dep ensure
-          # grep "FAIL" -A 8 - filter unnecessary logs from the final output but show failing tests
-          #  ; test ${PIPESTATUS[0]} -eq 0 - check if go test was finished success. Without it pipe return exit code from last command.
-          # go test test/pega | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
-          # go test test/addons | grep "FAIL" -A 8 ; test ${PIPESTATUS[0]} -eq 0
       
       - name: run go tests on pega
         run: |
@@ -156,7 +152,7 @@ jobs:
             pega-aws-eks-example.tar.gz
             pega-google-gke-example.tar.gz
             pega-pivotal-pks-example.tar.gz
-          repo_token: ${{ secrets.NEW_SECRET }}
+          repo_token: ${{ secrets.GH_ACTIONS_SECRET }}
 
       - name: deploy on github pages
         run: |
@@ -164,4 +160,4 @@ jobs:
           chmod 777 update_gh_pages.sh
           ./update_gh_pages.sh
         env:
-          GITHUB_TOKEN: ${{ secrets.NEW_SECRET }}
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
