@@ -3,7 +3,6 @@ set -e
 
 echo "${GITHUB_REF}"
 echo "${GITHUB_REPOSITORY}"
-echo "${GITHUB_TOKEN}"
 echo "${GITHUB_ACTOR}"
 
 repo_uri="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
