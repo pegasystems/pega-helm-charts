@@ -1,0 +1,163 @@
+name: GitHub Actions for pega helm chart
+
+env:
+  HELM_URL: https://get.helm.sh
+  HELM_TGZ: helm-v3.2.4-linux-amd64.tar.gz
+  YAMLLINT_VERSION: 1.15.0
+  GO_VERSION: 1.13.1
+
+
+on: 
+  push:
+    tags:
+      - '*'
+    branches-ignore:
+      - gh-pages
+  pull_request:
+    branches: [ master ]
+  workflow_dispatch:
+
+concurrency:
+  group:  ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  run-lint-job:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install yamllint
+        run: |
+          sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
+
+      - name: run yamllint
+        run: |
+          yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
+          yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+
+  run-remark-job:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install node
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+      
+      - name: Install npm dependencies
+        run: |    
+          npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
+
+      - name: run remark
+        run: |
+          remark -i .remark_ignore -f -u validate-links .
+
+  run-go-tests-job:
+    runs-on: ubuntu-18.04
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v2
+
+      - name: Install GO
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - run: export  PATH=$PATH:/usr/local/go/bin
+
+      - name: Install Helm
+        run: |
+          sudo rm /usr/local/bin/helm
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
+          mv linux-amd64/helm /usr/local/bin/helm
+
+      - run: helm version
+
+      - name: Now load the helm dependencies
+        run: |
+          make dependencies
+          
+      - name: Prepare for GO helm unit tests
+        run: |
+          mkdir $GITHUB_WORKSPACE/terratest/bin
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          dep ensure
+      
+      - name: run go tests on pega
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          go test test/pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: run go tests on addons
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          go test test/addons | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+      - name: run go tests on backing services
+        run: |
+          export GOPATH=$GITHUB_WORKSPACE/terratest
+          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
+          cd terratest/src/test
+          go test test/backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+  run-deploy-job:
+    runs-on: ubuntu-18.04
+    needs: [run-lint-job, run-remark-job, run-go-tests-job]
+    if: ( github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') ) &&  success()
+    steps:
+      - name: Install Helm
+        run: |
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
+          ls -l
+          mv linux-amd64/helm /usr/local/bin/helm
+          
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Now load the helm dependencies
+        run: |
+          make dependencies
+
+      - name: before deploy step 1
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 before_deploy.sh
+          ./before_deploy.sh
+
+      - name: before deploy step 2
+        run: |
+          make examples 
+
+
+      - name: deploy on github releases
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          prerelease: false
+          files: |
+            pega-kubernetes-example.tar.gz
+            pega-openshift-example.tar.gz
+            pega-azure-aks-example.tar.gz
+            pega-aws-eks-example.tar.gz
+            pega-google-gke-example.tar.gz
+            pega-pivotal-pks-example.tar.gz
+          repo_token: ${{ secrets.GH_ACTIONS_SECRET }}
+
+      - name: deploy on github pages
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 update_gh_pages.sh
+          ./update_gh_pages.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
