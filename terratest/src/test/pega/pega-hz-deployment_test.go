@@ -11,7 +11,6 @@ import (
 )
 
 
-
 func TestHazelcastDeployment(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy"}
