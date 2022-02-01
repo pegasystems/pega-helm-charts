@@ -20,7 +20,7 @@ The service deployment provisions runtime service pods along with a dependency o
 Pega Infinity version   | SRS version   | ElasticSearch version     | Description
 ---                     | ---           | ---                       | ---
 < 8.6                   | NA            | NA                        | SRS can be used with Pega Infinity 8.6 and later
-\>= 8.6                 | \>=1.12.0     | 7.9.3                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.12.0 or later (Pega recommends using 1.16.1 or later). All SRS Docker image versions are certified to support Elasticsearch version 7.9.3.
+\>= 8.6                 | \>=1.12.0     | 7.10.2                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.12.0 or later (Pega recommends using 1.17.10 or later). All SRS Docker image versions are certified to support Elasticsearch version 7.10.2.
 
 ### SRS runtime configuration
 
