@@ -16,6 +16,7 @@ spec:
       labels:
         app: {{ template "hazelcastName" . }}
         component: "Hazelcast"
+        ops.identifier: "hazelcast" 
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
