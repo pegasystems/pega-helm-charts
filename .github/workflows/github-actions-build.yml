@@ -142,7 +142,7 @@ jobs:
 
 
       - name: deploy on github releases
-        uses: marvinpinto/action-automatic-releases@latest
+        uses: softprops/action-gh-release@v1
         with:
           prerelease: false
           files: |
@@ -152,7 +152,7 @@ jobs:
             pega-aws-eks-example.tar.gz
             pega-google-gke-example.tar.gz
             pega-pivotal-pks-example.tar.gz
-          repo_token: ${{ secrets.GH_ACTIONS_SECRET }}
+          token: ${{ secrets.GH_ACTIONS_SECRET }}
 
       - name: deploy on github pages
         run: |
