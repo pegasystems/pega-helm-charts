@@ -16,7 +16,7 @@ traefik:
   service:
     serviceType: NodePorts
   ports:
-    web: 
+    web:
       port: 80
       nodePort: 30080
     websecure:
