@@ -1,10 +1,11 @@
 package addons
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func Test_shouldNotContainTraefikResourcesWhenDisabled(t *testing.T) {
@@ -116,8 +117,8 @@ func Test_noRoleWhenRbacDisabled(t *testing.T) {
 func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "true",
+			"traefik.enabled":                     "true",
+			"traefik.ports.websecure.tls.enabled": "true",
 		}),
 	)
 
@@ -127,13 +128,7 @@ func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.True(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
-	}))
-
-	require.Equal(t, "ssl", deployment.Spec.Template.Spec.Volumes[1].Name)
-	require.Equal(t, "pega-traefik-default-cert", deployment.Spec.Template.Spec.Volumes[1].Secret.SecretName)
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--entrypoints.websecure.http.tls=true")
 }
 
 func Test_hasNoSecretWhenSSLEnabled(t *testing.T) {
