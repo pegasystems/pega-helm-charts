@@ -134,15 +134,18 @@ func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 func Test_hasNoSecretWhenSSLEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "false",
+			"traefik.enabled":                     "true",
+			"traefik.ports.websecure.tls.enabled": "false",
 		}),
 	)
 
-	require.False(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
-	}))
+	var deployment v12.Deployment
+	helmChartParser.Find(SearchResourceOption{
+		Name: "pega-traefik",
+		Kind: "Deployment",
+	}, &deployment)
+
+	require.NotContains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--entrypoints.websecure.http.tls=true")
 }
 
 func Test_checkResourceRequests(t *testing.T) {
