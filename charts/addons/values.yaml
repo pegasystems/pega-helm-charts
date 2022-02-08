@@ -21,6 +21,16 @@ traefik:
     websecure:
       port: 443
       nodePort: 30443
+      tls:
+        enabled: false
+        # this is the name of a Traefik TLSOption definition
+        options: ""
+        certResolver: ""
+        domains: []
+        # - main: example.com
+        #   sans:
+        #     - foo.example.com
+        #     - bar.example.com
   resources:
     requests:
       # Enter the CPU Request for Traefik
