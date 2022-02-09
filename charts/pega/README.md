@@ -529,6 +529,27 @@ tier:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
 ```
 
+### Sidecar Containers
+
+Pega supports adding sidecar containers to manage requirements for your Pega application services that live outside of the primary tomcat container. This may include company policy requirements, utility images, networking containers, or other examples. For an overview of the versatility sidecar containers present, see [How Pods manage multiple containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers).
+
+You can specify custom `sidecarContainers` for your deployment tiers in the Pega Helm chart as shown in the example below. Each sidecar container definition must be a complete container definition, including a name, image, and resources.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      sidecarContainers:
+        - name: SIDECAR_NAME
+          image: SIDECAR_IMAGE_URL
+          ...
+        - name: SIDECAR_NAME_2
+          image: SIDECAR_IMAGE_URL_2
+          ...
+```
+
 ### Custom Annotations for Pods
 
 You may optionally provide custom annotations for Pods as metadata to be consumed by other tools and libraries. Pod annotations may be specified by using the `podAnnotations` element for a given `tier`.
