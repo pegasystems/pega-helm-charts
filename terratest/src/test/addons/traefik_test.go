@@ -223,7 +223,15 @@ func Test_checkDefaultResourceLimits(t *testing.T) {
 var traefikResources = []SearchResourceOption{
 	{
 		Name: "pega-traefik",
-		Kind: "ConfigMap",
+		Kind: "ServiceAccount",
+	},
+	{
+		Name: "pega-traefik",
+		Kind: "ClusterRole",
+	},
+	{
+		Name: "pega-traefik",
+		Kind: "ClusterRoleBinding",
 	},
 	{
 		Name: "pega-traefik",
@@ -231,14 +239,10 @@ var traefikResources = []SearchResourceOption{
 	},
 	{
 		Name: "pega-traefik",
-		Kind: "Service",
+		Kind: "List",
 	},
 	{
-		Name: "pega-traefik-test",
-		Kind: "Pod",
-	},
-	{
-		Name: "pega-traefik-test",
-		Kind: "ConfigMap",
+		Name: "pega-traefik-dashboard",
+		Kind: "IngressRoute",
 	},
 }
