@@ -152,6 +152,7 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 `platform/pega`                                 | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
 `platform/search`                               | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD`. |
 `platform-services/search-n-reporting-service`  | An image that deploys the required search engine for the latest generation of search and reporting capabilities in Pega Infinity as a backing service. This Docker image contains Pega Search and Reporting Services. For more information about this service, see [Instructions to configure the Pega backingservices](charts/backingservices/README.md). | `<version>` |
+`platform/clustering-service`                   | An image that deploys the required clustering service(hazelcast) for the caching capabilities in Pega Infinity as a backing service. This Docker image contains hazelcast clustering Service. **Note:** This feature is supported only from platform version "8.6" to deploy the infinity in client server hazelcast mode.| `<version>` |
 
 For the `platform/installer` image, the :tag represents the version of Pega you want to install, for example the tag :8.5.1 will install Pega Platform version 8.5.1.
 
