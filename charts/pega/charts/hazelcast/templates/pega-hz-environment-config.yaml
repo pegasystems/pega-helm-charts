@@ -9,10 +9,7 @@ data:
   NAMESPACE: {{ .Release.Namespace }}
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
   SERVICE_NAME: {{ template "hazelcastName" }}-service
-  CLUSTER_SIZE: {{ .Values.replicas | quote }}
-{{- if .Values.server.min_cluster_size }}
-  MIN_CLUSTER_SIZE: {{ .Values.server.min_cluster_size | quote }}
-{{- end }}
+  MIN_CLUSTER_SIZE: {{ .Values.replicas | quote }}
 {{- if .Values.server.jmx_enabled }}
   JMX_ENABLED: {{ .Values.server.jmx_enabled | quote }}
 {{- end }}
@@ -55,10 +52,10 @@ data:
 {{- if .Values.server.diagnostics_metric_level }}
   DIAGNOSTICS_METRIC_LEVEL: {{ .Values.server.diagnostics_metric_level | quote }}
 {{- end }}
-{{- if .Values.server.diagnostic_log_file_size_mb }}
-  DIAGNOSTIC_LOG_FILE_SIZE_MB: {{ .Values.server.diagnostic_log_file_size_mb | quote }}
-{{- end }}
 {{- if .Values.server.diagnostics_file_count }}
   DIAGNOSTICS_FILE_COUNT: {{ .Values.server.diagnostics_file_count | quote }}
+{{- end }}
+{{- if .Values.server.diagnostic_log_file_size_mb }}
+  DIAGNOSTIC_LOG_FILE_SIZE_MB: {{ .Values.server.diagnostic_log_file_size_mb | quote }}
 {{- end }}
 {{ end }}
