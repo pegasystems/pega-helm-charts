@@ -13,7 +13,7 @@ traefik:
   rbac:
     enabled: true
   service:
-    serviceType: LoadBalancer
+    type: LoadBalancer
   ports:
     web: 
       port: 80

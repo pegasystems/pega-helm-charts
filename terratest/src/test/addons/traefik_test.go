@@ -3,6 +3,7 @@ package addons
 import (
 	"testing"
 
+	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
 	v1 "k8s.io/api/core/v1"
@@ -57,23 +58,26 @@ func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 }
 
 func Test_shouldBeAbleToSetUpServiceTypeAsNodePort(t *testing.T) {
+
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.serviceType": "NodePort",
+			"traefik.enabled":      "true",
+			"traefik.service.type": "NodePort",
 		}),
 	)
 
-	var service *v1.Service
-	helmChartParser.Find(SearchResourceOption{
-		Name: "pega-traefik",
-		Kind: "Service",
-	}, &service)
+	var d DeploymentMetadata
+	var list string
+	for _, slice := range helmChartParser.SlicedResource {
+		helm.UnmarshalK8SYaml(helmChartParser.T, slice, &d)
+		if d.Kind == "List" {
+			list = slice
+			break
+		}
+	}
 
-	serviceType := service.Spec.Type
-	require.Equal(t, "NodePort", string(serviceType))
-	require.Equal(t, 30080, int(service.Spec.Ports[0].NodePort))
-	require.Equal(t, 30443, int(service.Spec.Ports[1].NodePort))
+	require.True(t, len(list) != 0)
+	require.Contains(t, list, "NodePort")
 }
 
 func Test_hasRoleWhenRbacEnabled(t *testing.T) {
