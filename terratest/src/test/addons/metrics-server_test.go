@@ -47,7 +47,7 @@ func Test_shouldContainCommandArgs(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--logtostderr")
 }
 
 var metricServerResources = []SearchResourceOption{
