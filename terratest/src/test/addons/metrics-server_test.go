@@ -2,7 +2,7 @@ package addons
 
 import (
 	"github.com/stretchr/testify/require"
-	v1 "k8s.io/api/apps/v1"
+	"k8s.io/api/apps/v1"
 	"testing"
 )
 
@@ -78,10 +78,6 @@ var metricServerResources = []SearchResourceOption{
 	{
 		Name: "pega-metrics-server",
 		Kind: "Service",
-	},
-	{
-		Name: "pega-metrics-server-test",
-		Kind: "Pod",
 	},
 	{
 		Name: "pega-metrics-server",
