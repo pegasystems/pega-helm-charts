@@ -80,8 +80,8 @@ spec:
 {{- end }}
         resources:
           requests:
-            cpu: "0.25"
-            memory: "2Gi"
+            cpu: "{{ .Values.cpuRequest }}"
+            memory: "{{ .Values.memRequest }}"
           limits:
             cpu: "{{ .Values.cpuLimit }}"
             memory: "{{ .Values.memLimit }}"
