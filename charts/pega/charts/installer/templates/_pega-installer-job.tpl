@@ -70,7 +70,7 @@ spec:
           requests:
             cpu: "{{ .root.Values.resources.requests.cpu }}"
             memory: "{{ .root.Values.resources.requests.memory }}"
-            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeral-storage }}"
+            ephemeral-storage: "{{ .root.Values.resources.requests.storage }}"
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
