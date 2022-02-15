@@ -570,8 +570,8 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
 
 After you push these three downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
 
-11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
- 
+11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the `<srs-version>` tag (refer [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix)) when you enter:
+
 ```bash
 $ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>
 Digest: <encryption verification>
