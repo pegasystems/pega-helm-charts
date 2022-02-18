@@ -71,12 +71,16 @@
                relaxedPathChars="[ ]"
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
-               connectionTimeout="20000" />
+               connectionTimeout="20000">
+          <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol"/>
+     </Connector>
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
-	       maxThreads="1"/>
+	       maxThreads="1">
+          <UpgradeProtocol className="org.apache.coyote.http2.Http2Protocol"/>
+    </Connector>
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
