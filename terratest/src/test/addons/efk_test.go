@@ -1,9 +1,9 @@
 package addons
 
 import (
+	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	"k8s.io/api/apps/v1beta2"
-	"k8s.io/api/extensions/v1beta1"
 	"testing"
 )
 
@@ -72,25 +72,28 @@ func Test_shouldBeIngressDisabledForKibana(t *testing.T) {
 func Test_shouldBeHostForIngressKibana(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"kibana.enabled":         "true",
-			"kibana.ingress.enabled": "true",
-			"kibana.ingress.hosts":   "{YOUR_WEB.KIBANA.EXAMPLE.COM}",
+			"kibana.enabled":               "true",
+			"kibana.ingress.enabled":       "true",
+			"kibana.ingress.hosts[0].host": "{YOUR_WEB.KIBANA.EXAMPLE.COM}",
 		}),
 	)
 
-	var ingress *v1beta1.Ingress
-	helmChartParser.Find(SearchResourceOption{
-		Name: "pega-kibana",
-		Kind: "Ingress",
-	}, &ingress)
+	var d DeploymentMetadata
+	var ingress string
+	for _, slice := range helmChartParser.SlicedResource {
+		helm.UnmarshalK8SYaml(t, slice, &d)
+		if d.Kind == "Ingress" {
+			ingress = slice
+			break
+		}
+	}
 
-	require.Contains(t, ingress.Spec.Rules[0].Host, "YOUR_WEB.KIBANA.EXAMPLE.COM")
-
+	require.Contains(t, ingress, "host: [YOUR_WEB.KIBANA.EXAMPLE.COM]")
 }
 func Test_shouldBeHostForElasticsearch(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"fluentd-elasticsearch.enabled": "true",
+			"fluentd-elasticsearch.enabled":            "true",
 			"fluentd-elasticsearch.elasticsearch.host": "elasticsearch-master:9200",
 		}),
 	)
@@ -116,7 +119,7 @@ var deployEfkResources = []SearchResourceOption{
 	{
 		Name: "pega-kibana",
 		Kind: "Ingress",
-	},	
+	},
 	{
 		Name: "elasticsearch-master",
 		Kind: "StatefulSet",

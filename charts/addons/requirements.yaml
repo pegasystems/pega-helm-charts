@@ -3,15 +3,15 @@
 # * Disable the dependency by setting its condition value (for example, 'traefik.enabled') to false in values.yaml.
 dependencies:
 - name: traefik
-  version: "1.77.1"
-  repository: https://charts.helm.sh/stable
+  version: "10.9.0"
+  repository: https://helm.traefik.io/traefik
   condition: traefik.enabled
 - name: aws-load-balancer-controller
-  version: "1.1.0"
+  version: "1.3.3"
   repository: https://aws.github.io/eks-charts
   condition: aws-load-balancer-controller.enabled
 - name: elasticsearch
-  version: "7.8.1"
+  version: "7.16.3"
   repository: https://helm.elastic.co/
   condition: elasticsearch.enabled
 - name: fluentd-elasticsearch
@@ -19,14 +19,14 @@ dependencies:
   repository: https://kiwigrid.github.io/
   condition: fluentd-elasticsearch.enabled
 - name: kibana
-  version: "7.8.1"
+  version: "7.16.3"
   repository: https://helm.elastic.co/
   condition: kibana.enabled
 - name: metrics-server
-  version: "2.8.4"
-  repository: https://charts.helm.sh/stable
+  version: "3.7.0"
+  repository: https://kubernetes-sigs.github.io/metrics-server/
   condition: metrics-server.enabled
 - name: ingress-azure
-  version: "1.2.0"
+  version: "1.5.0"
   repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
   condition: ingress-azure.enabled

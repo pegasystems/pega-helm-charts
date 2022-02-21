@@ -11,7 +11,6 @@ import (
 )
 
 
-
 func TestHazelcastDeployment(t *testing.T){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy"}
@@ -52,8 +51,8 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Port)
 			require.Equal(t, "/hazelcast/health/ready", statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Path)
 			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Port)
-			require.Equal(t, "2", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
-			require.Equal(t, "2Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
+			require.Equal(t, "1", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
+			require.Equal(t, "1Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
 			require.Equal(t, statefulsetSpec.Volumes[0].Name, "logs")
             require.Equal(t, statefulsetSpec.Volumes[1].Name, "pega-volume-credentials")
             require.Equal(t, statefulsetSpec.Volumes[1].Secret.SecretName, "pega-credentials-secret")
