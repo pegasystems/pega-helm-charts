@@ -1,6 +1,6 @@
 # BackingServices Helm chart
 
-The Pega Infinity backing service is a feature which you can deploy as an independent service module. For example `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with a Pega Infinity environment.  
+The Pega Infinity backing service is a feature which you can deploy as an independent service module. For example `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with a Pega Infinity environment.
 
 The backingservices chart supports deployment options for Search and Reporting Service (SRS). You configure this SRS into the `pega` namespace for your Pega Infinity deployment.
 
@@ -17,14 +17,14 @@ The service deployment provisions runtime service pods along with a dependency o
 
 ### SRS Version compatibility matrix
 
-Pega Infinity version   | SRS version   | ElasticSearch version     | Description
----                     | ---           | ---                       | ---
-< 8.6                   | NA            | NA                        | SRS can be used with Pega Infinity 8.6 and later
-\>= 8.6                 | \>=1.12.0     | 7.10.2                    | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.12.0 or later (Pega recommends using 1.17.10 or later). All SRS Docker image versions are certified to support Elasticsearch version 7.10.2.
+| Pega Infinity version | SRS version | ElasticSearch version | Description                                                                                                                                                                                                                                                                                                       |
+|-----------------------|-------------|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| < 8.6                 | NA          | NA                    | SRS can be used with Pega Infinity 8.6 and later                                                                                                                                                                                                                                                                  |
+| \>= 8.6               | \>=1.12.0   | 7.10.2 or 7.16.3      | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image that is tagged with version 1.12.0 or later (Pega recommends using 1.17.10 or later). All SRS Docker image versions are certified to support Elasticsearch version 7.10.2 and 7.16.3 as well |
 
 ### SRS runtime configuration
 
-The values.yaml provides configuration options to define the deployment resources along with option to either provision ElasticSearch cluster automatically for data storage, or you can choose to configure an existing managed elasticsearch cluster to use as a datastore with the SRS runtime. 
+The values.yaml provides configuration options to define the deployment resources along with option to either provision ElasticSearch cluster automatically for data storage, or you can choose to configure an existing externally managed elasticsearch cluster to use as a datastore with the SRS runtime.
 
 If an externally managed elasticsearch cluster is being used, make sure the service is accessible to the k8s cluster where SRS is deployed.
 
