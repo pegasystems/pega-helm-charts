@@ -18,7 +18,15 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 
 # Getting started
 
-This project assumes you have an installation of Kubernetes available and have Helm installed locally. The following commands will verify your installation. The exact output may be slightly different, but they should return without error.
+This project assumes you have an installation of Kubernetes available and have Helm installed locally.
+
+For details, see the examples listed in the preparation runbook:
+
+* [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
+* [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
+
+
+The following commands will verify your installation. The exact output may be slightly different, but they should return without error.
 
 ```bash
 $ helm version
@@ -139,10 +147,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details, see the examples listed in the preparation runbook:
-
-* [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
-* [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
+For details about downloading and then pushing Docker images to your repository for your deployment, see (Using Pega-provided Docker images)[https://docs.pega.com/client-managed-cloud/87/using-pega-provided-docker-images}
 
 Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains four types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
