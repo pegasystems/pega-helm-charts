@@ -37,3 +37,7 @@ set_data_owner_on_startup: false
 # Additional custom fields, such as environment variables
 custom:
   env: []
+
+busybox:
+  image: busybox:1.31.0
+  imagePullPolicy: IfNotPresent
