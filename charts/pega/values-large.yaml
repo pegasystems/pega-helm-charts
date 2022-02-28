@@ -57,6 +57,9 @@ global:
       # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
 
   # Upgrade specific properties
   upgrade:

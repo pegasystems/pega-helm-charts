@@ -53,6 +53,9 @@ global:
       # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
 
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
