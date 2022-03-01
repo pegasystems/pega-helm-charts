@@ -45,6 +45,9 @@ srs:
 
 #     To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
 #    requireInternetAccess: true
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
