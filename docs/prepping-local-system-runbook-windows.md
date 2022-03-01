@@ -237,6 +237,7 @@ You will manage these certificates in the environment to which you deploy Pega P
 ## Downloading a Pega Platform installer docker image
 
 Clients with appropriate licenses can log in to the image repository and download docker images that are required to install the Pega Platform onto your database.
+For details about managing Docker images for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/using-pega-provided-docker-images)
 
 ### Requesting access to the Pega Docker repository
 

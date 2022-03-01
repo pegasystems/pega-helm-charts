@@ -147,7 +147,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details about downloading and then pushing Docker images to your repository for your deployment, see (Using Pega-provided Docker images)[https://docs.pega.com/client-managed-cloud/87/using-pega-provided-docker-images].
+For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/using-pega-provided-docker-images).
 
 Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega images are available from the host site, pega-docker.downloads.pega.com. Pega maintains four types of required Docker images for Client-managed Cloud deployments of Pega Platform:
 
