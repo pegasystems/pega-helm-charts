@@ -51,23 +51,23 @@
 
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
-  image: {{ .Values.dcasavant/k8s-wait-for.image }}
-  imagePullPolicy: {{ .Values.dcasavant/k8s-wait-for.imagePullPolicy }}
+  image: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
 - name: wait-for-pegaupgrade
-  image: {{ .Values.dcasavant/k8s-wait-for.image }}
-  imagePullPolicy: {{ .Values.dcasavant/k8s-wait-for.imagePullPolicy }}
+  image: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
 - name: wait-for-pre-dbupgrade
-  image: {{ .Values.dcasavant/k8s-wait-for.image }}
-  imagePullPolicy: {{ .Values.dcasavant/k8s-wait-for.imagePullPolicy }}
+  image: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
 {{- end }}
 
@@ -94,8 +94,8 @@
 {{- $rolloutCommand = regexReplaceAllLiteral $deploymentNameRegex $rolloutCommand $deploymentName }}
 {{- end -}}
 - name: wait-for-rolling-updates
-  image: {{ .Values.dcasavant/k8s-wait-for.image }}
-  imagePullPolicy: {{ .Values.dcasavant/k8s-wait-for.imagePullPolicy }}
+  image: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.dcasavant/k8s-wait-for.imagePullPolicy }}
   command: ['sh', '-c',  '{{ $rolloutCommand }}' ]
 {{- include "initContainerEnvs" $ }}
 {{- end }}

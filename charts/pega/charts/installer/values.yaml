@@ -83,10 +83,6 @@ resources:
 
 shareProcessNamespace: false
 
-dcasavant/k8s-wait-for:
-  image: dcasavant/k8s-wait-for
-  imagePullPolicy: "IfNotPresent"
-
 # Provide custom side car container configuration for installer
 # sidecarContainers:
 #  - name: <SIDECAR_CONTAINER_NAME>

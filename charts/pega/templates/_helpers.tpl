@@ -126,8 +126,8 @@
 
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch
-  image: {{ .Values.global.docker.busybox.image }}
-  imagePullPolicy: {{ .Values.global.docker.busybox.imagePullPolicy }}
+  image: {{ .Values.global.utilityImages.busybox.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
 {{- end }}
