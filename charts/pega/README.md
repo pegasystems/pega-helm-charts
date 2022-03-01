@@ -137,6 +137,24 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Customize Utility Image Locations
+The Pega chart, installer chart, and pegasearch charts use the busybox and dcasavant/k8s-wait-for images for various utility tasks.  
+You can configure where and how these images are pulled by modifying `utilityImages.busybox` and `utilityImages.dcasavant/k8s-wait-for`.
+
+Example:
+
+ ```yaml
+utilityImages:
+  busybox:
+    image: busybox:1.31.0
+    imagePullPolicy: IfNotPresent
+  dcasavant/k8s-wait-for:
+    image: dcasavant/k8s-wait-for
+    imagePullPolicy: "IfNotPresent"
+```
+
+If you configured a private docker registry earlier, you may also pull these images from there.
+
 ## Deployment Name (Optional)
 
 Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
