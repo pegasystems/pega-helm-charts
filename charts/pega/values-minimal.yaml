@@ -58,7 +58,7 @@ global:
     busybox:
       image: busybox:1.31.0
       imagePullPolicy: IfNotPresent
-    dcasavant/k8s-wait-for:
+    k8s_wait_for:
       image: dcasavant/k8s-wait-for
       imagePullPolicy: "IfNotPresent"
 
