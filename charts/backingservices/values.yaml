@@ -30,21 +30,21 @@ srs:
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
     # The elasticsearch connection supports two authentication methods: basic authentication or AWS IAM role-based authentication.
-#    domain: managed-elasticsearch.acme.io
-#    port: 443
-#    protocol: https
-#     To configure basic authentication to your externally-managed Elasticsearch cluster, uncomment and add the
-#     parameter details: srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
-#    basicAuthentication:
-#      username: "BASIC_AUTH_USERNAME"
-#      password: "BASIC_AUTH_PASSWORD"
-#     To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
-#     and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
-#    awsIAM:
-#      region: "AWS_ELASTICSEARCH_REGION"
+    # domain: managed-elasticsearch.acme.io
+    # port: 443
+    # protocol: https
+    #     To configure basic authentication to your externally-managed Elasticsearch cluster, uncomment and add the
+    #     parameter details: srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
+    # basicAuthentication:
+    #   username: "BASIC_AUTH_USERNAME"
+    #   password: "BASIC_AUTH_PASSWORD"
+    #     To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
+    #     and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
+    # awsIAM:
+    #   region: "AWS_ELASTICSEARCH_REGION"
 
-#     To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
-#    requireInternetAccess: true
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
+    # requireInternetAccess: true
     busybox:
       image: busybox:1.31.0
       imagePullPolicy: IfNotPresent
