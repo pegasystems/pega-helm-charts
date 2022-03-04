@@ -1,0 +1,20 @@
+---
+# Parameters for constellation operation:
+# Docker repos and tag for image
+image: IMAGE_REPO_URL_HERE
+# log level : error, warn, info, debug.  use error for production
+logLevel: info
+enabled: false
+replicas: 2
+livenessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3
