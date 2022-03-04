@@ -10,7 +10,6 @@ The test can also be run from the command line which allows you to avoid complyi
 
 ## Setup
 Add {path to repo}/terratest to the GOPATH environment variable on your local system.
-It will need to be at the front of the path.  E.g. `GOPATH={path to repo}/terratest:$GOPATH`
 
 Then:
 - cd to {path to repo}/terratest/src/test
