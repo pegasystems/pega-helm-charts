@@ -1,4 +1,4 @@
-module tests
+module github.com/pegasystems/pega-helm-charts/terratest/src/test
 
 go 1.16
 
