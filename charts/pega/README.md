@@ -139,7 +139,7 @@ docker:
 
 ## Customize Utility Image Locations
 The Pega chart, installer chart, and pegasearch charts use the busybox and dcasavant/k8s-wait-for images for various utility tasks.  
-You can configure where and how these images are pulled by modifying `utilityImages.busybox` and `utilityImages.dcasavant/k8s-wait-for`.
+You can configure where and how these images are pulled by modifying `utilityImages.busybox` and `utilityImages.k8s_wait_for`.
 
 Example:
 
@@ -148,7 +148,7 @@ utilityImages:
   busybox:
     image: busybox:1.31.0
     imagePullPolicy: IfNotPresent
-  dcasavant/k8s-wait-for:
+  k8s_wait_for:
     image: dcasavant/k8s-wait-for
     imagePullPolicy: "IfNotPresent"
 ```
