@@ -45,7 +45,7 @@ srs:
     # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
     # requireInternetAccess: true
 
-# Configure the location of the busybox image that is used during the deployment process of 
+# Configure the location of the busybox image that is used during the deployment process of
 # the internal Elasticsearch cluster
 busybox:
   image: busybox:1.31.0
