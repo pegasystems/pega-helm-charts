@@ -38,13 +38,13 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 
 Configuration                       | Usage
 ---                                 | ---
-`enabled`                           | Enable the Search and Reporting Service deployment as a backing service.
-`deploymentName`                    | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.
-`srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
+`srs.enabled`                           | Enable the Search and Reporting Service deployment as a backing service.
+`srs.deploymentName`                    | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.
+`srs.srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
 `elasticsearch`                     | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for elasticsearch provisioning in the cluster.
-`srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS (Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`).</li><li>Disable this parameter to use your own Elasticsearch service with the SRS.</li></ul>
-`busybox.image` | When provisioning an internally managed Elasticsearch cluster, you can customize the location of the busybox image that is used during the deployment process.
-`busybox.imagePullPolicy ` | Configure the imagePullPolicy of the busybox image.
+`srs.srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS (Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`).</li><li>Disable this parameter to use your own Elasticsearch service with the SRS.</li></ul>
+`srs.busybox.image` | When provisioning an internally managed Elasticsearch cluster, you can customize the location of the busybox image that is used during the deployment process.
+`srs.busybox.imagePullPolicy ` | Configure the imagePullPolicy of the busybox image.
 
 
 Example:
