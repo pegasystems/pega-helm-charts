@@ -8,15 +8,15 @@ import (
 
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
+	autoscaling "k8s.io/api/autoscaling/v2beta2"
+	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
-	autoscaling "k8s.io/kubernetes/pkg/apis/autoscaling"
-	api "k8s.io/kubernetes/pkg/apis/core"
 )
 
 func TestPegaTierHPA(t *testing.T) {
-	var supportedVendors = []string{"k8s", "openshift", "eks","gke","aks","pks"}
-	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -25,48 +25,47 @@ func TestPegaTierHPA(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-            for _, depName := range deploymentNames {
+			for _, depName := range deploymentNames {
 
-                fmt.Println(vendor + "-" + operation)
+				fmt.Println(vendor + "-" + operation)
 
-                var options = &helm.Options{
-                    SetValues: map[string]string{
-                        "global.deployment.name": depName,
-                        "global.provider":        vendor,
-                        "global.actions.execute": operation,
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                    },
-                }
+					},
+				}
 
-                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
-                verifyPegaHPAs(t, yamlContent, options, []hpa{
-                    {
-                        name:          getObjName(options, "-web-hpa"),
-                        targetRefName: getObjName(options, "-web"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.55"),
-                    },
-                    {
-                        name:          getObjName(options, "-batch-hpa"),
-                        targetRefName: getObjName(options, "-batch"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.55"),
-                    },
-                })
-            }
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"})
+				verifyPegaHPAs(t, yamlContent, options, []hpa{
+					{
+						name:          getObjName(options, "-web-hpa"),
+						targetRefName: getObjName(options, "-web"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						cpu:           true,
+						cpuValue:      parseResourceValue(t, "2.55"),
+					},
+					{
+						name:          getObjName(options, "-batch-hpa"),
+						targetRefName: getObjName(options, "-batch"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						cpu:           true,
+						cpuValue:      parseResourceValue(t, "2.55"),
+					},
+				})
+			}
 		}
 	}
 }
 
-
 func TestPegaTierHPADisableTarget(t *testing.T) {
-    var supportedVendors = []string{"k8s", "openshift", "eks","gke","aks","pks"}
-	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -78,48 +77,46 @@ func TestPegaTierHPADisableTarget(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-            for _, depName := range deploymentNames {
-                fmt.Println(vendor + "-" + operation)
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation)
 
-                var options = &helm.Options{
-                    SetValues: map[string]string{
-                        "global.deployment.name": depName,
-                        "global.provider":        vendor,
-                        "global.actions.execute": operation,
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                    },
-                }
+					},
+				}
 
-
-			    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_disabletarget.yaml")
-                verifyPegaHPAs(t, yamlContent, options, []hpa{
-                    {
-                        name:          getObjName(options, "-web-hpa"),
-                        targetRefName: getObjName(options, "-web"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        mem:           true,
-                        memPercent:    85,
-                    },
-                    {
-                        name:          getObjName(options, "-batch-hpa"),
-                        targetRefName: getObjName(options, "-batch"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.55"),
-                    },
-                })
-            }
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_disabletarget.yaml")
+				verifyPegaHPAs(t, yamlContent, options, []hpa{
+					{
+						name:          getObjName(options, "-web-hpa"),
+						targetRefName: getObjName(options, "-web"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						mem:           true,
+						memPercent:    85,
+					},
+					{
+						name:          getObjName(options, "-batch-hpa"),
+						targetRefName: getObjName(options, "-batch"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						cpu:           true,
+						cpuValue:      parseResourceValue(t, "2.55"),
+					},
+				})
+			}
 		}
 	}
 }
-
 
 func TestPegaTierOverrideValues(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -131,38 +128,38 @@ func TestPegaTierOverrideValues(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-            for _, depName := range deploymentNames {
-                fmt.Println(vendor + "-" + operation + "-" + depName)
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation + "-" + depName)
 
-                var options = &helm.Options{
-                    SetValues: map[string]string{
-                        "global.provider":        vendor,
-                        "global.actions.execute": operation,
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                    },
-                }
+					},
+				}
 
-                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_overridevalues.yaml")
-                verifyPegaHPAs(t, yamlContent, options, []hpa{
-                    {
-                        name:          getObjName(options, "-web-hpa"),
-                        targetRefName: getObjName(options, "-web"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuValue:      parseResourceValue(t, "4.13"),
-                        mem:           true,
-                        memPercent:    42,
-                    },
-                    {
-                        name:          getObjName(options, "-batch-hpa"),
-                        targetRefName: getObjName(options, "-batch"),
-                        kind:          "Deployment",
-                        apiversion:    "apps/v1",
-                        cpu:           true,
-                        cpuPercent:    24,
-                    },
-                })
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_overridevalues.yaml")
+				verifyPegaHPAs(t, yamlContent, options, []hpa{
+					{
+						name:          getObjName(options, "-web-hpa"),
+						targetRefName: getObjName(options, "-web"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						cpu:           true,
+						cpuValue:      parseResourceValue(t, "4.13"),
+						mem:           true,
+						memPercent:    42,
+					},
+					{
+						name:          getObjName(options, "-batch-hpa"),
+						targetRefName: getObjName(options, "-batch"),
+						kind:          "Deployment",
+						apiversion:    "apps/v1",
+						cpu:           true,
+						cpuPercent:    24,
+					},
+				})
 			}
 		}
 	}
@@ -192,7 +189,7 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 	require.Equal(t, expectedHpa.expectedMetricCount(), len(hpaObj.Spec.Metrics))
 
 	if expectedHpa.cpu {
-		require.Equal(t, api.ResourceName("cpu"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
+		require.Equal(t, v1.ResourceName("cpu"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
 		if expectedHpa.cpuValue != (resource.Quantity{}) {
 			require.Equal(t, autoscaling.MetricTargetType("Value"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.Type)
 			require.Equal(t, expectedHpa.cpuValue, *hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.AverageValue)
@@ -204,7 +201,7 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 		currentMetricIndex++
 	}
 	if expectedHpa.mem {
-		require.Equal(t, api.ResourceName("memory"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
+		require.Equal(t, v1.ResourceName("memory"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
 		require.Equal(t, autoscaling.MetricTargetType("Utilization"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.Type)
 		require.Equal(t, expectedHpa.memPercent, *hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.AverageUtilization)
 		currentMetricIndex++

@@ -9,26 +9,25 @@ import (
 	"testing"
 )
 
-
 func TestPegaGKEBackendConfig(t *testing.T) {
-	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	for _,operation := range supportedOperations{
+	for _, operation := range supportedOperations {
 
-        for _, depName := range deploymentNames {
+		for _, depName := range deploymentNames {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-				    "global.deployment.name": depName,
-					"global.provider":        "gke",
-					"global.actions.execute": operation,
+					"global.deployment.name":        depName,
+					"global.provider":               "gke",
+					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
-			 	},
-		    }
+				},
+			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
 			verifyBackendConfigs(t, yamlContent, options)
