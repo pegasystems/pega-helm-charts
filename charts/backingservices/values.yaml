@@ -12,7 +12,7 @@ srs:
 
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
-  
+
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
@@ -40,7 +40,7 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    
+
     # The elasticsearch connection supports two authentication methods: basic authentication or AWS IAM role-based authentication.
     # domain: managed-elasticsearch.acme.io
     # port: 443
