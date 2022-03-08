@@ -41,6 +41,7 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
+        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-config.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
