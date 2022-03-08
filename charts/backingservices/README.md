@@ -34,6 +34,10 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 * Update the elasticsearch `version` value, or
 * Disable deploying elasticsearch by setting `srs.srsStorage.provisionInternalESCluster` to false.
 
+## Deploying SRS with Pega-provided busybox images
+The busybox image is required to deploy SRS. For clients who want to pull this image from a registry other than Docker Hub, they must tag and push their image to the registry, and then pull it by specifying `busybox.image` and `busybox.imagePullPolicy`.
+
+
 ### Configuration settings
 
 Configuration                       | Usage
@@ -52,6 +56,11 @@ Example:
 srs:
   enabled: true
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
+
+  busybox:
+    image: busybox:1.31.0
+    imagePullPolicy: IfNotPresent
+
   srsRuntime:
     #srs-service values
     replicaCount: 2
