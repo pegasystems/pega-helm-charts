@@ -228,7 +228,7 @@ spec:
           timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $startupProbe.failureThreshold | default 20 }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
 {{- else }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}

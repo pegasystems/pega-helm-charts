@@ -2,7 +2,7 @@ package addons
 
 import (
 	"github.com/stretchr/testify/require"
-	v1 "k8s.io/api/apps/v1"
+	"k8s.io/api/apps/v1"
 	"testing"
 )
 
@@ -47,7 +47,7 @@ func Test_shouldContainCommandArgs(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Command, "--logtostderr")
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--logtostderr")
 }
 
 var metricServerResources = []SearchResourceOption{
@@ -78,10 +78,6 @@ var metricServerResources = []SearchResourceOption{
 	{
 		Name: "pega-metrics-server",
 		Kind: "Service",
-	},
-	{
-		Name: "pega-metrics-server-test",
-		Kind: "Pod",
 	},
 	{
 		Name: "pega-metrics-server",
