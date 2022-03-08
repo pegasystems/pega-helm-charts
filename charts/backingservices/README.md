@@ -43,7 +43,7 @@ Configuration                       | Usage
 `srsRuntime`                        | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.
 `elasticsearch`                     | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for elasticsearch provisioning in the cluster.
 `srsStorage.provisionInternalESCluster` | <ul><li>Enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS (Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`).</li><li>Disable this parameter to use your own Elasticsearch service with the SRS.</li></ul>
-`busybox` | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the BusyBox image used during the deployment process by specifying `srs.busybox.image` and `srs.busybox.imagePullPolicy`.
+`busybox` | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the BusyBox image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.
 
 
 Example:
