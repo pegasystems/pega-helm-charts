@@ -58,14 +58,14 @@ srs:
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
 
   busybox:
-    image: busybox:1.31.0
-    imagePullPolicy: IfNotPresent
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
     #srs-service values
     replicaCount: 2
     srsImage: "YOUR_SRS_IMAGE:TAG"
-    imagepullPolicy: IfNotPresent
+    imagePullPolicy: "IfNotPresent"
     resources:
       limits:
         cpu: 1300m

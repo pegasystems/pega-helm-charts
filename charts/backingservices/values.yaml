@@ -16,8 +16,8 @@ srs:
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
-    image: busybox:1.31.0
-    imagePullPolicy: IfNotPresent
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
     # Number of pods to provision
