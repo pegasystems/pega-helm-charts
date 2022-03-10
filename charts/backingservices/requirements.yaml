@@ -1,5 +1,5 @@
 # Pega does NOT actively update this elasticsearch dependency. To leverage SRS, you should:
-# * Update the elasticsearch 'version' value, or
+# * Update the elasticsearch 'version' value (the version value should be same as imageTag in values.yaml), or
 # * Disable deploying elasticsearch by setting 'srs.srsStorage.provisionInternalESCluster' to false.
 dependencies:
 - name: elasticsearch
