@@ -51,6 +51,7 @@ srs:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
+  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 if required
   imageTag: 7.10.2
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
