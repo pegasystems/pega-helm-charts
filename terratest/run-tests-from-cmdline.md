@@ -1,7 +1,5 @@
 # Running tests from the command line
 
-The tests can be run from the command line which allows you to avoid complying with the IntelliJ plugin license requirements.
-
 ## Prerequisites
 - You have a local clone of this repo
 - You have installed an appropriate go version (v1.13 or later)
