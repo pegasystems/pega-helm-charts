@@ -276,7 +276,6 @@ true
         name: {{ template "pegaCredentialsSecret" }}
     - secret:
         name: example
-    {{ end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
