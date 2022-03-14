@@ -9,7 +9,7 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/resource"
-	autoscaling "k8s.io/api/autoscaling/v2beta2
+	autoscaling "k8s.io/api/autoscaling/v2beta2"
 	v1 "k8s.io/api/core/v1"
 )
 
