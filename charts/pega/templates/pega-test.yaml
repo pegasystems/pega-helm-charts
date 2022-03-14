@@ -1,0 +1,14 @@
+apiVersion: external-secrets.io/v1alpha1
+kind: ExternalSecret
+metadata:
+  name: example
+spec:
+  data:
+  - secretKey: firstname
+    remoteRef:
+      key: my-first-secret
+      property: Saurabh
+  - secretKey: lastname
+    remoteRef:
+      key: my-second-secret
+      property: Kumar
