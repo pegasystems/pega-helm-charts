@@ -824,3 +824,45 @@ certificates:
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
 
 ```
+## Clustering Service Deployment (Draft)
+
+The values.yaml section for `hazelcast` is used for configuring a Client Server form of deployment, Pega nodes act as Client for the hazelcast server nodes in this form of deployment. It is supported for Pega Platform 8.6 or later. 
+
+Specifying your clustering service image for `hazelcast.image` and setting  `hazelcast.enabled` as `true` deploys Pega Platform and Hazelcast cluster in a client server arrangement. In latter arrangement, nodes running hazelcast startup independently of Pega Nodes and create a cluster
+having member count as specified in `hazelcast.replicas` parameter. Pega nodes connects to this cluster as client.
+
+Provide information on how discovery takes place, Ref: https://github.com/hazelcast/hazelcast-kubernetes
+
+**Note:** If you are deploying Pega Platform below release 8.6, you need to set `hazelcast.enabled` as `false`, otherwise the installation will fail. 
+
+Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. Although from Pega 8.6 onwards it is highly recommended to use Client Server form of deployment.
+### Clustering Service Compatibility Matrix
+
+Pega Infinity version   | Clustering Service version   |    Description
+---                     | ---             | ---
+< 8.6                   | NA             | Clustering Service is not supported for releases 8.5 or below 
+\>= 8.6                 | \=                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later. 
+
+
+#### Configuration Settings
+The values.yaml provides configuration options to define the deployment of Hazelcast. Apart from the below parameters when `hazelcast.enabled` is set to `true`, additional parameters are required for Client server deployment which have been documented
+here: [Additional Parameters](charts/hazelcast/README.md)
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_HAZELCAST_IMAGE:TAG`
+`hazelcast.enabled` |  Set as true if Client Server deployment of Pega Platform is required, otherwise false. Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail | `true`
+`hazelcast.replicas` | Number of initial members to join the hazelcast cluster | `3`
+`hazelcast.username` | UserName to be used in client server hazelcast mode for authentication | `""`
+`hazelcast.password` | Password to be used in client server hazelcast mode for authentication | `""`
+
+#### Example
+```yaml
+hazelcast:
+  image: "YOUR_HAZELCAST_IMAGE:TAG"
+  enabled: true
+  replicas: 3
+  username: ""
+  password: ""
+```
+
