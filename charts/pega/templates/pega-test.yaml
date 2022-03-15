@@ -3,12 +3,17 @@ kind: ExternalSecret
 metadata:
   name: example
 spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    name: secretstore-sample
+    kind: SecretStore
+  target:
+    name: secret-to-be-created
+    creationPolicy: Owner
   data:
   - secretKey: firstname
     remoteRef:
       key: my-first-secret
-      property: Saurabh
   - secretKey: lastname
     remoteRef:
       key: my-second-secret
-      property: Kumar
