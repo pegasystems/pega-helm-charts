@@ -48,15 +48,23 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
-  # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
+    # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-      # Docker image information for the Pega docker image, containing the application server.
+    # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
+
+  utilityImages:
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
+    k8s_wait_for:
+      image: dcasavant/k8s-wait-for
+      imagePullPolicy: "IfNotPresent"
 
   # Upgrade specific properties
   upgrade:
