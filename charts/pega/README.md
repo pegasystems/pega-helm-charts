@@ -838,10 +838,10 @@ Provide information on how discovery takes place, Ref: https://github.com/hazelc
 Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. Although from Pega 8.6 onwards it is highly recommended to use Client Server form of deployment.
 ### Clustering Service Compatibility Matrix
 
-Pega Infinity version   | Clustering Service version   |    Description
----                     | ---             | ---
-< 8.6                   | NA             | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6                 | \=                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later. 
+Pega Infinity version   | Clustering Service version    |    Description
+---                     | ---                           | ---
+< 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
+\>= 8.6                 | \>= 1.0.3                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later. 
 
 
 #### Configuration Settings
