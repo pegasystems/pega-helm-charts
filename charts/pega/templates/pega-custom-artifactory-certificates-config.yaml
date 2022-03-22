@@ -1,0 +1,5 @@
+{{ if (eq (include "useCustomArtifactory" .) "true") }}
+{{- if .Values.global.customArtifactory.certificate }}
+{{- include "pegaCustomArtifactoryCertificatesConfigTemplate" . }}
+{{- end }}
+{{- end }}

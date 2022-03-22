@@ -20,6 +20,22 @@
     defaultMode: 420
 {{- end}}
 
+{{- define "pegaCustomArtifactoryCertificateConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-custom-artifactory-certificate-config
+{{- end }}
+
+{{- define "pegaVolumeCustomArtifactoryCertificate" }}pega-volume-custom-artifactory-certificate{{- end }}
+
+{{- define "pegaCustomArtifactoryCertificateTemplate" }}
+- name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaCustomArtifactoryCertificateConfig" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
@@ -60,6 +76,30 @@
 
 {{- define "performInstallAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "useBasicAuthForCustomArtifactory" }}
+  {{- if and (.Values.global.customArtifactory.auth.basic.username) (.Values.global.customArtifactory.auth.basic.password) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "useApiKeyForCustomArtifactory" }}
+  {{- if and (.Values.global.customArtifactory.auth.apiKey.headerName) (.Values.global.customArtifactory.auth.apiKey.value) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "useCustomArtifactory" }}
+  {{- if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") -}}
     true
   {{- else -}}
     false
