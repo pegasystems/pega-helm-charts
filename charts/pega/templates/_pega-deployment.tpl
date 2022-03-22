@@ -41,9 +41,11 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
+        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-config.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
+{{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
@@ -58,6 +60,9 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{ if .root.Values.global.certificates }}
+{{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
+{{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -159,7 +164,7 @@ spec:
           {{- if .node.cpuRequest }}
             cpu: "{{ .node.cpuRequest }}"
           {{- else }}
-            cpu: 2
+            cpu: 3
           {{- end }}
           {{- if .node.memRequest }}
             memory: "{{ .node.memRequest }}"
@@ -182,6 +187,11 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
+        #mount custom certificates
+{{ if .root.Values.global.certificates }}
+        - name: {{ template "pegaVolumeImportCertificates" }}
+          mountPath: "/opt/pega/certs"
+{{ end }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
@@ -218,7 +228,7 @@ spec:
           timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $startupProbe.failureThreshold | default 20 }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
 {{- else }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
@@ -244,6 +254,12 @@ spec:
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
+{{- end }}
+{{- if .custom }}
+{{- if .custom.sidecarContainers }}
+      # Additional custom sidecar containers
+{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{- end }}
 {{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always

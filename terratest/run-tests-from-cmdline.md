@@ -6,6 +6,7 @@ The test can also be run from the command line which allows you to avoid complyi
 - You have a local clone of this repo
 - You have installed an appropriate go version (v1.13 or later)
 - You have installed dep
+- You have disabled go modules by setting the environment variable `GO111MODULE="off"` (v1.16 or later)
 
 ## Setup
 Add {path to repo}/terratest to the GOPATH environment variable on your local system.

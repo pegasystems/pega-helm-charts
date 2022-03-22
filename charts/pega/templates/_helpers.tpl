@@ -4,6 +4,22 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
+{{- define "pegaImportCertificatesConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-import-certificates-config
+{{- end }}
+
+{{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
+
+{{- define "pegaImportCertificatesTemplate" }}
+- name: {{ template "pegaVolumeImportCertificates" }}
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaImportCertificatesConfig" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
@@ -110,7 +126,8 @@
 
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch
-  image: busybox:1.31.0
+  image: {{ .Values.global.utilityImages.busybox.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
 {{- end }}
@@ -260,6 +277,14 @@ true
     defaultMode: 420
 {{- end}}
 
+{{- define "generatedDNSConfigAnnotations" }}
+{{ if (.Values.global.privateHostedZoneDomainName) }}
+dnsConfig:
+  searches:
+  - {{ .Values.global.privateHostedZoneDomainName }}
+{{- end }}
+{{- end }}
+
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 
@@ -268,3 +293,47 @@ true
 {{- $d2 := merge $ $d1 }}
 {{- template "searchURL" $d2 }}
 {{- end -}}
+
+{{- define "ingressApiVersion" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: extensions/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "ingressService" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port: 
+    number: {{ .node.service.port }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.service.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceC11n" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: constellation
+  port: 
+    number: 3000
+{{- else }}
+serviceName: constellation
+servicePort: 3000
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceSSLRedirect" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: ssl-redirect
+  port: 
+    name: use-annotation
+{{- else }}
+serviceName: ssl-redirect
+servicePort: use-annotation
+{{- end }}
+{{- end }}

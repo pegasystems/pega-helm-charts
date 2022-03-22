@@ -34,6 +34,7 @@ func TestPegaTierHPA(t *testing.T) {
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
@@ -45,7 +46,7 @@ func TestPegaTierHPA(t *testing.T) {
                         kind:          "Deployment",
                         apiversion:    "apps/v1",
                         cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.8"),
+                        cpuValue:      parseResourceValue(t, "2.55"),
                     },
                     {
                         name:          getObjName(options, "-batch-hpa"),
@@ -53,7 +54,7 @@ func TestPegaTierHPA(t *testing.T) {
                         kind:          "Deployment",
                         apiversion:    "apps/v1",
                         cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.8"),
+                        cpuValue:      parseResourceValue(t, "2.55"),
                     },
                 })
             }
@@ -85,6 +86,7 @@ func TestPegaTierHPADisableTarget(t *testing.T) {
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
@@ -105,7 +107,7 @@ func TestPegaTierHPADisableTarget(t *testing.T) {
                         kind:          "Deployment",
                         apiversion:    "apps/v1",
                         cpu:           true,
-                        cpuValue:      parseResourceValue(t, "2.8"),
+                        cpuValue:      parseResourceValue(t, "2.55"),
                     },
                 })
             }
@@ -136,6 +138,7 @@ func TestPegaTierOverrideValues(t *testing.T) {
                     SetValues: map[string]string{
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 

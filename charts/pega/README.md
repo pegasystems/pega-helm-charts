@@ -1,6 +1,6 @@
 # Pega Helm chart
 
-The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm install --; you can run the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
+The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
 ## Supported providers
 
@@ -120,6 +120,10 @@ Specify the location for the Pega Docker image.  This image is available on Dock
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
+When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `pegasystems/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
+
+For this reason, it is also recommended that you specify the `docker.pega.imagePullPolicy: "IfNotPresent"` option in production, since it will ensure that a new generic tagged image will not overwrite the locally cached version.
+
 Example:
 
  ```yaml
@@ -129,8 +133,23 @@ docker:
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
   pega:
-    image: "pegasystems/pega"
+    image: "pegasystems/pega:8.4.4"
     imagePullPolicy: "Always"
+```
+
+## Deploying with Pega-provided busybox and k8s-wait-for utility images
+To deploy Pega Platform, the Pega helm chart requires the use of the busybox and k8s-wait-for images. For clients who want to pull these images from a registry other than Docker Hub, they must tag and push these images to another registry, and then pull these images by specifying `busybox` and `k8s-wait-for` values as described below.
+
+Example:
+
+ ```yaml
+utilityImages:
+  busybox:
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
+  k8s_wait_for:
+    image: "dcasavant/k8s-wait-for"
+    imagePullPolicy: "IfNotPresent"
 ```
 
 ## Deployment Name (Optional)
@@ -388,7 +407,7 @@ You can optionally configure the resource allocation and limits for a tier using
 Parameter       | Description                                            | Default value
 ---             | ---                                                    | ---
 `replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.      | `2`
+`cpuRequest`    | Initial CPU request for pods in the current tier.      | `3`
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
@@ -470,11 +489,24 @@ Parameter           | Description    | Default value
 ---                 | ---       | ---
 `hpa.minReplicas`   | Minimum number of replicas that HPA can scale-down | `1` 
 `hpa.maxReplicas`   | Maximum number of replicas that HPA can scale-up  | `5`
-`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.8` which represents 2.8 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.8`
+`hpa.targetAverageCPUValue` | Threshold value for scaling based on absolute CPU usage (The default value is `2.55` which represents 2.55 [Kubernetes CPU units](https://kubernetes.io/docs/tasks/configure-pod-container/assign-cpu-resource/#cpu-units)) | `2.55`
 `hpa.targetAverageCPUUtilization` | Threshold value for scaling based on initial CPU request utilization (Can be set instead of `hpa.targetAverageCPUValue` to set the threshold as a percentage of the requested CPU) | 
 `hpa.targetAverageMemoryUtilization` | Threshold value for scaling based on initial memory utilization (The default value is `85` which corresponds to 85% of 12Gi ) | `85`
 `hpa.enableCpuTarget` | Set to true if you want to enable scaling based on CPU utilization or false if you want to disable it | true
 `hpa.enableMemoryTarget` | Set to true if you want to enable scaling based on memory utilization or false if you want to disable it (Pega recommends leaving this disabled) | false
+
+### Ensure System Availability during Voluntary Disruptions by Using a Kubernetes Pod Disruption Budget (PDB)
+To limit the number of Pods running your Pega Platform application that can go down for planned disruptions, 
+Pega allows you to enable a Kubernetes `PodDisruptionBudget` on a tier.  For more details on PDBs, see the Kubernetes [Pod Disruption Budgets documentation](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets).
+
+You can configure a Kubernetes `PodDisruptionBudget` on your tier by setting `pdb.enabled` to `true` in your values.yaml file.  By default, this value is
+set to `false.`  You must also specify exactly one of the following parameters to configure the Pod Disruption Budget.  These parameters
+are mutually exclusive, and thus only one may be set.  You may provide values that are expressed as percentages (% of pods) or integers (# of pods).  
+
+Parameter             | Description    | Default value
+---                   | ---       | ---
+`pdb.minAvailable`    | The minimum number or percentage of pods in the tier that must be available.  If this minimum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy. | `1`
+`pdb.maxUnavailable`  | The maximum number or percentage of pods in the tier that can be unavailable.  If this maximum is reached, the Kubernetes deployment will not bring down additional pods for voluntary disruptions until more are available and healthy.      | `50%` (disabled by default)
 
 ### Volume claim template
 
@@ -510,6 +542,27 @@ tier:
   - name: my-tier
     custom:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
+### Sidecar Containers
+
+Pega supports adding sidecar containers to manage requirements for your Pega application services that live outside of the primary tomcat container. This may include company policy requirements, utility images, networking containers, or other examples. For an overview of the versatility sidecar containers present, see [How Pods manage multiple containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers).
+
+You can specify custom `sidecarContainers` for your deployment tiers in the Pega Helm chart as shown in the example below. Each sidecar container definition must be a complete container definition, including a name, image, and resources.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      sidecarContainers:
+        - name: SIDECAR_NAME
+          image: SIDECAR_IMAGE_URL
+          ...
+        - name: SIDECAR_NAME_2
+          image: SIDECAR_IMAGE_URL_2
+          ...
 ```
 
 ### Custom Annotations for Pods
@@ -589,6 +642,8 @@ dds:
 
 You may deploy a Cassandra instance along with Pega.  Cassandra is a separate technology and needs to be independently managed.  When deploying Cassandra, set `cassandra.enabled` to `true` and leave the `dds` section as-is.  For more information about configuring Cassandra, see the [Cassandra Helm charts](https://github.com/helm/charts/blob/master/incubator/cassandra/values.yaml).
 
+Pega does **not** actively update the Cassandra dependency in `requirements.yaml`. When deploying Cassandra with Pega, you should update its `version` value in `requirements.yaml`.
+
 #### Cassandra minimum resource requirements
 
 Deployment  | CPU     | Memory
@@ -621,8 +676,7 @@ dds:
 
 ## Search deployment
 
-Use the `pegasearch` section to configure a deployment of ElasticSearch for searching Rules and Work within Pega.  This deployment is used exclusively for Pega search, and is not the same ElasticSearch deployment used by the EFK stack or any other dedicated service such as Pega BI.
-
+Use the `pegasearch` section to configure the source ElasticSearch service that the Pega Platform deployment uses for searching Rules and Work within Pega. The ElasticSearch service defined here is not related to the ElasticSearch deployment if you also define an EFK stack for logging and monitoring in your Pega Platform deployment.
 ### For Pega Platform 8.6 and later:
 
 Pega recommends using the chart ['backingservices'](../backingservices) to enable Pega Infinity backing service and to deploy the latest generation of search and reporting capabilities to your Pega applications that run independently on nodes provisioned exclusively to run these services.
@@ -692,26 +746,73 @@ installer:
 
 ### Upgrades and patches
 
-To **upgrade Pega Platform software** deployed in a Kubernetes environment, you must download the latest Pega software from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and then use the appropriate upgrade guide:
+The Pega Helm charts support zero-downtime patch and upgrades processes which synchronize the required process steps to minimize downtime. With these zero-downtime processes, you and your customers can continue to access and use their applications in your environment with minimal disruption while you patch or upgrade your system.
 
-- Use the appropriate Pega Platform deployment Upgrade Guide available from the page, [Stay current with Pega](https://community.pega.com/upgrade).
-- Use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+To **upgrade Pega Platform software** deployed in a Kubernetes environment in zero-downtime, you must download the latest Pega-provided images for the version to which you are upgrading from  [Pega Digital Software Delivery](https://community.pega.com/digital-delivery) and use the Helm chart with versions 1.6.0 or later to complete the upgrade. To learn about how the upgrade process works and its requirements and the steps you must complete, see the Pega-provided runbook, [Upgrading Pega Platform in your deployment with zero-downtime](/docs/upgrading-pega-deployment-zero-downtime.md). With earlier versions of the Pega Helm charts, you must use the Pega Platform upgrade guides. To obtain the latest upgrade guide, see [Stay current with Pega](https://community.pega.com/upgrade).
 
-To **apply a Pega Platform patch** with zero downtime to your existing Pega platform software, you must use `installer.upgrade.upgradeType "out-of-place"` option. A zero downtime patch allows you to continue working in your application while you patch your system. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
+To complete your Pega Infinity upgrade, after you upgrade your Pega Platform software using the Pega Helm charts and Docker images, you must use the latest Pega application software Upgrade Guide, which is separate from Pega Platform software. You can locate the appropriate upgrade guide for your installed application from the page, [All Products](https://community.pega.com/knowledgebase/products).
+
+To **apply a Pega Platform patch** with zero-downtime to your existing Pega platform software, you use the same "zero-downtime" parameters that you use for upgrades and use the Pega-provided `platform/installer` Docker image that you downloaded for your patch version. For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md). The patch process applies only changes observed between the patch and your currently running version and then separately upgrades the data. For details about Pega patches, see [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy).
+
+Use the `installer` section  of the values file with the appropriate parameters to install, upgrade, or apply a patch to your Pega Platform software:
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
+`adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
+`upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
+`upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
+`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
 
 Upgrade type    | Description
 ---             | ---
-`in-place`      | An in-place upgrade will upgrade both rules and data using a single process. This process involves system downtime, which means you cannot use the system until you complete the upgrade.
-`out-of-place`  | Use the out-of-place upgrade option to apply a patch with zero-downtime.  This process uses a split-schema to apply patches. It creates a temporary schema, specified with the `installer.targetRulesSchema: "rules_upgrade"` parameter, in your current database then migrates the rules to it. To apply a patch, specify `installer.upgradeType: out-of-place"` and `installer.targetRulesSchema: "rules_upgrade"`.
+`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime. This patch or upgrade type migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and patches (only changed rules) or upgrades (all) the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
+`custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`. To specify which steps to include in your custom upgrade, specify them in your pega.yaml file using the `upgrade.upgradeSteps` parameter.
+`out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
+`out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
+`in-place`      | Use this option to upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in application downtime.
+`out-of-place` | `Deprecated and supported only with Helm charts prior to version 1.4`: For patches using Helm charts from 1.4 or earlier, you can use this process to apply a patch with zero-downtime; for upgrades from 1.4 or earlier this upgrade type minimizes downtime, but still requires some downtime. For patches or upgrades the process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", and then applies the patch only to changed rules or upgrades all of the rules. With the new rules in place, the process performs a rolling reboot, patches or upgrades the data, and then redeploys your application using the new rules.
 
-Example:
+Install example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+```
+
+Zero-downtime upgrade example:
 
 ```yaml
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   upgrade:
-    upgradeType: "out-of-place"
-    targetRulesSchema: "rules_upgrade"
+    upgradeType: "zero-downtime"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
+```
+
+Custom rules upgrade without a data upgrade example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  upgrade:
+    upgradeType: "custom"
+    upgradeSteps: "enable_cluster_upgrade, rules_migration, rules_upgrade, disable_cluster_upgrade"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
+```
+
+Zero-downtime patch example:
+
+```yaml
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  upgrade:
+    upgradeType: "zero-downtime"
+    targetRulesSchema: "new_rules_schema_name"
+    targetDataSchema: "temporary_data_schema_name"
 ```
 
 ### Installer Pod Annotations
@@ -725,4 +826,16 @@ installer:
   podAnnotations:
     annotation-name1: annotation-value1
     annotation-name2: annotation-value2
+```
+### Mount the custom certificates into the Tomcat container
+
+Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
+
+Example:
+
+```yaml
+certificates:
+    badssl.cer: |
+      "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
+
 ```

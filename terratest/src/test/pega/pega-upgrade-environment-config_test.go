@@ -20,8 +20,9 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":               vendor,
+					"global.actions.execute":        operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
 
@@ -33,9 +34,11 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 
 func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *helm.Options) {
 	var upgradeEnvConfigMap k8score.ConfigMap
+
 	UnmarshalK8SYaml(t, configYaml, &upgradeEnvConfigMap)
 	upgradeEnvConfigData := upgradeEnvConfigMap.Data
 
+	require.Equal(t, upgradeEnvConfigData["ADMIN_PASSWORD"], "ADMIN_PASSWORD")
 	require.Equal(t, upgradeEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, upgradeEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, upgradeEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
@@ -43,7 +46,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
-	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "in-place")
+	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "zero-downtime")
 	require.Equal(t, upgradeEnvConfigData["MULTITENANT_SYSTEM"], "false")
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")

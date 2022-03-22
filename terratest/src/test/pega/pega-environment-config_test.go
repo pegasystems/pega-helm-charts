@@ -33,6 +33,7 @@ func TestPegaEnvironmentConfig(t *testing.T){
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
