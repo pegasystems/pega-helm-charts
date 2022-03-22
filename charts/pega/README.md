@@ -137,6 +137,21 @@ docker:
     imagePullPolicy: "Always"
 ```
 
+## Deploying with Pega-provided busybox and k8s-wait-for utility images
+To deploy Pega Platform, the Pega helm chart requires the use of the busybox and k8s-wait-for images. For clients who want to pull these images from a registry other than Docker Hub, they must tag and push these images to another registry, and then pull these images by specifying `busybox` and `k8s-wait-for` values as described below.
+
+Example:
+
+ ```yaml
+utilityImages:
+  busybox:
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
+  k8s_wait_for:
+    image: "dcasavant/k8s-wait-for"
+    imagePullPolicy: "IfNotPresent"
+```
+
 ## Deployment Name (Optional)
 
 Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
