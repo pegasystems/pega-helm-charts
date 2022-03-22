@@ -52,7 +52,7 @@ global:
   customArtifactory:
     # If using a custom artifactory to download JDBC uri, supply the authentication details here.
     auth:
-      #Provide either basic authentication or api key authentication details based on preferred way of authentication mechanism to custom artifactory.
+      # Provide either basic authentication or api key authentication details based on preferred way of authentication mechanism to custom artifactory.
       basic:
         username: "YOUR_ARTIFACTORY_USERNAME"
         password: "YOUR_ARTIFACTORY_PASSWORD"
