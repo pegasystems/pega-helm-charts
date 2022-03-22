@@ -824,17 +824,24 @@ certificates:
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
 
 ```
-## Clustering Service Deployment (Draft)
+## Deploying Hazelcast in Client Server Mode (Draft)
 
-The values.yaml section for `hazelcast` is used for configuring a Client Server form of deployment, Pega nodes act as Client for the hazelcast server nodes in this form of deployment. It is supported for Pega Platform 8.6 or later. 
+The values.yaml section for `hazelcast` is used for configuration of a Client Server form of deployment. Pega Platform supports the client-server model for the Hazelcast service, which provides cluster communication and distributes Pega Platform features across Kubernetes PODs. This deployment model introduces 
+independent scalability for both servers and clients in Pega Platform.  
 
-Specifying your clustering service image for `hazelcast.image` and setting  `hazelcast.enabled` as `true` deploys Pega Platform and Hazelcast cluster in a client server arrangement. In latter arrangement, nodes running hazelcast startup independently of Pega Nodes and create a cluster
-having member count as specified in `hazelcast.replicas` parameter. Pega nodes connects to this cluster as client.
+Deploying the Pega provided `platform/clustering-service` docker image which contains the Hazelcast clustering service image inside it, 
+starts a cluster of hazelcast server nodes. For the discovery of hazelcast members in the cluster, a plugin provided by Hazelcast, namely Hazelcast-Kubernetes Plugin is used. 
+Out of the two discovery strategies that the latter plugin provides - Kubernetes API and DNS Lookup, we make use of DNS lookup for resolving the IPs of PODs running hazelcast.
+For additional information on hazelcast member discovery, refer the plugin: [Hazelcast-Kubernetes Plugin](https://github.com/hazelcast/hazelcast-kubernetes)
 
-Provide information on how discovery takes place, Ref: https://github.com/hazelcast/hazelcast-kubernetes
+Using Clustering service for Client Server form of deployment is only supported from Pega Platform 8.6 or later. 
+
+Specifying the `platform/clustering-service` docker image that you downloaded in `hazelcast.image` and setting  `hazelcast.enabled` as `true` deploys Pega Platform and Hazelcast cluster in a client server arrangement. In latter arrangement, nodes running hazelcast startup independently but at the same time as Pega Nodes and create a cluster
+having member count as specified in `hazelcast.replicas` parameter. Pega nodes then connects to this cluster as client.
+
+
 
 **Note:** If you are deploying Pega Platform below release 8.6, you need to set `hazelcast.enabled` as `false`, otherwise the installation will fail. 
-
 Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. Although from Pega 8.6 onwards it is highly recommended to use Client Server form of deployment.
 ### Clustering Service Compatibility Matrix
 

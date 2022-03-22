@@ -160,6 +160,11 @@ For `platform/pega` and `platform/search` images, Pega also offers an image with
 
 The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](charts/backingservices/charts/srs), or SRS subchart under [backing services](charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
 
+The Docker image `platform/clustering-service` is used with the Hazelcast subchart under [Pega charts](charts/pega/charts). Using the Clustering Service docker image, Pega platform and Hazelcast can be deployed in a Client Server arrangement. **Pega supports Client Server deployment with Hazelcast from Pega "8.6".**
+In Client Server arrangement, Pega nodes connect as client to a cluster of nodes running hazelcast as server. 
+This deployment model introduces independent scalability for both servers and clients in Pega Platform. 
+Client Server deployment has improved stability for deployments that use a large number of nodes.
+
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
 After you obtain access to the Pega-provided host repository and pull each image, you can re-tag and push each of the Pega-provided images to your preferred Docker registry to make them available to the deployment. For an overview of tagging and managing Docker images, see the Docker article, [Deploy a registry server](https://docs.docker.com/registry/deploying/).
