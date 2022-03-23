@@ -11,8 +11,11 @@ metadata:
 data:
   # Base64 encoded username for connecting to the Pega DB
   DB_USERNAME: {{ .Values.global.jdbc.username | b64enc }}
+
   # Base64 encoded password for connecting to the Pega DB
+  {{ if .Values.global.jdbc.password -}}
   DB_PASSWORD: {{ .Values.global.jdbc.password | b64enc }}
+  {{- end }}
 
  {{ if (eq (include "performDeployment" .) "true") }}
   # Base64 encoded username for connecting to cassandra
