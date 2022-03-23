@@ -166,6 +166,7 @@ The Docker image `platform/clustering-service` is used with the Hazelcast subcha
 In Client Server arrangement, Pega nodes connect as client to a cluster of nodes running hazelcast as server. 
 This deployment model introduces independent scalability for both servers and clients in Pega Platform. 
 Client Server deployment has improved stability for deployments that use a large number of nodes.
+For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
