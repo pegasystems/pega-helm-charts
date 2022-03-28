@@ -35,6 +35,10 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 * To use the internally-provided Elasticsearch service in the SRS cluster, use the default `srs.enabled.true` parameter and set the Elasticsearch version by updating the `elasticsearch.imageTag` parameter in the [values.yaml](./values.yaml) to match the `dependencies.version` parameter in the [requirements.yaml](./requirements.yaml).
 * To use an externally-provided Elasticsearch service from the SRS cluster, update the `srs.srsStorage.provisionInternalESCluster` parameter in the [values.yaml](./values.yaml) to `false` and then provide connection details as documented below.
 
+### Deploying SRS with Pega-provided busybox images
+To deploy Pega Platform with the SRS backing service, the SRS helm chart requires the use of the busybox image.  For clients who want to pull this image from a registry other than Docker Hub, they must tag and push their image to another registry, and then pull it by specifying `busybox.image` and `busybox.imagePullPolicy`.
+
+
 ### Configuration settings
 
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                  |
@@ -44,6 +48,7 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 | `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.                                                                                                                                                                                                                                                                                             |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.10.2`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster. |
 | `srsStorage.provisionInternalESCluster` | <ul><li>Set to `true` to enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.</li><li>Set to `false` to disable this parameter to use your own Elasticsearch service from the SRS cluster.</li></ul>                                                               |
+| `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the BusyBox image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                     |
 
 Example:
 
@@ -51,11 +56,16 @@ Example:
 srs:
   enabled: true
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
+
+  busybox:
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
+
   srsRuntime:
     #srs-service values
     replicaCount: 2
     srsImage: "YOUR_SRS_IMAGE:TAG"
-    imagepullPolicy: IfNotPresent
+    imagePullPolicy: "IfNotPresent"
     resources:
       limits:
         cpu: 1300m
