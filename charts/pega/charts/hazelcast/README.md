@@ -2,8 +2,8 @@
 
 Clustering Service is Pega's own docker image containing the Hazelcast Clustering Service image inside it. 
 The hazelcast sub chart defines the additional deployment parameters used by Clustering Service docker image for Client server type deployment of Pega Platform with Hazelcast.
-In the latter arrangement, Pega Platform uses Hazelcast in Client configuration to connect to a cluster of PODs running Hazelcast in server configuration. Pega highly recommends client server
-form of deployment from Pega 8.6 onwards.
+In the latter arrangement, Pega Platform uses Hazelcast in Client configuration to connect to a cluster of PODs running Hazelcast in server configuration. 
+**For Kubernetes based deployments Client server is the default and the recommended form of deployment.**
 
 
 #### Managing Resources

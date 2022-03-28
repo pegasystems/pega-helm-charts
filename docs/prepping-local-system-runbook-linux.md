@@ -429,7 +429,7 @@ For the `platform/installer` image, the :tag represents the version of Pega you 
 
 For `platform/pega` and `platform/search` images, Pega also offers an image with a version tag appended with a datestamp using the pattern `pegaVersion-YYYYMMDD` to indicate the version and the date that Pega built the image. For example, if you pull the `platform/pega` with a tag, `pega:8.5.1-20201026`, the tag indicates that Pega built this 8.5.1 image on 26 October 2020. Using the version tag without the datestamp will always point to the most recently built image for that version.
 
-The Docker image `platform/clustering-service` is used with the Hazelcast subchart under [Pega charts](charts/pega/charts). Using the Clustering Service docker image, Pega platform and Hazelcast can be deployed in a Client Server arrangement. **Pega supports Client Server deployment with Hazelcast from Pega "8.6".**
+The Docker image `platform/clustering-service` is used with the hazelcast subchart under [Pega charts](../charts/pega/charts). Using the Clustering Service docker image, Pega platform and Hazelcast can be deployed in a Client Server arrangement. **Pega supports Client Server deployment with Hazelcast from Pega "8.6".**
 In Client Server arrangement, Pega nodes connect as client to a cluster of nodes running hazelcast as server. 
 This deployment model introduces independent scalability for both servers and clients in Pega Platform. 
 Client Server deployment has improved stability for deployments that use a large number of nodes.

@@ -841,8 +841,8 @@ certificates:
 ```
 ## Deploying Hazelcast in Client Server Mode (Draft)
 
-The values.yaml section for `hazelcast` is used for configuration of a Client Server form of deployment. Pega Platform supports the client-server model for the Hazelcast service, which provides cluster communication and distributes Pega Platform features across Kubernetes PODs. This deployment model introduces 
-independent scalability for both servers and clients in Pega Platform.  
+The values.yaml section for `hazelcast` is used for configuration of a Client Server form of deployment for Hazelcast. Pega Platform supports the client-server model for the Hazelcast service, which provides cluster communication and distributes Pega Platform features across Kubernetes PODs. This deployment model introduces 
+independent scalability for both servers and clients in Pega Platform. **For Kubernetes based deployments Client server is the default and the recommended form of deployment.**
 
 Deploying the Pega provided `platform/clustering-service` docker image which contains the Hazelcast clustering service image inside it, 
 starts a cluster of hazelcast server nodes. For the discovery of hazelcast members in the cluster, a plugin provided by Hazelcast, namely Hazelcast-Kubernetes Plugin is used. 
@@ -855,9 +855,10 @@ Specifying the `platform/clustering-service` docker image that you downloaded in
 having member count as specified in `hazelcast.replicas` parameter. Pega nodes then connects to this cluster as client.
 
 
-
 **Note:** If you are deploying Pega Platform below release 8.6, you need to set `hazelcast.enabled` as `false`, otherwise the installation will fail. 
-Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. Although from Pega 8.6 onwards it is highly recommended to use Client Server form of deployment.
+Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. 
+The default and recommended deployment strategy for Hazelcast is Client Server, embedded is only being supported for backwards compatibility.
+
 ### Clustering Service Compatibility Matrix
 
 Pega Infinity version   | Clustering Service version    |    Description
