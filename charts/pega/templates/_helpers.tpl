@@ -273,7 +273,7 @@ true
     defaultMode: 420
     sources:
     - secret:
-        name: {{ template "pegaCredentialsSecret" }}
+        name: {{ template "pegaCredentialsSecret" $ }}
   {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
     - secret:
         name: {{ .Values.global.jdbc.external_secret_name }}
