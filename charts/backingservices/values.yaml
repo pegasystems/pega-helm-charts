@@ -5,22 +5,33 @@ global:
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
+# srs-service configuration
 srs:
   # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true
-  deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
+
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
-  # srs-service configuration
+  deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
+
+  # Configure the location of the busybox image that is used during the deployment process of
+  # the internal Elasticsearch cluster
+  busybox:
+    image: "busybox:1.31.0"
+    imagePullPolicy: "IfNotPresent"
+
   srsRuntime:
     # Number of pods to provision
     replicaCount: 2
+
     # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
     srsImage: "YOUR_SRS_IMAGE:TAG"
+
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
       # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
       PublicKeyURL: ""
+
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
@@ -29,36 +40,41 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    # The elasticsearch connection supports two authentication methods: basic authentication or AWS IAM role-based authentication.
-#    domain: managed-elasticsearch.acme.io
-#    port: 443
-#    protocol: https
-#     To configure basic authentication to your externally-managed Elasticsearch cluster, uncomment and add the
-#     parameter details: srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
-#    basicAuthentication:
-#      username: "BASIC_AUTH_USERNAME"
-#      password: "BASIC_AUTH_PASSWORD"
-#     To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
-#     and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
-#    awsIAM:
-#      region: "AWS_ELASTICSEARCH_REGION"
 
-#     To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
-#    requireInternetAccess: true
+    # The elasticsearch connection supports two authentication methods: basic authentication or AWS IAM role-based authentication.
+    # domain: managed-elasticsearch.acme.io
+    # port: 443
+    # protocol: https
+    #     To configure basic authentication to your externally-managed Elasticsearch cluster, uncomment and add the
+    #     parameter details: srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
+    # basicAuthentication:
+    #   username: "BASIC_AUTH_USERNAME"
+    #   password: "BASIC_AUTH_PASSWORD"
+    #     To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
+    #     and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
+    # awsIAM:
+    #   region: "AWS_ELASTICSEARCH_REGION"
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
+    # requireInternetAccess: true
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
+  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 if required
   imageTag: 7.10.2
+
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
+
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
+
   protocol: http
   # This section specifies the elasticsearch cluster configuration for authentication and TLS.
+
   esConfig:
     elasticsearch.yml: |
       xpack.security.enabled: true
@@ -66,6 +82,7 @@ elasticsearch:
       xpack.security.transport.ssl.verification_mode: certificate
       xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
       xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+
   # Use this section to include additional, supported environmental variables for Elasticsearch basic authentication.
   # The parameter values can be read from a specified secrets file.
   extraEnvs:
@@ -79,6 +96,7 @@ elasticsearch:
         secretKeyRef:
           name: srs-elastic-credentials
           key: username
+
   resources:
     requests:
       cpu: "1000m"
@@ -86,17 +104,20 @@ elasticsearch:
     limits:
       cpu: "2000m"
       memory: "3Gi"
+
   volumeClaimTemplate:
     accessModes: ["ReadWriteOnce"]
     resources:
       requests:
         # configure volume size of the elasticsearch nodes based on search data storage requirements. The default storage size from elasticsearch is 30Gi.
         storage: 30Gi
+
   # elasticsearch.secretMounts will help reading certificates from elastic-certificates secret.
   secretMounts:
     - name: elastic-certificates
       secretName: elastic-certificates
       path: /usr/share/elasticsearch/config/certs
+
 # For Openshift deployments, you must enable the following custom values. For details
 # refer to https://github.com/elastic/helm-charts/tree/master/elasticsearch/examples/openshift.
 #  securityContext:

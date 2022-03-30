@@ -34,7 +34,7 @@
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="socketTimeout=1200;"
+    connectionProperties="socketTimeout=1200;statement_timeout=1200500;idle_in_transaction_session_timeout=1200500;"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
