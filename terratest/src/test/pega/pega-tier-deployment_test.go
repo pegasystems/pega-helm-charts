@@ -111,7 +111,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, volumeDefaultModePtr, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode)
 	require.Equal(t, "pega-volume-credentials", pod.Volumes[1].Name)
 	require.Equal(t, getObjName(options, "-credentials-secret"), pod.Volumes[1].VolumeSource.Projected.Sources[0].Secret.Name)
-	require.Equal(t, volumeDefaultModePtr, pod.Volumes[1].VolumeSource.Secret.DefaultMode)
+	require.Equal(t, volumeDefaultModePtr, pod.Volumes[1].VolumeSource.Projected.DefaultMode)
 
 	actualInitContainers := pod.InitContainers
 	count := len(actualInitContainers)
