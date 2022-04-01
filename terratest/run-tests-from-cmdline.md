@@ -3,7 +3,7 @@
 ## Prerequisites
 - You have a local clone of this repo
 - You have installed an appropriate go version (v1.13 or later)
-- You have enabled go modules by setting the environment variable `GO111MODULE="on"`
+- You enabled go modules by setting the environment variable `GO111MODULE="on"`
 
 ## Running Tests
 
