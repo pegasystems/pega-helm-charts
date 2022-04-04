@@ -162,11 +162,13 @@ For `platform/pega` and `platform/search` images, Pega also offers an image with
 
 The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](charts/backingservices/charts/srs), or SRS subchart under [backing services](charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](charts/backingservices/README.md). 
 
-The Docker image `platform/clustering-service` is used with the Hazelcast subchart under [Pega charts](charts/pega/charts). Using the Clustering Service docker image, Pega platform and Hazelcast can be deployed in a Client Server arrangement. **Pega supports Client Server deployment with Hazelcast from Pega "8.6".**
-In Client Server arrangement, Pega nodes connect as client to a cluster of nodes running hazelcast as server,
-this deployment model introduces independent scalability for both servers and clients in Pega Platform. 
-Client Server deployment has improved stability for deployments that use a large number of nodes.
-For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
+For Pega Platform 8.6 and later, Pega supports a new client-server deployment model using a cluster of nodes running Hazelcast as server,
+to which the Pega nodes connect as client. This new client-server deployment model introduces improved stability for Pega Platform
+deployments that use a large number of nodes, since it introduces independent scalability for both servers and clients in Pega Platform.
+Because of the inherent stability and scalability of this model, **Pega recommends that all clients deploying Pega platform 8.6 and later adopt
+this client-server model using Hazelcast.**
+To deploy Pega platform and Hazelcast using this client-server deployment model, you must download and push the Clustering Service Docker image,
+`platform/clustering-service` to your Docker repository and use with the Hazelcast subchart under [Pega charts](charts/pega/charts).For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
