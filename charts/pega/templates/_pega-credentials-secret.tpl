@@ -10,7 +10,9 @@ metadata:
     "helm.sh/hook-delete-policy": before-hook-creation
 data:
   # Base64 encoded username for connecting to the Pega DB
+  {{ if .Values.global.jdbc.username -}}
   DB_USERNAME: {{ .Values.global.jdbc.username | b64enc }}
+  {{- end }}
 
   # Base64 encoded password for connecting to the Pega DB
   {{ if .Values.global.jdbc.password -}}
