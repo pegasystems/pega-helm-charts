@@ -21,7 +21,7 @@ spec:
       - name: {{ template "pegaRegistrySecret" $ }}
       containers:
       - name: constellation
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        imagePullPolicy: Always
         image: {{ .Values.image }}
         args:
         - port=3000
@@ -35,7 +35,7 @@ spec:
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/api/v1/ping
+            path: /c11n/v102/ping
             port: 3000
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
@@ -44,7 +44,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/api/v1/ping
+            path: /c11n/v102/ping
             port: 3000
         ports:
         - containerPort: 3000
