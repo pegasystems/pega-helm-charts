@@ -8,19 +8,29 @@
 traefik:
   enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
+  # See https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
-  serviceType: LoadBalancer
-  # If enabled is set to "true", ssl will be enabled for Traefik
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
-    nodePorts:
-      # NodePorts for Traefik service.
-      http: 30080
-      https: 30443
+    type: LoadBalancer
+  ports:
+    web:
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
+      tls:
+        enabled: false
+        # this is the name of a Traefik TLSOption definition
+        options: ""
+        certResolver: ""
+        domains: []
+        # - main: example.com
+        #   sans:
+        #     - foo.example.com
+        #     - bar.example.com
   resources:
     requests:
       # Enter the CPU Request for Traefik
@@ -91,7 +101,9 @@ kibana:
     enabled: true
     # Enter the domain name to access kibana via a load balancer.
     hosts:
-      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
+      - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
+        paths:
+          - path: /
 
 fluentd-elasticsearch:
   enabled: *deploy_efk
