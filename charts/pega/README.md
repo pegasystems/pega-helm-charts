@@ -90,7 +90,7 @@ jdbc:
 
 Pega requires a database driver JAR to be provided for connecting to the relational database.  This JAR may either be baked into your image by extending the Pega provided Docker image, or it may be pulled in dynamically when the container is deployed.  If you want to pull in the driver during deployment, you will need to specify a URL to the driver using the `jdbc.driverUri` parameter.  This address must be visible and accessible from the process running inside the container.
 
-If the artifactory where driver is hosted is secured with Basic or APIKey Authentication then use `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` to provide APIKey value and dedicated APIKey header details.
+Use the `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` to provide an APIKey value and dedicated APIKey header details if you host the driver in a custom artifactory that requires Basic or APIKey Authentication.
 In case if the custom artifactory domain has a self-signed SSL certificate, provide the certificate. SSL certificate verification can be disabled by setting `customArtifactory.enableSSLVerification` to `false`
 
 The Pega Docker images use Java 11, which requires that the JDBC driver that you specify is compatible with Java 11.
