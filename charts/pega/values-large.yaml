@@ -48,6 +48,20 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
+  customArtifactory:
+    # If using a custom artifactory secured with Basic or APIKey Authentication to download JDBC driver, supply the authentication details here.
+    authentication:
+      # Provide either basic authentication or api key authentication details based on preferred way of authentication mechanism to custom artifactory.
+      basic:
+        username: "YOUR_ARTIFACTORY_USERNAME"
+        password: "YOUR_ARTIFACTORY_PASSWORD"
+      apiKey:
+        headerName: "YOUR_ARTIFACTORY_DEDICATED_APIKEY_HEADER"
+        value: "YOUR_ARTIFACTORY_API_KEY"
+    enableSSLVerification: true
+    # Custom artifactory domain server certificate if needed.
+    certificate:
+
   docker:
     # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:

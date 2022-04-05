@@ -74,8 +74,6 @@ data:
   # Hostname of hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
-{{ if (eq (include "useCustomArtifactory" .) "true") }}
   # enable ssl verification for jdbc driver download
-  ENABLE_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enable_ssl_verification }}"
-{{- end }}
+  ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
 {{ end }}

@@ -1,6 +1,6 @@
 {{- define "pegaCustomArtifactoryCertificatesConfigTemplate" }}
 # Config map used for certificate of custom artifactory
-{{ if (eq (include "useCustomArtifactory" .) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .) "true") }}
 {{- if .Values.global.customArtifactory.certificate }}
 kind: ConfigMap
 apiVersion: v1

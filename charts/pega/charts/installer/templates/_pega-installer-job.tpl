@@ -56,7 +56,7 @@ spec:
      {{- end }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-{{ if (eq (include "useCustomArtifactory" .root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
 {{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
 {{- end }}
@@ -88,10 +88,10 @@ spec:
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
 {{- end }}
-{{ if (eq (include "useCustomArtifactory" .root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
         - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-          mountPath: "/opt/pega/artifactory/certs"
+          mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}

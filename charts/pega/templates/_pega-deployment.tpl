@@ -63,7 +63,7 @@ spec:
 {{ if .root.Values.global.certificates }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
-{{ if (eq (include "useCustomArtifactory" .root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
 {{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
 {{- end }}
@@ -197,10 +197,10 @@ spec:
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{ end }}
-{{ if (eq (include "useCustomArtifactory" .root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
         - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-          mountPath: "/opt/pega/artifactory/certs"
+          mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}

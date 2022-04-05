@@ -36,6 +36,18 @@
     defaultMode: 420
 {{- end}}
 
+{{- define "customArtifactorySSLVerificationEnabled" }}
+{{- if (.Values.global.customArtifactory) }}
+{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
+{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
+true
+{{- else -}}
+false
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
@@ -83,26 +95,30 @@
 {{- end }}
 
 {{- define "useBasicAuthForCustomArtifactory" }}
-  {{- if and (.Values.global.customArtifactory.auth.basic.username) (.Values.global.customArtifactory.auth.basic.password) -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.basic) }}
+        {{- if and (.Values.global.customArtifactory.authentication.basic.username) (.Values.global.customArtifactory.authentication.basic.password) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+  {{- end }}
 {{- end }}
 
 {{- define "useApiKeyForCustomArtifactory" }}
-  {{- if and (.Values.global.customArtifactory.auth.apiKey.headerName) (.Values.global.customArtifactory.auth.apiKey.value) -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "useCustomArtifactory" }}
-  {{- if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") -}}
-    true
-  {{- else -}}
-    false
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.apiKey) }}
+        {{- if and (.Values.global.customArtifactory.authentication.apiKey.headerName) (.Values.global.customArtifactory.authentication.apiKey.value) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end }}
+    {{- end }}
   {{- end -}}
 {{- end }}
 
