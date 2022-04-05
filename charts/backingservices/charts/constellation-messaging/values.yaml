@@ -1,0 +1,21 @@
+---
+# Default values for c11n-messaging-service charts.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+enabled: true
+deploymentName: c11n-messaging
+
+# c11n-messaging-service configuration
+c11n-messaging-Runtime:
+  replicaCount: 2
+  # docker image of the c11n-messaging-service, example : constellation-messaging/docker-image:dockerTag
+  c11n-messaging-image: "YOUR_C11N_MESSAGING_IMAGE:TAG"
+  imagePullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 1300m
+      memory: "2Gi"
+    requests:
+      cpu: 650m
+      memory: "2Gi"
+  serviceType: "ClusterIP"

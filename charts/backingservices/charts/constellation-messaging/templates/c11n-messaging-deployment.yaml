@@ -1,0 +1,35 @@
+{{ if .Values.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "c11n-messaging.fullname" . }}
+  namespace: {{ .Release.Namespace }}
+  labels:
+{{- include "c11n-messaging.c11n-messaging-service.labels" . | indent 4 }}
+spec:
+  replicas: {{ .Values.c11n-messagingRuntime.replicaCount }}
+  selector:
+    matchLabels:
+{{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 6 }}
+  template:
+    metadata:
+      labels:
+{{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 8 }}
+    spec:
+      imagePullSecrets:
+        - name: {{ template "c11n-messagingRegistrySecretName" . }}
+      containers:
+        - name: c11n-messaging-service
+          image: {{ .Values.c11n-messagingRuntime.c11n-messagingImage }}
+          imagePullPolicy: {{ .Values.c11n-messagingRuntime.imagePullPolicy }}
+          ports:
+            - name: c11n-messaging-port
+              containerPort: 3000
+              protocol: TCP
+          env:
+            - --max-semi-space-size=1024
+            - root=/usr/src/app/environments
+            - port=3000
+          resources:
+            {{- toYaml .Values.c11n-messagingRuntime.resources | indent 12 }}
+  {{ end }}
