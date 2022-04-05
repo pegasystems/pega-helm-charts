@@ -10,7 +10,7 @@ srsRuntime:
   replicaCount: 2
   # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
   srsImage: "YOUR_SRS_IMAGE:TAG"
-  imagepullPolicy: IfNotPresent
+  imagePullPolicy: IfNotPresent
   resources:
     limits:
       cpu: 1300m
