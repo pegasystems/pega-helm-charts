@@ -76,7 +76,22 @@
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
-	       maxThreads="1"/>
+               maxThreads="1"/>
+
+    <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
+    {{ if and .Env.CERT_DIR .Env.CERT_PASSWORD }}
+
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+               maxThreads="150" scheme="https" secure="true" SSLEnabled="true"
+               keystoreFile="{{ .Env.CERT_DIR }}"
+               keystorePass="{{ .Env.CERT_PASSWORD }}"
+               clientAuth="false" sslProtocol="TLS" relaxedQueryChars="[ ]"
+               relaxedPathChars="[ ]"
+               maxHttpHeaderSize="16384"
+               maxSavePostSize="65536"
+               connectionTimeout="20000" />
+    {{ end }}
+
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -167,18 +182,18 @@
         -->
 
         <Valve className="org.apache.catalina.valves.RemoteIpValve"
-          protocolHeader="x-forwarded-proto" />
+               protocolHeader="x-forwarded-proto" />
 
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log" suffix=".txt"
-               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b" 
+               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b"
                resolveHosts="false" />
 
         <Valve className="org.apache.catalina.valves.ErrorReportValve"
-               showReport="false" 
+               showReport="false"
                showServerInfo="false" />
 
       </Host>
