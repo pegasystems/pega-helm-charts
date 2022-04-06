@@ -839,3 +839,19 @@ certificates:
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
 
 ```
+### Enable Tomcat to use HTTPS
+
+Pega supports mounting and passing TLS certificates into the container to enable HTTPS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tlscertificates` attributes as a map along with the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+
+Example:
+
+```yaml
+tlscertificates:
+  enabled: true
+  certificate: |
+    "Encoded certificate content"
+  tlspassword: "123456"
+  tlsport: 443
+  tlstargetPort: 8443
+
+```
