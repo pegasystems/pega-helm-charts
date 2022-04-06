@@ -89,6 +89,14 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+      # to enable TLS, set the following:
+      tlscertificates:
+        enabled: false
+        certificate: ""
+        tlspassword: ""
+        tlsport: 443
+        tlstargetPort: 8443
+
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service

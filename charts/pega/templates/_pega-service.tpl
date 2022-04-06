@@ -40,6 +40,13 @@ spec:
   - name: http
     port: {{ .node.service.port }}
     targetPort: {{ .node.service.targetPort }}
+{{- if .node.tlscertificates }}
+{{- if .node.tlscertificates.enabled }}
+  - name: https
+    port: {{ .node.tlscertificates.tlsport }}
+    targetPort: {{ .node.tlscertificates.tlstargetPort }}
+{{- end }}
+{{- end }}
   selector:
     app: {{ .name }}
 ---

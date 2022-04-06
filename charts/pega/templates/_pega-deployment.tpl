@@ -63,6 +63,11 @@ spec:
 {{ if .root.Values.global.certificates }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
+{{- if .node.tlscertificates }}
+{{- if .node.tlscertificates.enabled }}
+{{- include "pegaTomcatCertificatesTemplate" .root | indent 6 }}
+{{ end }}
+{{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -191,6 +196,12 @@ spec:
 {{ if .root.Values.global.certificates }}
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
+{{ end }}
+{{- if .node.tlscertificates }}
+{{- if .node.tlscertificates.enabled }}
+        - name: {{ template "pegaVolumeTomcatCertificates" }}
+          mountPath: "/opt/pega/tlscerts"
+{{ end }}
 {{ end }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
         # LivenessProbe: indicates whether the container is live, i.e. running.

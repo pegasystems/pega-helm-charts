@@ -20,6 +20,22 @@
     defaultMode: 420
 {{- end}}
 
+{{- define "pegaTomcatCertificatesSecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-tomcat-certificates-secret
+{{- end }}
+
+{{- define "pegaVolumeTomcatCertificates" }}pega-volume-tomcat-certificates{{- end }}
+
+{{- define "pegaTomcatCertificatesTemplate" }}
+- name: {{ template "pegaVolumeTomcatCertificates" }}
+  secret:
+    # This name will be referred in the volume mounts kind.
+    secretName: {{ template "pegaTomcatCertificatesSecret" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
