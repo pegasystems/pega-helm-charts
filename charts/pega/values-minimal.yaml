@@ -74,6 +74,14 @@ global:
         # Without a load balancer, use a direct NodePort instead.
         serviceType: "NodePort"
 
+      # to enable TLS, set the following:
+      tlscertificates:
+        enabled: false
+        certificate: ""
+        tlspassword: ""
+        tlsport: 443
+        tlstargetPort: 8443
+
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
