@@ -593,9 +593,9 @@ It is a best practice to retag each of your Pega Docker images by including your
 
     `$ docker push <Registry host name:Port>/my-clustering-service:1.0.3`
 
-After you push these downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
+    After you push these downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
 
-11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
+14. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
  
     ```bash
     $ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>
@@ -603,11 +603,11 @@ After you push these downloaded images to your private Docker registry, you are 
     Status: Downloaded pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>
     ```
 
-12. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
+15. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
 
-   `$ docker tag pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version> <Registry host name:Port>/my-pega-srs:8.6.0`
+    `$ docker tag pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version> <Registry host name:Port>/my-pega-srs:8.6.0`
 
-13. To push the retagged `my-pega-srs` image to your registry, enter:
+16. To push the retagged `my-pega-srs` image to your registry, enter:
 
-   `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
+    `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
 
