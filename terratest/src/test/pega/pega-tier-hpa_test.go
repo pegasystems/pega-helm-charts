@@ -9,8 +9,8 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/api/resource"
-	autoscaling "k8s.io/kubernetes/pkg/apis/autoscaling"
-	api "k8s.io/kubernetes/pkg/apis/core"
+	autoscaling "k8s.io/api/autoscaling/v2beta2"
+	v1 "k8s.io/api/core/v1"
 )
 
 func TestPegaTierHPA(t *testing.T) {
@@ -192,7 +192,7 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 	require.Equal(t, expectedHpa.expectedMetricCount(), len(hpaObj.Spec.Metrics))
 
 	if expectedHpa.cpu {
-		require.Equal(t, api.ResourceName("cpu"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
+		require.Equal(t, v1.ResourceName("cpu"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
 		if expectedHpa.cpuValue != (resource.Quantity{}) {
 			require.Equal(t, autoscaling.MetricTargetType("Value"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.Type)
 			require.Equal(t, expectedHpa.cpuValue, *hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.AverageValue)
@@ -204,7 +204,7 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 		currentMetricIndex++
 	}
 	if expectedHpa.mem {
-		require.Equal(t, api.ResourceName("memory"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
+		require.Equal(t, v1.ResourceName("memory"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Name)
 		require.Equal(t, autoscaling.MetricTargetType("Utilization"), hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.Type)
 		require.Equal(t, expectedHpa.memPercent, *hpaObj.Spec.Metrics[currentMetricIndex].Resource.Target.AverageUtilization)
 		currentMetricIndex++
