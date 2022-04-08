@@ -66,6 +66,8 @@ func TestPegaCredentialsSecretWithArtifactoryBasicAuth(t *testing.T){
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.customArtifactory.authentication.basic.username": "username",
 						"global.customArtifactory.authentication.basic.password": "pwd",
+						"global.customArtifactory.authentication.apiKey.headerName": "",
+						"global.customArtifactory.authentication.apiKey.value": "",
 					},
 				}
 
@@ -100,6 +102,8 @@ func TestPegaCredentialsSecretWithNoArtifactoryBasicAuth(t *testing.T){
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.customArtifactory.authentication.basic.username": "",
 						"global.customArtifactory.authentication.basic.password": "pwd",
+						"global.customArtifactory.authentication.apiKey.headerName": "",
+						"global.customArtifactory.authentication.apiKey.value": "",
 					},
 				}
 
@@ -134,6 +138,8 @@ func TestPegaCredentialsSecretWithArtifactoryApiKeyAuth(t *testing.T){
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.customArtifactory.authentication.apiKey.headerName": "headerName",
 						"global.customArtifactory.authentication.apiKey.value": "apiKey-value",
+						"global.customArtifactory.authentication.basic.username": "",
+						"global.customArtifactory.authentication.basic.password": "",
 					},
 				}
 
@@ -168,6 +174,8 @@ func TestPegaCredentialsSecretWithNoArtifactoryApiKeyAuth(t *testing.T){
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.customArtifactory.authentication.apiKey.headerName": "headerName",
 						"global.customArtifactory.authentication.apiKey.value": "",
+						"global.customArtifactory.authentication.basic.username": "",
+						"global.customArtifactory.authentication.basic.password": "",
 					},
 				}
 
@@ -187,8 +195,8 @@ func VerifyCredentialsSecretArtifactoryBasicAuth(t *testing.T, yamlContent strin
 	require.Equal(t, secretobj.ObjectMeta.Name, getObjName(options, "-credentials-secret"))
 	secretData := secretobj.Data
 	if expectBasicAuthData == true {
-		require.Equal(t, "CUSTOM_ARTIFACTORY_USERNAME", string(secretData["CUSTOM_ARTIFACTORY_USERNAME"]))
-		require.Equal(t, "CUSTOM_ARTIFACTORY_PASSWORD", string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
+		require.Equal(t, "username", string(secretData["CUSTOM_ARTIFACTORY_USERNAME"]))
+		require.Equal(t, "pwd", string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
 	} else {
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_USERNAME"]))
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
@@ -206,8 +214,8 @@ func VerifyCredentialsSecretArtifactoryApiKeyAuth(t *testing.T, yamlContent stri
 	require.Equal(t, secretobj.ObjectMeta.Name, getObjName(options, "-credentials-secret"))
 	secretData := secretobj.Data
 	if expectApiKeyAuthData == true {
-		require.Equal(t, "CUSTOM_ARTIFACTORY_APIKEY_HEADER", string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
-		require.Equal(t, "CUSTOM_ARTIFACTORY_APIKEY", string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
+		require.Equal(t, "headerName", string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
+		require.Equal(t, "apiKey-value", string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
 	} else {
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
