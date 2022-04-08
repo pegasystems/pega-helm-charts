@@ -69,7 +69,7 @@ func TestCustomArtifactoryCertificatesConfigWhenSSLVerificationIsDisabled(t *tes
 				}
 
 				_, err := RenderTemplateWithErr(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
-				require.Equal(t, "could not find template templates/pega-custom-artifactory-certificates-config.yaml in chart", err)
+				require.Equal(t, "could not find template templates/pega-custom-artifactory-certificates-config.yaml in chart", err.Error())
 			}
 		}
 	}

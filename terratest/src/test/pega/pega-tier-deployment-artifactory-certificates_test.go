@@ -32,13 +32,13 @@ func TestPegaDeploymentWithArtifactoryCerts(t *testing.T) {
 			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 			yamlSplit := strings.Split(deploymentYaml, "---")
 			assertWeb(t, yamlSplit[1], options)
-			assertVolumeAndMount(t, yamlSplit[1], options, true)
+			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[1], options, true)
 
 			assertBatch(t, yamlSplit[2], options)
-			assertVolumeAndMount(t, yamlSplit[2], options, true)
+			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[2], options, true)
 
 			assertStream(t, yamlSplit[3], options)
-			assertVolumeAndMount(t, yamlSplit[3], options, true)
+			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, true)
 
 			options.ValuesFiles = []string{"data/values_with_artifactory_sslverification_disabled.yaml"}
 
