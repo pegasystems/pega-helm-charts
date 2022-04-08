@@ -303,6 +303,16 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 3. Save the file.
 
+#### Add Support for providing DB credentials using External Secrets Operator
+
+- Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.1/) :
+  •	An external secret file that specifies what information in your secret to fetch.
+  •	A secret store to define access how to access the external and placing the required files in your Helm directory.
+
+- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
+- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
+- Update Pega.yaml file to refer to the external secret manager for DB password.
+
 ### Deploying Pega Platform using the command line
 
 A Helm installation and a Pega Platform installation are separate processes. The Helm install command uses Helm to install your deployment as directed in the Helm charts, one in the **charts\\addons** folder and one in the **charts\\pega** folder.
