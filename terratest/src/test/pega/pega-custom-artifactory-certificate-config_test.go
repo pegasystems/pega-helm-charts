@@ -37,7 +37,7 @@ func TestCustomArtifactoryCertificatesConfig(t *testing.T) {
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
-				fmt.Println(yamlContent)
+				fmt.Println("certs config \n" + yamlContent)
 				VerifyArtifactoryCertificatesConfig(t, yamlContent, options)
 			}
 		}
