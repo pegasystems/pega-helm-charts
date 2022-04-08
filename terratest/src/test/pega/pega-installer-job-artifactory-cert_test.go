@@ -22,7 +22,6 @@ func TestPegaInstallerJobWithArtifactoryCert(t *testing.T) {
 		for _, operation := range supportedOperations {
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.deployment.name":        depName,
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
@@ -62,10 +61,8 @@ func TestPegaInstallerJobWithoutArtifactoryCert(t *testing.T) {
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-			for _, depName := range deploymentNames {
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.deployment.name":        depName,
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
@@ -91,7 +88,6 @@ func TestPegaInstallerJobWithoutArtifactoryCert(t *testing.T) {
 						assertJobArtifactoryCertVolumeAndMount(t, yamlSplit[1], false)
 					}
 				}
-			}
 		}
 	}
 }
