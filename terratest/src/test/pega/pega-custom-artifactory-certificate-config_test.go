@@ -36,6 +36,7 @@ func TestCustomArtifactoryCertificatesConfig(t *testing.T) {
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
+				fmt.Println(yamlContent)
 				VerifyArtifactoryCertificatesConfig(t, yamlContent, options)
 			}
 		}
@@ -69,7 +70,8 @@ func TestCustomArtifactoryCertificatesConfigWhenSSLVerificationIsDisabled(t *tes
 				}
 
 				_, err := RenderTemplateWithErr(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
-				require.Equal(t, "could not find template templates/pega-custom-artifactory-certificates-config.yaml in chart", err.Error())
+				require.Contains(t, err.Error(),
+					"could not find template templates/pega-custom-artifactory-certificates-config.yaml in chart")
 			}
 		}
 	}

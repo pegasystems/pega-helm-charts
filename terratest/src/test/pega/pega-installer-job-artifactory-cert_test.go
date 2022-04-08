@@ -109,7 +109,6 @@ func assertJobArtifactoryCertVolumeAndMount(t *testing.T, jobYaml string, should
 
 	var foundVolMount = false
 	for _, container := range jobSpec.Containers {
-		if container.Name == "pega-web-tomcat" {
 			for _, volMount := range container.VolumeMounts {
 				if volMount.Name == "pega-volume-custom-artifactory-certificate" {
 					require.Equal(t, "/opt/pega/artifactory/cert", volMount.MountPath)
@@ -118,7 +117,6 @@ func assertJobArtifactoryCertVolumeAndMount(t *testing.T, jobYaml string, should
 				}
 			}
 			break
-		}
 	}
 	require.Equal(t, shouldHaveVol, foundVolMount)
 
