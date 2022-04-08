@@ -191,11 +191,11 @@ func VerifyCredentialsSecretArtifactoryBasicAuth(t *testing.T, yamlContent strin
 		require.Equal(t, "CUSTOM_ARTIFACTORY_PASSWORD", string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
 	} else {
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_USERNAME"]))
-		require.Equal(t, string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
+		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
 	}
 
 	require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
-	require.Equal(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
+	require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
 }
 
 func VerifyCredentialsSecretArtifactoryApiKeyAuth(t *testing.T, yamlContent string, options *helm.Options, expectApiKeyAuthData bool) {
@@ -210,11 +210,11 @@ func VerifyCredentialsSecretArtifactoryApiKeyAuth(t *testing.T, yamlContent stri
 		require.Equal(t, "CUSTOM_ARTIFACTORY_APIKEY", string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
 	} else {
 		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
-		require.Equal(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
+		require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
 	}
 
 	require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_USERNAME"]))
-	require.Equal(t, string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
+	require.Empty(t, string(secretData["CUSTOM_ARTIFACTORY_PASSWORD"]))
 }
 
 func VerifyCredentialsSecret(t *testing.T, yamlContent string, options *helm.Options) {

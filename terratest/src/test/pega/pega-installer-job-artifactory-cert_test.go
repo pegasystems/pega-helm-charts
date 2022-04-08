@@ -1,7 +1,6 @@
 package pega
 
 import (
-	appsv1 "k8s.io/api/apps/v1"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -9,7 +8,6 @@ import (
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8sbatch "k8s.io/api/batch/v1"
-	k8score "k8s.io/api/core/v1"
 )
 
 func TestPegaInstallerJobWithArtifactoryCert(t *testing.T) {
@@ -22,7 +20,6 @@ func TestPegaInstallerJobWithArtifactoryCert(t *testing.T) {
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-			for _, depName := range deploymentNames {
 				var options = &helm.Options{
 					SetValues: map[string]string{
 						"global.deployment.name":        depName,
@@ -52,7 +49,6 @@ func TestPegaInstallerJobWithArtifactoryCert(t *testing.T) {
 					}
 				}
 			}
-		}
 	}
 }
 
