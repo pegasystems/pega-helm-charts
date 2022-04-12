@@ -5,7 +5,9 @@ global:
     enableSSLVerification: true
     certificate:
       self-signed-certificate.cer: |
-        -----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----
+        -----BEGIN CERTIFICATE-----
+        certificate content
+        -----END CERTIFICATE-------
   tier:
     - name: "web"
       nodeType: "WebUser"

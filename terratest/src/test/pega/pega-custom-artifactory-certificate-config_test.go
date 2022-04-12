@@ -37,7 +37,7 @@ func TestCustomArtifactoryCertificatesConfig(t *testing.T) {
 
 				yamlContent, err := RenderTemplateWithErr(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
 				t.Log("certs config error \n", err)
-				t.Log("certs config \n" + yamlContent)
+				t.Log("certs config \n" , yamlContent)
 				VerifyArtifactoryCertificatesConfig(t, yamlContent, options)
 			}
 		}
@@ -86,7 +86,7 @@ func VerifyArtifactoryCertificatesConfig(t *testing.T, yamlContent string, optio
 	artifactoryCertConfigData := artifactoryCertConfigMap.Data
 	if len(artifactoryCertConfigData) != 0 {
 		require.Equal(t, artifactoryCertConfigMap.ObjectMeta.Name, getObjName(options, "-custom-artifactory-certificate-config"))
-		require.Equal(t, artifactoryCertConfigData["self-signed-certificate.cer"], "-----BEGIN CERTIFICATE-----\\n<<certificate content>>\\n-----END CERTIFICATE-----")
+		require.Equal(t, artifactoryCertConfigData["self-signed-certificate.cer"], "-----BEGIN CERTIFICATE-----\ncertificate content\n-----END CERTIFICATE-----")
 	} else {
 		require.Nil(t, artifactoryCertConfigMap.Data)
 	}
