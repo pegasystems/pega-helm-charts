@@ -14,6 +14,8 @@ global:
   actions:
     execute: "deploy"
 
+  # Add custom certificates to be mounted to container, as a map
+  certificates:
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
@@ -47,15 +49,23 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
-  # If using a custom Docker registry, supply the credentials here to pull Docker images.
   docker:
+    # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-      # Docker image information for the Pega docker image, containing the application server.
+    # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
+
+  utilityImages:
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
+    k8s_wait_for:
+      image: dcasavant/k8s-wait-for
+      imagePullPolicy: "IfNotPresent"
 
   # Upgrade specific properties
   upgrade:
@@ -129,6 +139,14 @@ global:
       hpa:
         enabled: true
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
@@ -157,6 +175,14 @@ global:
 
       hpa:
         enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -202,6 +228,14 @@ global:
         resources:
           requests:
             storage: 5Gi
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
 
 # External services
 
@@ -261,8 +295,9 @@ installer:
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
-  # Setting below to true will deploy the infinity in client server hazelcast mode
-  enabled: false
+  # Setting below to true will deploy the infinity in client server hazelcast mode.
+  # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
+  enabled: true
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client server hazelcast mode for authentication

@@ -1,7 +1,16 @@
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
-{{- define "pegaInstallConfig" }}pega-installer-config{{- end }}
+{{- define "pegaInstallConfig" }}pega-install-config{{- end }}
+{{- define "pegaUpgradeConfig" }}pega-upgrade-config{{- end }}
 {{- define "pegaDBInstall" -}}pega-db-install{{- end -}}
-{{- define "pegaDBCustomUpgrade" -}}pega-db-custom-upgrade{{- end -}}
+{{- define "pegaDBInstallerContainer" -}}pega-installer{{- end -}}
+{{- define "pegaDBCustomUpgrade" -}}
+{{- if (contains "," .Values.upgrade.upgradeSteps) -}}
+    pega-db-custom-upgrade
+{{- else -}}
+{{- $jobName := printf "%s-%s" "pega-db-upgrade" .Values.upgrade.upgradeSteps -}}
+{{- $jobName | replace "_" "-" -}}
+{{- end -}}
+{{- end -}}
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
 {{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
@@ -42,20 +51,23 @@
 
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
-  image: dcasavant/k8s-wait-for
+  image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
 - name: wait-for-pegaupgrade
-  image: dcasavant/k8s-wait-for
+  image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
 - name: wait-for-pre-dbupgrade
-  image: dcasavant/k8s-wait-for
+  image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
 {{- end }}
 
@@ -82,7 +94,8 @@
 {{- $rolloutCommand = regexReplaceAllLiteral $deploymentNameRegex $rolloutCommand $deploymentName }}
 {{- end -}}
 - name: wait-for-rolling-updates
-  image: dcasavant/k8s-wait-for
+  image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   command: ['sh', '-c',  '{{ $rolloutCommand }}' ]
 {{- include "initContainerEnvs" $ }}
 {{- end }}
