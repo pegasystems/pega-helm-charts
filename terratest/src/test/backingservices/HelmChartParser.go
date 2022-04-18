@@ -17,6 +17,12 @@ func NewHelmConfigParser(helmTest *HelmTest) *HelmChartParser {
 	return &HelmChartParser{T: helmTest.T, SlicedResource: slicedResource}
 }
 
+func C11NHelmConfigParser(helmTest *HelmTest) *HelmChartParser {
+	parsedChart := helm.RenderTemplate(helmTest.T, helmTest.HelmOptions, helmTest.ChartPath, "constellation-messaging",helmTest.Templates)
+	slicedResource := strings.Split(parsedChart, "---")
+	return &HelmChartParser{T: helmTest.T, SlicedResource: slicedResource}
+}
+
 func (p *HelmChartParser) getResourceYAML(searchOptions SearchResourceOption, resource interface{}) {
 	var d DeploymentMetadata
 	for _, slice := range p.SlicedResource {

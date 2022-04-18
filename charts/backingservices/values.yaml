@@ -128,17 +128,14 @@ elasticsearch:
 #  sysctlInitContainer:
 #    enabled: false
 
+
 # c11n-messaging-service configuration
 c11n-messaging:
-
   enabled: true
-
   # specify unique name for the deployment based on org app and/or c11n-messaging applicable environment name. eg: acme-demo-dev-c11n-messaging
   deploymentName: "YOUR_C11N_MESSAGING_DEPLOYMENT_NAME"
-
   c11n-messaging-Runtime:
     # Number of pods to provision
     replicaCount: 2
-
     # docker image of the c11n-messaging-service, example : constellation-messaging/docker-image:dockerTag
     c11n-messaging-image: "YOUR_C11N_MESSAGING_IMAGE:TAG"
