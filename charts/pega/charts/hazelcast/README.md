@@ -1,4 +1,4 @@
-# Clustering Service Deployment (Draft)
+# Clustering Service Deployment
 
 Clustering Service is Pega's own docker image containing the Hazelcast Clustering Service image inside it. 
 The hazelcast sub chart defines the additional deployment parameters used by Clustering Service docker image for Client server type deployment of Pega Platform with Hazelcast.
