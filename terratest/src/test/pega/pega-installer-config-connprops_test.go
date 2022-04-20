@@ -31,7 +31,7 @@ func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
-				assertInstallerConnectionPropsConfig(t, yamlContent)
+				assertInstallerConnectionPropsConfig(t, yamlContent, dbPlatform)
 			}
 		}
 	}
