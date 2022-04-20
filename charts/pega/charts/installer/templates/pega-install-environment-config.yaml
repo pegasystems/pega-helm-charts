@@ -38,10 +38,6 @@ data:
   BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
   # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
   BYPASS_TRUNCATE_UPDATESCACHE: {{ .Values.bypassTruncateUpdatescache | quote }}
-{{- if .Values.global.jdbc.connectionProperties }}
-  # JDBC custom connection properties
-  JDBC_CUSTOM_CONNECTION: {{ .Values.global.jdbc.connectionProperties }}
-{{- end }}
   # Maximum Idle Thread.Default is 5
   MAX_IDLE: {{ .Values.threads.maxIdle | quote }}
   # Maximum Thread Wait.Default is -1

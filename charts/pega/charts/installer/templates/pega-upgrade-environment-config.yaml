@@ -26,10 +26,6 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
-{{- if .Values.global.jdbc.connectionProperties }}
-  # JDBC custom connection properties
-  JDBC_CUSTOM_CONNECTION: {{ .Values.global.jdbc.connectionProperties }}
-{{- end }}
   # Type of Upgrade
   UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
   # custom upgrade steps
