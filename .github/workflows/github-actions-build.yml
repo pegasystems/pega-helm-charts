@@ -85,31 +85,29 @@ jobs:
         run: |
           mkdir $GITHUB_WORKSPACE/terratest/bin
           export GOPATH=$GITHUB_WORKSPACE/terratest
-          curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-          dep ensure
       
       - name: run go tests on pega
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-          go test test/pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+          go test ./pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
 
       - name: run go tests on addons
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-          go test test/addons | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+          go test ./addons | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
 
       - name: run go tests on backing services
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-          go test test/backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+          go test ./backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
 
   run-deploy-job:
     runs-on: ubuntu-18.04
