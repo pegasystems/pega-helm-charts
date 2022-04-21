@@ -114,7 +114,7 @@
 {{- end }}
 
 {{- define "customJdbcProps" -}}
-{{ range (splitList ";" .Values.global.jdbc.connectionProperties) -}}
+{{ range (splitList ";" .Values.global.jdbc.connectionProperties) }}
 {{ . }}
-{{- end }}
+{{ end }}
 {{- end -}}
