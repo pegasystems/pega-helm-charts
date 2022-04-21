@@ -54,6 +54,6 @@ func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPla
 	if dbPlatform == "db2zos" {
 		compareConfigMapData(t, installConfigData["DB2SiteDependent.properties"], "data/expectedDB2SiteDependent.properties")
 	} else {
-		assert.Nil(t, installConfigData["DB2SiteDependent.properties"])
+		assert.Equal(t, installConfigData["DB2SiteDependent.properties"], "")
 	}
 }
