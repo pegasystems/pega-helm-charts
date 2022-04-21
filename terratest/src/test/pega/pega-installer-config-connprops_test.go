@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/gruntwork-io/terratest/modules/helm"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
 )
@@ -50,4 +51,9 @@ func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPla
 	compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
 	compareConfigMapData(t, installConfigData["prpcUtils.properties.tmpl"], "data/expectedPRPCUtils.properties.tmpl")
 	compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%s.conf", dbPlatform))
+	if dbPlatform == "db2zos" {
+		compareConfigMapData(t, installConfigData["DB2SiteDependent.properties"], "data/expectedDB2SiteDependent.properties")
+	} else {
+		assert.Nil(t, installConfigData["DB2SiteDependent.properties"])
+	}
 }
