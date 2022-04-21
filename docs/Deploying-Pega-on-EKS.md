@@ -478,7 +478,7 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 Make these changes before you begin deploying Pega Platform using Helm charts.
 
-#### Add Support for providing DB credentials using External Secrets Operator
+#### (Optional) Add Support for providing DB credentials using External Secrets Operator
 
 - Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.1/) :
   •	An external secret file that specifies what information in your secret to fetch.
