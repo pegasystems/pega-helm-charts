@@ -839,7 +839,7 @@ certificates:
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
 
 ```
-## Deploying Hazelcast in Client-Server Mode 
+## Deploying Hazelcast in Client-Server Model 
 
 **For Pega Platform deployments using 8.6 and later, Pega recommends adopting a client-server model for your Hazelcast deployment.**
 This deployment model introduces independent scalability for both servers and clients in Pega Platform. 
@@ -847,18 +847,18 @@ To adopt this client-server deployment model, configure the values.yaml section 
 Using this image, your deployment starts a cluster of Hazelcast server nodes; a plugin provided by Hazelcast, the Hazelcast-Kubernetes Plugin, discovers the Hazelcast members in the cluster.
 
 Deploying the Pega provided `platform/clustering-service` Docker image which contains the Hazelcast clustering service image inside it, 
-starts a cluster of hazelcast server nodes. For the discovery of hazelcast members in the cluster, a plugin provided by Hazelcast, namely Hazelcast-Kubernetes Plugin is used. 
+starts a cluster of Hazelcast server nodes. For the discovery of Hazelcast members in the cluster, a plugin provided by Hazelcast, namely Hazelcast-Kubernetes Plugin is used. 
 Out of the two discovery strategies that the latter plugin provides - Kubernetes API and DNS Lookup, the client-server model with Hazelcast uses DNS lookup to resolve the IP addressing of PODs running Hazelcast.
-For additional information on hazelcast member discovery, refer the plugin: [Hazelcast-Kubernetes Plugin](https://github.com/hazelcast/hazelcast-kubernetes)
+For additional information on Hazelcast member discovery, refer the plugin: [Hazelcast-Kubernetes Plugin](https://github.com/hazelcast/hazelcast-kubernetes)
 
 Specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.image` and set `hazelcast.enabled` as true to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
-**Using Clustering service for Client-Server form of deployment is only supported from Pega Platform 8.6 or later.**
+**Using Clustering service for client-server form of deployment is only supported from Pega Platform 8.6 or later.**
 
 In this model, nodes running Hazelcast start independently and simultaneously with the Pega web tier nodes and create a cluster with a member count you must specify using `hazelcast.replicas` parameter. Pega web tier nodes then connect to this Hazelcast cluster in a client-sever model.
 
 **Note:** If you are deploying Pega Platform below release 8.6, you need to set `hazelcast.enabled` as `false`, otherwise the installation will fail. 
-Setting `hazelcast.enabled` as `false` deploys Pega and hazelcast in an embedded arrangement, in which hazelcast and Pega Platform run on the same node. 
-The default and recommended deployment strategy for Hazelcast is Client-Server, embedded is only being supported for backwards compatibility.
+Setting `hazelcast.enabled` as `false` deploys Pega and Hazelcast in an embedded arrangement, in which Hazelcast and Pega Platform run on the same node. 
+The default and recommended deployment strategy for Hazelcast is client-server, embedded is only being supported for backwards compatibility.
 
 ### Clustering Service Compatibility Matrix
 
@@ -876,9 +876,9 @@ Parameter   | Description   | Default value
 ---         | ---           | ---
 `hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_HAZELCAST_IMAGE:TAG`
 `hazelcast.enabled` |  Set as true if client-server deployment of Pega Platform is required, otherwise false. Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail | `true`
-`hazelcast.replicas` | Number of initial members to join the hazelcast cluster | `3`
-`hazelcast.username` | UserName to be used in client-server hazelcast mode for authentication | `""`
-`hazelcast.password` | Password to be used in client-server hazelcast mode for authentication | `""`
+`hazelcast.replicas` | Number of initial members to join the Hazelcast cluster | `3`
+`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication | `""`
+`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication | `""`
 
 #### Example
 ```yaml

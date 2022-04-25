@@ -22,7 +22,7 @@ Name                                           | Description                    
 
 Name                                           | Description                                           | Default value |
 ------------------------------------------------|-------------------------------------------------------|---|
-`client.clusterName` | Cluster Name for Pega nodes to connect to for Client-Server Deployment | `PRPC`
+`client.clusterName` | Cluster Name for Pega nodes to connect to for client-server Deployment | `PRPC`
  
 
 #### Server Parameters
@@ -37,8 +37,8 @@ Name                                           | Description                    
 `server.io_thread_count` | Number of threads performing socket input and socket output. For example, If a default value of (3) is used, it implies there are 3 threads performing input and 3 threads performing output (6 threads in total). | `""`
 `server.event_thread_count` | Number of event handler threads | `""`
 `server.max_join_seconds`  | Join timeout, maximum time to try to join before giving. | `""`
-`server.group_name`  | Specifies the name of the cluster created by hazelcast nodes |  `PRPC`
-`server.mancenter_url`  | URL of the Hazelcast Management center to which the hazelcast nodes can connect | `""`
+`server.group_name`  | Specifies the name of the cluster created by Hazelcast nodes |  `PRPC`
+`server.mancenter_url`  | URL of the Hazelcast Management center to which the Hazelcast nodes can connect | `""`
 `server.graceful_shutdown_max_wait_seconds` | Maximum wait in seconds during graceful shutdown. | `600`
 `server.service_dns_timeout` | Custom time for how long the DNS Lookup is checked | `""`
 `server.logging_level` | Can be used to set logging level for Hazelcast, available logging levels are OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE and ALL. Invalid levels are assumed to be OFF| `info`

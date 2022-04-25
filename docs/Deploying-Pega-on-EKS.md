@@ -496,7 +496,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
-- Enable hazelcast Client-Server mode for Pega Platform 8.6 and later.
+- Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
@@ -521,9 +521,9 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul> |
    | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".     | adminPassword: "\<initial password\>"  |
-   | hazelcast: | For Pega Platform 8.6 and later, Pega recommends using the hazelcast in Client-Server mode. | |
+   | hazelcast: | For Pega Platform 8.6 and later, Pega recommends using Hazelcast in client-server model. | |
    | hazelcast.image:        | Specify the Pega-provided `clustering-service` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
-   | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable hazelcast in Client-Server mode and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server hazelcast mode, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
+   | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
 
 3. Save the file.
 
