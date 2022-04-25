@@ -28,9 +28,9 @@ data:
   CASSANDRA_KEYSTORE_PASSWORD: {{ .Values.dds.keyStorePassword | b64enc }}
   {{- end }}
   {{ if $.Values.hazelcast.enabled }}
-  # Base64 encoded username used for authentication in hazelcast client server mode
+  # Base64 encoded username used for authentication in hazelcast client-server mode
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
-  # Base64 encoded password used for authentication in hazelcast client server mode
+  # Base64 encoded password used for authentication in hazelcast client-server mode
   HZ_CS_AUTH_PASSWORD: {{ .Values.hazelcast.password | b64enc }}
   {{ end }}
   {{ range $index, $dep := .Values.global.tier}}

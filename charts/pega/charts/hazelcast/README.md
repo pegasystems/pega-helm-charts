@@ -3,7 +3,7 @@
 The Hazelcast clustering service is implemented using a Pega-provided Docker image that contains the Hazelcast clustering service image, which you must make available in your deployment Docker image repository.
 This Hazelcast subchart defines the additional deployment parameters the clustering service uses to define dynamic features for the client-server deployment model using Hazelcast.
 In the latter deployment model, Pega Platform uses Hazelcast in Client configuration to connect to a cluster of PODs running Hazelcast in server configuration. 
-**For Kubernetes based deployments Client server is the default and the recommended form of deployment.**
+**For Kubernetes based deployments client-server is the default and the recommended form of deployment.**
 
 
 #### Managing Resources
@@ -22,7 +22,7 @@ Name                                           | Description                    
 
 Name                                           | Description                                           | Default value |
 ------------------------------------------------|-------------------------------------------------------|---|
-`client.clusterName` | Cluster Name for Pega nodes to connect to for Client Server Deployment | `PRPC`
+`client.clusterName` | Cluster Name for Pega nodes to connect to for Client-Server Deployment | `PRPC`
  
 
 #### Server Parameters
