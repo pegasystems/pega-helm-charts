@@ -72,7 +72,8 @@ spec:
   {{- if .Values.srsStorage.provisionInternalESCluster }}
       initContainers:
       - name: wait-for-internal-es-cluster
-        image: busybox:1.31.0
+        image: {{ .Values.busybox.image }}
+        imagePullPolicy: {{ .Values.busybox.imagePullPolicy }}
         args:
           - until $(wget -q -S --spider --timeout=2 -O /dev/null $ELASTICSEARCH_PROTO://$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD@$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT ); do echo Waiting for Elasticsearch cluster to become live...; sleep 10; done;
         command:

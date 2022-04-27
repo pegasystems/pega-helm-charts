@@ -37,7 +37,8 @@ spec:
         # Init containers
       {{- if and (eq .Values.global.provider "openshift") (eq .Values.set_data_owner_on_startup true) }}
       - name: set-dir-owner
-        image: busybox:1.31.0
+        image: {{ .Values.global.utilityImages.busybox.image }}
+        imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
         command: ['sh', '-c', 'chown -R {{ .Values.podSecurityContext.runAsUser | default 1000 }}:{{ .Values.podSecurityContext.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
         volumeMounts:
         - name: esstorage
@@ -45,7 +46,8 @@ spec:
       {{ end }}
       {{- if .Values.set_vm_max_map_count }}
       - name: set-max-map-count
-        image: busybox:1.31.0
+        image: {{ .Values.global.utilityImages.busybox.image }}
+        imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
         securityContext:
           privileged: true
@@ -80,8 +82,8 @@ spec:
 {{- end }}
         resources:
           requests:
-            cpu: "0.25"
-            memory: "2Gi"
+            cpu: "{{ .Values.cpuRequest }}"
+            memory: "{{ .Values.memRequest }}"
           limits:
             cpu: "{{ .Values.cpuLimit }}"
             memory: "{{ .Values.memLimit }}"

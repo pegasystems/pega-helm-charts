@@ -1,10 +1,11 @@
 package addons
 
 import (
+	"testing"
+
+	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	v12 "k8s.io/api/apps/v1"
-	v1 "k8s.io/api/core/v1"
-	"testing"
 )
 
 func Test_shouldNotContainTraefikResourcesWhenDisabled(t *testing.T) {
@@ -40,39 +41,45 @@ func Test_shouldContainTraefikResourcesWhenEnabled(t *testing.T) {
 func Test_shouldBeAbleToSetUpServiceTypeAsLoadBalancer(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.serviceType": "LoadBalancer",
+			"traefik.enabled":      "true",
+			"traefik.service.type": "LoadBalancer",
 		}),
 	)
 
-	var service *v1.Service
-	helmChartParser.Find(SearchResourceOption{
-		Name: "pega-traefik",
-		Kind: "Service",
-	}, &service)
+	var d DeploymentMetadata
+	var list string
+	for _, slice := range helmChartParser.SlicedResource {
+		helm.UnmarshalK8SYaml(helmChartParser.T, slice, &d)
+		if d.Kind == "List" {
+			list = slice
+			break
+		}
+	}
 
-	serviceType := service.Spec.Type
-	require.Equal(t, "LoadBalancer", string(serviceType))
+	require.True(t, len(list) != 0)
+	require.Contains(t, list, "LoadBalancer")
 }
 
 func Test_shouldBeAbleToSetUpServiceTypeAsNodePort(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.serviceType": "NodePort",
+			"traefik.enabled":      "true",
+			"traefik.service.type": "NodePort",
 		}),
 	)
 
-	var service *v1.Service
-	helmChartParser.Find(SearchResourceOption{
-		Name: "pega-traefik",
-		Kind: "Service",
-	}, &service)
+	var d DeploymentMetadata
+	var list string
+	for _, slice := range helmChartParser.SlicedResource {
+		helm.UnmarshalK8SYaml(helmChartParser.T, slice, &d)
+		if d.Kind == "List" {
+			list = slice
+			break
+		}
+	}
 
-	serviceType := service.Spec.Type
-	require.Equal(t, "NodePort", string(serviceType))
-	require.Equal(t, 30080, int(service.Spec.Ports[0].NodePort))
-	require.Equal(t, 30443, int(service.Spec.Ports[1].NodePort))
+	require.True(t, len(list) != 0)
+	require.Contains(t, list, "NodePort")
 }
 
 func Test_hasRoleWhenRbacEnabled(t *testing.T) {
@@ -116,8 +123,8 @@ func Test_noRoleWhenRbacDisabled(t *testing.T) {
 func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "true",
+			"traefik.enabled":                     "true",
+			"traefik.ports.websecure.tls.enabled": "true",
 		}),
 	)
 
@@ -127,27 +134,24 @@ func Test_hasSecretWhenSSLEnabled(t *testing.T) {
 		Kind: "Deployment",
 	}, &deployment)
 
-	require.True(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
-	}))
-
-	require.Equal(t, "ssl", deployment.Spec.Template.Spec.Volumes[1].Name)
-	require.Equal(t, "pega-traefik-default-cert", deployment.Spec.Template.Spec.Volumes[1].Secret.SecretName)
+	require.Contains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--entrypoints.websecure.http.tls=true")
 }
 
 func Test_hasNoSecretWhenSSLEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"traefik.enabled":     "true",
-			"traefik.ssl.enabled": "false",
+			"traefik.enabled":                     "true",
+			"traefik.ports.websecure.tls.enabled": "false",
 		}),
 	)
 
-	require.False(t, helmChartParser.Contains(SearchResourceOption{
-		Name: "pega-traefik-default-cert",
-		Kind: "Secret",
-	}))
+	var deployment v12.Deployment
+	helmChartParser.Find(SearchResourceOption{
+		Name: "pega-traefik",
+		Kind: "Deployment",
+	}, &deployment)
+
+	require.NotContains(t, deployment.Spec.Template.Spec.Containers[0].Args, "--entrypoints.websecure.http.tls=true")
 }
 
 func Test_checkResourceRequests(t *testing.T) {
@@ -225,7 +229,15 @@ func Test_checkDefaultResourceLimits(t *testing.T) {
 var traefikResources = []SearchResourceOption{
 	{
 		Name: "pega-traefik",
-		Kind: "ConfigMap",
+		Kind: "ServiceAccount",
+	},
+	{
+		Name: "pega-traefik",
+		Kind: "ClusterRole",
+	},
+	{
+		Name: "pega-traefik",
+		Kind: "ClusterRoleBinding",
 	},
 	{
 		Name: "pega-traefik",
@@ -233,14 +245,10 @@ var traefikResources = []SearchResourceOption{
 	},
 	{
 		Name: "pega-traefik",
-		Kind: "Service",
+		Kind: "List",
 	},
 	{
-		Name: "pega-traefik-test",
-		Kind: "Pod",
-	},
-	{
-		Name: "pega-traefik-test",
-		Kind: "ConfigMap",
+		Name: "pega-traefik-dashboard",
+		Kind: "IngressRoute",
 	},
 }
