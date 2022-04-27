@@ -7,7 +7,7 @@ In the latter deployment model, Pega Platform uses Hazelcast in Client configura
 
 
 #### Managing Resources
-You can configure the memory and cpu limits for the hazelcast service using the below parameters. Default value is used in case an alternate value is not
+You can configure the memory and cpu limits for the Hazelcast service using the below parameters. Default value is used in case an alternate value is not
 specified.
 
 Name                                           | Description                                           | Default value |
