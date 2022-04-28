@@ -1,5 +1,4 @@
 {{ if .Values.enabled }}
----
 apiVersion: v1
 kind: Service
 metadata:
@@ -8,7 +7,7 @@ metadata:
   labels:
 {{- include "c11n-messaging.c11n-messaging-service.labels" . | indent 4 }}
 spec:
-  type: {{ .Values.c11n-messaging-Runtime.serviceType }}
+  type: {{ .Values.c11nMessagingRuntime.serviceType }}
   selector:
 {{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 4 }}
   ports:

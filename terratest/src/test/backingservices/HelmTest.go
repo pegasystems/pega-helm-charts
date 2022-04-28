@@ -1,10 +1,11 @@
 package backingservices
 
 import (
-	"github.com/gruntwork-io/terratest/modules/helm"
-	"github.com/stretchr/testify/require"
 	"path/filepath"
 	"testing"
+
+	"github.com/gruntwork-io/terratest/modules/helm"
+	"github.com/stretchr/testify/require"
 )
 
 type HelmTest struct {
@@ -32,6 +33,7 @@ func NewHelmTestFromTemplate(t *testing.T, chartRelativePath string, options map
 
 	path, err := filepath.Abs(chartRelativePath)
 	require.NoError(t, err)
+
 
 	return &HelmTest{
 		T:           t,
