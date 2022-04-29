@@ -246,7 +246,7 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 `platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
 `platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
 `platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
-`platform/clustering-service`  | (Download required) Deploys the required clustering service(Hazelcast) for the caching capabilities in Pega platform as a backing service. This Docker image contains Hazelcast clustering Service. <br/><br/>*Note: This feature is supported only from platform version "8.6" to deploy the platform in client-server Hazelcast model.*| `<version>` |
+`platform/clustering-service`  | (Download required) Deploys the required clustering service(Hazelcast) for the caching capabilities in Pega platform as a backing service. This Docker image contains Hazelcast clustering Service. <br/><br/>*Note: This feature is supported only from platform version "8.6" to deploy the platform in client-server Hazelcast model. Embedded deployment would not be supported in future platform releases.*| `<version>` |
 `platform-services/search-n-reporting-service`  | [optional and compatible only with Pega version 8.6 and later] (Download required) Deploys the latest Pega generation of search and reporting capabilities in Pega Infinity on dedicated, backing service nodes. This Docker image contains Pega Search and Reporting Services and allows you to optimize Elasticsearch processing in your Pega deployment. To optimize Elasticsearch processing, you must deploy this image and the matching release of the platform/search image. For more information about this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md). | `<version>` |
 
 When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for each of the images you download.
@@ -259,7 +259,7 @@ For Pega Platform 8.6 and later, Pega supports a new client-server deployment mo
 to which the Pega nodes connect as client. This new client-server deployment model introduces improved stability for Pega Platform
 deployments that use a large number of nodes, since it introduces independent scalability for both servers and clients in Pega Platform.
 Because of the inherent stability and scalability of this model, **Pega recommends that all clients deploying Pega platform 8.6 and later adopt
-this client-server model using Hazelcast.**
+this client-server model using Hazelcast. Embedded deployment would not be supported in future platform releases.**
 To deploy Pega platform and Hazelcast using this client-server deployment model, you must download and push the Clustering Service Docker image,
 `platform/clustering-service` to your Docker repository and use with the Hazelcast subchart under [Pega charts](../charts/pega/charts).For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
 

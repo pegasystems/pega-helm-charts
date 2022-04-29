@@ -5,6 +5,7 @@ This Hazelcast subchart defines the additional deployment parameters the cluster
 In the latter deployment model, Pega Platform uses Hazelcast in Client configuration to connect to a cluster of PODs running Hazelcast in server configuration. 
 **For Kubernetes based deployments client-server is the default and the recommended form of deployment.**
 
+**Using Clustering service for client-server form of deployment is only supported from Pega Platform 8.6 or later.**
 
 #### Managing Resources
 You can configure the memory and cpu limits for the Hazelcast service using the below parameters. Default value is used in case an alternate value is not

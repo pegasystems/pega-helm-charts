@@ -857,8 +857,9 @@ Specify the `platform/clustering-service` Docker image that you downloaded in `h
 In this model, nodes running Hazelcast start independently and simultaneously with the Pega web tier nodes and create a cluster with a member count you must specify using `hazelcast.replicas` parameter. Pega web tier nodes then connect to this Hazelcast cluster in a client-sever model.
 
 **Note:** If you are deploying Pega Platform below release 8.6, you need to set `hazelcast.enabled` as `false`, otherwise the installation will fail. 
-Setting `hazelcast.enabled` as `false` deploys Pega and Hazelcast in an embedded arrangement, in which Hazelcast and Pega Platform run on the same node. 
-The default and recommended deployment strategy for Hazelcast is client-server, embedded is only being supported for backwards compatibility.
+Setting `hazelcast.enabled` as `false` deploys Pega and Hazelcast in an Embedded arrangement, in which Hazelcast and Pega Platform run on the same node. 
+The default and recommended deployment strategy for Hazelcast is client-server, Embedded deployment is only being supported for backwards compatibility.
+**Embedded deployment would not be supported in future platform releases.**
 
 ### Clustering Service Compatibility Matrix
 
