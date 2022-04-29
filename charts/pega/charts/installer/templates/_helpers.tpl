@@ -112,3 +112,9 @@
     value: {{ $apiserver.httpsServicePort | quote }}
 {{- end }}
 {{- end }}
+
+{{- define "customJdbcProps" -}}
+{{ range (splitList ";" .Values.global.jdbc.connectionProperties) }}
+{{ . }}
+{{ end }}
+{{- end -}}
