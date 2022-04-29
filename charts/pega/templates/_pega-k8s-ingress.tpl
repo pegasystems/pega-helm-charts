@@ -34,6 +34,14 @@ spec:
       {{ end }}
       - pathType: ImplementationSpecific
         backend: 
-{{ include "ingressService" . | indent 10 }}
+{{- if .node.ingress }}
+{{- if and (.node.tlscertificates) (.node.tlscertificates.enabled) }}
+    {{ include "ingressServiceHttps" . | indent 10 }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
+{{- end }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
+{{- end }}
 ---     
 {{- end }}

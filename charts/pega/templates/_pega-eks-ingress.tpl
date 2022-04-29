@@ -37,6 +37,13 @@ metadata:
     # enable sticky sessions on target group and set alb routing algorithm
     alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 {{- end }}
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{- if or (.node.service.domain) (.node.ingress) }}
+{{- if and (.node.tlscertificates) (.node.tlscertificates.enabled) }}
+    # TLS certificate used for the ingress
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+{{- end }}
+{{- end }}
 spec:
   rules:
   {{ if (.node.service.domain) }}
@@ -66,7 +73,16 @@ spec:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
       - pathType: ImplementationSpecific
-        backend: 
-{{ include "ingressService" . | indent 10 }}
+        backend:
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{- if or (.node.service.domain) (.node.ingress) }}
+{{- if and (.node.tlscertificates) (.node.tlscertificates.enabled) }}
+    {{ include "ingressServiceHttps" . | indent 10 }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
+{{- end }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
+{{- end }}
 ---
 {{- end }}
