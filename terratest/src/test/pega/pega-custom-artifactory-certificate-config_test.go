@@ -36,8 +36,6 @@ func TestCustomArtifactoryCertificatesConfig(t *testing.T) {
 				}
 
 				yamlContent, err := RenderTemplateWithErr(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-certificates-config.yaml"})
-				t.Log("certs config error \n", err)
-				t.Log("certs config \n" , yamlContent)
 				VerifyArtifactoryCertificatesConfig(t, yamlContent, options)
 			}
 		}
