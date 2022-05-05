@@ -1,31 +1,31 @@
 ---
 image: "YOUR_HAZELCAST_IMAGE:TAG"
 imagePullPolicy: "Always"
-# Enter the number of initial members in hazelcast cluster.
+# Enter the number of initial members in Hazelcast cluster.
 replicas: 3
-# Setting below to true will deploy the infinity in client server hazelcast mode
-enabled: false
-# username to be used in client server hazelcast mode for authentication
+# Setting below to true will deploy the infinity in client-server Hazelcast model.
+# Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
+enabled: true
+# username to be used in client-server Hazelcast model for authentication
 username: ""
-# password to be used in client server hazelcast mode for authentication
+# password to be used in client-server Hazelcast model for authentication
 password: ""
 
 # Memory and CPU settings for HZ service
 resources:
   requests:
-    memory: "2Gi"
-    cpu: 2
+    memory: "1Gi"
+    cpu: 1
   limits:
-    memory: "4Gi"
+    memory: "1Gi"
     cpu: 2
-# client settings for hazelcast
+# client settings for Hazelcast
 client:
   clusterName: "PRPC"
-# Server side settings for hazelcast
+# Server side settings for Hazelcast
 server:
-  java_opts: "-XX:MaxRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof
+  java_opts: "-Xms820m -Xmx820m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof
   -XX:+UseParallelGC -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m"
-  min_cluster_size: "3"
   jmx_enabled: "true"
   health_monitoring_level: "OFF"
   operation_generic_thread_count: ""
