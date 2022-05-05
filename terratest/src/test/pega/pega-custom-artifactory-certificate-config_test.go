@@ -26,7 +26,7 @@ func TestCustomArtifactoryCertificatesConfig(t *testing.T) {
 				fmt.Println(vendor + "-" + operation + "-" + depName)
 
 				var options = &helm.Options{
-					ValuesFiles: []string{"data/values_with_artifactory_cert.yaml"},
+					//ValuesFiles: []string{"data/values_with_artifactory_cert.yaml"},
 					SetValues: map[string]string{
 						"global.deployment.name":        depName,
 						"global.provider":               vendor,
