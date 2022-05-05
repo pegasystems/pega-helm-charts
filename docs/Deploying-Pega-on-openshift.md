@@ -240,6 +240,8 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Specify host names for your web and stream tiers.
 
+- Enable Hazelcast client-server model for Pega Platform 8.6 and later.
+
 1. To download the pega.yaml Helm chart to the \<local filepath\>/openshift-demo, enter:
 
    `$ helm inspect values pega/pega > /<local filepath>/openshift-demo/pega.yaml`

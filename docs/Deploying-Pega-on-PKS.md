@@ -251,6 +251,8 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Specify host names for your web and stream tiers.
 
+- Enable Hazelcast client-server model for Pega Platform 8.6 and later.
+
 1. To download the pega.yaml to the \<local filepath\>/TKGI-demo, enter:
 
 `$ helm inspect values pega/pega > <local filepath>/TKGI-demo/pega.yaml`
