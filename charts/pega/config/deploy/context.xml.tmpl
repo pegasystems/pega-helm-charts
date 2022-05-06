@@ -21,14 +21,18 @@
     minEvictableIdleTimeMillis="60000"
     />
 
-  {{ if and .Env.DB_RW_USERNAME .Env.JDBC_RW_URL }}
+  {{ if .Env.JDBC_RW_URL }}
     <Resource name="jdbc/PegaRULESLongRW"
     auth="Container"
     type="javax.sql.DataSource"
     driverClassName="{{ .Env.JDBC_CLASS }}"
     url="{{ .Env.JDBC_RW_URL }}"
+    {{- if .Env.DB_RW_USERNAME }}
     username="{{ .Env.DB_RW_USERNAME }}"
-    password=""
+    {{- else }}
+    username="{{ .Env.SECRET_DB_USERNAME }}"
+    {{- end }}
+    password="{{ .Env.SECRET_DB_PASSWORD }}"
     maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
     minIdle="{{ default .Env.JDBC_RO_MIN_IDLE .Env.JDBC_MIN_IDLE }}"
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
