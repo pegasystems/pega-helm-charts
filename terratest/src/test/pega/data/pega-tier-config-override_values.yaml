@@ -280,11 +280,11 @@ installer:
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
-  # Setting below to true will deploy the infinity in client server hazelcast mode
+  # Setting below to true will deploy the infinity in client-server Hazelcast model
   enabled: false
   # No. of initial members to join
   replicas: 3
-  # UserName to be used in client server hazelcast mode for authentication
+  # UserName to be used in client-server Hazelcast model for authentication
   username: ""
-  # Password to be used in client server hazelcast mode for authentication
+  # Password to be used in client-server Hazelcast model for authentication
   password: ""
