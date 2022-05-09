@@ -19,6 +19,20 @@ data:
   DB_PASSWORD: {{ .Values.global.jdbc.password | b64enc }}
   {{- end }}
 
+  {{ if (eq (include "useBasicAuthForCustomArtifactory" .) "true") }}
+  # Base64 encoded username for basic authentication of custom artifactory
+  CUSTOM_ARTIFACTORY_USERNAME: {{ .Values.global.customArtifactory.authentication.basic.username | b64enc }}
+  # Base64 encoded password for basic authentication of custom artifactory
+  CUSTOM_ARTIFACTORY_PASSWORD: {{ .Values.global.customArtifactory.authentication.basic.password | b64enc }}
+  {{- end }}
+
+  {{ if (eq (include "useApiKeyForCustomArtifactory" .) "true") }}
+  # Base64 encoded dedicated apikey header name and apikey value for authentication of custom artifactory
+  CUSTOM_ARTIFACTORY_APIKEY_HEADER: {{ .Values.global.customArtifactory.authentication.apiKey.headerName | b64enc }}
+  # Base64 encoded password for basic authentication of custom artifactory
+  CUSTOM_ARTIFACTORY_APIKEY: {{ .Values.global.customArtifactory.authentication.apiKey.value | b64enc }}
+  {{- end }}
+
  {{ if (eq (include "performDeployment" .) "true") }}
   # Base64 encoded username for connecting to cassandra
   CASSANDRA_USERNAME: {{ .Values.dds.username | b64enc }}
