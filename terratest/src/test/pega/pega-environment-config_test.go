@@ -68,4 +68,5 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
+        require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }
