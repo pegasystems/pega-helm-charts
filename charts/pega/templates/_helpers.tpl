@@ -20,6 +20,34 @@
     defaultMode: 420
 {{- end}}
 
+{{- define "pegaCustomArtifactoryCertificateConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-custom-artifactory-certificate-config
+{{- end }}
+
+{{- define "pegaVolumeCustomArtifactoryCertificate" }}pega-volume-custom-artifactory-certificate{{- end }}
+
+{{- define "pegaCustomArtifactoryCertificateTemplate" }}
+- name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaCustomArtifactoryCertificateConfig" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
+{{- define "customArtifactorySSLVerificationEnabled" }}
+{{- if (.Values.global.customArtifactory) }}
+{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
+{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
+true
+{{- else -}}
+false
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
@@ -63,6 +91,34 @@
     true
   {{- else -}}
     false
+  {{- end -}}
+{{- end }}
+
+{{- define "useBasicAuthForCustomArtifactory" }}
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.basic) }}
+        {{- if and (.Values.global.customArtifactory.authentication.basic.username) (.Values.global.customArtifactory.authentication.basic.password) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- define "useApiKeyForCustomArtifactory" }}
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.apiKey) }}
+        {{- if and (.Values.global.customArtifactory.authentication.apiKey.headerName) (.Values.global.customArtifactory.authentication.apiKey.value) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end }}
+    {{- end }}
   {{- end -}}
 {{- end }}
 
@@ -270,11 +326,15 @@ true
 #Override this template in a subchart if your secret values are provided by seperate secrets
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
-  secret:
-    # This name will be referred in the volume mounts kind.
-    secretName: {{ template "pegaCredentialsSecret" $ }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+    - secret:
+        name: {{ template "pegaCredentialsSecret" $ }}
+  {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
+    - secret:
+        name: {{ .Values.global.jdbc.external_secret_name }}
+  {{- end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
