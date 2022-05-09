@@ -41,6 +41,9 @@ global:
     driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
+    # To avoid exposing a password, leave the jdbc.password parameter empty (no quotes), configure a JDBC password
+    # in the External Secrets Manager, and enter the external secret for the JDBC password.
+    external_secret_name: "YOUR_EXTERNAL_SECRETS_NAME"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
