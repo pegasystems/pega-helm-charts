@@ -14,6 +14,9 @@ traefik:
     enabled: true
   service:
     type: LoadBalancer
+  # set the below to true if the connection from traefik to the backend is to be encrypted using self-signed certificates
+  globalArguments:
+    - "--serverstransport.insecureskipverify=true"
   ports:
     web:
       port: 80
