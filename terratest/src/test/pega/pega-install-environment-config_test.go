@@ -59,4 +59,5 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
 	require.Equal(t, "", installEnvConfigData["DISTRIBUTION_KIT_URL"])
+        require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }

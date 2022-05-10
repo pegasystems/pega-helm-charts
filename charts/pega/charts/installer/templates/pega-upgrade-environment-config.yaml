@@ -80,6 +80,8 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
+  # Enable ssl verification for jdbc driver download
+  ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: {{ .Values.global.customArtifactory.enableSSLVerification | quote }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
 {{- range .Values.advancedSettings }}
