@@ -390,6 +390,18 @@ servicePort: {{ .node.service.port }}
 {{- end }}
 {{- end }}
 
+{{- define "ingressServiceHttps" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port:
+    number: {{ .node.tlscertificates.tlsport }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.tlscertificates.tlsport }}
+{{- end }}
+{{- end }}
+
 {{- define "ingressServiceC11n" }}
 {{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
