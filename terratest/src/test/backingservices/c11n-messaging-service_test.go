@@ -27,7 +27,6 @@ func TestC11NMessagingService(t *testing.T) {
 }
 
 func VerifyC11NMessagingService(t *testing.T, serviceObj *k8score.Service) {
-	require.Equal(t, "c11n-messaging-service", serviceObj.Spec.Selector["app.kubernetes.io/name"])
 	require.Equal(t, "http", serviceObj.Spec.Ports[0].Name)
 	require.Equal(t, int32(443), serviceObj.Spec.Ports[0].Port)
 	require.Equal(t, intstr.FromInt(3000), serviceObj.Spec.Ports[0].TargetPort)

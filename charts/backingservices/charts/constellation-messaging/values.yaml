@@ -17,7 +17,7 @@ c11nMessagingRuntime:
   replicaCount: 2
   # docker image of the c11n-messaging-service, example : constellation-messaging/docker-image:dockerTag
   c11nMessagingImage: "YOUR_C11N_MESSAGING_IMAGE:TAG"
-  imagePullPolicy: IfNotPresent
+  imagePullPolicy: Always
   resources:
     limits:
       cpu: 1300m
@@ -25,4 +25,4 @@ c11nMessagingRuntime:
     requests:
       cpu: 650m
       memory: "2Gi"
-  serviceType: "ClusterIP"
+  serviceType: "LoadBalancer"

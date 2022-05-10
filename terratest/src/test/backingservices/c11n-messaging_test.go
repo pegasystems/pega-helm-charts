@@ -6,22 +6,6 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-// func Test_shouldNotContainC11NMessagingResourcesWhenDisabled(t *testing.T) {
-// 	helmChartParser := C11NHelmConfigParser(
-// 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-// 			"enabled":        "false",
-// 			"deploymentName": "c11n-messaging",
-// 		}),
-// 	)
-
-// 	for _, i := range c11nMessagingResources {
-// 		require.False(t, helmChartParser.Contains(SearchResourceOption{
-// 			Name: i.Name,
-// 			Kind: i.Kind,
-// 		}))
-// 	}
-// }
-
 func Test_shouldContainC11NMessagingResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := C11NHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{

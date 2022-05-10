@@ -5,11 +5,11 @@ metadata:
   name: {{ template "c11n-messaging.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-{{- include "c11n-messaging.c11n-messaging-service.labels" . | indent 4 }}
+    app: constellation-messaging
 spec:
   type: {{ .Values.c11nMessagingRuntime.serviceType }}
   selector:
-{{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 4 }}
+    app: constellation-messaging
   ports:
     - name: http
       port: 443

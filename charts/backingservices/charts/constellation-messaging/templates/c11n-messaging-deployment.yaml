@@ -5,16 +5,16 @@ metadata:
   name: {{ template "c11n-messaging.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-{{- include "c11n-messaging.c11n-messaging-service.labels" . | indent 4 }}
+    app: constellation-messaging
 spec:
   replicas: {{ .Values.c11nMessagingRuntime.replicaCount }}
   selector:
     matchLabels:
-{{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 6 }}
+      app: constellation-messaging
   template:
     metadata:
       labels:
-{{- include "c11n-messaging.c11n-messaging-service.match-labels" . | indent 8 }}
+        app: constellation-messaging
     spec:
       imagePullSecrets:
         - name: {{ template "c11n-messagingRegistrySecretName" . }}
@@ -30,6 +30,24 @@ spec:
             - --max-semi-space-size=1024
             - root=/usr/src/app/environments
             - port=3000
+          livenessProbe:
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /c11n-messaging/v001/healthcheck
+              port: 3000
+          readinessProbe:
+            initialDelaySeconds: 5
+            timeoutSeconds: 5
+            periodSeconds: 30
+            successThreshold: 1
+            failureThreshold: 3
+            httpGet:
+              path: /c11n-messaging/v001/healthcheck
+              port: 3000
           resources:
             {{- toYaml .Values.c11nMessagingRuntime.resources | nindent 12 }}
   {{ end }}
