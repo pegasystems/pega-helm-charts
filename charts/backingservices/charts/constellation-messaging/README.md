@@ -4,13 +4,13 @@ The Pega Helm chart is used to deploy an instance of constellation messaging ser
 
 ### Constellation messaging service runtime configuration
 
-The values.yaml file provides configuration options to define the values for the deployment resources of the constellationui service.
+The values.yaml file provides configuration options to define the values for the deployment resources of the constellation messaging service.
 
 ### Configuration settings
 
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `enabled`                               | Enables the constellationui service. Set to true to enable constellationui service in the kubernetes environment.                                                                                                                                                                                                               |
+| `enabled`                               | Enables the constellation messaging service. Set to true to enable constellation messaging service in the kubernetes environment.                                                                                                                                                                                                               |
 | `image`                        | Specify the image repository and the version.                                                                                                                                                                                                                                                                                          |
 | `global.imageCredentials.registry`                        | Specify the docker image registry.                                                                                                                                                                                                                                                                                          |
 | `global.imageCredentials.username`                        | Specify the username for the registry.                                                                                                                                                                                                                                                                                          |
@@ -29,7 +29,7 @@ deploymentName: c11n-messaging
 
 c11nMessagingRuntime:
   replicaCount: 2
-  c11nMessagingImage: pega-docker.downloads.pega.com/constellation-messaging/docker-image:1234
+  c11nMessagingImage: pega-docker.downloads.pega.com/constellation-messaging/docker-image:0.0.5-20220225103826317
   imagePullPolicy: Always
   resources:
     limits:
