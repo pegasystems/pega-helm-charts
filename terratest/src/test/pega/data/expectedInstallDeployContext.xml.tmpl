@@ -26,7 +26,7 @@
     auth="Container"
     type="javax.sql.DataSource"
     driverClassName="{{ .Env.JDBC_CLASS }}"
-    url="{{- if .Env.JDBC_RW_URL -}}{{ .Env.JDBC_RW_URL }}{{- else -}}{{ .Env.JDBC_URL }}{{- end -}}?socketTimeout=1200;statement_timeout=1200500;idle_in_transaction_session_timeout=1200500"
+    url="{{- if .Env.JDBC_RW_URL -}}{{ .Env.JDBC_RW_URL }}{{- else -}}{{ .Env.JDBC_URL }}{{- end -}}"
     username="{{ .Env.SECRET_DB_USERNAME }}"
     password="{{ .Env.SECRET_DB_PASSWORD }}"
     maxTotal="{{ .Env.JDBC_MAX_ACTIVE }}"
@@ -34,7 +34,7 @@
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}socketTimeout=1200;statement_timeout=1200500;idle_in_transaction_session_timeout=1200500;"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
