@@ -86,6 +86,16 @@ jdbc:
   driverClass: org.postgresql.Driver
 ```
 
+#### (Optional) Support for providing DB credentials using External Secrets Operator
+
+Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.1/) :
+•	An external secret file that specifies what information in your secret to fetch.
+•	A secret store to define access how to access the external and placing the required files in your Helm directory.
+
+- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
+- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
+- Update Pega.yaml file to refer to the external secret manager for DB password.
+
 ### Driver URI
 
 Pega requires a database driver JAR to be provided for connecting to the relational database.  This JAR may either be baked into your image by extending the Pega provided Docker image, or it may be pulled in dynamically when the container is deployed.  If you want to pull in the driver during deployment, you will need to specify a URL to the driver using the `jdbc.driverUri` parameter.  This address must be visible and accessible from the process running inside the container.
