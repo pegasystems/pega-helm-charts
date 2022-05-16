@@ -7,6 +7,8 @@ global:
   # Enter your Kubernetes provider.
   provider: "k8s"
 
+  certificates:
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -22,26 +24,27 @@ global:
     #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
     #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
     #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
-    url: "YOUR_JDBC_URL"
+    url: "jdbc:postgresql://host.minikube.internal:5432/pega87"
+    #url: "jdbc:postgresql://kumaa43-demo.cyy9df92ztvl.us-east-1.rds.amazonaws.com:5432/dev"
     #   driverClass 	-- jdbc class.  Valid values are:
     #
     #   Oracle              oracle.jdbc.OracleDriver
     #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
     #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
     #   PostgreSQL          org.postgresql.Driver
-    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    driverClass: "org.postgresql.Driver"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
-    dbType: "YOUR_DATABASE_TYPE"
+    dbType: "postgres"
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "YOUR_JDBC_DRIVER_URI"
-    username: "YOUR_JDBC_USERNAME"
-    password: "YOUR_JDBC_PASSWORD"
+    driverUri: "https://jdbc.postgresql.org/download/postgresql-42.2.9.jar"
+    username: "postgres"
+    password: "postgres"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
     connectionProperties: ""
-    rulesSchema: "YOUR_RULES_SCHEMA"
-    dataSchema: "YOUR_DATA_SCHEMA"
+    rulesSchema: "rules"
+    dataSchema: "data"
     customerDataSchema: ""
 
   customArtifactory:
@@ -65,12 +68,12 @@ global:
   docker:
     # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:
-      url: "YOUR_DOCKER_REGISTRY"
-      username: "YOUR_DOCKER_REGISTRY_USERNAME"
-      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-    # Docker image information for the Pega docker image, containing the application server.
+      url: "https://registry.hub.docker.com"
+      username: "smootherbug"
+      password: "Qwer@5678"
+      # Docker image information for the Pega docker image, containing the application server.
     pega:
-      image: "pegasystems/pega"
+      image: "smootherbug/docker-pega-web:latest"
 
   utilityImages:
     busybox:
@@ -94,16 +97,24 @@ global:
 
       # to enable TLS, set the following:
       tlscertificates:
-        enabled: false
-        certificate: ""
-        tlspassword: ""
+        enabled: true
+        cacertificate:
+        certificate:
+        tlspassword:
         tlsport: 443
         tlstargetPort: 8443
 
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
-        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+        domain: "smootherbug.click"
+        tls:
+          # Enable TLS encryption
+          enabled: false
+          secretName:
+          useManagedCertificate: false
+          ssl_annotation:
+            alb.ingress.kubernetes.io/certificate-arn: "arn:aws:acm:us-east-1:061209114125:certificate/c75446c2-4329-4fce-8088-48c944c8f6a2"
 
       # Set resource consumption to minimal levels
       replicas: 1
@@ -145,16 +156,15 @@ pegasearch:
   memLimit: "3Gi"
 
 # Pega Installer settings
-installer:
-  image: "YOUR_INSTALLER_IMAGE:TAG"
-  adminPassword: "ADMIN_PASSWORD"
-
+deploy:
+  image: "smootherbug/installer86"
+  adminPassword: "install"
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
-  enabled: true
+  enabled: false
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client-server Hazelcast model for authentication

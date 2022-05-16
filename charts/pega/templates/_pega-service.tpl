@@ -22,6 +22,8 @@ metadata:
     traefik.ingress.kubernetes.io/max-conn-amount: '10'
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
+    # Sets serversTreansport that has config in order to verify rootCA
+    traefik.ingress.kubernetes.io/service.serverstransport: {{ .root.Release.Namespace }}-{{ .name }}-servers-transport@kubernetescrd
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'

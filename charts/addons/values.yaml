@@ -6,17 +6,40 @@
 # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
 # Set traefik.enabled: true to deploy Traefik using the parameters specified below.
 traefik:
-  enabled: false
+  enabled: true
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
   # See https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
   rbac:
     enabled: true
   service:
-    type: LoadBalancer
-  # set the below to true if the connection from traefik to the backend is to be encrypted using self-signed certificates
-  globalArguments:
-    - "--serverstransport.insecureskipverify=true"
+    type: NodePort
+  logs:
+    general:
+      # By default, the level is set to ERROR. Alternative logging levels are DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
+      level: DEBUG
+    access:
+      # To enable access logs
+      enabled: true
+      # To write the logs in an asynchronous fashion, specify a bufferingSize option.
+      # This option represents the number of log lines Traefik will keep in memory before writing
+      # them to the selected output. In some cases, this option can greatly help performances.
+      # bufferingSize: 100
+      # Filtering https://docs.traefik.io/observability/access-logs/#filtering
+      fields:
+        general:
+          defaultmode: keep
+          names: { }
+          # Examples:
+          # ClientUsername: drop
+        headers:
+          defaultmode: drop
+          names: { }
+            # Examples:
+            # User-Agent: redact
+          # Authorization: drop
+          # Content-Type: keep
+
   ports:
     web:
       port: 80
@@ -25,7 +48,7 @@ traefik:
       port: 443
       nodePort: 30443
       tls:
-        enabled: false
+        enabled: true
         # this is the name of a Traefik TLSOption definition
         options: ""
         certResolver: ""
@@ -70,7 +93,7 @@ aws-load-balancer-controller:
 
 # Replace false with true to deploy EFK.
 # Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
-deploy_efk: &deploy_efk true
+deploy_efk: &deploy_efk false
 
 elasticsearch:
   enabled: *deploy_efk
@@ -104,7 +127,7 @@ kibana:
     enabled: true
     # Enter the domain name to access kibana via a load balancer.
     hosts:
-      - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
+      - host: "testwebkibana.test"
         paths:
           - path: /
 
