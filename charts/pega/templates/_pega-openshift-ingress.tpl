@@ -14,6 +14,8 @@ metadata:
 spec:
   # Host on which you can reach mentioned service.
   host: {{ template "domainName" dict "node" .node }}
+  port:
+      targetPort: https
   to:
     kind: Service
     # Name of the service associated with the route
@@ -21,6 +23,7 @@ spec:
   tls:
     # Edge-terminated routes can specify an insecureEdgeTerminationPolicy that enables traffic on insecure schemes (HTTP) to be disabled, allowed or redirected.  (None/Allow/Redirect/EMPTY_VALUE)
     insecureEdgeTerminationPolicy: Redirect
-    termination: edge
+    termination: reencrypt
+    destinationCACertificate: {{ .root.Files.Get "config/certs/smootherbug2.cer" | quote }}
 ---
 {{- end }}
