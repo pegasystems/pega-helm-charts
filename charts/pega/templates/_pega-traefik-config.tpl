@@ -17,6 +17,11 @@ spec:
   rootCAsSecrets:
     - {{ .depname }}-tomcat-certificates-secret
   serverName: {{ .node.tlscertificates.traefik.serverName -}}
+{{- if .node.tlscertificates.traefik.serverName }}
+  serverName: {{ .node.tlscertificates.traefik.serverName -}}
+{{- else }}
+  serverName: pega.com
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end}}
