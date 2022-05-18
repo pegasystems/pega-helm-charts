@@ -20,7 +20,7 @@ spec:
 {{- if .node.tlscertificates.traefik.serverName }}
   serverName: {{ .node.tlscertificates.traefik.serverName -}}
 {{- else }}
-  serverName: pega.com
+  serverName: www.pega.com
 {{- end }}
 {{- end }}
 {{- end }}
