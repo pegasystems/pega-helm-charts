@@ -39,9 +39,11 @@ metadata:
 {{- end }}
 # protocol will be set to https only when either ingress is enabled or domain is set
 {{- if or (.node.service.domain) (.node.ingress) }}
-{{- if and (.node.tlscertificates) (.node.tlscertificates.enabled) }}
+{{- if .node.tlscertificates }}
+{{- if .node.tlscertificates.enabled }}
     # TLS certificate used for the ingress
     alb.ingress.kubernetes.io/backend-protocol: HTTPS
+{{- end }}
 {{- end }}
 {{- end }}
 spec:
