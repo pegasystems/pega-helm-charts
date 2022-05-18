@@ -6,14 +6,14 @@
 # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/addons/README.md
 # Set traefik.enabled: true to deploy Traefik using the parameters specified below.
 traefik:
-  enabled: true
+  enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
   # See https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
   rbac:
     enabled: true
   service:
-    type: NodePort
+    type: LoadBalancer
   ports:
     web:
       port: 80
@@ -22,7 +22,7 @@ traefik:
       port: 443
       nodePort: 30443
       tls:
-        enabled: true
+        enabled: false
         # this is the name of a Traefik TLSOption definition
         options: ""
         certResolver: ""
@@ -67,7 +67,7 @@ aws-load-balancer-controller:
 
 # Replace false with true to deploy EFK.
 # Do not remove &deploy_efk; it is a yaml anchor which is referenced by the EFK subcharts.
-deploy_efk: &deploy_efk false
+deploy_efk: &deploy_efk true
 
 elasticsearch:
   enabled: *deploy_efk
@@ -101,7 +101,7 @@ kibana:
     enabled: true
     # Enter the domain name to access kibana via a load balancer.
     hosts:
-      - host: "testwebkibana.test"
+      - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
         paths:
           - path: /
 
