@@ -14,32 +14,6 @@ traefik:
     enabled: true
   service:
     type: NodePort
-  logs:
-    general:
-      # By default, the level is set to ERROR. Alternative logging levels are DEBUG, PANIC, FATAL, ERROR, WARN, and INFO.
-      level: DEBUG
-    access:
-      # To enable access logs
-      enabled: true
-      # To write the logs in an asynchronous fashion, specify a bufferingSize option.
-      # This option represents the number of log lines Traefik will keep in memory before writing
-      # them to the selected output. In some cases, this option can greatly help performances.
-      # bufferingSize: 100
-      # Filtering https://docs.traefik.io/observability/access-logs/#filtering
-      fields:
-        general:
-          defaultmode: keep
-          names: { }
-          # Examples:
-          # ClientUsername: drop
-        headers:
-          defaultmode: drop
-          names: { }
-            # Examples:
-            # User-Agent: redact
-          # Authorization: drop
-          # Content-Type: keep
-
   ports:
     web:
       port: 80
