@@ -23,7 +23,8 @@ spec:
   tls:
     # Edge-terminated routes can specify an insecureEdgeTerminationPolicy that enables traffic on insecure schemes (HTTP) to be disabled, allowed or redirected.  (None/Allow/Redirect/EMPTY_VALUE)
     insecureEdgeTerminationPolicy: Redirect
-{{- if and (.node.tlscertificates) (.node.tlscertificates.enabled) }}
+{{- if .node.tlscertificates }}
+{{- if .node.tlscertificates.enabled }}
     termination: reencrypt
   {{- if .node.tlscertificates.cacertificate }}
     destinationCACertificate: {{ .node.tlscertificates.cacertificate -}}
@@ -33,6 +34,6 @@ spec:
 {{- else }}
     termination: edge
 {{- end }}
-
+{{- end }}
 ---
 {{- end }}
