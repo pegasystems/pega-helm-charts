@@ -53,7 +53,7 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 			UnmarshalK8SYaml(t, ingressInfo, &pegaIngressObj)
 			if index == 1 {
 				VerifyPegaIngress(t, &pegaIngressObj,
-					pegaIngress{getObjName(options, "-web"), intstr.IntOrString{IntVal: 443}, 1020},
+					pegaIngress{getObjName(options, "-web"), intstr.IntOrString{IntVal: 80}, 1020},
 					options)
 			} else {
 				VerifyPegaIngress(t, &pegaIngressObj,

@@ -112,7 +112,7 @@ global:
 
       # to enable TLS between ingress/loadbalancer and the backend, set the following:
       tlscertificates:
-        enabled: true
+        enabled: false
         certificate: ""
         tlspassword: ""
         tlsport: 443
