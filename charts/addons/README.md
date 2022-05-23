@@ -53,7 +53,7 @@ Configuration   | Usage
 `clusterName`   | The name of your EKS cluster.  Resources created by the ALB Ingress controller will be prefixed with this string.
 `region`     | AWS region of the EKS cluster. Required if if ec2metadata is unavailable from the controller Pod.
 `vpcId`      | VPC ID of EKS cluster, required if ec2metadata is unavailable from controller pod.
-`image.repository`  | Amazon EKS Amazon ECR image repositories. To be enabled only for aws gov cloud deployments.
+`image.repository`  | Amazon EKS Amazon ECR image repository. To be enabled only for aws gov cloud deployments.
 `serviceAccount.annotations`  | Annotate the service account with `eks.amazonaws.com/role-arn` IAM Role that provides access to AWS resources.
 
 Example:
@@ -65,7 +65,7 @@ aws-load-balancer-controller:
   region: "YOUR_EKS_CLUSTER_REGION"
   vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
   image:
-    repository: "Amazon EKS Amazon ECR image repositories"
+    repository: "Amazon EKS Amazon ECR image repository"
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
