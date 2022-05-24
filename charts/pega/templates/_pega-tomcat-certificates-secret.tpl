@@ -16,15 +16,15 @@ stringData:
 {{- else }}
   CERT_PASSWORD: "123456"
 {{- end }}
-{{- if .node.tlscertificates.certificate }}
-  CERT_CONTENT: {{ .node.tlscertificates.certificate | quote -}}
+{{- if .node.tlscertificates.keystore }}
+  CERT_CONTENT: {{ .node.tlscertificates.keystore | quote -}}
 {{- else }}
-  CERT_CONTENT: {{ .root.Files.Get "config/certs/pegaselfsigned.jks" | b64enc | indent 2 }}
+  CERT_CONTENT: {{ .root.Files.Get "config/certs/pegakeystore.jks" | b64enc | indent 2 }}
 {{- end }}
 {{- if .node.tlscertificates.cacertificate }}
   ca.crt: {{ .node.tlscertificates.cacertificate | b64dec | quote -}}
 {{- else }}
-  ca.crt: {{ .root.Files.Get "config/certs/pegaselfsignedcert.cer" | quote | indent 2 }}
+  ca.crt: {{ .root.Files.Get "config/certs/pegaca.crt" | quote | indent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
