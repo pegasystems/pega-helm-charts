@@ -14,8 +14,10 @@ metadata:
 spec:
   # Host on which you can reach mentioned service.
   host: {{ template "domainName" dict "node" .node }}
+{{- if (.node.tlscertificates).enabled }}
   port:
       targetPort: https
+{{- end }}
   to:
     kind: Service
     # Name of the service associated with the route
