@@ -57,6 +57,8 @@ Configuration   | Usage
 `serviceAccount.annotations`  | Annotate the service account with `eks.amazonaws.com/role-arn` IAM Role that provides access to AWS resources.
 
 Example:
+
+
 For Commercial Cloud Deployment:
 ```yaml
 aws-load-balancer-controller:
