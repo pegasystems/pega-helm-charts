@@ -88,13 +88,23 @@ jdbc:
 
 #### (Optional) Support for providing DB credentials using External Secrets Operator
 
-Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.3/) :
-•	An external secret file that specifies what information in your secret to fetch.
-•	A secret store to define access how to access the external and placing the required files in your Helm directory.
+To avoid directly entering your passwords as plain text in your Helm charts, Pega supports Kubernetes secrets to secure credentials and related information. 
+Use secrets to represent credentials for your database, Docker registry, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
+Pega supports two methods of passing secrets to your deployments; choose the method that best suits you organization's needs:
 
-- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
-- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
-- Update Pega.yaml file to refer to the external secret manager for DB password.
+• Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
+
+To support this option,
+
+1) Create two files following the Kubernetes documentation for External Secrets Operator :
+   - An external secret file that specifies what information in your secret to fetch.
+   - A secret store to define access how to access the external and placing the required files in your Helm directory.
+2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
+3) Update your local Helm repository to the latest version using the command: 
+   - helm repo update pega https://pegasystems.github.io/pega-helm-charts
+4) Update your values.yaml file to refer to the external secret manager for DB password.
+
+•  Pass secrets directly to your deployment using your organization's recommend practices.
 
 ### Driver URI
 
