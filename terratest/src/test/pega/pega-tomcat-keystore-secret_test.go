@@ -9,7 +9,7 @@ import (
 	"testing"
 )
 
-func TestPegaTomcatCertificatesSecret(t *testing.T) {
+func TestPegaTomcatKeystoreSecret(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
@@ -34,7 +34,7 @@ func TestPegaTomcatCertificatesSecret(t *testing.T) {
 					},
 				}
 
-				yamlContent, error := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-tomcat-certificates-secret.yaml"})
+				yamlContent, error := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-tomcat-keystore-secret.yaml"})
 				if error != nil {
 					VerifyTomcatCertificatesSecret(t, yamlContent, options)
 				}
@@ -51,7 +51,7 @@ func VerifyTomcatCertificatesSecret(t *testing.T, yamlContent string, options *h
 
 	importCertSecretData := importCertSecret.StringData
 	if len(importCertSecretData) != 0 {
-		require.Equal(t, importCertSecret.ObjectMeta.Name, getObjName(options, "-tomcat-certificates-secret"))
+		require.Equal(t, importCertSecret.ObjectMeta.Name, getObjName(options, "-tomcat-keystore-secret"))
 		require.Equal(t, importCertSecretData["CERT_PASSWORD"], "123456")
 	} else {
 		require.Nil(t, importCertSecret.Data)

@@ -48,18 +48,18 @@ false
 {{- end }}
 {{- end }}
 
-{{- define "pegaTomcatCertificatesSecret" }}
+{{- define "pegaTomcatKeystoreSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-tomcat-certificates-secret
+{{- $depName -}}-tomcat-keystore-secret
 {{- end }}
 
-{{- define "pegaVolumeTomcatCertificates" }}pega-volume-tomcat-certificates{{- end }}
+{{- define "pegaVolumeTomcatKeystore" }}pega-volume-tomcat-keystore{{- end }}
 
-{{- define "pegaTomcatCertificatesTemplate" }}
-- name: {{ template "pegaVolumeTomcatCertificates" }}
+{{- define "pegaTomcatKeystoreTemplate" }}
+- name: {{ template "pegaVolumeTomcatKeystore" }}
   secret:
     # This name will be referred in the volume mounts kind.
-    secretName: {{ template "pegaTomcatCertificatesSecret" $ }}
+    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}
@@ -395,10 +395,10 @@ servicePort: {{ .node.service.port }}
 service:
   name: {{ .name }}
   port:
-    number: {{ .node.tlscertificates.tlsport }}
+    number: {{ .node.service.tlsport }}
 {{- else }}
 serviceName: {{ .name }}
-servicePort: {{ .node.tlscertificates.tlsport }}
+servicePort: {{ .node.service.tlsport }}
 {{- end }}
 {{- end }}
 

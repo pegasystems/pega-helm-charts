@@ -46,8 +46,8 @@ spec:
 {{- if .node.tlscertificates }}
 {{- if .node.tlscertificates.enabled }}
   - name: https
-    port: {{ .node.tlscertificates.tlsport }}
-    targetPort: {{ .node.tlscertificates.tlstargetPort }}
+    port: {{ .node.service.tlsport }}
+    targetPort: {{ .node.service.tlstargetPort }}
 {{- end }}
 {{- end }}
   selector:

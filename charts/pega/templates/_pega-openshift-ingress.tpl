@@ -30,7 +30,7 @@ spec:
   {{- if .node.tlscertificates.cacertificate }}
     destinationCACertificate: {{ .node.tlscertificates.cacertificate -}}
   {{- else }}
-    destinationCACertificate: {{ .root.Files.Get "config/certs/pegaselfsignedcert1.cer" | quote }}
+    destinationCACertificate: {{ .root.Files.Get "config/certs/pegaca.crt" | quote }}
   {{- end }}
 {{- else }}
     termination: edge

@@ -70,7 +70,7 @@ spec:
 {{- end }}
 {{- if .node.tlscertificates }}
 {{- if .node.tlscertificates.enabled }}
-{{- include "pegaTomcatCertificatesTemplate" .root | indent 6 }}
+{{- include "pegaTomcatKeystoreTemplate" .root | indent 6 }}
 {{ end }}
 {{ end }}
 {{- if .custom }}
@@ -204,7 +204,7 @@ spec:
 {{ end }}
 {{- if .node.tlscertificates }}
 {{- if .node.tlscertificates.enabled }}
-        - name: {{ template "pegaVolumeTomcatCertificates" }}
+        - name: {{ template "pegaVolumeTomcatKeystore" }}
           mountPath: "/opt/pega/tlscerts"
 {{ end }}
 {{ end }}

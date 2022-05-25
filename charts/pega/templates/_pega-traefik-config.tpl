@@ -15,8 +15,9 @@ spec:
 {{- else }}
   insecureSkipVerify: false
 {{- end }}
+#For traefik, it expects the root CA certificate in a secret under the field ca.crt
   rootCAsSecrets:
-    - {{ .depname }}-tomcat-certificates-secret
+    - {{ .depname }}-tomcat-keystore-secret
 {{- if .node.tlscertificates.traefik.serverName }}
   serverName: {{ .node.tlscertificates.traefik.serverName -}}
 {{- else }}
