@@ -12,14 +12,14 @@ stringData:
   # cert Files
   # Base64 encoded password for enabling TLS in tomcat
 {{- if .node.tlscertificates.keystorepassword }}
-  CERT_PASSWORD: {{ .node.tlscertificates.keystorepassword | quote}}
+  TOMCAT_KEYSTORE_PASSWORD: {{ .node.tlscertificates.keystorepassword | quote}}
 {{- else }}
-  CERT_PASSWORD: "123456"
+  TOMCAT_KEYSTORE_PASSWORD: "123456"
 {{- end }}
 {{- if .node.tlscertificates.keystore }}
-  CERT_CONTENT: {{ .node.tlscertificates.keystore | quote -}}
+  TOMCAT_KEYSTORE_CONTENT: {{ .node.tlscertificates.keystore | quote -}}
 {{- else }}
-  CERT_CONTENT: {{ .root.Files.Get "config/certs/pegakeystore.jks" | b64enc | indent 2 }}
+  TOMCAT_KEYSTORE_CONTENT: {{ .root.Files.Get "config/certs/pegakeystore.jks" | b64enc | indent 2 }}
 {{- end }}
 # this field is used for traefik, it expects the root CA certificate in a secret under the field ca.crt
 {{- if .node.tlscertificates.cacertificate }}
