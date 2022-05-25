@@ -44,6 +44,7 @@ traefik:
       memory: 500Mi
 
 # When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+## For more details on this, please refer https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
@@ -55,7 +56,6 @@ aws-load-balancer-controller:
   
   ## Deployments on AWS Gov Cloud requires the image repository to be passed explicitly. Please enable this block for aws gov cloud deployments only.
   ## The AMAZON_CONTAINER_IMAGE_REGISTRY can be found here: https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html
-  ## For more details on this, please refer https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
   ##image:
   ##  repository: "<AMAZON_CONTAINER_IMAGE_REGISTRY>/amazon/aws-load-balancer-controller"
   
