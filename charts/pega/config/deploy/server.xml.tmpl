@@ -79,12 +79,12 @@
 	       maxThreads="1"/>
 
     <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
-    {{ if and .Env.CERT_DIR .Env.CERT_PASSWORD }}
+    {{ if and .Env.TOMCAT_KEYSTORE_DIR .Env.TOMCAT_KEYSTORE_PASSWORD }}
 
 	<Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
-                   maxThreads="150" scheme="https" secure="true" SSLEnabled="true"
-                   keystoreFile="{{ .Env.CERT_DIR }}"
-                   keystorePass="{{ .Env.CERT_PASSWORD }}"
+                   scheme="https" secure="true" SSLEnabled="true"
+                   keystoreFile="{{ .Env.TOMCAT_KEYSTORE_DIR }}"
+                   keystorePass="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}"
                    clientAuth="false" sslProtocol="TLS" relaxedQueryChars="[ ]"
                    relaxedPathChars="[ ]"
                    maxHttpHeaderSize="16384"
