@@ -18,7 +18,7 @@ metadata:
     appgw.ingress.kubernetes.io/ssl-redirect: "true"
 {{ end }}
 {{- if or (.node.service.domain) (.node.ingress) }}
-{{- if (.node.tlscertificates).enabled }}
+{{- if (.node.tls).enabled }}
     # TLS certificate used for the ingress
     appgw.ingress.kubernetes.io/backend-protocol: https
 {{- end }}
@@ -39,7 +39,7 @@ spec:
         backend:
 # protocol will be set to https only when either ingress is enabled or domain is set
 {{- if or (.node.service.domain) (.node.ingress) }}
-{{- if (.node.tlscertificates).enabled }}
+{{- if (.node.tls).enabled }}
     {{ include "ingressServiceHttps" . | indent 10 }}
 {{- else }}
     {{ include "ingressService" . | indent 10 }}

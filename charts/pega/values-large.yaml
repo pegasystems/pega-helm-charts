@@ -115,7 +115,7 @@ global:
         tlstargetPort: 8443
 
       # to enable TLS between ingress/loadbalancer and the backend, set the following:
-      tlscertificates:
+      tls:
         enabled: false
         keystore: ""
         keystorepassword: ""
