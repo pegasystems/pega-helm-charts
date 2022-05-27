@@ -68,10 +68,8 @@ spec:
 {{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
 {{- end }}
 {{- end }}
-{{- if .node.tls }}
-{{- if .node.tls.enabled }}
-{{- include "pegaTomcatKeystoreTemplate" .root | indent 6 }}
-{{ end }}
+{{- if (.node.tls).enabled }}
+{{- include "pegaVolumeTomcatKeystoreTemplate" .root | indent 6 }}
 {{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
@@ -202,11 +200,9 @@ spec:
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{ end }}
-{{- if .node.tls }}
-{{- if .node.tls.enabled }}
+{{- if (.node.tls).enabled }}
         - name: {{ template "pegaVolumeTomcatKeystore" }}
-          mountPath: "/opt/pega/tlscerts"
-{{ end }}
+          mountPath: "/opt/pega/tomcatcertsmount"
 {{ end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}

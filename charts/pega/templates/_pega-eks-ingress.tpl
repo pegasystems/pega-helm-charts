@@ -38,11 +38,9 @@ metadata:
     alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 {{- end }}
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{- if or (.node.service.domain) (.node.ingress) }}
 {{- if (.node.tls).enabled }}
     # TLS certificate used for the ingress
     alb.ingress.kubernetes.io/backend-protocol: HTTPS
-{{- end }}
 {{- end }}
 spec:
   rules:
@@ -75,14 +73,6 @@ spec:
       - pathType: ImplementationSpecific
         backend:
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{- if or (.node.service.domain) (.node.ingress) }}
-{{- if (.node.tls).enabled }}
-    {{ include "ingressServiceHttps" . | indent 10 }}
-{{- else }}
-    {{ include "ingressService" . | indent 10 }}
-{{- end }}
-{{- else }}
-    {{ include "ingressService" . | indent 10 }}
-{{- end }}
+{{ include "ingressBackend" . }}
 ---
 {{- end }}

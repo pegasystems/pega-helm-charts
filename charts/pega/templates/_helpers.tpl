@@ -55,7 +55,7 @@ false
 
 {{- define "pegaVolumeTomcatKeystore" }}pega-volume-tomcat-keystore{{- end }}
 
-{{- define "pegaTomcatKeystoreTemplate" }}
+{{- define "pegaVolumeTomcatKeystoreTemplate" }}
 - name: {{ template "pegaVolumeTomcatKeystore" }}
   secret:
     # This name will be referred in the volume mounts kind.
@@ -399,6 +399,14 @@ service:
 {{- else }}
 serviceName: {{ .name }}
 servicePort: {{ .node.service.tlsport }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressBackend" }}
+{{- if (.node.tls).enabled }}
+    {{ include "ingressServiceHttps" . | indent 10 }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
 {{- end }}
 {{- end }}
 

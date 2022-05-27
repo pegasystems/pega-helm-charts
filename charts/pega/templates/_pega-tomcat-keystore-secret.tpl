@@ -1,7 +1,6 @@
 {{- define "pegaTomcatKeystoreSecretTemplate" }}
 # Secret used for tls certificates to configure https to tomcat
-{{- if .node.tls }}
-{{- if .node.tls.enabled }}
+{{- if (.node.tls).enabled }}
 kind: Secret
 apiVersion: v1
 type: Opaque
@@ -26,7 +25,6 @@ stringData:
   ca.crt: {{ .node.tls.cacertificate | b64dec | quote -}}
 {{- else }}
   ca.crt: {{ .root.Files.Get "config/certs/pegaca.crt" | quote | indent 2 }}
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

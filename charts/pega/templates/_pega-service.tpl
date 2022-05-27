@@ -43,12 +43,10 @@ spec:
   - name: http
     port: {{ .node.service.port }}
     targetPort: {{ .node.service.targetPort }}
-{{- if .node.tls }}
-{{- if .node.tls.enabled }}
+{{- if (.node.tls).enabled }}
   - name: https
     port: {{ .node.service.tlsport }}
     targetPort: {{ .node.service.tlstargetPort }}
-{{- end }}
 {{- end }}
   selector:
     app: {{ .name }}

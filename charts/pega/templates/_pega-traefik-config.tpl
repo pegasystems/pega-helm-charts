@@ -1,7 +1,6 @@
 {{- define "pegaTraefikConfigTemplate" }}
 # Secret used for tls certificates to configure https to tomcat
-{{- if .node.tls }}
-{{- if .node.tls.enabled }}
+{{- if (.node.tls).enabled }}
 {{- if .node.tls.traefik.enabled }}
 kind: ServersTransport
 apiVersion: traefik.containo.us/v1alpha1
@@ -22,7 +21,6 @@ spec:
   serverName: {{ .node.tls.traefik.serverName -}}
 {{- else }}
   serverName: www.pega.com
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}

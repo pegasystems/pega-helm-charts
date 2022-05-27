@@ -53,14 +53,6 @@ spec:
       - pathType: ImplementationSpecific
         backend: 
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{- if or (.node.service.domain) (.node.ingress) }}
-{{- if (.node.tls).enabled }}
-    {{ include "ingressServiceHttps" . | indent 10 }}
-{{- else }}
-    {{ include "ingressService" . | indent 10 }}
-{{- end }}
-{{- else }}
-    {{ include "ingressService" . | indent 10 }}
-{{- end }}
+{{ include "ingressBackend" . }}
 ---
 {{- end }}
