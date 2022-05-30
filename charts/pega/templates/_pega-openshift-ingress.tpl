@@ -14,7 +14,7 @@ metadata:
 spec:
   # Host on which you can reach mentioned service.
   host: {{ template "domainName" dict "node" .node }}
-{{- if (.node.tls).enabled }}
+{{- if (.node.service.tls).enabled }}
   port:
       targetPort: https
 {{- end }}
@@ -25,10 +25,10 @@ spec:
   tls:
     # Edge-terminated routes can specify an insecureEdgeTerminationPolicy that enables traffic on insecure schemes (HTTP) to be disabled, allowed or redirected.  (None/Allow/Redirect/EMPTY_VALUE)
     insecureEdgeTerminationPolicy: Redirect
-{{- if (.node.tls).enabled }}
+{{- if (.node.service.tls).enabled }}
     termination: reencrypt
-  {{- if .node.tls.cacertificate }}
-    destinationCACertificate: {{ .node.tls.cacertificate -}}
+  {{- if .node.service.tls.cacertificate }}
+    destinationCACertificate: {{ .node.service.tls.cacertificate -}}
   {{- else }}
     destinationCACertificate: {{ .root.Files.Get "config/certs/pegaca.crt" | quote }}
   {{- end }}

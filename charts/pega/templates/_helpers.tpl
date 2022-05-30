@@ -395,15 +395,15 @@ servicePort: {{ .node.service.port }}
 service:
   name: {{ .name }}
   port:
-    number: {{ .node.service.tlsport }}
+    number: {{ .node.service.tls.port }}
 {{- else }}
 serviceName: {{ .name }}
-servicePort: {{ .node.service.tlsport }}
+servicePort: {{ .node.service.tls.port }}
 {{- end }}
 {{- end }}
 
 {{- define "ingressBackend" }}
-{{- if (.node.tls).enabled }}
+{{- if (.node.service.tls).enabled }}
     {{ include "ingressServiceHttps" . | indent 10 }}
 {{- else }}
     {{ include "ingressService" . | indent 10 }}
