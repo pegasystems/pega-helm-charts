@@ -104,6 +104,7 @@ global:
         # set enabled=true, only if addon chart is deployed and traefik is enabled
         traefik:
           enabled: false
+          # the SAN of the certificate present inside the container
           serverName: ""
           # set insecureSkipVerify=true, if the certificate verification has to be skipped
           insecureSkipVerify: false
