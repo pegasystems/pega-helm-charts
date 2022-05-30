@@ -128,8 +128,6 @@ global:
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
 
-
-
       ingress:
         # For help configuring the ingress block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress

@@ -403,7 +403,7 @@ servicePort: {{ .node.service.tls.port }}
 {{- end }}
 
 {{- define "ingressBackend" }}
-{{- if (.node.service.tls).enabled }}
+{{- if ((.node.service).tls).enabled }}
     {{ include "ingressServiceHttps" . | indent 10 }}
 {{- else }}
     {{ include "ingressService" . | indent 10 }}

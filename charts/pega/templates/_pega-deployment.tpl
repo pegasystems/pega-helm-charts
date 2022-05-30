@@ -68,7 +68,7 @@ spec:
 {{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
 {{- end }}
 {{- end }}
-{{- if (.node.service.tls).enabled }}
+{{- if ((.node.service).tls).enabled }}
 {{- include "pegaVolumeTomcatKeystoreTemplate" .root | indent 6 }}
 {{ end }}
 {{- if .custom }}
@@ -200,7 +200,7 @@ spec:
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{ end }}
-{{- if (.node.service.tls).enabled }}
+{{- if ((.node.service).tls).enabled }}
         - name: {{ template "pegaVolumeTomcatKeystore" }}
           mountPath: "/opt/pega/tomcatcertsmount"
 {{ end }}
