@@ -145,6 +145,16 @@ Create a PostgreSQL database in your new SQL instance for the Pega Platform inst
 
 With your SQL service IP address and your new database name, you are ready to continue to the next section.
 
+#### (Optional) Add Support for providing DB credentials using External Secrets Operator
+
+Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.3/) :
+•	An external secret file that specifies what information in your secret to fetch.
+•	A secret store to define access how to access the external and placing the required files in your Helm directory.
+
+- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
+- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
+- Update Pega.yaml file to refer to the external secret manager for DB password.
+
 ## Installing and deploying Pega Platform using Helm charts – 90 minutes
 
 To deploy Pega Platform by using Helm, customize the pega.yaml Helm chart that holds the specific settings for your deployment needs and then run a series of Helm commands to complete the deployment.
