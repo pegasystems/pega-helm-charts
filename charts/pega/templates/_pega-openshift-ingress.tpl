@@ -28,7 +28,7 @@ spec:
 {{- if ((.node.service).tls).enabled }}
     termination: reencrypt
   {{- if .node.service.tls.cacertificate }}
-    destinationCACertificate: {{ .node.service.tls.cacertificate -}}
+    destinationCACertificate: {{ .node.service.tls.cacertificate | b64dec | quote -}}
   {{- else }}
     destinationCACertificate: {{ .root.Files.Get "config/certs/pegaca.crt" | quote }}
   {{- end }}
