@@ -917,7 +917,7 @@ hazelcast:
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 
-Pega supports mounting and passing TLS certificates into the container to enable TLS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under service to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+Pega supports mounting and passing TLS certificates into the container to enable TLS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
