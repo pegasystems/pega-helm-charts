@@ -54,6 +54,10 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
+  env:  
+    - name: WAIT_TIME
+      value: {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
+      
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -61,6 +65,9 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
+  env:  
+    - name: WAIT_TIME
+      value: {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -69,6 +76,9 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
+  env:  
+    - name: WAIT_TIME
+      value: {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
