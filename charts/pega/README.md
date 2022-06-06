@@ -915,19 +915,90 @@ hazelcast:
 ```
 
 
-### Enable Tomcat to use HTTPS
+### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 
-Pega supports mounting and passing TLS certificates into the container to enable HTTPS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tlscertificates` attributes as a map along with the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+Pega supports mounting and passing TLS certificates into the container to enable TLS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under service to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
 
-Example:
+Parameter   | Description   | Default value
+---         | ---           | ---
+`service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
+`service.tls.targetPort` | The target port of the container to expose. The tls enabled Pega container exposes web traffic on port `8443`. | `8443`
+`service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
+`service.tls.keystore` | The keystore content for the tier. If left empty, a default keystore will be used internally | `""`
+`service.tls.keystorepassword` | The keystore password for the tier. If left empty, default password for the default keystore will be used internally | `""`
+`service.tls.cacertificate` | The CA certificate for the tier. If left empty, a default CA certificate for the default keystore will be used internally | `""`
+`service.tls.traefik.enabled` | Set as true if Traefik is enabled for the tier and Traefik addon has been deployed, otherwise false. | `false`
+`service.tls.traefik.serverName` | The server name for the tier, SAN of the certificate present inside the container | `""`
+`service.tls.traefik.insecureSkipVerify` | Set as `true` if the certificate should be skipped verification,this means, we do not need a valid root/CA certificate but the traffic will be encrypted. otherwise `false`. | `false`
+
+##### Points to note
+-	A default self-signed keystore and a custom root/CA certificate will be shipped by default, So service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate are related, all 3 values must be empty in order to use the default certificates.
+-	Base encode your keystore and certificates using the below command:
+     o	Linux:  cat ca_bundle.crt | base64
+     o	Windows: type smootherbug.jks | openssl base64  (needs openssl)
+-	Add the encoded content in the values.yaml.
+-	The keystore file should be created mandatorily with the SAN field present in case of Traefik ingress controller.
+
+####Example:
+if the tls is enabled for the web tier and the traefik addon is deployed for `k8s` provider, the following values.yaml should be used
 
 ```yaml
-tlscertificates:
-  enabled: true
-  certificate: |
-    "Encoded certificate content"
-  tlspassword: "123456"
-  tlsport: 443
-  tlstargetPort: 8443
+# to enable TLS between ingress/loadbalancer and the backend, set the following:
+tls:
+   enabled: true
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: true
+      serverName: "<< SAN name of the certificate >>"
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: false
+
+```
+
+if the tls is enabled for the web tier and the traefik addon is not deployed for other providers, the following values.yaml should be used
+
+```yaml
+# to enable TLS between ingress/loadbalancer and the backend, set the following:
+tls:
+   enabled: true
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
+
+```
+
+if the tls is not enabled for the web tier , the following values.yaml should be used
+
+```yaml
+# to enable TLS between ingress/loadbalancer and the backend, set the following:
+tls:
+   enabled: false
+   keystore: ""
+   keystorepassword: ""
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: ""
+   # set enabled=true, only if addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
 
 ```
