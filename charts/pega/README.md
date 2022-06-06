@@ -939,7 +939,7 @@ Parameter   | Description   | Default value
 -	Add the encoded content in the values.yaml.
 -	The keystore file should be created mandatorily with the SAN field present in case of Traefik ingress controller.
 
-####Example:
+#### Example:
 if the tls is enabled for the web tier and the traefik addon is deployed for `k8s` provider, the following values.yaml should be used
 
 ```yaml
