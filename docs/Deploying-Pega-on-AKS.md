@@ -474,6 +474,8 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
+- To enable encryption of traffic between ingress/load balancer and the pods by specifying SSL certificates for your web tiers.
+
 - Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
@@ -499,6 +501,7 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
     | docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
     | docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
     | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul> |
+    | tier.name: ”web” tier.service.tls:| Set this flag as `true` if the traffic between the loadbalancer/ingress and pods needs to be encrypted. Pega ships with a default self-signed certificate and also supports specifying your own certificate.  | <ul><li>tier.service.tls.enabled: set to `true` to enable the traffic encryption </li><li>tier.service.tls.port: 443</li><li>tier.service.tls.targetPort: 8443</li><li>tier.service.tls.keystore: The base64 encoded content of the keystore file, leaving it empty will take a default self-signed certificate. The CN of the certificate should be same as that of the domain specified in `tiers.web.ingress.domain`, see [End-to-end TLS with the v2 SKU](https://docs.microsoft.com/en-us/azure/application-gateway/ssl-overview#end-to-end-tls-with-the-v2-sku).</li><li>tier.service.tls.keystorepassword: the password of the keystore file</li><li>tier.service.tls.cacertificate: the base64 encrypted content of the root CA certificate. This should be left empty for AKS deployment.</li><li>tier.service.traefik.enabled: set to `false` as this option is for a different provider</li></ul> |
     | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul> |
     | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul> |
     | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
@@ -508,6 +511,18 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
     | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
 
 3. Save the file.
+
+### Changes in Backend setting if tiers.service.tls.domain is `true`
+
+If the setting `tiers.service.tls.enabled` is set to `true` and the certificate in the keystore is issued by a valied CA authority, no additional steps is required.
+else if the certificate in the keystore is a self-signed or not issued by a valid certificate authority, the following additional configuration is required in Azure application gateway,
+
+- Go to the Application Gateway created
+- In the left side pane, under **Settings**, select **Backend Settings** option
+- Under **Trusted Root Certificate**, select **No** for **Use well known CA certificate** option
+- A new section appears, click **Create New**
+- Upload your CA certificate as .cer file in the **CER certificate** field and give a name for the certificate in **Cert name** field.
+- Click **Save** to update the backend settings
 
 ### Deploying Pega Platform using the command line
 
