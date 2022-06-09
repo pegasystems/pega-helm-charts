@@ -917,7 +917,7 @@ hazelcast:
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 
-Pega supports mounting and passing TLS certificates into the container to enable TLS during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+Using Helm version _____, Pega supports mounting and passing TLS certificates into the container to enable TLS between loadbalancer/ingress and pods during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
@@ -933,11 +933,13 @@ Parameter   | Description   | Default value
 
 ##### Important Points to note
 - By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version _____. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- The CA certificate should be issued by any valid Certificate Authorities or we can also use a self created CA certificate with proper chaining.
 - To encode your keystore and certificates using the following command:
      o	Linux:  cat ca_bundle.crt | base64
      o	Windows: type keystore.jks | openssl base64  (needs openssl)
 - Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
 - Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
+- Make sure you update your docker web images to the latest versions in order to use this feature. If you use the latest Helm charts with older docker images and set `service.tls.enabled` to `true` you will face a `Bad Gateway` error. So make sure you set the flag to `false` or update to the latest patch version.
 
 #### Example:
 With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
