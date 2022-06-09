@@ -111,7 +111,7 @@ global:
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
-        # to enable TLS between ingress/loadbalancer and the backend, set the following:
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
           keystore: ""
