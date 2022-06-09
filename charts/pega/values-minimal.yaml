@@ -91,7 +91,7 @@ global:
         targetPort: 8080
         # Without a load balancer, use a direct NodePort instead.
         serviceType: "NodePort"
-        # to enable TLS between ingress/loadbalancer and the backend, set the following:
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
           keystore: ""
