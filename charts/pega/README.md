@@ -917,7 +917,7 @@ hazelcast:
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 
-Using Helm version _____, Pega supports mounting and passing TLS certificates into the container to enable TLS between loadbalancer/ingress and pods during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+Using Helm version `2.2.0`, Pega supports mounting and passing TLS certificates into the container to enable TLS between loadbalancer/ingress and pods during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
@@ -932,14 +932,14 @@ Parameter   | Description   | Default value
 `service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
 
 ##### Important Points to note
-- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version _____. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
-- The CA certificate should be issued by any valid Certificate Authorities or we can also use a self created CA certificate with proper chaining.
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
 - To encode your keystore and certificates using the following command:
      o	Linux:  cat ca_bundle.crt | base64
      o	Windows: type keystore.jks | openssl base64  (needs openssl)
 - Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
 - Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
-- Make sure you update your docker web images to the latest versions in order to use this feature. If you use the latest Helm charts with older docker images and set `service.tls.enabled` to `true` you will face a `Bad Gateway` error. So make sure you set the flag to `false` or update to the latest patch version.
+- You must use the latest Docker web images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
 
 #### Example:
 With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
