@@ -158,7 +158,7 @@ To customize these files, you must download them from the source github reposito
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
   pega/pega             2.2.0                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
   pega/addons           2.2.0           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
-  pega/backingservices  2.2.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
+  pega/backingservices  2.2.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment.
 ```
 
 The addons charts is not required for OpenShift deployments of Pega Platform. Use of the backingservices chart is optional, but recommended for delivering your ElasticSearch service for Pega Infinity 8.6 and later.
