@@ -22,6 +22,15 @@
 {{- define "pegaInstallEnvironmentConfig" -}}pega-install-environment-config{{- end -}}
 {{- define "pegaUpgradeEnvironmentConfig" -}}pega-upgrade-environment-config{{- end -}}
 {{- define "pegaDistributionKitVolume" -}}pega-distribution-kit-volume{{- end -}}
+{{- define "k8sWaitForWaitTime" -}}
+  {{- if (.Values.global.utilityImages.k8s_wait_for) -}}
+    {{- if (.Values.global.utilityImages.k8s_wait_for.waitTimeSeconds) -}}
+      {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
+    {{- else -}}
+      2
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
 
 {{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
@@ -56,8 +65,7 @@
   args: [ 'job', '{{ template "pegaDBInstall" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}"
-      
+      value: "{{ template "k8sWaitForWaitTime" }}"
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -67,7 +75,7 @@
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}"
+      value: "{{ template "k8sWaitForWaitTime" }}"
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -78,7 +86,7 @@
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}"
+      value: "{{ template "k8sWaitForWaitTime" }}"
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
