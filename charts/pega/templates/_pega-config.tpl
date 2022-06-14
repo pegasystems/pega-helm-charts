@@ -50,11 +50,11 @@ data:
 {{- end }}
 
   # Pega deployment server.xml file
-  server.xml: |-
+  server.xml.tmpl: |-
 {{- if $custom_config.serverXML }}
 {{ $custom_config.serverXML | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/server.xml" | indent 6 }}
+{{ .root.Files.Get "config/deploy/server.xml.tmpl" | indent 6 }}
 {{- end }}
 
 {{- if $custom_config.webXML }}

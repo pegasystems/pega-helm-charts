@@ -111,6 +111,22 @@ global:
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
+        tls:
+          enabled: false
+          keystore: ""
+          keystorepassword: ""
+          port: 443
+          targetPort: 8443
+          # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+          cacertificate: ""
+          # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
+          traefik:
+            enabled: false
+            # the SAN of the certificate present inside the container
+            serverName: ""
+            # set insecureSkipVerify=true, if the certificate verification has to be skipped
+            insecureSkipVerify: false
 
       ingress:
         # For help configuring the ingress block, see the Helm chart documentation
