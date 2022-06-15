@@ -1,50 +1,46 @@
 package pega
 
 import (
+	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
-	intstr "k8s.io/apimachinery/pkg/util/intstr"
 	k8sv1beta1 "k8s.io/api/extensions/v1beta1"
+	intstr "k8s.io/apimachinery/pkg/util/intstr"
 	"path/filepath"
-	"testing"
 	"strings"
-	"fmt"
+	"testing"
 )
 
-
-
-func TestPegaTierIngress(t *testing.T){
-	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
-	var supportedVendors = []string{"k8s","eks","gke","aks","pks"}
-    var deploymentNames = []string{"pega","myapp-dev"}
+func TestPegaTierIngress(t *testing.T) {
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
+	for _, vendor := range supportedVendors {
 
-	for _,vendor := range supportedVendors{
+		for _, operation := range supportedOperations {
 
-		for _,operation := range supportedOperations{
+			for _, depName := range deploymentNames {
 
-                for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation)
 
-                fmt.Println(vendor + "-" + operation)
-
-                var options = &helm.Options{
-                    SetValues: map[string]string{
-                        "global.deployment.name": depName,
-                        "global.provider":        vendor,
-                        "global.actions.execute": operation,
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-                    },
-                }
+					},
+				}
 
-                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
-                VerifyPegaIngresses(t, yamlContent, options)
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+				VerifyPegaIngresses(t, yamlContent, options)
 			}
 		}
 	}
-
 
 }
 
@@ -70,7 +66,7 @@ func VerifyPegaIngresses(t *testing.T, yamlContent string, options *helm.Options
 }
 
 func VerifyPegaIngress(t *testing.T, ingressObj *k8sv1beta1.Ingress, expectedIngress pegaIngress, options *helm.Options) {
-    require.Equal(t, ingressObj.ObjectMeta.Name, expectedIngress.Name)
+	require.Equal(t, ingressObj.ObjectMeta.Name, expectedIngress.Name)
 	provider := options.SetValues["global.provider"]
 	if provider == "eks" {
 		VerifyEKSIngress(t, ingressObj, expectedIngress)
