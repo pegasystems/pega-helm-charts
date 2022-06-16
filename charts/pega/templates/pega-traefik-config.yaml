@@ -1,0 +1,8 @@
+{{ $depName := printf "%s" (include "deploymentName" $) }}
+
+{{ if (eq (include "performDeployment" $) "true") }}
+{{ range $index, $dep := .Values.global.tier }}
+{{ $data := dict "root" $ "node" $dep "depname" $depName  "name" (printf "%s-%s" $depName $dep.name) }}
+{{- include "pegaTraefikConfigTemplate" $data }}
+{{ end }}
+{{ end }}

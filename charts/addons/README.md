@@ -26,15 +26,22 @@ Example:
 ```yaml
 traefik:
   enabled: true
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
     type: NodePort
-    nodePorts:
-      http: 30080
-      https: 30443
+  ports:
+    web:
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
+      tls:
+        enabled: false
+        options: ""
+        certResolver: ""
+        domains: []
   resources:
     requests:
       cpu: 200m
@@ -42,6 +49,7 @@ traefik:
     limits:
       cpu: 500m
       memory: 500Mi
+
 ```
 
 ### Amazon ALB
