@@ -52,6 +52,7 @@ spec:
       {{ end }}
       - pathType: ImplementationSpecific
         backend: 
-{{ include "ingressService" . | indent 10 }}
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{ include "ingressBackend" . }}
 ---
 {{- end }}

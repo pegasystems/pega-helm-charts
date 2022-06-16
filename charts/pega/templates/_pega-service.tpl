@@ -22,9 +22,16 @@ metadata:
     traefik.ingress.kubernetes.io/max-conn-amount: '10'
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
+{{- if ((.node.service).tls).enabled }}
+{{- if .node.service.tls.traefik.enabled }}
+    # Sets serversTreansport that has config in order to verify rootCA
+    traefik.ingress.kubernetes.io/service.serverstransport: {{ .root.Release.Namespace }}-{{ .name }}-servers-transport@kubernetescrd
+{{- end }}
+{{- end }}
   {{- else if (eq .root.Values.global.provider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
     {{ if (semverCompare "< 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}beta.{{ end -}}cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
   {{ end }}
 {{- end }}
@@ -40,6 +47,11 @@ spec:
   - name: http
     port: {{ .node.service.port }}
     targetPort: {{ .node.service.targetPort }}
+{{- if (.node.service.tls).enabled }}
+  - name: https
+    port: {{ .node.service.tls.port }}
+    targetPort: {{ .node.service.tls.targetPort }}
+{{- end }}
   selector:
     app: {{ .name }}
 ---
