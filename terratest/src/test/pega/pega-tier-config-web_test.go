@@ -33,8 +33,8 @@ func TestPegaTierConfigWithWeb(t *testing.T) {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":               vendor,
+					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
@@ -79,7 +79,7 @@ func VerifyTierConfgWithWeb(t *testing.T, yamlContent string, options *helm.Opti
 			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
 			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
-			compareConfigMapData(t, pegaConfigMapData["server.xml"], "data/expectedInstallDeployServer.xml")
+			compareConfigMapData(t, pegaConfigMapData["server.xml.tmpl"], "data/expectedInstallDeployServer.xml.tmpl")
 			compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
 		}
 	}
