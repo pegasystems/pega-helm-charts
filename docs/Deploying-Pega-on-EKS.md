@@ -2,6 +2,8 @@
 
 Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
 
+Pega Platform deployments in EKS environments support commercial and GovCloud regions.
+
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a EKS cluster without much experience in either EKS configurations or Pega Platform deployments.
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a EKS cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a EKS cluster with a Amazon RDS database instance and two clustered virtual machines (VMs).
@@ -46,6 +48,10 @@ The following account, resources, and application versions are required for use 
 - Pega Platform 8.3.1 or later.
 
 - Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
+
+- Clients deploying to GovCloud region must upload their Pega-provided Docker images to an ECR repository and reference them in the Pega yaml file before they can use the Helm charts to deploy Pega Platform.
+
+- Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.Pega Platform deployments support commercial and GovCloud regions.
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -93,6 +99,8 @@ When you create an access key, the key pair is active by default, and you can us
 ### Configuring your AWS CLI credentials
 
 To save your IAM user access keys and other preferences for your EKS deployment to a configuration file on your local system, use the `aws configure` command. this command prompts you for four pieces of information you must specify in order to deploy an EKS cluster in your AWS account (access key, secret access key, AWS Region, and output format). For complete details about what this information includes, see the overview article, [Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html). To see details that may be useful to customize your stored credentials to meet your organization's business needs, see [Configuration and Credential File Settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+
+Pega Platform deployments support commercial and GovCloud regions.
 
 To setup your local system and save your AWS credentials and profile to the $USER/.aws file, enter:
 
@@ -158,7 +166,7 @@ nodeGroups:
 instanceType: m5.xlarge
 minSize: 2
 ```
-You should use a name and region here to reflect the version of Pega Platform you want to deploy and specify the region in which your cluster will run.
+Pega Platform deployments support commercial and GovCloud regions. Use a name and region here to reflect the version of Pega Platform you want to deploy and specify the region in which your cluster will run. Clients deploying to GovCloud region should specify a valid GovCloud region.
 
 2. To create your Amazon EKS cluster and Windows and Linux worker nodes, from your /EKS-demo folder, enter.
 
@@ -434,7 +442,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
 - Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
 - Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
-- Uncomment and specify the Amazon EKS Amazon ECR image repository in the image.repository: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
+- Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
 - Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
