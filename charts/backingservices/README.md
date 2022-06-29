@@ -38,6 +38,28 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 ### Deploying SRS with Pega-provided busybox images
 To deploy Pega Platform with the SRS backing service, the SRS helm chart requires the use of the busybox image.  For clients who want to pull this image from a registry other than Docker Hub, they must tag and push their image to another registry, and then pull it by specifying `busybox.image` and `busybox.imagePullPolicy`.
 
+### Enabling security between SRS and Elasticsearch
+To enable security connection between SRS and Elasticsearch below steps needs to be followed.
+
+| Configuration                            | Usage                                                                                                                                                                                                                                              |
+|------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `tls`                                    | Setting this to true will make SRS service to use es certificates for connection.                                                                                                                                                                  |
+| `srsStorage.provisionInternalESCluster`  | <ul><li>Set to `true` to enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.  |
+
+To connect to elasticsearch that is deployed on instacluster below configuration needs to be made.
+Certificates used by elasticsearch deployment on instacluster needs to be placed on to an accessible location for make command to use.
+eg: If certs are placed under /home/certs. Make command will look like this:
+make instacluster-secrets NAMESPACE=pegabackingservices PATH_TO_CERTIFICATE=/home/certs/truststore.jks
+
+| Configuration                            | Usage                                                                                                                                                                                                                                                                                                                              |
+|------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `tls`                                    | Setting this to true will make SRS service to use es certificates for connection.                                                                                                                                                                                                                                                  |
+| `instacluster.username`                  | Give the value of the username as shown in connection info section of instacluster.                                                                                                                                                                                                                                                |
+| `instacluster.username`                  | Give the value of the password as shown in connection info section of instacluster.                                                                                                                                                                                                                                                |
+| `srsStorage.provisionInternalESCluster`  | <ul><li>Set to `false` to disable this parameter to use your own Elasticsearch service from the SRS cluster; this Requires you to run `$ make instacluster-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`. </li><li> PATH_TO_CERTIFICATE takes the location value of the placed </li></ul> |
+| `domain`                                 | DNS entry associated with instacluster.                                                                                                                                                                                                                                                                                            |
+
+Note: Only .p12 and .jks certificates are supported.
 
 ### Configuration settings
 
@@ -48,8 +70,7 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 | `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.                                                                                                                                                                                                                                                                                             |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.10.2`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster. |
 | `srsStorage.provisionInternalESCluster` | <ul><li>Set to `true` to enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.</li><li>Set to `false` to disable this parameter to use your own Elasticsearch service from the SRS cluster.</li></ul>                                                               |
-| `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the BusyBox image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                     |
-
+| `alpine`                                | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                      |
 Example:
 
 ```yaml
