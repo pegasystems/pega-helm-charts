@@ -168,7 +168,7 @@ nodeGroups:
 instanceType: m5.xlarge
 minSize: 2
 ```
-Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the name of EKS cluster you want to deploy Pega Platform on and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller
+Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the version of Pega Platform you want to deploy and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller.
 
 2. To create your Amazon EKS cluster and Windows and Linux worker nodes, from your /EKS-demo folder, enter.
 
