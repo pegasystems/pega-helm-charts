@@ -39,6 +39,8 @@ The following account, resources, and application versions are required for use 
 
 - An Amazon AWS account with a payment method set up to pay for the Amazon cluster and RDS resources you create and appropriate AWS account permissions and knowledge to:
 
+  -	Set up an AWS Load Balancer Controller with an appropriate IAM role and policy for your region. For GovCloud deployments, there are specific requirements. For details, see [Installing the AWS Load Balancer Controller add-on]( https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html)
+
   - Create an Amazon RDS DB instance.
 
   - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
@@ -166,7 +168,7 @@ nodeGroups:
 instanceType: m5.xlarge
 minSize: 2
 ```
-Pega Platform deployments support commercial and GovCloud regions. Use a name and region here to reflect the version of Pega Platform you want to deploy and specify the region in which your cluster will run. Clients deploying to GovCloud region should specify a valid GovCloud region.
+Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the name of EKS cluster you want to deploy Pega Platform on and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller
 
 2. To create your Amazon EKS cluster and Windows and Linux worker nodes, from your /EKS-demo folder, enter.
 
@@ -443,7 +445,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
 - Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
 - Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
-- Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
+- Specify the complete required annotation to the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
