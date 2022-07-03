@@ -73,12 +73,11 @@ elasticsearch:
   imageTag: 7.10.2
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
-  replicas: 1
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
 
-  protocol: "http"
+  protocol: http
   # This section specifies the elasticsearch cluster configuration for authentication and TLS.
 
   esConfig:
