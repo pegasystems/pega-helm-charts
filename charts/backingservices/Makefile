@@ -24,6 +24,5 @@ es-secrets:
 purge-es-secrets:
 	kubectl delete secrets elastic-certificates elastic-certificate-pem elastic-certificate-crt --namespace=$(NAMESPACE) || true
 
-instacluster-secrets:
-	kubectl create secret generic elastic-certificates --from-file=$(PATH_TO_CERTIFICATE) --namespace=$(NAMESPACE) && \
-    kubectl create secret generic srs-certificates --from-file=$(PATH_TO_CERTIFICATE) --namespace=$(NAMESPACE)
+external-es-secrets:
+	kubectl create secret generic srs-certificates --from-file=$(PATH_TO_CERTIFICATE) --namespace=$(NAMESPACE)

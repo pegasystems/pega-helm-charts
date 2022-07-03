@@ -31,7 +31,8 @@ srs:
       AuthEnabled: false
       # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
       PublicKeyURL: ""
-    #  certificateName: "truststore.jks"
+      # Specify the certificate name used to connect to elasticsearch.
+      # certificateName: "truststore.jks"
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
@@ -41,13 +42,13 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    # authType: "tls"
     # The elasticsearch connection supports three authentication methods: basic authentication , AWS IAM role-based authentication and Elasticsearch secure connection(tls).
-    # tls: true
-    # instacluster details
-    # instacluster:
-    #   username: ""
-    #   password: ""
+    # tls:
+    #  enabled: true
+    # external elasticsearch deployment
+    # externalESDeployment:
+    #  username: ""
+    #  password: ""
     # domain: ""
     # port: 9200
     # protocol: https
@@ -62,7 +63,7 @@ srs:
     #   region: "AWS_ELASTICSEARCH_REGION"
     # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
     # requireInternetAccess: true
-        
+
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
@@ -72,11 +73,12 @@ elasticsearch:
   imageTag: 7.10.2
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
+  replicas: 1
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
 
-  protocol: http
+  protocol: "http"
   # This section specifies the elasticsearch cluster configuration for authentication and TLS.
 
   esConfig:

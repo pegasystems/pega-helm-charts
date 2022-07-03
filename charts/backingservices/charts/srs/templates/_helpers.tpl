@@ -119,9 +119,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 
 {{- define "elasticsearch.protocol" -}}
-{{- if and (.Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls) }}
+{{- if and (.Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls.enabled) }}
 {{- "https" | quote }}
-{{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls) }}
+{{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
 {{- "http" | quote }}
 {{- else }}
 {{- required "A valid ''.Values.srsStorage.protocol' entry is required when connecting to external Elasticsearch!" .Values.srsStorage.protocol | quote  }}
@@ -129,17 +129,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "elasticsearch.authProvider" -}}
-{{- if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls) -}}
+{{- if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) -}}
     {{- "basic-authentication" }}
 {{- else }}
     {{- if and  (.Values.srsStorage.basicAuthentication) (not .Values.srsStorage.awsIAM ) -}}
     {{- "basic-authentication" }}
     {{- else if and  (.Values.srsStorage.awsIAM)  (not .Values.srsStorage.basicAuthentication ) -}}
     {{- "aws-iam"}}
-    {{- else if and (.Values.srsStorage.tls) (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM )}}
+    {{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication ) (not .Values.srsStorage.awsIAM )}}
     {{- "tls" }}
-    {{- else if and ( .Values.srsStorage.basicAuthentication ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls)}}
-    {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls/.Values.srsStorage.basicAuthentication/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+    {{- else if and ( .Values.srsStorage.basicAuthentication ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled)}}
+    {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -166,15 +166,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end}}
 
-{{- define "instaclusterUsername" -}}
-{{- if and (not .Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls) ( .Values.srsStorage.instacluster) }}
-{{- .Values.srsStorage.instacluster.username |  b64enc }}
+{{- define "externalESDeploymentUsername" -}}
+{{- if and (not .Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls.enabled) ( .Values.srsStorage.externalESDeployment) }}
+{{- .Values.srsStorage.externalESDeployment.username |  b64enc }}
 {{- end}}
 {{- end}}
 
-{{- define "instaclusterPassword" -}}
-{{- if and (not .Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls) ( .Values.srsStorage.instacluster) }}
-{{- .Values.srsStorage.instacluster.password  |  b64enc }}
+{{- define "externalESDeploymentPassword" -}}
+{{- if and (not .Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls.enabled) ( .Values.srsStorage.externalESDeployment) }}
+{{- .Values.srsStorage.externalESDeployment.password  |  b64enc }}
 {{- end}}
 {{- end}}
 
