@@ -20,6 +20,7 @@ func TestSRSDeployment(t *testing.T){
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:latest",
 			"srs.srsRuntime.env.AuthEnabled": "false",
 			"srs.srsRuntime.env.PublicKeyURL": "",
+			"srs.srsStorage.tls.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -63,6 +64,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.srsRuntime.resources.requests.cpu": "1",
 			"srs.srsRuntime.resources.requests.memory": "2Gi",
 			"srs.srsStorage.provisionInternalESCluster": "false",
+			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
@@ -115,6 +117,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
+			"srs.srsStorage.tls.enabled": "true",
 		},
 			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -186,6 +189,22 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
     require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	}
+	if strings.EqualFold("tls", authProvider) {
+	require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+	require.Equal(t, "username", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+	require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	require.Equal(t, "PATH_TO_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "/usr/share/elastic-certificates.p12", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_AUTH_PROVIDER", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "tls", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	}
 	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)

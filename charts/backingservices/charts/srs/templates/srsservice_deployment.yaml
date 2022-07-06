@@ -73,8 +73,6 @@ spec:
                 secretKeyRef:
                   name: srs-elastic-credentials
                   key: password
-            - name: PUBLIC_KEY_URL
-              value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
             - name: PATH_TO_TRUSTSTORE
               value: "/usr/share/{{ .Values.srsRuntime.env.certificateName | default "elastic-certificates.p12"}}"
             - name: ELASTICSEARCH_AUTH_PROVIDER
