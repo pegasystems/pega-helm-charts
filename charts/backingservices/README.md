@@ -43,7 +43,7 @@ To configure a secure connection between the SRS cluster and Elasticsearch, add 
 
 | Configuration                            | Usage                                                                                                                                                                                                                                              |
 |------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `tls`                                    | Setting this to true will make the SRS service use es certificates for connection.                                                                                                                                                                 |
+| `tls`                                    | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                    |
 | `srsStorage.provisionInternalESCluster`  | <ul><li>Set to `true` to enable this parameter to provide an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.    |
 
 To connect to external elasticsearch below configuration needs to be made.
@@ -53,9 +53,9 @@ make external-es-secrets NAMESPACE=pegabackingservices PATH_TO_CERTIFICATE=/home
 
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
 |-----------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `tls`                                   | Set to true to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-| `externalESDeployment.username`         | Enter the username for your available Elasticsearch service. This username value must match the values you set in the connection info section of externalESDeployment.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| `externalESDeployment.password`         | Enter the required password for your available Elasticsearch service. This password value must match the values you set in the connection info section of externalESDeployment.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `tls`                                   | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `esCredentials.username`                | Enter the username for your available Elasticsearch service. This username value must match the values you set in the connection info section of externalESDeployment.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
+| `esCredentials.password`                | Enter the required password for your available Elasticsearch service. This password value must match the values you set in the connection info section of externalESDeployment.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 | `srsStorage.provisionInternalESCluster` | <ul><li>Set to false to disable this parameter and connect to your available Elasticsearch service from the SRS cluster. Disabling this setting requires you to provide connectivity details to your organization's external Elasticsearch service along with an appropriate TLS certificate with which you authenticate with the service. To pass the required certificate to the cluster use a secrets file, run the command.This Requires you to run `$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`. </li><li> where `NAMEPACE` is the the deployment namespace running the SRS cluster and `PATH_TO_CERTIFICATE` points to the location where certs are copied on your location machine  </li></ul> |
 | `domain`                                | Set to provide the DNS entry associated with your external Elasticsearch service set using externalESDeployment.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 
@@ -70,48 +70,66 @@ Note: Only .p12 and .jks certificates are supported.
 | `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.                                                                                                                                                                                                                                                                                             |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.10.2`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster. |
 | `srsStorage.provisionInternalESCluster` | <ul><li>Set to `true` to enable this parameter to provision an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.</li><li>Set to `false` to disable this parameter to use your own Elasticsearch service from the SRS cluster.</li></ul>                                                               |
-| `alpine`                                | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                      |
+| `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                      |
+
 Example:
 
 ```yaml
 srs:
+  # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true
+
+  # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
 
+  # Configure the location of the busybox image that is used during the deployment process of
+  # the internal Elasticsearch cluster
   busybox:
-    image: "busybox:1.31.0"
+    image: "alpine:3.16.0"
     imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
-    #srs-service values
+    # Number of pods to provision
     replicaCount: 2
+
+    # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
     srsImage: "YOUR_SRS_IMAGE:TAG"
-    imagePullPolicy: "IfNotPresent"
-    resources:
-      limits:
-        cpu: 1300m
-        memory: "2Gi"
-      requests:
-        cpu: 650m
-        memory: "2Gi"
-    serviceType: "ClusterIP"
+
     env:
-      #AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
+      # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
-      PublicKeyURL:
+      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
+      PublicKeyURL: ""
 
+  # This section specifies the elasticsearch cluster configuration.
   srsStorage:
-    # To configure authentication for the externally managed Elasticsearch cluster to use Basic Authentication then uncomment
-    # add the parameters, srs.srsStorage.basicAuthentication.username and srs.srsStorage.basicAuthentication.password
-    #    basicAuthentication:
-    #      username: "BASIC_AUTH_USERNAME"
-    #      password: "BASIC_AUTH_PASSWORD"
-    # To configure authentication for the externally managed Elasticsearch cluster to use an AWS IAM Role then uncomment and
-    # add the parameters, srs.srsStorage.awsIAM and srs.srsStorage.awsIAM.region
-    # srs.srsStorage.awsIAM's srs.srsStorage.awsIAM.region value
-    #    awsIAM:
-    #      region: "AWS_ELASTICSEARCH_REGION"
-
-    # set `requireInternetAccess` to true when the elasticsearch domain is outside of the Kubernetes cluster network  and is available over internet
-#    requireInternetAccess: true
+    # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
+    # specified in the `elasticsearch` section
+    provisionInternalESCluster: true
+    # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
+    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
+    # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
+    #domain: ""
+    #port: 9200
+    #protocol: https
+    # The elasticsearch connection supports three authentication methods: basic authentication , AWS IAM role-based authentication and Elasticsearch secure connection(tls).
+    # To configure tls on internal cluster uncomment and set `srs.srsStorage.tls.enabled: true`
+    tls:
+     enabled: false
+    # Specify the certificate name used to connect to elasticsearch when tls.enabled: true and srsStorage.provisionInternalESCluster: false.
+    # certificateName: "elastic-certificates.p12"
+    # To configure basicAuthentication on internal cluster uncomment and set `srs.srsStorage.basicAuthentication.enabled: true`
+    basicAuthentication:
+      enabled: false
+    #     when  basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster, uncomment and add the
+    #     parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password
+    # esCredentials:
+    #   username: "username"
+    #   password: "password"
+    # To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
+    # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
+    # awsIAM:
+    #  region: "AWS_ELASTICSEARCH_REGION"
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
+    # requireInternetAccess: true
 ```

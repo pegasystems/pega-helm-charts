@@ -59,7 +59,7 @@ func Test_shouldContainSRSandESResourcesWhenEnabled(t *testing.T) {
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
 			"srs.srsStorage.provisionInternalESCluster": "true",
-			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.tls.enabled": "false",
 		}),
 	)
 
@@ -86,7 +86,7 @@ func Test_shouldContainSRSWhenEnabledandNotESResourcesWhenDisabled(t *testing.T)
 			"srs.srsStorage.domain": "es.managed.io",
 			"srs.srsStorage.port": "9200",
 			"srs.srsStorage.protocol": "https",
-			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.tls.enabled": "false",
 		}),
 	)
 

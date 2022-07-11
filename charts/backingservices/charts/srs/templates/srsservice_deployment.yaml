@@ -74,7 +74,7 @@ spec:
                   name: srs-elastic-credentials
                   key: password
             - name: PATH_TO_TRUSTSTORE
-              value: "/usr/share/{{ .Values.srsRuntime.env.certificateName | default "elastic-certificates.p12"}}"
+              value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
             - name: ELASTICSEARCH_AUTH_PROVIDER
               value: tls
             {{- end}}

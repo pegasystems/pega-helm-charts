@@ -20,7 +20,7 @@ func TestSRSDeployment(t *testing.T){
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:latest",
 			"srs.srsRuntime.env.AuthEnabled": "false",
 			"srs.srsRuntime.env.PublicKeyURL": "",
-			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.tls.enabled": "true",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -43,7 +43,7 @@ func TestSRSDeployment(t *testing.T){
 			esDomain{
 				domain:   "elasticsearch-master.default.svc",
 				port:     "9200",
-				protocol: "http",
+				protocol: "https",
 			},
 		})
 }
@@ -117,9 +117,9 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
-			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.tls.enabled": "false",
 		},
-			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
 
 	var srsDeploymentObj appsv1.Deployment
