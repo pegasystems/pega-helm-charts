@@ -1,7 +1,7 @@
 default: es-prerequisite
 
 NAMESPACE := <YOUR_NAMESPACE>
-ELASTICSEARCH_IMAGE := docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+ELASTICSEARCH_IMAGE := docker.elastic.co/elasticsearch/elasticsearch:$(ELASTICSEARCH_VERSION)
 
 es-prerequisite: es-secrets
 

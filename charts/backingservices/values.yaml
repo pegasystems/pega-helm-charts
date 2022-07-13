@@ -44,14 +44,14 @@ srs:
     #port: 9200
     #protocol: https
     # The elasticsearch connection supports three authentication methods: basic authentication , AWS IAM role-based authentication and Elasticsearch secure connection(tls).
-    # To configure tls on internal cluster uncomment and set `srs.srsStorage.tls.enabled: true`
+    # set `srs.srsStorage.tls.enabled: true` to enable tls on internal/external elasticsearch cluster.
     tls:
      enabled: false
     # Specify the certificate name used to connect to elasticsearch when tls.enabled: true and srsStorage.provisionInternalESCluster: false.
-    # certificateName: "elastic-certificates.p12"
-    # To configure basicAuthentication on internal cluster uncomment and set `srs.srsStorage.basicAuthentication.enabled: true`
+    # certificateName: "Certificate_Name"
+    # set `srs.srsStorage.basicAuthentication.enabled: true` to enable basicAuthentication on internal/external elasticsearch.
     basicAuthentication:
-      enabled: false
+      enabled: true
     #     when  basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster, uncomment and add the
     #     parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password
     # esCredentials:
@@ -77,8 +77,14 @@ elasticsearch:
   # Shrink default JVM heap.
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
-  protocol: http
   # This section specifies the elasticsearch cluster configuration for authentication and TLS.
+  # If `srs.srsStorage.tls.enabled: true` uncomment the blow parameter `protocol: https`
+  # protocol: https
+
+  # uncomment and add below lines under esConfig.elasticsearch.yml to enable tls based security on internal Elasticsearch cluster
+    # xpack.security.http.ssl.enabled: true
+    # xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    # xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
 
   esConfig:
     elasticsearch.yml: |
@@ -87,9 +93,6 @@ elasticsearch:
      xpack.security.transport.ssl.verification_mode: certificate
      xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
      xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
-     xpack.security.http.ssl.enabled: true
-     xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
-     xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
 
   # Use this section to include additional, supported environmental variables for Elasticsearch basic authentication.
   # The parameter values can be read from a specified secrets file.
