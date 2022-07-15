@@ -57,6 +57,7 @@ func TestSRSServicePDBWithESInternetAccessWithExternalES(t *testing.T){
 			"srs.srsStorage.domain": "es.acme.io",
 			"srs.srsStorage.port": "8008",
 			"srs.srsStorage.protocol": "https",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_poddisruptionbudget.yaml"}),
 	)

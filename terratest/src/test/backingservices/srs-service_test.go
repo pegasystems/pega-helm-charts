@@ -38,6 +38,7 @@ func TestSRSServiceWithInternetEgress(t *testing.T){
 			"srs.srsStorage.port": "8008",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.protocol": "https",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_service.yaml"}),
 	)

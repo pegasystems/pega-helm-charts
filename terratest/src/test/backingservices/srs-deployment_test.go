@@ -21,6 +21,7 @@ func TestSRSDeployment(t *testing.T){
 			"srs.srsRuntime.env.AuthEnabled": "false",
 			"srs.srsRuntime.env.PublicKeyURL": "",
 			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -70,6 +71,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.srsStorage.protocol": "https",
 			"srs.srsStorage.awsIAM.region": "us-east-1",
 			"srs.srsStorage.requireInternetAccess": "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -118,6 +120,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
 			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)

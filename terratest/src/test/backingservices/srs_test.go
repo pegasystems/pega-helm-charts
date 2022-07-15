@@ -12,6 +12,7 @@ func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.deploymentName": "test-srs",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
 
@@ -36,6 +37,7 @@ func Test_shouldContainSRSResourcesWhenEnabled(t *testing.T) {
 			"srs.deploymentName": "test-srs",
 			"srs.srsStorage.provisionInternalESCluster": "true",
 			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
 
@@ -87,6 +89,7 @@ func Test_shouldContainSRSWhenEnabledandNotESResourcesWhenDisabled(t *testing.T)
 			"srs.srsStorage.port": "9200",
 			"srs.srsStorage.protocol": "https",
 			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
 
