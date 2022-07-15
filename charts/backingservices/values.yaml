@@ -52,7 +52,7 @@ srs:
     # set `srs.srsStorage.basicAuthentication.enabled: true` to enable basicAuthentication on internal/external elasticsearch.
     basicAuthentication:
       enabled: true
-    # when  basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster, uncomment and add the
+    # When basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster uncomment and add below parameters.
     # parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password
     # esCredentials:
     #   username: "username"
@@ -61,8 +61,8 @@ srs:
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
     #   region: "AWS_ELASTICSEARCH_REGION"
-    # To configure either authentication method, when the elasticsearch domain requires an open internet connection, uncomment to set this parameter to "true".
-    # requireInternetAccess: true
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,set requireInternetAccess parameter to "true".
+    requireInternetAccess: false
 
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
