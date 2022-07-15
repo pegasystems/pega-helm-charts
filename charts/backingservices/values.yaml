@@ -40,20 +40,20 @@ srs:
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
-    #domain: ""
-    #port: 9200
-    #protocol: https
+    # domain: ""
+    # port: 9200
+    # protocol: https
     # The elasticsearch connection supports three authentication methods: basic authentication , AWS IAM role-based authentication and Elasticsearch secure connection(tls).
     # set `srs.srsStorage.tls.enabled: true` to enable tls on internal/external elasticsearch cluster.
     tls:
-     enabled: false
+      enabled: false
     # Specify the certificate name used to connect to elasticsearch when tls.enabled: true and srsStorage.provisionInternalESCluster: false.
     # certificateName: "Certificate_Name"
     # set `srs.srsStorage.basicAuthentication.enabled: true` to enable basicAuthentication on internal/external elasticsearch.
     basicAuthentication:
       enabled: true
-    #     when  basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster, uncomment and add the
-    #     parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password
+    # when  basic authentication/tls based authentication is configured to your externally-managed Elasticsearch cluster, uncomment and add the
+    # parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password
     # esCredentials:
     #   username: "username"
     #   password: "password"
