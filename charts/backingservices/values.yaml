@@ -43,16 +43,21 @@ srs:
     # domain: ""
     # port: 9200
     # protocol: https
-    # The elasticsearch connection supports three authentication methods: basic authentication , AWS IAM role-based authentication and Elasticsearch secure connection(tls).
-    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch service whether is it running as an internalized or externalized service in your SRS cluster.
+    # The elasticsearch connection supports three authentication methods: basic authentication ,
+    # AWS IAM role-based authentication and Elasticsearch secure connection(tls).
+    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch service
+    # whether is it running as an internalized or externalized service in your SRS cluster.
     tls:
       enabled: false
-    # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false), uncomment the following line to specify the TLS certificate name for your Elasticsearch service.
+    # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false),
+    # uncomment the following line to specify the TLS certificate name for your Elasticsearch service.
     # certificateName: "Certificate_Name"
-    # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service whether is it running as an internalized or externalized service in your SRS cluster.
+    # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
+    # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
       enabled: true
-    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch service in your SRS cluster, uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password.
+    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch service in your SRS cluster,
+    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password.
     # esCredentials:
     #   username: "username"
     #   password: "password"
@@ -60,7 +65,8 @@ srs:
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
     #   region: "AWS_ELASTICSEARCH_REGION"
-    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,set the requireInternetAccess parameter to "true".
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,
+    # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
 
@@ -80,7 +86,8 @@ elasticsearch:
   # If you previously set srs.srsStorage.tls.enabled: true, you must uncomment the line to use protocol: https parameter.
   # protocol: https
 
-  # For deployments that use TLS-based authentication to an internal Elasticsearch service in the SRS cluster, uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
+  # For deployments that use TLS-based authentication to an internal Elasticsearch service in the SRS cluster,
+  # uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
   # xpack.security.http.ssl.enabled: true
   # xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
   # xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
