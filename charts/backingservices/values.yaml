@@ -47,7 +47,7 @@ srs:
     # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch service whether is it running as an internalized or externalized service in your SRS cluster.
     tls:
       enabled: false
-    # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false), uncomment the following line to specify the TLS certificate name for your Elasticsearch service
+    # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false), uncomment the following line to specify the TLS certificate name for your Elasticsearch service.
     # certificateName: "Certificate_Name"
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -60,7 +60,7 @@ srs:
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
     #   region: "AWS_ELASTICSEARCH_REGION"
-    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,set requireInternetAccess parameter to "true".
+    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
 
