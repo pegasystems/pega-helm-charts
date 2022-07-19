@@ -10,6 +10,7 @@ func TestSRSRegistrySecretDefaultName(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/registrysecret.yaml"}),
 	)
@@ -32,6 +33,7 @@ func TestSRSRegistrySecretCustomName(t *testing.T){
 			"global.imageCredentials.registry": "docker-repo.acme.io",
 			"global.imageCredentials.username": "acmeuser",
 			"global.imageCredentials.password": "thisisapwd",
+			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/registrysecret.yaml"}),
 	)

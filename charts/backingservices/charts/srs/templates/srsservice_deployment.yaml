@@ -26,6 +26,9 @@ spec:
             - name: srs-port
               containerPort: 8080
               protocol: TCP
+          volumeMounts:
+            - name: srs-certificates
+              mountPath: /usr/share/
           readinessProbe:
             httpGet:
               path: /health
@@ -59,6 +62,22 @@ spec:
                   name: srs-elastic-credentials
                   key: password
             {{- end}}
+            {{- if eq (include "elasticsearch.authProvider" $) "tls" }}
+            - name: ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: srs-elastic-credentials
+                  key: username
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: srs-elastic-credentials
+                  key: password
+            - name: PATH_TO_TRUSTSTORE
+              value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
+            - name: ELASTICSEARCH_AUTH_PROVIDER
+              value: tls
+            {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
             - name: APPLICATION_PORT
@@ -69,16 +88,27 @@ spec:
               value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
-  {{- if .Values.srsStorage.provisionInternalESCluster }}
+      volumes:
+      - name: srs-certificates
+        secret:
+          secretName: srs-certificates
       initContainers:
       - name: wait-for-internal-es-cluster
         image: {{ .Values.busybox.image }}
         imagePullPolicy: {{ .Values.busybox.imagePullPolicy }}
+    {{- if .Values.srsStorage.tls.enabled }}
+        args:
+          - until $(wget -q -S --spider --timeout=2 -O /dev/null $ELASTICSEARCH_PROTO://$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD@$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT --no-check-certificate); do echo Waiting for Elasticsearch cluster to become live...; sleep 10; done;
+        command:
+          - sh
+          - -c
+  {{ else }}
         args:
           - until $(wget -q -S --spider --timeout=2 -O /dev/null $ELASTICSEARCH_PROTO://$ELASTICSEARCH_USERNAME:$ELASTICSEARCH_PASSWORD@$ELASTICSEARCH_HOST:$ELASTICSEARCH_PORT ); do echo Waiting for Elasticsearch cluster to become live...; sleep 10; done;
         command:
           - sh
           - -c
+    {{ end }}
         env:
           - name: ELASTICSEARCH_PROTO
             value: {{ template "elasticsearch.protocol" . }}
@@ -96,5 +126,4 @@ spec:
               secretKeyRef:
                 name: srs-elastic-credentials
                 key: password
-  {{ end }}
   {{ end }}
