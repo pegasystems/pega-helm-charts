@@ -86,10 +86,10 @@ jdbc:
   driverClass: org.postgresql.Driver
 ```
 
-#### (Optional) Support for providing DB credentials using External Secrets Operator
+#### (Optional) Support for providing credentials/certificates using External Secrets Operator
 
-To avoid directly entering your passwords as plain text in your Helm charts, Pega supports Kubernetes secrets to secure credentials and related information. 
-Use secrets to represent credentials for your database, Docker registry, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
+To avoid directly entering your confidential content such as passwords, certificates as plain text in your Helm charts, Pega supports Kubernetes secrets to secure credentials and related information. 
+Use secrets to represent credentials for your database, Docker registry, SSL certificates or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
 Pega supports two methods of passing secrets to your deployments; choose the method that best suits you organization's needs:
 
 • Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
@@ -105,6 +105,13 @@ To support this option,
 4) Update your values.yaml file to refer to the external secret manager for DB password.
 
 •  Pass secrets directly to your deployment using your organization's recommend practices.
+
+##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
+1. Have the CA certificate and keystore as a base64 encrypted string inside the secret manager(AWS Secret Manager, Azure Key Vault etc). [Check this](https://github.com/smootherbug/pega-helm-charts/tree/tomcat-encrypt/charts/pega#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
+2. Have the keystore password as plaintext
+3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
+4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
+
 
 ### Driver URI
 
@@ -924,6 +931,7 @@ Parameter   | Description   | Default value
 `service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
 `service.tls.targetPort` | The target port of the container to expose. The TLS-enabled Pega container exposes web traffic on port `8443`. | `8443`
 `service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
+`service.tls.external_secret_name` | Enter the secret name if external secrets operator is used, [Check here](#optional-support-for-providing-db-credentials-using-external-secrets-operator) | `""` 
 `service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
 `service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
 `service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
@@ -935,7 +943,7 @@ Parameter   | Description   | Default value
 - By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
 - The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
 - To encode your keystore and certificates using the following command:
-     o	Linux:  cat ca_bundle.crt | base64
+     o	Linux:  cat ca_bundle.crt | base64 -w 0
      o	Windows: type keystore.jks | openssl base64  (needs openssl)
 - Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
 - Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
