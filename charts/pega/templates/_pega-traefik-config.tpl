@@ -16,7 +16,11 @@ spec:
 {{- end }}
 #For traefik, it expects the root CA certificate in a secret under the field ca.crt
   rootCAsSecrets:
+  {{- if .node.service.tls.external_secret_name }}
+    - {{ .node.service.tls.external_secret_name }}
+  {{- else }}
     - {{ .depname }}-tomcat-keystore-secret
+  {{- end }}
 {{- if .node.service.tls.traefik.serverName }}
   serverName: {{ .node.service.tls.traefik.serverName -}}
 {{- else }}
