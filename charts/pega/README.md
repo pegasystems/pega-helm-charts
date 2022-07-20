@@ -931,7 +931,7 @@ Parameter   | Description   | Default value
 `service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
 `service.tls.targetPort` | The target port of the container to expose. The TLS-enabled Pega container exposes web traffic on port `8443`. | `8443`
 `service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
-`service.tls.external_secret_name` | Enter the secret name if external secrets operator is used, [Check here](#optional-support-for-providing-db-credentials-using-external-secrets-operator) | `""` 
+`service.tls.external_secret_name` | Enter the secret name if external secrets operator is used, [Check here](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator) | `""` 
 `service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
 `service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
 `service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
