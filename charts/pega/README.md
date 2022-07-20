@@ -107,7 +107,7 @@ To support this option,
 •  Pass secrets directly to your deployment using your organization's recommend practices.
 
 ##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
-1. Have the CA certificate and keystore as a base64 encrypted string inside the secret manager(AWS Secret Manager, Azure Key Vault etc). [Check this](https://github.com/smootherbug/pega-helm-charts/tree/tomcat-encrypt/charts/pega#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
+1. Have the CA certificate and keystore as a base64 encrypted string inside the secret manager(AWS Secret Manager, Azure Key Vault etc). [Check this](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
 2. Have the keystore password as plaintext
 3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
 4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
