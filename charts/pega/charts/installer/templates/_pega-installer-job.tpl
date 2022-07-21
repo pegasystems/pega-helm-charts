@@ -68,6 +68,9 @@ spec:
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
+{{- if .root.Values.imagePullPolicy }}
+        imagePullPolicy: {{ .root.Values.imagePullPolicy  }}
+{{- end }}
         ports:
         - containerPort: 8080
         resources:
