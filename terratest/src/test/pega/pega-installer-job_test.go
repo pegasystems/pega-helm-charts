@@ -98,6 +98,7 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 		require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
 	}
 	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
+
 	require.Equal(t, string(jobContainers[0].ImagePullPolicy), pullPolicy)
 
 	require.Equal(t, jobContainers[0].Name, expectedJob.containerName)
