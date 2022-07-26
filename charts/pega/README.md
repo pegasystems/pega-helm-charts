@@ -759,7 +759,7 @@ The Helm charts also support an automated install or upgrade with a Kubernetes J
 
 For installations of the Pega platform, you must specify the installer Docker image and an initial default password for the `administrator@pega.com` user.
 
-Along with this, you can specify the imagePullPolicy here, an element that defines when an image should be pulled. It is defaulted to `IfNotPresent`, meaning an image will be pulled if it is "not present". However, depending on how images are built, it may be worthwhile to change it to `Always`, as fixes may come out that aren't automatically applied to the image. 
+Along with this, you can configure the kubelet pull policy for the image. It is defaulted to `IfNotPresent`, meaning an image will be pulled if it is "not present". All possible options are `IfNotPresent`, `Always`, and `Never`. Always pulling an image ensures you always have the latest image at all times, even if the specific tag already exists on your machine. 
 
 Example:
 
