@@ -950,12 +950,35 @@ Parameter   | Description   | Default value
 - You must use the latest Docker web images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
 
 #### Example:
+With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider and the keystore file and password are from external secret operator, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   external_secret_name: secret-to-be-crated
+   keystore: 
+   keystorepassword: 
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: 
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: true
+      serverName: "<< SAN name of the certificate >>"
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: false
+
+```
+
 With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
 
 ```yaml
 # To configure TLS between the ingress/load balancer and the backend, set the following:
 tls:
    enabled: true
+   external_secret_name: 
    keystore: "<< encoded keystore content >>"
    keystorepassword: "<< keystore password >>"
    port: 443
@@ -977,6 +1000,7 @@ With TLS enabled for the web tier and the traefik addon is NOT deployed for `k8s
 # To configure TLS between the ingress/load balancer and the backend, set the following:
 tls:
    enabled: true
+   external_secret_name:
    keystore: "<< encoded keystore content >>"
    keystorepassword: "<< keystore password >>"
    port: 443
@@ -998,6 +1022,7 @@ Without TLS enabled, and no traefik addon in use, there is no reason to add and 
 # To configure TLS between the ingress/load balancer and the backend, set the following:
 tls:
    enabled: false
+   external_secret_name:
    keystore: ""
    keystorepassword: ""
    port: 443
