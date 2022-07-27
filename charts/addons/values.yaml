@@ -44,6 +44,7 @@ traefik:
       memory: 500Mi
 
 # When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+## For more details on this, please refer https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
@@ -52,6 +53,10 @@ aws-load-balancer-controller:
   region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## Deployments on AWS Gov Cloud requires the image repository to be passed explicitly. Please enable this block for aws gov cloud deployments only.
+  ## The AMAZON_CONTAINER_IMAGE_REGISTRY can be found here: https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html
+  ## image:
+  ##  repository: "<AMAZON_CONTAINER_IMAGE_REGISTRY>/amazon/aws-load-balancer-controller"
   ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
   ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json and
   ## attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details

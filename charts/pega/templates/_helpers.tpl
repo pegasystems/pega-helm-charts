@@ -48,6 +48,22 @@ false
 {{- end }}
 {{- end }}
 
+{{- define "pegaTomcatKeystoreSecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-tomcat-keystore-secret
+{{- end }}
+
+{{- define "pegaVolumeTomcatKeystore" }}pega-volume-tomcat-keystore{{- end }}
+
+{{- define "pegaVolumeTomcatKeystoreTemplate" }}
+- name: {{ template "pegaVolumeTomcatKeystore" }}
+  secret:
+    # This name will be referred in the volume mounts kind.
+    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
@@ -371,6 +387,26 @@ service:
 {{- else }}
 serviceName: {{ .name }}
 servicePort: {{ .node.service.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceHttps" }}
+{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port:
+    number: {{ .node.service.tls.port }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.service.tls.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressBackend" }}
+{{- if ((.node.service).tls).enabled }}
+    {{ include "ingressServiceHttps" . | indent 10 }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
 {{- end }}
 {{- end }}
 

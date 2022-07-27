@@ -26,15 +26,22 @@ Example:
 ```yaml
 traefik:
   enabled: true
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
     type: NodePort
-    nodePorts:
-      http: 30080
-      https: 30443
+  ports:
+    web:
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
+      tls:
+        enabled: false
+        options: ""
+        certResolver: ""
+        domains: []
   resources:
     requests:
       cpu: 200m
@@ -42,6 +49,7 @@ traefik:
     limits:
       cpu: 500m
       memory: 500Mi
+
 ```
 
 ### Amazon ALB
@@ -53,16 +61,32 @@ Configuration   | Usage
 `clusterName`   | The name of your EKS cluster.  Resources created by the ALB Ingress controller will be prefixed with this string.
 `region`     | AWS region of the EKS cluster. Required if if ec2metadata is unavailable from the controller Pod.
 `vpcId`      | VPC ID of EKS cluster, required if ec2metadata is unavailable from controller pod.
+`image.repository`  | Your Amazon EKS Amazon ECR image repository, which is required for AWS GovCloud (US) deployments.
 `serviceAccount.annotations`  | Annotate the service account with `eks.amazonaws.com/role-arn` IAM Role that provides access to AWS resources.
 
 Example:
 
+
+For Commercial Cloud Deployment:
 ```yaml
 aws-load-balancer-controller:
   enabled: true
   clusterName: "YOUR_EKS_CLUSTER_NAME"
   region: "YOUR_EKS_CLUSTER_REGION"
   vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
+```
+For AWS Gov Cloud Deployment:
+```yaml
+aws-load-balancer-controller:
+  enabled: true
+  clusterName: "YOUR_EKS_CLUSTER_NAME"
+  region: "YOUR_EKS_CLUSTER_REGION"
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  image:
+    repository: "Amazon EKS Amazon ECR image repository"
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"

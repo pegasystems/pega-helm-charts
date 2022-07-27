@@ -610,7 +610,7 @@ Parameter     | Description    | Default value
 `prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
 `prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
 `contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
-`serverXML`   | A complete server.xml file to inject  | See [server.xml](config/deploy/server.xml).
+`serverXML`   | A complete server.xml file to inject  | See [server.xml.tmpl](config/deploy/server.xml.tmpl).
 `webXML`      | A complete web.xml file to inject  | No default provided, but if `config/deploy/web.xml` exists, it will be used as the default.
 
 
@@ -919,3 +919,93 @@ hazelcast:
   password: ""
 ```
 
+
+### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
+
+Using Helm version `2.2.0`, Pega supports mounting and passing TLS certificates into the container to enable TLS between loadbalancer/ingress and pods during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
+`service.tls.targetPort` | The target port of the container to expose. The TLS-enabled Pega container exposes web traffic on port `8443`. | `8443`
+`service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
+`service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
+`service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
+`service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
+`service.tls.traefik.enabled` | Set as `true` if you enabled Traefik for the tier and deployed the Traefik addon Helm charts; otherwise set it to `false`. | `false`
+`service.tls.traefik.serverName` | The server name for the tier, SAN(Subject Alternative Name) of the certificate present inside the container | `""`
+`service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
+
+##### Important Points to note
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
+- To encode your keystore and certificates using the following command:
+     o	Linux:  cat ca_bundle.crt | base64
+     o	Windows: type keystore.jks | openssl base64  (needs openssl)
+- Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
+- Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
+- You must use the latest Docker web images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
+
+#### Example:
+With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: true
+      serverName: "<< SAN name of the certificate >>"
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: false
+
+```
+
+With TLS enabled for the web tier and the traefik addon is NOT deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
+
+```
+
+Without TLS enabled, and no traefik addon in use, there is no reason to add and verify the certificate. You can use the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: false
+   keystore: ""
+   keystorepassword: ""
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: ""
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
+
+```
