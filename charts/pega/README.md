@@ -88,8 +88,8 @@ jdbc:
 
 #### (Optional) Support for providing credentials/certificates using External Secrets Operator
 
-To avoid directly entering your confidential content such as passwords, certificates as plain text in your Helm charts, Pega supports Kubernetes secrets to secure credentials and related information. 
-Use secrets to represent credentials for your database, Docker registry, SSL certificates or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
+To avoid directly entering your confidential content in your Helm charts such as passwords or certificates in plain text, Pega supports Kubernetes secrets to secure credentials and related information.
+Use secrets to represent credentials for your database, Docker registry, SSL certificates, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
 Pega supports two methods of passing secrets to your deployments; choose the method that best suits you organization's needs:
 
 • Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
@@ -107,8 +107,8 @@ To support this option,
 •  Pass secrets directly to your deployment using your organization's recommend practices.
 
 ##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
-1. Have the CA certificate and keystore as a base64 encrypted string inside the secret manager(AWS Secret Manager, Azure Key Vault etc). [Check this](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
-2. Have the keystore password as plaintext
+1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
+2. Have the keystore password as plaintext.
 3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
 4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
 
@@ -931,7 +931,7 @@ Parameter   | Description   | Default value
 `service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
 `service.tls.targetPort` | The target port of the container to expose. The TLS-enabled Pega container exposes web traffic on port `8443`. | `8443`
 `service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
-`service.tls.external_secret_name` | Enter the secret name if external secrets operator is used, [Check here](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator) | `""` 
+`service.tls.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator) | `""` 
 `service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
 `service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
 `service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
@@ -947,10 +947,10 @@ Parameter   | Description   | Default value
      o	Windows: type keystore.jks | openssl base64  (needs openssl)
 - Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
 - Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
-- You must use the latest Docker web images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
+- You must use the latest Docker images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
 
 #### Example:
-With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider and the keystore file and password are from external secret operator, you set the following parameters in the `values.yaml`:
+After you enable TLS for the web tier, deploy the traefik addon for `k8s` provider, and configure the keystore file and password using the external secret operator, set the following parameters in the `values.yaml`:
 
 ```yaml
 # To configure TLS between the ingress/load balancer and the backend, set the following:
