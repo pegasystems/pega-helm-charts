@@ -6,4 +6,3 @@ The backingservices chart supports deployment of the following services. Each of
 
 * [Search and Reporting Service](./charts/srs/README.md)
 * [Constellation Static Content](./charts/constellation/README.md)
-* Constellation Push Notifications (coming soon)

@@ -8,19 +8,29 @@
 traefik:
   enabled: false
   # When you set this to true, you can then set additional Traefik parameters to be passed into Traefik's Helm chart.
-  # See https://github.com/helm/charts/blob/master/stable/traefik/values.yaml
+  # See https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml
   # To use Traefik as a load balancer in PKS, AKS, GKE, or k8s, set traefik.serviceType: "LoadBalancer".
-  serviceType: LoadBalancer
-  # If enabled is set to "true", ssl will be enabled for Traefik
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
-    nodePorts:
-      # NodePorts for Traefik service.
-      http: 30080
-      https: 30443
+    type: LoadBalancer
+  ports:
+    web:
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
+      tls:
+        enabled: false
+        # this is the name of a Traefik TLSOption definition
+        options: ""
+        certResolver: ""
+        domains: []
+        # - main: example.com
+        #   sans:
+        #     - foo.example.com
+        #     - bar.example.com
   resources:
     requests:
       # Enter the CPU Request for Traefik
@@ -34,6 +44,7 @@ traefik:
       memory: 500Mi
 
 # When deploying on AWS EKS, set this to true to install aws-load-balancer-controller.
+## For more details on this, please refer https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html
 aws-load-balancer-controller:
   enabled: false
   ## Resources created by the ALB Ingress controller will be prefixed with this string
@@ -42,6 +53,10 @@ aws-load-balancer-controller:
   region: "YOUR_EKS_CLUSTER_REGION"
   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod
   vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## Deployments on AWS Gov Cloud requires the image repository to be passed explicitly. Please enable this block for aws gov cloud deployments only.
+  ## The AMAZON_CONTAINER_IMAGE_REGISTRY can be found here: https://docs.aws.amazon.com/eks/latest/userguide/add-ons-images.html
+  ## image:
+  ##  repository: "<AMAZON_CONTAINER_IMAGE_REGISTRY>/amazon/aws-load-balancer-controller"
   ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
   ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json and
   ## attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details
@@ -91,7 +106,9 @@ kibana:
     enabled: true
     # Enter the domain name to access kibana via a load balancer.
     hosts:
-      - "YOUR_WEB.KIBANA.EXAMPLE.COM"
+      - host: "YOUR_WEB.KIBANA.EXAMPLE.COM"
+        paths:
+          - path: /
 
 fluentd-elasticsearch:
   enabled: *deploy_efk

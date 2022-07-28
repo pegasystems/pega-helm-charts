@@ -77,6 +77,21 @@
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
 	       maxThreads="1"/>
+
+    <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
+    {{ if and .Env.TOMCAT_KEYSTORE_DIR .Env.TOMCAT_KEYSTORE_PASSWORD }}
+
+	<Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+                   scheme="https" secure="true" SSLEnabled="true"
+                   keystoreFile="{{ .Env.TOMCAT_KEYSTORE_DIR }}"
+                   keystorePass="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}"
+                   clientAuth="false" sslProtocol="TLS" relaxedQueryChars="[ ]"
+                   relaxedPathChars="[ ]"
+                   maxHttpHeaderSize="16384"
+                   maxSavePostSize="65536"
+                   connectionTimeout="20000" />
+    {{ end }}
+
     <!-- A "Connector" using the shared thread pool-->
     <!--
     <Connector executor="tomcatThreadPool"
@@ -158,7 +173,7 @@
       </Realm>
 
       <Host name="localhost"  appBase="webapps"
-            unpackWARs="true" autoDeploy="true">
+            unpackWARs="true" autoDeploy="false">
 
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
@@ -174,11 +189,11 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log" suffix=".txt"
-               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b" 
+               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b %D %I"
                resolveHosts="false" />
 
         <Valve className="org.apache.catalina.valves.ErrorReportValve"
-               showReport="false" 
+               showReport="false"
                showServerInfo="false" />
 
       </Host>
