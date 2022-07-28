@@ -111,6 +111,7 @@ To support this option,
 2. Have the keystore password as plaintext.
 3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
 4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
+5. In case of `openshift` provider, add the cacertificate as the base64 encoded plaintext in the `values.yaml` file.
 
 
 ### Driver URI
