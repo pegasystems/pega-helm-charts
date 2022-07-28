@@ -141,7 +141,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details, see the examples listed in the preparation runbook:
+For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/pega-provided-docker-images).
 
 * [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md)
 * [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md)
@@ -170,6 +170,8 @@ After you obtain access to the Pega-provided host repository and pull each image
 After you have the images in your Docker repository, you then provide your registry URL, credentials, and reference each image appropriately in the Pega Helm chart. You can find example usage details for referencing the three images in a repository in the appropriate runbook for your type of deployment.
 
 These images do not expire, and you can keep them in your repository for as long as you require.
+
+=======
 
 # Contributing
 

@@ -1,0 +1,50 @@
+---
+global:
+  certificates:
+  customArtifactory:
+    enableSSLVerification: true
+    certificate:
+      self-signed-certificate.cer: |
+        -----BEGIN CERTIFICATE-----
+        certificate content
+        -----END CERTIFICATE-------
+  tier:
+    - name: "web"
+      nodeType: "WebUser"
+      requestor:
+        passivationTimeSec: 900
+      replicas: 1
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      livenessProbe:
+        port: 8081
+      # Values for test - web
+      custom:
+    - name: "batch"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+      replicas: 1
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      livenessProbe:
+        port: 8081
+      # Values for test - batch
+      custom:
+    - name: "stream"
+      nodeType: "Stream"
+      requestor:
+        passivationTimeSec: 900
+      replicas: 1
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
+      livenessProbe:
+        port: 8081
+      # Values for test - stream
+      custom:

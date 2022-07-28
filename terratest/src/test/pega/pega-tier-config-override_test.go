@@ -26,8 +26,8 @@ func TestPegaTierConfigOverride(t *testing.T) {
 			var options = &helm.Options{
 				ValuesFiles: []string{"data/pega-tier-config-override_values.yaml"},
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":               vendor,
+					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
@@ -51,7 +51,7 @@ func VerifyTierConfgOverrides(t *testing.T, yamlContent string, options *helm.Op
 			require.Equal(t, "prconfig override", pegaConfigMapData["prconfig.xml"])
 			require.Equal(t, "context.xml override", pegaConfigMapData["context.xml.tmpl"])
 			require.Equal(t, "prlog4j2 override", pegaConfigMapData["prlog4j2.xml"])
-			require.Equal(t, "server.xml override", pegaConfigMapData["server.xml"])
+			require.Equal(t, "server.xml override", pegaConfigMapData["server.xml.tmpl"])
 			require.Equal(t, "web.xml override", pegaConfigMapData["web.xml"])
 		}
 	}
