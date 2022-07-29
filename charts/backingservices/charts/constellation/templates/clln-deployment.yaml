@@ -35,7 +35,7 @@ spec:
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/v102/ping
+            path: /c11n/api/v1/ping
             port: 3000
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
