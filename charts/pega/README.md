@@ -767,13 +767,17 @@ The Helm charts also support an automated install or upgrade with a Kubernetes J
 
 For installations of the Pega platform, you must specify the installer Docker image and an initial default password for the `administrator@pega.com` user.
 
+Along with this, you can configure the kubelet pull policy for the image. It is defaulted to `IfNotPresent`, meaning an image will be pulled if it is "not present". All possible options are `IfNotPresent`, `Always`, and `Never`. Always pulling an image ensures you always have the latest image at all times, even if the specific tag already exists on your machine. 
+
 Example:
 
 ```yaml
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
+  imagePullPolicy: "PREFERRED_IMAGE_PULL_POLICY"
   adminPassword: "ADMIN_PASSWORD"
 ```
+
 
 ### Upgrades and patches
 
@@ -790,7 +794,8 @@ Use the `installer` section  of the values file with the appropriate parameters 
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
-`adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`imagePullPolicy` | Specify when to pull an image. | `IfNotPresent`
+`adminPassword` | Specify a temporary, initial password to log into the Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
