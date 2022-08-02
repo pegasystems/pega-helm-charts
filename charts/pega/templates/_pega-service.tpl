@@ -23,7 +23,7 @@ metadata:
     # Manually set the cookie name for sticky sessions
     traefik.ingress.kubernetes.io/session-cookie-name: UNIQUE-PEGA-COOKIE-NAME
 {{- if ((.node.service).tls).enabled }}
-{{- if .node.service.tls.traefik.enabled }}
+{{- if (.node.service.tls.traefik).enabled }}
     # Sets serversTreansport that has config in order to verify rootCA
     traefik.ingress.kubernetes.io/service.serverstransport: {{ .root.Release.Namespace }}-{{ .name }}-servers-transport@kubernetescrd
 {{- end }}

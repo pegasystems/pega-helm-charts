@@ -69,7 +69,8 @@ spec:
 {{- end }}
 {{- end }}
 {{- if ((.node.service).tls).enabled }}
-{{- include "pegaVolumeTomcatKeystoreTemplate" .root | indent 6 }}
+{{- $data := dict "root" .root "node" .node }}
+{{- include "pegaVolumeTomcatKeystoreTemplate" $data | indent 6 }}
 {{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
