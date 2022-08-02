@@ -143,6 +143,7 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 
 For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/pega-provided-docker-images).
 
+From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
 
 # Contributing
 

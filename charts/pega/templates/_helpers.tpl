@@ -49,7 +49,7 @@ false
 {{- end }}
 
 {{- define "pegaTomcatKeystoreSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName := printf "%s" (include "deploymentName" .root) -}}
 {{- $depName -}}-tomcat-keystore-secret
 {{- end }}
 
@@ -59,7 +59,11 @@ false
 - name: {{ template "pegaVolumeTomcatKeystore" }}
   secret:
     # This name will be referred in the volume mounts kind.
+  {{ if ((.node.service).tls).external_secret_name }}
+    secretName: {{ ((.node.service).tls).external_secret_name }}
+  {{ else }}
     secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}

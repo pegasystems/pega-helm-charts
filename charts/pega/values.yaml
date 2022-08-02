@@ -120,12 +120,16 @@ global:
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
-          keystore: ""
-          keystorepassword: ""
+          # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
+          # values in the External Secrets Manager, and enter the external secret name below
+          # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
+          external_secret_name: ""
+          keystore:
+          keystorepassword:
           port: 443
           targetPort: 8443
           # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
-          cacertificate: ""
+          cacertificate:
           # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
           traefik:
             enabled: false
