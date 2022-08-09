@@ -13,11 +13,19 @@
 
 {{- define "pegaImportCertificatesTemplate" }}
 - name: {{ template "pegaVolumeImportCertificates" }}
-  configMap:
-    # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaImportCertificatesConfig" $ }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (.Values.global.certificates.external_secret_name) }}
+  {{- range .Values.global.certificates.external_secret_name }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaImportCertificatesConfig" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaCustomArtifactoryCertificateConfig" }}
