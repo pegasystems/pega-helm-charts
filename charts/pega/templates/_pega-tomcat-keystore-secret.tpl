@@ -12,7 +12,7 @@ data:
 {{- if and .node.service.tls.certificateFile .node.service.tls.certificateKeyFile }}
   TOMCAT_CERTIFICATE_FILE: {{ .node.service.tls.certificateFile | b64enc | indent 4 }}
   TOMCAT_CERTIFICATE_KEY_FILE: {{ .node.service.tls.certificateKeyFile | b64enc | indent 4 }}
-  TOMCAT_CERTIFICATE_CHAIN_FILE: {{ .node.service.tls.cacertificate | b64enc | quote | indent 4 -}}
+  TOMCAT_CERTIFICATE_CHAIN_FILE: {{ .node.service.tls.certificateChainFile | b64enc | quote | indent 4 -}}
 
 {{- else }}
   # cert Files

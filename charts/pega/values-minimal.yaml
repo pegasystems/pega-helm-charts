@@ -103,11 +103,11 @@ global:
           port: 443
           targetPort: 8443
           # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
-          # set the chain file here in case you specify certificateFile and certificateKeyFile.
           cacertificate:
           # SSL certificate and private key as a PEM format
           certificateFile:
           certificateKeyFile:
+          certificateChainFile:
           # set enabled=true, only if addon chart is deployed and traefik is enabled
           traefik:
             enabled: false
