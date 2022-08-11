@@ -32,7 +32,7 @@ spec:
 {{ end }}
 {{ end }}
 {{ end }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
   defaultBackend:
 {{ else }}
   backend:
