@@ -221,13 +221,13 @@ For more information about the architecture for how Pega Platform runs in a Pega
 
 #### Standard deployment using three tiers
 
-To provision a three tier Pega cluster, use the default example in the in the helm chart, which is a good starting point for most deployments:
+To provision a three tier Pega cluster, use the default example in the helm chart, which is a good starting point for most deployments:
 
 Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream        | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`.
+stream (Deprecated)        | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`. The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.
 
 #### Small deployment with a single tier
 
@@ -235,7 +235,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | One tier handles all foreground and background processing and is given a `nodeType` of "WebUser,BackgroundProcessing,search,Stream".
+pega        | One tier handles all foreground and background processing and is given a `nodeType` of "WebUser,BackgroundProcessing,search,Stream".The "Stream" `nodetype` is deprecated, please enable External Kafka configuration under External Services.
 
 #### Large deployment for production isolation of processing
 
@@ -245,7 +245,7 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream      | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`.
+stream (Deprecated)     | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`.The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -465,8 +465,8 @@ Pega supports configuring certain nodes in your Kubernetes cluster with a label 
 
 ```yaml
 tier:
-- name: "stream"
-  nodeType: "Stream"
+- name: "my-tier"
+  nodeType: "WebUser"
 
   nodeSelector:
     disktype: ssd
@@ -756,7 +756,40 @@ pegasearch:
     - name: TZ
       value: "EST5EDT"
 ```
+## Deploying Pega with external kafka for stream
 
+
+Starting from 8.7 embedded stream (Stream tier or “Stream” `nodetype`) is deprecated. Pega recommends deployment of stream with external kafka.
+Configure external Kafka as a stream service provider to use your own managed Kafka infrastructure.
+
+### Stream (External Kafka) settings
+
+```yaml
+stream:
+  # Disabled by default, remove stream tier when this setting is enabled
+  enabled: false
+  # Provide external kafka broker urls
+  bootstrapServer: ""
+  # Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+  securityProtocol: PLAINTEXT
+  # Optional depends on value of securityProtocol
+  trustStore: ""
+  # Optional depends on value of securityProtocol
+  trustStorePassword: ""
+  # Optional depends on value of securityProtocol
+  keyStore: ""
+  # Optional depends on value of securityProtocol
+  keyStorePassword: ""
+  # Optional JAAS login context parameters for SASL connections, depends on securityProtocol
+  jaasConfig: ""
+  saslMechanism: PLAIN
+  # By default, topics originating from Pega Platform have the pega- prefix,
+  # so that it is easy to distinguish them from topics created by other applications.
+  # You can configure this pattern, to customize topic names per environment
+  streamNamePattern: "pega-{stream.name}"
+  # Value of replicationFactor cannot be more than number of brokers
+  replicationFactor: "1"
+```
 ## Pega database installation and upgrades
 
 Pega requires a relational database that stores the rules, data, and work objects used and generated by Pega Platform. The [Pega Platform deployment guide](https://community.pega.com/knowledgebase/products/platform/deploy) provides detailed information about the requirements and instructions for installations and upgrades.  Follow the instructions for Tomcat and your environment's database server.
@@ -926,7 +959,6 @@ hazelcast:
   username: ""
   password: ""
 ```
-
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 

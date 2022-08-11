@@ -82,6 +82,8 @@ global:
 
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
+  # Note: The nodeType Stream is deprecated, please remove it and enable External Kafka
+  # configuration under External Services
   tier:
     - name: "minikube"
       nodeType: "Stream,BackgroundProcessing,WebUser,Search"
@@ -173,3 +175,29 @@ hazelcast:
   username: ""
   # Password to be used in client-server Hazelcast model for authentication
   password: ""
+
+# Stream (External Kafka) settings
+# Disabled by default, remove stream tier when this setting is enabled
+stream:
+  enabled: false
+  # Provide external kafka broker urls
+  bootstrapServer: ""
+  # Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+  securityProtocol: PLAINTEXT
+  # Optional depends on value of securityProtocol
+  trustStore: ""
+  # Optional depends on value of securityProtocol
+  trustStorePassword: ""
+  # Optional depends on value of securityProtocol
+  keyStore: ""
+  # Optional depends on value of securityProtocol
+  keyStorePassword: ""
+  # Optional JAAS login context parameters for SASL connections, depends on securityProtocol
+  jaasConfig: ""
+  saslMechanism: PLAIN
+  # By default, topics originating from Pega Platform have the pega- prefix,
+  # so that it is easy to distinguish them from topics created by other applications.
+  # You can configure this pattern, to customize topic names per environment
+  streamNamePattern: "pega-{stream.name}"
+  # Value of replicationFactor cannot be more than number of brokers
+  replicationFactor: "1"
