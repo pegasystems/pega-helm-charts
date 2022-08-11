@@ -375,7 +375,7 @@ dnsConfig:
 {{- end -}}
 
 {{- define "ingressApiVersion" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.k8s.io/v1
 {{- else }}
 apiVersion: extensions/v1beta1
@@ -383,7 +383,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 
 {{- define "ingressService" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: {{ .name }}
   port: 
@@ -395,7 +395,7 @@ servicePort: {{ .node.service.port }}
 {{- end }}
 
 {{- define "ingressServiceHttps" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: {{ .name }}
   port:
@@ -415,7 +415,7 @@ servicePort: {{ .node.service.tls.port }}
 {{- end }}
 
 {{- define "ingressServiceC11n" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: constellation
   port: 
@@ -427,7 +427,7 @@ servicePort: 3000
 {{- end }}
 
 {{- define "ingressServiceSSLRedirect" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: ssl-redirect
   port: 
