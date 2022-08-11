@@ -16,8 +16,8 @@
   projected:
     defaultMode: 420
     sources:
-  {{ if (.Values.global.certificates.external_secret_name) }}
-  {{- range .Values.global.certificates.external_secret_name }}
+  {{ if (.Values.global.certificatesSecret) }}
+  {{- range .Values.global.certificatesSecret }}
     - secret:
         name: {{ . }}
   {{- end }}

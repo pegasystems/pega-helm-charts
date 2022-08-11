@@ -1,7 +1,7 @@
 {{- define "pegaCertificatesConfigTemplate" }}
-# Config map used for common configuration between Pega nodes
+# Secret used for common configuration between Pega nodes
 {{ if (eq (include "performDeployment" .) "true") }}
-{{- if .Values.global.certificates }}
+{{- if and (.Values.global.certificates) (not (.Values.global.certificatesSecret)) }}
 kind: Secret
 apiVersion: v1
 metadata:
@@ -12,7 +12,7 @@ stringData:
 {{- if .Values.global.certificates }}
   # import certificates from values
 {{- range $k, $v := .Values.global }}
-  {{- if and (eq $k "certificates") (not (hasKey $v "external_secret_name")) }}
+  {{- if eq $k "certificates" }}
   {{ $v | toYaml | nindent 2 -}}
   {{- end }}
 {{- end }}
