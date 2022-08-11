@@ -35,7 +35,7 @@ Note: Pega does **not** actively update the elasticsearch dependency in `require
 * To use the internally-provided Elasticsearch service in the SRS cluster, use the default `srs.enabled.true` parameter and set the Elasticsearch version by updating the `elasticsearch.imageTag` parameter in the [values.yaml](./values.yaml) to match the `dependencies.version` parameter in the [requirements.yaml](./requirements.yaml).
 * To use an externally-provided Elasticsearch service from the SRS cluster, update the `srs.srsStorage.provisionInternalESCluster` parameter in the [values.yaml](./values.yaml) to `false` and then provide connection details as documented below.
 
-### Deploying SRS with Pega-provided busybox images
+### Deploying SRS with busybox images from a private registry
 To deploy Pega Platform with the SRS backing service, the SRS helm chart requires the use of the busybox image.  For clients who want to pull this image from a registry other than Docker Hub, they must tag and push their image to another registry, and then pull it by specifying `busybox.image` and `busybox.imagePullPolicy`.
 
 ### Enabling security between SRS and Elasticsearch
