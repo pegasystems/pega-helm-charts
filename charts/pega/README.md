@@ -110,8 +110,7 @@ To support this option,
 1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
 2. Have the keystore password as plaintext.
 3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
-4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
-5. In case of `openshift` provider, add the cacertificate as the base64 encoded plaintext in the `values.yaml` file.
+4. For alternate configuration the keys should be TOMCAT_CERTIFICATE_FILE, TOMCAT_CERTIFICATE_KEY_FILE and TOMCAT_CERTIFICATE_CHAIN_FILE, ca.crt(in case of traefik addon enabled) for certificate and key files.
 
 
 ### Driver URI
@@ -940,18 +939,22 @@ Parameter   | Description   | Default value
 `service.tls.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator) | `""` 
 `service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
 `service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
-`service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
+`service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. Pass the certificateChainFile file if you are using certificateFile and certificateKeyFile | `""`
+`service.tls.certificateFile` | The content of the file that contains the server certificate. The format is PEM-encoded. This should be given if keystore and keystorepassword is not specified. | `""`
+`service.tls.certificateKeyFile` | The content of the file that contains the server private key. The format is PEM-encoded. This should be given if keystore and keystorepassword is not specified. | `""`
 `service.tls.traefik.enabled` | Set as `true` if you enabled Traefik for the tier and deployed the Traefik addon Helm charts; otherwise set it to `false`. | `false`
 `service.tls.traefik.serverName` | The server name for the tier, SAN(Subject Alternative Name) of the certificate present inside the container | `""`
 `service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
 
 ##### Important Points to note
 - By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- To enable SSL, you should either provide keystore and keystorepassword or certificate, certificatekey and cacertificate files in PEM format. If nothing is given, a default self-signed keystore and a custom root/CA certificate is taken by Tomcat.
 - The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
-- To encode your keystore and certificates using the following command:
+- In case of passing the certificate files in `values.yaml`, base64 encode the certificate files and specify the string content. In case of passing certificates through external secrets, it can be done normally.
+- To encode your keystore and certificate files using the following command:
      o	Linux:  cat ca_bundle.crt | base64 -w 0
      o	Windows: type keystore.jks | openssl base64  (needs openssl)
-- Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
+- Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate or service.tls.certificateFile and service.tls.certificateKeyFile.
 - Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
 - You must use the latest Docker images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
 
@@ -968,7 +971,11 @@ tls:
    port: 443
    targetPort: 8443
    # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
-   cacertificate: 
+   # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
+   cacertificate:
+   # SSL certificate and private key as a PEM format
+   certificateFile:
+   certificateKeyFile:
    # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
    traefik:
       enabled: true
@@ -990,13 +997,42 @@ tls:
    port: 443
    targetPort: 8443
    # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
    cacertificate: "<< encoded CA certificate >>"
-   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+  # SSL certificate and private key as a PEM format
+   certificateFile:
+   certificateKeyFile:
+  # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
    traefik:
       enabled: true
       serverName: "<< SAN name of the certificate >>"
       # set insecureSkipVerify=true, if the certificate verification has to be skipped
       insecureSkipVerify: false
+
+```
+With TLS enabled for the web tier and the certificateFile, certificateKeyFile and certificateChainFile is used instead of keystore and password, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   external_secret_name:
+   keystore: 
+   keystorepassword: 
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
+   cacertificate: "<< encoded certificateChainFile certificate >>"
+  # SSL certificate and private key as a PEM format
+   certificateFile: "<< encoded certificateFile content >>"
+   certificateKeyFile: "<< encoded certificateKeyFile content >>"
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
 
 ```
 
@@ -1012,7 +1048,11 @@ tls:
    port: 443
    targetPort: 8443
    # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
    cacertificate: "<< encoded CA certificate >>"
+  # SSL certificate and private key as a PEM format
+   certificateFile:
+   certificateKeyFile:
    # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
    traefik:
       enabled: false
@@ -1034,7 +1074,11 @@ tls:
    port: 443
    targetPort: 8443
    # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
    cacertificate: ""
+  # SSL certificate and private key as a PEM format
+   certificateFile:
+   certificateKeyFile:
    # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
    traefik:
       enabled: false
