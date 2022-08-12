@@ -1,9 +1,8 @@
 ---
 global:
-  certificatesSecret: ["secret1"]
-  certificates:
-    cert1: |
-      "2edbekj"
+  certificatesSecrets: ["cert1","cert2"]
+  certificates: |
+    badssl.cer: "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
   tier:
     - name: "web"
       nodeType: "WebUser"

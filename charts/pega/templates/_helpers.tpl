@@ -4,9 +4,9 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
-{{- define "pegaImportCertificatesConfig" }}
+{{- define "pegaImportCertificatesSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-import-certificates-config
+{{- $depName -}}-import-certificates-secret
 {{- end }}
 
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
@@ -16,15 +16,15 @@
   projected:
     defaultMode: 420
     sources:
-  {{ if (.Values.global.certificatesSecret) }}
-  {{- range .Values.global.certificatesSecret }}
+  {{ if (.Values.global.certificatesSecrets) }}
+  {{- range .Values.global.certificatesSecrets }}
     - secret:
         name: {{ . }}
   {{- end }}
   {{ else }}
     # This name will be referred in the volume mounts kind.
     - secret:
-        name: {{ template "pegaImportCertificatesConfig" $ }}
+        name: {{ template "pegaImportCertificatesSecret" $ }}
   {{ end }}
 {{- end}}
 
