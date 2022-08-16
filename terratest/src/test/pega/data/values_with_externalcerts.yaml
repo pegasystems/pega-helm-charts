@@ -1,6 +1,6 @@
 ---
 global:
-  certificatesSecrets: ["cert1","cert2"]
+  certificatesSecrets: ["cert1", "cert2"]
   certificates: |
     badssl.cer: "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
   tier:

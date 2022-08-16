@@ -11,8 +11,8 @@ global:
   actions:
     execute: "deploy"
   # Add custom certificates to be mounted to container
-  #to support external secrets
-  #supports multiple externalSecrets , add externalSecret names as array of strings
+  # to support external secrets
+  # supports multiple externalSecrets , add externalSecret names as array of strings
   certificatesSecrets: []
   certificates:
   # Provide JDBC connection information to the Pega relational database
