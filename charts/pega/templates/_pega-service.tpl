@@ -32,7 +32,7 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
     cloud.google.com/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
-    {{ if (semverCompare "< 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}beta.{{ end -}}cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
+    {{ if (semverCompare "< 1.16.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}beta.{{ end -}}cloud.google.com/backend-config: '{"ports": {"{{ .node.service.port }}": "{{ .name }}"}}'
   {{ end }}
 {{- end }}
 spec:
