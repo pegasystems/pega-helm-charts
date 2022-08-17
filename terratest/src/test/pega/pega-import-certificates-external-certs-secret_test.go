@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -36,7 +37,9 @@ func TestPegaImportCertificatesESSecret(t *testing.T) {
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-certificates-secret.yaml"})
-				VerifyImportCertificatesESSecret(t, yamlContent, options)
+				yamlSplit := strings.Split(yamlContent, "---")
+				//passing split value here to suppress warnings generated
+				VerifyImportCertificatesESSecret(t, yamlSplit[1], options)
 			}
 		}
 	}
@@ -45,7 +48,6 @@ func TestPegaImportCertificatesESSecret(t *testing.T) {
 func VerifyImportCertificatesESSecret(t *testing.T, yamlContent string, options *helm.Options) {
 
 	var importCertSecret k8score.Secret
-	fmt.Println(importCertSecret)
 	UnmarshalK8SYaml(t, yamlContent, &importCertSecret)
 	require.Empty(t, importCertSecret.Name)
 	require.Nil(t, importCertSecret.StringData)

@@ -1,8 +1,11 @@
 ---
 global:
-  certificatesSecrets: ["cert1", "cert2"]
-  certificates: |
-    badssl.cer: "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
+  certificatesSecrets: ["secret-to-be-created1","secret-to-be-created2"]
+  certificates:
+    cert1: |
+      "cert-data1"
+    cert2: |
+      "cert-data2"
   tier:
     - name: "web"
       nodeType: "WebUser"
