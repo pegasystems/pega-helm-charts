@@ -32,21 +32,21 @@ func TestPegaExternalStreamEnvironmentConfig(t *testing.T){
 					"stream.bootstrapServer": "localhost:9092",
 					"stream.securityProtocol": "PLAINTEXT",
 					"stream.saslMechanism": "PLAIN",
+					"stream.trustStore": "truststore",
+					"stream.keyStore": "keystore",
 					"stream.streamNamePattern": "pega-{stream.name}",
 					"stream.replicationFactor": "1",
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, options)
+			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, "/opt/pega/certs/truststore.jks", "/opt/pega/certs/keystore.jks", "","", options)
 
 		}
 	}
-
-
 }
 
-func VerifyPegaWithExternalStreamEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
+func VerifyPegaWithExternalStreamEnvironmentConfig(t *testing.T, yamlContent string, truststore string, keystore string, jksCertType string, keyCertType string, options *helm.Options) {
 
 	var envConfigMap k8score.ConfigMap
 	statefulSlice := strings.Split(yamlContent, "---")
@@ -58,10 +58,84 @@ func VerifyPegaWithExternalStreamEnvironmentConfig(t *testing.T, yamlContent str
 			require.Equal(t, envConfigData["STREAM_BOOTSTRAP_SERVERS"], "localhost:9092")
 			require.Equal(t, envConfigData["STREAM_SECURITY_PROTOCOL"], "PLAINTEXT")
 			require.Equal(t, envConfigData["STREAM_SASL_MECHANISM"], "PLAIN")
-			require.Equal(t, envConfigData["STREAM_TRUSTSTORE_TYPE"], "")
-			require.Equal(t, envConfigData["STREAM_KEYSTORE_TYPE"], "")
+            require.Equal(t, envConfigData["STREAM_TRUSTSTORE"], truststore)
+            require.Equal(t, envConfigData["STREAM_KEYSTORE"], keystore)
+			require.Equal(t, envConfigData["STREAM_TRUSTSTORE_TYPE"], jksCertType)
+			require.Equal(t, envConfigData["STREAM_KEYSTORE_TYPE"], keyCertType)
 			require.Equal(t, envConfigData["STREAM_NAME_PATTERN"], "pega-{stream.name}")
 			require.Equal(t, envConfigData["STREAM_REPLICATION_FACTOR"], "1")
+		}
+	}
+}
+
+func TestPegaExternalStreamEnvironmentConfigWithoutSSL(t *testing.T){
+	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
+	var supportedOperations =  []string{"deploy","install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+
+	for _,vendor := range supportedVendors{
+
+		for _,operation := range supportedOperations{
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"stream.enabled": "true",
+					"stream.bootstrapServer": "localhost:9092",
+					"stream.securityProtocol": "PLAINTEXT",
+					"stream.saslMechanism": "PLAIN",
+					"stream.streamNamePattern": "pega-{stream.name}",
+					"stream.replicationFactor": "1",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, "", "", "","", options)
+
+		}
+	}
+}
+
+func TestPegaExternalStreamEnvironmentConfigWithPEM(t *testing.T){
+	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
+	var supportedOperations =  []string{"deploy","install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+
+	for _,vendor := range supportedVendors{
+
+		for _,operation := range supportedOperations{
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"stream.enabled": "true",
+					"stream.bootstrapServer": "localhost:9092",
+					"stream.securityProtocol": "PLAINTEXT",
+					"stream.saslMechanism": "PLAIN",
+					"stream.trustStore": "truststore",
+					"stream.trustStoreType": "pem",
+					"stream.keyStore": "keystore",
+					"stream.keyStoreType": "pem",
+					"stream.streamNamePattern": "pega-{stream.name}",
+					"stream.replicationFactor": "1",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, "/opt/pega/certs/truststore.pem", "/opt/pega/certs/keystore.pem", "pem", "pem", options)
+
 		}
 	}
 }

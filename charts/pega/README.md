@@ -89,7 +89,7 @@ jdbc:
 #### (Optional) Support for providing credentials/certificates using External Secrets Operator
 
 To avoid directly entering your confidential content in your Helm charts such as passwords or certificates in plain text, Pega supports Kubernetes secrets to secure credentials and related information.
-Use secrets to represent credentials for your database, Docker registry, SSL certificates, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
+Use secrets to represent credentials for your database, Docker registry, SSL certificates, external kafka, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
 Pega supports two methods of passing secrets to your deployments; choose the method that best suits you organization's needs:
 
 • Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
@@ -765,22 +765,25 @@ Configure external Kafka as a stream service provider to use your own managed Ka
 ### Stream (External Kafka) settings
 
 ```yaml
+# Stream (External Kafka) settings.
+# Disabled by default, you must not use stream tier when this setting is enabled.
+# Parameters trustStore,trustStorePassword,keyStore,keyStorePassword and jaasConfig are optional, their value depends on the securityProtocol.
+# For truststore/keystore certificate names, specify the Kubernetes secret that you have created to store SSL certificates for your deployment. For compatibility, see provider support for SSL certificate injection.
+# For more details please check "Support for providing credentials/certificates using External Secrets Operator". 
+# Please note for stream add certificate names in 'global.certificatesSecrets','stream.trustStore', and 'stream.keyStore' as appropriate. 
+# Pega does not support truststore and keystore certificates as plain text for stream.
+# By default, Pega supports only Java Key Store (.jks) format for truststore and keystore certificates.
+# Provide trustStorePassword, KeystorePassword, and jaasConfig values in Plain text. Alternatively, to secure the values leave values empty and configure them in the External Secrets Manager, make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
 stream:
-  # Disabled by default, remove stream tier when this setting is enabled
   enabled: false
   # Provide external kafka broker urls
   bootstrapServer: ""
   # Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
   securityProtocol: PLAINTEXT
-  # Optional depends on value of securityProtocol
   trustStore: ""
-  # Optional depends on value of securityProtocol
   trustStorePassword: ""
-  # Optional depends on value of securityProtocol
   keyStore: ""
-  # Optional depends on value of securityProtocol
   keyStorePassword: ""
-  # Optional JAAS login context parameters for SASL connections, depends on securityProtocol
   jaasConfig: ""
   saslMechanism: PLAIN
   # By default, topics originating from Pega Platform have the pega- prefix,
