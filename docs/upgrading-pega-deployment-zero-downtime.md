@@ -29,7 +29,7 @@ The Pega zero-downtime upgrade process for Client-managed cloud automates the Pe
 
    ![Migrates the rules structure and content and data structure](media/upgrade-rules-rnew-schema.png "Migrates the rules structure and content and data structure")
 
-4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content; the process discards these tables and data after the upgrade completes.
+4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content.
 
 5. For deployments running in Oracle, grants access to the new rules schema tables to generate the necessary rules objects (GRANT statements) which will link the existing data schema to the new rules schema after you upgrade the new rules schema.
 
