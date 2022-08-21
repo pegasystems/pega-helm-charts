@@ -880,9 +880,9 @@ To support this option,
 3) Update your local Helm repository to the latest version using the command:
     - helm repo update pega https://pegasystems.github.io/pega-helm-charts
 4) Update your values.yaml file to refer to the external secret manager for certificates.
-5) pega supports multiple externalSecrets for custom certificates, add externalSecret names as array of strings to certificatesSecrets
+5) Add multiple custom certificates that you maintain as an externally-managed secret, each as a string, separated by a comma in the certificatesSecrets parameter.
 
-• You can either pass certificates as external secrets or as plain text to values.yaml ,not both. if both are given only external secrets will be mounted to into the tomcat container
+• You can either pass certificates as external secrets or as plain text to the Pega values.yaml, but not both. If you provide both, the deployment mounts only external secrets into the tomcat container.
 Example:
 
 ```yaml
