@@ -940,7 +940,7 @@ Parameter   | Description   | Default value
 `service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
 `service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
 `service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. Pass the certificateChainFile file if you are using certificateFile and certificateKeyFile. | `""`
-`service.tls.certificateFile` | The content of the file that contains the server certificate, which you must provide if keystore and keystorepassword is not specified. The format of this file is PEM-encoded. | `""`
+`service.tls.certificateFile` | The content of the file that contains the server certificate, which you must provide if you do not provide a keystore and keystorepassword. The format of this file is PEM-encoded. | `""`
 `service.tls.certificateKeyFile` | The content of the file that contains the server private key, which you must provide if you do not provide a keystore and keystorepassword. The format of this file is PEM-encoded. | `""`
 `service.tls.traefik.enabled` | Set as `true` if you enabled Traefik for the tier and deployed the Traefik addon Helm charts; otherwise set it to `false`. | `false`
 `service.tls.traefik.serverName` | The server name for the tier, SAN(Subject Alternative Name) of the certificate present inside the container | `""`
