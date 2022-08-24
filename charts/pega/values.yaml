@@ -360,7 +360,7 @@ hazelcast:
   username: ""
   # Password to be used in client-server Hazelcast model for authentication
   password: ""
-  # To avoid exposing username,password parameters, configure the
+  # To avoid exposing username,password parameters, configure the 
   # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
   external_secret_name: ""
