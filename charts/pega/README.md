@@ -865,10 +865,27 @@ installer:
 ### Mount the custom certificates into the Tomcat container
 
 Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
+#### (Optional) Support for providing custom certificates using External Secrets Operator
+To avoid directly entering your  certificates in plain text, Pega supports Kubernetes secrets to secure certificates. Your certificates can be stored in any secrets manager provider.
 
+• Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
+
+To support this option,
+
+1) Create two files following the Kubernetes documentation for External Secrets Operator :
+    - An external secret file that specifies what information in your secret to fetch.
+    - A secret store to define access how to access the external and placing the required files in your Helm directory.
+2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
+3) Update your local Helm repository to the latest version using the command:
+    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
+4) Update your values.yaml file to refer to the external secret manager for certificates.
+5) Add multiple custom certificates that you maintain as an externally-managed secret, each as a string, separated by a comma in the certificatesSecrets parameter.
+
+• You can either pass certificates as external secrets or as plain text to the Pega values.yaml, but not both. If you provide both, the deployment mounts only external secrets into the tomcat container.
 Example:
 
 ```yaml
+certificatesSecrets: ["secret-to-be-created1","secret-to-be-created2"]
 certificates:
     badssl.cer: |
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
