@@ -1,13 +1,13 @@
-{{- define "pegaCertificatesConfigTemplate" }}
-# Config map used for common configuration between Pega nodes
+{{- define "pegaCertificatesSecretTemplate" }}
+# Secret used for common configuration between Pega nodes
 {{ if (eq (include "performDeployment" .) "true") }}
-{{- if .Values.global.certificates }}
-kind: ConfigMap
+{{- if and (.Values.global.certificates) (not (.Values.global.certificatesSecrets)) }}
+kind: Secret
 apiVersion: v1
 metadata:
-  name: {{ template "pegaImportCertificatesConfig" $ }}
+  name: {{ template "pegaImportCertificatesSecret" $ }}
   namespace: {{ .Release.Namespace }}
-data:
+stringData:
   # cert Files
 {{- if .Values.global.certificates }}
   # import certificates from values
