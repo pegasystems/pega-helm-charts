@@ -72,7 +72,7 @@
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
                connectionTimeout="20000"
-               maxHeaderCount="50" />
+               maxHeaderCount="40" />
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
@@ -91,7 +91,7 @@
                    maxHttpHeaderSize="16384"
                    maxSavePostSize="65536"
                    connectionTimeout="20000"
-                   maxHeaderCount="50" />
+                   maxHeaderCount="40" />
     {{ end }}
 
     <!-- A "Connector" using the shared thread pool-->
