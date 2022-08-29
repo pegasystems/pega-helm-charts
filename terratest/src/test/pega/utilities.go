@@ -43,8 +43,8 @@ func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, containe
 	}
 }
 
-// VerifyInitContinerData - Verifies any possible initContainer that can occur in pega helm chart deployments
-func VerifyInitContinerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
+// VerifyInitContainerData - Verifies any possible initContainer that can occur in pega helm chart deployments
+func VerifyInitContainerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 	var depName = getDeploymentName(options)
 
 	if len(containers) == 0 {
@@ -60,10 +60,6 @@ func VerifyInitContinerData(t *testing.T, containers []k8score.Container, option
 		} else if name == "wait-for-pegasearch" {
 			require.Equal(t, "busybox:1.31.0", container.Image)
 			require.Equal(t, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://" + depName + "-search); do echo Waiting for search to become live...; sleep 10; done;"}, container.Command)
-		} else if name == "wait-for-cassandra" {
-			require.Equal(t, "cassandra:3.11.3", container.Image)
-			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc
-			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
 			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc

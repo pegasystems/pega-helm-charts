@@ -19,22 +19,29 @@ Microsoft Azure Kubernetes Service (AKS)  | Application Gateway Ingress Controll
 
 ### Traefik
 
-Deploying Pega Platform with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/helm/charts/blob/master/stable/traefik/values.yaml).
+Deploying Pega Platform with more than one Pod typically requires a load balancer to ensure that traffic is routed equally.  Some IaaS and PaaS providers supply a load balancer and some do not. If a native load balancer is not provided and configured, or the load balancer does not support cookie based session affinity, Traefik may be used instead.  If you do not wish to deploy Traefik, set `traefik.enabled` to `false` in the addons values.yaml configuration. For more configuration options available for Traefik, see the [Traefik Helm chart](https://github.com/traefik/traefik-helm-chart/blob/master/traefik/values.yaml).
 
 Example:
 
 ```yaml
 traefik:
   enabled: true
-  serviceType: NodePort
-  ssl:
-    enabled: false
   rbac:
     enabled: true
   service:
-    nodePorts:
-      http: 30080
-      https: 30443
+    type: NodePort
+  ports:
+    web:
+      port: 80
+      nodePort: 30080
+    websecure:
+      port: 443
+      nodePort: 30443
+      tls:
+        enabled: false
+        options: ""
+        certResolver: ""
+        domains: []
   resources:
     requests:
       cpu: 200m
@@ -42,6 +49,7 @@ traefik:
     limits:
       cpu: 500m
       memory: 500Mi
+
 ```
 
 ### Amazon ALB
@@ -53,16 +61,32 @@ Configuration   | Usage
 `clusterName`   | The name of your EKS cluster.  Resources created by the ALB Ingress controller will be prefixed with this string.
 `region`     | AWS region of the EKS cluster. Required if if ec2metadata is unavailable from the controller Pod.
 `vpcId`      | VPC ID of EKS cluster, required if ec2metadata is unavailable from controller pod.
+`image.repository`  | Your Amazon EKS Amazon ECR image repository, which is required for AWS GovCloud (US) deployments.
 `serviceAccount.annotations`  | Annotate the service account with `eks.amazonaws.com/role-arn` IAM Role that provides access to AWS resources.
 
 Example:
 
+
+For Commercial Cloud Deployment:
 ```yaml
 aws-load-balancer-controller:
   enabled: true
   clusterName: "YOUR_EKS_CLUSTER_NAME"
   region: "YOUR_EKS_CLUSTER_REGION"
   vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  serviceAccount:
+    annotations:
+      eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
+```
+For AWS Gov Cloud Deployment:
+```yaml
+aws-load-balancer-controller:
+  enabled: true
+  clusterName: "YOUR_EKS_CLUSTER_NAME"
+  region: "YOUR_EKS_CLUSTER_REGION"
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
+  image:
+    repository: "Amazon EKS Amazon ECR image repository"
   serviceAccount:
     annotations:
       eks.amazonaws.com/role-arn: "YOUR_IAM_ROLE_ARN"
@@ -114,7 +138,7 @@ Microsoft Azure Kubernetes Service (AKS)  | Azure Monitor
 
 ## Logging with Elasticsearch-Fluentd-Kibana (EFK)
 
-EFK is a standard logging stack that is provided as an example for ease of getting started in environments that do not have aggregated logging configured such as open-source Kubernetes. Other IaaS and PaaS providers typically include a logging system out of the box. You may enable the three components of EFK ([Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml),[Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml), and [Kibana](https://github.com/helm/charts/tree/master/stable/kibana/values.yaml)) in the addons values.yaml file to deploy EFK automatically. For more configuration options available for each of the components, see their Helm Charts.
+EFK is a standard logging stack that is provided as an example for ease of getting started in environments that do not have aggregated logging configured such as open-source Kubernetes. Other IaaS and PaaS providers typically include a logging system out of the box. You may enable the three components of EFK ([Elasticsearch](https://github.com/elastic/helm-charts/blob/v7.16.3/elasticsearch/values.yaml),[Fluentd](https://github.com/helm/charts/tree/master/stable/fluentd-elasticsearch/values.yaml), and [Kibana](https://github.com/elastic/helm-charts/blob/v7.16.3/kibana/values.yaml)) in the addons values.yaml file to deploy EFK automatically. For more configuration options available for each of the components, see their Helm Charts.
 
 Example:
 
@@ -158,7 +182,7 @@ All others              | Built-in metrics server
 
 Autoscaling in Kubernetes requires the use of a metrics server, a cluster-wide aggregator of resource usage data.  Most PaaS and IaaS providers supply a metrics server, but if you wish to deploy into open source kubernetes, you will need to supply your own.
 
-See the [metrics-server Helm chart](https://github.com/helm/charts/blob/master/stable/metrics-server/values.yaml) for additional parameters.
+See the [metrics-server Helm chart](https://github.com/kubernetes-sigs/metrics-server/tree/master/charts/metrics-server) for additional parameters.
 
 Example:
 

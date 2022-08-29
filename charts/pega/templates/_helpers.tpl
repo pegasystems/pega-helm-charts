@@ -4,18 +4,74 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
-{{- define "pegaImportCertificatesConfig" }}
+{{- define "pegaImportCertificatesSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-import-certificates-config
+{{- $depName -}}-import-certificates-secret
 {{- end }}
 
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
 
 {{- define "pegaImportCertificatesTemplate" }}
 - name: {{ template "pegaVolumeImportCertificates" }}
+  projected:
+    defaultMode: 420
+    sources:
+  {{ if (.Values.global.certificatesSecrets) }}
+  {{- range .Values.global.certificatesSecrets }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaImportCertificatesSecret" $ }}
+  {{ end }}
+{{- end}}
+
+{{- define "pegaCustomArtifactoryCertificateConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-custom-artifactory-certificate-config
+{{- end }}
+
+{{- define "pegaVolumeCustomArtifactoryCertificate" }}pega-volume-custom-artifactory-certificate{{- end }}
+
+{{- define "pegaCustomArtifactoryCertificateTemplate" }}
+- name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
   configMap:
     # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaImportCertificatesConfig" $ }}
+    name: {{ template "pegaCustomArtifactoryCertificateConfig" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
+{{- end}}
+
+{{- define "customArtifactorySSLVerificationEnabled" }}
+{{- if (.Values.global.customArtifactory) }}
+{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
+{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
+true
+{{- else -}}
+false
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "pegaTomcatKeystoreSecret" }}
+{{- $depName := printf "%s" (include "deploymentName" .root) -}}
+{{- $depName -}}-tomcat-keystore-secret
+{{- end }}
+
+{{- define "pegaVolumeTomcatKeystore" }}pega-volume-tomcat-keystore{{- end }}
+
+{{- define "pegaVolumeTomcatKeystoreTemplate" }}
+- name: {{ template "pegaVolumeTomcatKeystore" }}
+  secret:
+    # This name will be referred in the volume mounts kind.
+  {{ if ((.node.service).tls).external_secret_name }}
+    secretName: {{ ((.node.service).tls).external_secret_name }}
+  {{ else }}
+    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}
@@ -63,6 +119,34 @@
     true
   {{- else -}}
     false
+  {{- end -}}
+{{- end }}
+
+{{- define "useBasicAuthForCustomArtifactory" }}
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.basic) }}
+        {{- if and (.Values.global.customArtifactory.authentication.basic.username) (.Values.global.customArtifactory.authentication.basic.password) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end -}}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- define "useApiKeyForCustomArtifactory" }}
+  {{- if (.Values.global.customArtifactory) }}
+    {{- if (.Values.global.customArtifactory.authentication) }}
+      {{- if (.Values.global.customArtifactory.authentication.apiKey) }}
+        {{- if and (.Values.global.customArtifactory.authentication.apiKey.headerName) (.Values.global.customArtifactory.authentication.apiKey.value) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- end }}
+    {{- end }}
   {{- end -}}
 {{- end }}
 
@@ -126,7 +210,8 @@
 
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch
-  image: busybox:1.31.0
+  image: {{ .Values.global.utilityImages.busybox.image }}
+  imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
 {{- end }}
@@ -269,11 +354,15 @@ true
 #Override this template in a subchart if your secret values are provided by seperate secrets
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
-  secret:
-    # This name will be referred in the volume mounts kind.
-    secretName: {{ template "pegaCredentialsSecret" $ }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+    - secret:
+        name: {{ template "pegaCredentialsSecret" $ }}
+  {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
+    - secret:
+        name: {{ .Values.global.jdbc.external_secret_name }}
+  {{- end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
@@ -292,3 +381,67 @@ dnsConfig:
 {{- $d2 := merge $ $d1 }}
 {{- template "searchURL" $d2 }}
 {{- end -}}
+
+{{- define "ingressApiVersion" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: networking.k8s.io/v1
+{{- else }}
+apiVersion: extensions/v1beta1
+{{- end }}
+{{- end }}
+
+{{- define "ingressService" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port: 
+    number: {{ .node.service.port }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.service.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceHttps" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: {{ .name }}
+  port:
+    number: {{ .node.service.tls.port }}
+{{- else }}
+serviceName: {{ .name }}
+servicePort: {{ .node.service.tls.port }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressBackend" }}
+{{- if ((.node.service).tls).enabled }}
+    {{ include "ingressServiceHttps" . | indent 10 }}
+{{- else }}
+    {{ include "ingressService" . | indent 10 }}
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceC11n" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: constellation
+  port: 
+    number: 3000
+{{- else }}
+serviceName: constellation
+servicePort: 3000
+{{- end }}
+{{- end }}
+
+{{- define "ingressServiceSSLRedirect" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+service:
+  name: ssl-redirect
+  port: 
+    name: use-annotation
+{{- else }}
+serviceName: ssl-redirect
+servicePort: use-annotation
+{{- end }}
+{{- end }}

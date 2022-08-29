@@ -41,6 +41,7 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
+        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-secret.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
@@ -59,9 +60,18 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
-
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
-
+{{ end }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
+{{- if .root.Values.global.customArtifactory.certificate }}
+{{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
+{{- end }}
+{{- end }}
+{{- if ((.node.service).tls).enabled }}
+{{- $data := dict "root" .root "node" .node }}
+{{- include "pegaVolumeTomcatKeystoreTemplate" $data | indent 6 }}
+{{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -187,8 +197,20 @@ spec:
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
         #mount custom certificates
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
+{{ end }}
+{{- if ((.node.service).tls).enabled }}
+        - name: {{ template "pegaVolumeTomcatKeystore" }}
+          mountPath: "/opt/pega/tomcatcertsmount"
+{{ end }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
+{{- if .root.Values.global.customArtifactory.certificate }}
+        - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
+          mountPath: "/opt/pega/artifactory/cert"
+{{- end }}
+{{- end }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
@@ -225,7 +247,7 @@ spec:
           timeoutSeconds: {{ $startupProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $startupProbe.failureThreshold | default 20 }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
 {{- else }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         {{- $livenessProbe := .node.livenessProbe }}
@@ -251,6 +273,12 @@ spec:
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
+{{- end }}
+{{- if .custom }}
+{{- if .custom.sidecarContainers }}
+      # Additional custom sidecar containers
+{{ toYaml .custom.sidecarContainers | indent 6 }}
+{{- end }}
 {{- end }}
       # Mentions the restart policy to be followed by the pod.  'Always' means that a new pod will always be created irrespective of type of the failure.
       restartPolicy: Always

@@ -1,7 +1,7 @@
 {{- define "pega.aks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: extensions/v1beta1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -17,6 +17,10 @@ metadata:
     # HTTP to HTTPS Redirect
     appgw.ingress.kubernetes.io/ssl-redirect: "true"
 {{ end }}
+{{- if ((.node.service).tls).enabled }}
+    # TLS certificate used for the ingress
+    appgw.ingress.kubernetes.io/backend-protocol: https
+{{- end }}
 spec:
 {{ if ( include "ingressTlsEnabled" . ) }}
 {{- if .node.ingress.tls.secretName }}
@@ -29,8 +33,9 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
-      - backend:
-          serviceName: {{ .name }}
-          servicePort: {{ .node.service.port }}
+      - pathType: ImplementationSpecific
+        backend:
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{ include "ingressBackend" . }}
 ---     
 {{- end }}

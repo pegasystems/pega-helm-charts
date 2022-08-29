@@ -13,6 +13,10 @@ externalURL: "http://pega-search"
 # Push the Elasticsearch image to the same internal Docker registry that you specified in the Docker section above.
 image: "pegasystems/search"
 imagePullPolicy: ""
+# Enter the CPU request for each search node (recommended 200m).
+cpuRequest: "200m"
+# Enter the Memory request for each search node (recommended "2Gi").
+memRequest: "2Gi"
 # Enter the CPU limit for each search node (recommended 1).
 cpuLimit: 1
 # Enter the Memory limit for each search node (recommended 4Gi).

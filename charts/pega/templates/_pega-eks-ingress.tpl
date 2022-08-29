@@ -1,7 +1,7 @@
 {{- define "pega.eks.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: extensions/v1beta1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -37,21 +37,26 @@ metadata:
     # enable sticky sessions on target group and set alb routing algorithm
     alb.ingress.kubernetes.io/target-group-attributes: load_balancing.algorithm.type=least_outstanding_requests,stickiness.enabled=true,stickiness.lb_cookie.duration_seconds={{ include "lbSessionCookieStickiness" . }}
 {{- end }}
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{- if ((.node.service).tls).enabled }}
+    # TLS certificate used for the ingress
+    alb.ingress.kubernetes.io/backend-protocol: HTTPS
+{{- end }}
 spec:
   rules:
   {{ if (.node.service.domain) }}
   - http:
       paths:
-      - backend:
-          serviceName: ssl-redirect
-          servicePort: use-annotation
+      - pathType: ImplementationSpecific
+        backend:
+{{ include "ingressServiceSSLRedirect" . | indent 10 }}
   {{ else }}
   {{ if ( include "ingressTlsEnabled" . ) }}
   - http:
       paths:
-      - backend:
-          serviceName: ssl-redirect
-          servicePort: use-annotation
+      - pathType: ImplementationSpecific
+        backend:
+{{ include "ingressServiceSSLRedirect" . | indent 10 }}
   {{ end }}
   {{ end }}
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
@@ -61,12 +66,13 @@ spec:
       paths: 
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
+        pathType: ImplementationSpecific
         backend:
-          serviceName: constellation
-          servicePort: 3000
+{{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - backend: 
-          serviceName: {{ .name }} 
-          servicePort: {{ .node.service.port }}
+      - pathType: ImplementationSpecific
+        backend:
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{ include "ingressBackend" . }}
 ---
 {{- end }}

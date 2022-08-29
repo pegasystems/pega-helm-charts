@@ -1,7 +1,7 @@
 {{- define "pega.gke.ingress" -}}
 # Ingress to be used for {{ .name }}
 kind: Ingress
-apiVersion: extensions/v1beta1
+{{ include "ingressApiVersion" . }}
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
@@ -32,9 +32,12 @@ spec:
 {{ end }}
 {{ end }}
 {{ end }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+  defaultBackend:
+{{ else }}
   backend:
-    serviceName: {{ .name }}
-    servicePort: {{ .node.service.port }}
+{{ end }}
+{{ include "ingressService" . | indent 4 }}
   rules:
   # The calls will be redirected from {{ .node.domain }} to below mentioned backend serviceName and servicePort.
   # To access the below service, along with {{ .node.domain }}, http/https port also has to be provided in the URL.
@@ -43,12 +46,13 @@ spec:
       paths: 
       {{ if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
       - path: /c11n     
+        pathType: ImplementationSpecific
         backend:
-          serviceName: constellation
-          servicePort: 3000
+{{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - backend: 
-          serviceName: {{ .name }} 
-          servicePort: {{ .node.service.port }}
+      - pathType: ImplementationSpecific
+        backend: 
+# protocol will be set to https only when either ingress is enabled or domain is set
+{{ include "ingressBackend" . }}
 ---
 {{- end }}

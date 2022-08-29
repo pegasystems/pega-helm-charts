@@ -14,7 +14,12 @@ global:
   # Deploy Pega nodes
   actions:
     execute: "deploy"
-
+  # Add custom certificates to be mounted to container
+  # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
+  # to support multiple custom certificates as external secrets, specify each of your external secrets
+  # as an array of comma-separated strings using the certificatesSecrets parameter.
+  certificatesSecrets: []
+  certificates:
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
@@ -48,15 +53,42 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
-  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  customArtifactory:
+    # If you use a secured custom artifactory to manager your JDBC driver,
+    # provide the authentication details below by filling in the appropriate authentication section,
+    # either basic or apiKey.
+    authentication:
+      # Provide the basic authentication credentials or the API key authentication details to satisfy your custom artifactory authentication mechanism.
+      basic:
+        username: "YOUR_ARTIFACTORY_USERNAME"
+        password: "YOUR_ARTIFACTORY_PASSWORD"
+      apiKey:
+        headerName: "YOUR_ARTIFACTORY_DEDICATED_APIKEY_HEADER"
+        value: "YOUR_ARTIFACTORY_API_KEY"
+    # Leave customArtifactory.enableSSLVerification enabled to ensure secure access to your custom artifactory;
+    # when customArtifactory.enableSSLVerification is false, SSL verification is skipped and establishes an insecure connection.
+    enableSSLVerification: true
+    # Provide a required domain certificate for your custom artifactory; if none is required, leave this field blank.
+    certificate:
+
   docker:
+    # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-      # Docker image information for the Pega docker image, containing the application server.
+    # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
+
+  utilityImages:
+    busybox:
+      image: busybox:1.31.0
+      imagePullPolicy: IfNotPresent
+    k8s_wait_for:
+      image: dcasavant/k8s-wait-for
+      imagePullPolicy: "IfNotPresent"
+      # waitTimeSeconds: 2
 
   # Upgrade specific properties
   upgrade:
@@ -85,6 +117,26 @@ global:
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
+        tls:
+          enabled: false
+          # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
+          # values in the External Secrets Manager, and enter the external secret name below
+          # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
+          external_secret_name: ""
+          keystore:
+          keystorepassword:
+          port: 443
+          targetPort: 8443
+          # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+          cacertificate:
+          # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
+          traefik:
+            enabled: false
+            # the SAN of the certificate present inside the container
+            serverName: ""
+            # set insecureSkipVerify=true, if the certificate verification has to be skipped
+            insecureSkipVerify: false
 
       ingress:
         # For help configuring the ingress block, see the Helm chart documentation
@@ -322,3 +374,16 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
+
+# Hazelcast settings (applicable from Pega 8.6)
+hazelcast:
+  image: "YOUR_HAZELCAST_IMAGE:TAG"
+  # Setting below to true will deploy the infinity in client-server Hazelcast model.
+  # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
+  enabled: true
+  # No. of initial members to join
+  replicas: 3
+  # UserName to be used in client-server Hazelcast model for authentication
+  username: ""
+  # Password to be used in client-server Hazelcast model for authentication
+  password: ""

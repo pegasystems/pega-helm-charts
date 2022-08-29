@@ -413,9 +413,9 @@ To customize these files, you must download them from the source github reposito
 ```
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega             1.4.4                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.4.4           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
-  pega/backingservices  1.4.4                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
+  pega/pega             2.2.0                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           2.2.0           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
+  pega/backingservices  2.2.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment.
 ```
 
 The pega and addons charts in the /charts/pega folder require customization for your organization's EKS deployment of Pega Platform. The backingservices chart is optional, but recommended for Pega Infinity 8.6 and later.
@@ -434,6 +434,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
 - Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
 - Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
+- Uncomment and specify the Amazon EKS Amazon ECR image repository in the image.repository: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
 - Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
@@ -478,6 +479,16 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 Make these changes before you begin deploying Pega Platform using Helm charts.
 
+#### (Optional) Add Support for providing DB credentials using External Secrets Operator
+
+Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.3/) :
+  •	An external secret file that specifies what information in your secret to fetch.
+  •	A secret store to define access how to access the external and placing the required files in your Helm directory.
+
+- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
+- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
+- Update Pega.yaml file to refer to the external secret manager for DB password.
+
 #### Updating the pega.yaml Helm chart values
 
 To configure the parameters in the pega.yaml fie, download the file in the charts/pega folder, edit it with a text editor, and then save it to your local system using the same filename.
@@ -496,6 +507,10 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Specify host names for your web and stream tiers and import and use any required SSL certificates for your web tiers.
 
+- Enable encryption of traffic between the ingress/load balancer and the pods by specifying SSL certificates for your web tiers.
+
+- Enable Hazelcast client-server model for Pega Platform 8.6 and later.
+
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
    `$ helm inspect values pega/pega > pega.yaml`
@@ -512,13 +527,19 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | jdbc.driverUri:         | Specify the database driver Pega Platform uses during the deployment.| <ul> <li>driverUri: "latest jar file available” </li> <li>For PostgreSQL databases, use the URL of the latest PostgreSQL driver file that is publicly available at <https://jdbc.postgresql.org/download.html>.</li></ul>    |
    | jdbc: username: password: | Set the security credentials for your database server to allow installation of Pega Platform into your database.   | <ul><li>username: "\<name of your database user\>" </li><li>password: "\<password for your database user\>"</li><li>-- For RDS postgreSQL databases, previously set default <username>.</li></ul>   |
    | jdbc.rulesSchema: jdbc.dataSchema:  | Set the names of both your rules and the data schema to the values that Pega Platform uses for these two schemas.      | <ul><li>rulesSchema: "rules" </li><li>dataSchema: "data"</li></ul>  |
+   | customArtifactory.authentication: basic.username: basic.password: apiKey.headerName: apiKey.value: | To download a JDBC driver from your custom artifactory which is secured with Basic or APIKey Authentication. Use `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` section to provide APIKey value and dedicated APIKey header details. | <ul><li>basic.username: "\<Custom artifactory basic Authentication username\>"</li><li>basic.password: "\<Custom artifactory basic Authentication password\>"</li><li>apiKey.headerName: "\<Custom artifactory dedicated APIKey Authentication header name\>"</li><li>apiKey.value: "\<Custom artifactory APIKey value for APIKey authentication\>"</li> </ul> |
+   | customArtifactory.certificate: | Custom artifactory SSL certificate verification is enabled by default. If your custom artifactory domain has a self-signed SSL certificate, provide the certificate. You can disable SSL certificate verification by setting `customArtifactory.enableSSLVerification` to `false`;however, this setting establishes an insecure connection. | <ul><li> certificate: "\<custom artifactory SSL certificate to be verified\>"</li></ul> |
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
-   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate, where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn></li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul>|
-   | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul>|
-   | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul>
+   | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate, where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn></li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul> |
+   | tier.name: ”web” tier.service.tls:| Set this parameter as `true` to encrypt the traffic between the load balancer/ingress and pods. Beginning with Helm version `2.2.0` Pega provides a default self-signed certificate; Pega also supports specifying your own CA certificate. | <ul><li>tier.service.tls.enabled: set to `true` to enable the traffic encryption </li><li>tier.service.tls.port: 443</li><li>tier.service.tls.targetPort: 8443</li><li>tier.service.tls.external_secret_name: The external secret name for fetching certificates from a secure location. For details, see [this option in the Pega Helm chart](../charts/pega#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)</li><li>tier.service.tls.keystore: The base64 encoded content of the keystore file. Leave this value empty to use the default, Pega-provided self-signed certificate.</li><li>tier.service.tls.keystorepassword: the password of the keystore file</li><li>tier.service.tls.cacertificate: the base64 encrypted content of the root CA certificate.  You can leave this value empty for EKS deployments.</li><li>tier.service.traefik.enabled:  set to `false` as this option is for `k8s` provider not for `EKS`</li></ul> |
+   | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul> |
+   | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul> |
    | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".     | adminPassword: "\<initial password\>"  |
+   | hazelcast: | For Pega Platform 8.6 and later, Pega recommends using Hazelcast in client-server model. Embedded deployment would not be supported in future platform releases.| |
+   | hazelcast.image:        | Specify the Pega-provided `clustering-service` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
+   | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
 
 3. Save the file.
 
