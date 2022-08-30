@@ -14,7 +14,11 @@ global:
   actions:
     execute: "deploy"
 
-  # Add custom certificates to be mounted to container, as a map
+  # Add custom certificates to be mounted to container
+  # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
+  # to support multiple custom certificates as external secrets, specify each of your external secrets
+  # as an array of comma-separated strings using the certificatesSecrets parameter.
+  certificatesSecrets: []
   certificates:
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
@@ -41,6 +45,9 @@ global:
     driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
+    # To avoid exposing a password, leave the jdbc.password parameter empty (no quotes), configure a JDBC password
+    # in the External Secrets Manager, and enter the external secret for the JDBC password.
+    external_secret_name: "YOUR_EXTERNAL_SECRETS_NAME"
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
@@ -84,6 +91,7 @@ global:
     k8s_wait_for:
       image: dcasavant/k8s-wait-for
       imagePullPolicy: "IfNotPresent"
+      # waitTimeSeconds: 2
 
   # Upgrade specific properties
   upgrade:
@@ -107,11 +115,32 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
+        tls:
+          enabled: false
+          # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
+          # values in the External Secrets Manager, and enter the external secret name below
+          # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
+          external_secret_name: ""
+          keystore:
+          keystorepassword:
+          port: 443
+          targetPort: 8443
+          # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+          cacertificate:
+          # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
+          traefik:
+            enabled: false
+            # the SAN of the certificate present inside the container
+            serverName: ""
+            # set insecureSkipVerify=true, if the certificate verification has to be skipped
+            insecureSkipVerify: false
 
       ingress:
         # For help configuring the ingress block including TLS, see the Helm chart documentation

@@ -86,6 +86,34 @@ jdbc:
   driverClass: org.postgresql.Driver
 ```
 
+#### (Optional) Support for providing credentials/certificates using External Secrets Operator
+
+To avoid directly entering your confidential content in your Helm charts such as passwords or certificates in plain text, Pega supports Kubernetes secrets to secure credentials and related information.
+Use secrets to represent credentials for your database, Docker registry, SSL certificates, or any other token or key that you need to pass to a deployed application. Your secrets can be stored in any secrets manager provider. 
+Pega supports two methods of passing secrets to your deployments; choose the method that best suits you organization's needs:
+
+• Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
+
+To support this option,
+
+1) Create two files following the Kubernetes documentation for External Secrets Operator :
+   - An external secret file that specifies what information in your secret to fetch.
+   - A secret store to define access how to access the external and placing the required files in your Helm directory.
+2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
+3) Update your local Helm repository to the latest version using the command: 
+   - helm repo update pega https://pegasystems.github.io/pega-helm-charts
+4) Update your values.yaml file to refer to the external secret manager for DB password.
+
+•  Pass secrets directly to your deployment using your organization's recommend practices.
+
+##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
+1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
+2. Have the keystore password as plaintext.
+3. The secret key should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt for keystore, keystore password and CA certificate respectively.
+4. for ca.crt, make sure you have `decodingStrategy: Base64` under `remoteRef` in external secret file.
+5. In case of `openshift` provider, add the cacertificate as the base64 encoded plaintext in the `values.yaml` file.
+
+
 ### Driver URI
 
 Pega requires a database driver JAR to be provided for connecting to the relational database.  This JAR may either be baked into your image by extending the Pega provided Docker image, or it may be pulled in dynamically when the container is deployed.  If you want to pull in the driver during deployment, you will need to specify a URL to the driver using the `jdbc.driverUri` parameter.  This address must be visible and accessible from the process running inside the container.
@@ -140,7 +168,7 @@ docker:
     imagePullPolicy: "Always"
 ```
 
-## Deploying with Pega-provided busybox and k8s-wait-for utility images
+## Deploying with busybox and k8s-wait-for utility images from a private registry
 To deploy Pega Platform, the Pega helm chart requires the use of the busybox and k8s-wait-for images. For clients who want to pull these images from a registry other than Docker Hub, they must tag and push these images to another registry, and then pull these images by specifying `busybox` and `k8s-wait-for` values as described below.
 
 Example:
@@ -590,7 +618,7 @@ Parameter     | Description    | Default value
 `prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
 `prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
 `contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
-`serverXML`   | A complete server.xml file to inject  | See [server.xml](config/deploy/server.xml).
+`serverXML`   | A complete server.xml file to inject  | See [server.xml.tmpl](config/deploy/server.xml.tmpl).
 `webXML`      | A complete web.xml file to inject  | No default provided, but if `config/deploy/web.xml` exists, it will be used as the default.
 
 
@@ -739,13 +767,17 @@ The Helm charts also support an automated install or upgrade with a Kubernetes J
 
 For installations of the Pega platform, you must specify the installer Docker image and an initial default password for the `administrator@pega.com` user.
 
+Along with this, you can configure the kubelet pull policy for the image. It is defaulted to `IfNotPresent`, meaning an image will be pulled if it is "not present". All possible options are `IfNotPresent`, `Always`, and `Never`. Always pulling an image ensures you always have the latest image at all times, even if the specific tag already exists on your machine. 
+
 Example:
 
 ```yaml
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
+  imagePullPolicy: "PREFERRED_IMAGE_PULL_POLICY"
   adminPassword: "ADMIN_PASSWORD"
 ```
+
 
 ### Upgrades and patches
 
@@ -762,7 +794,8 @@ Use the `installer` section  of the values file with the appropriate parameters 
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
-`adminPassword` | Specify a temporary, initial password to log into teh Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`imagePullPolicy` | Specify when to pull an image. | `IfNotPresent`
+`adminPassword` | Specify a temporary, initial password to log into the Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
@@ -770,10 +803,10 @@ Parameter   | Description   | Default value
 
 Upgrade type    | Description
 ---             | ---
-`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime. This patch or upgrade type migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and patches (only changed rules) or upgrades (all) the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
+`zero-downtime` |  If applying any patch or upgrading from 8.4.2 and later, use this option to minimize downtime. This patch or upgrade type migrates the rules to your designated "new rules schema", uses the temporary data schema to host some required data-specific tables, and patches or upgrades the rules to the new version with zero-downtime. With the new rules in place, the process performs a rolling reboot of your nodes, patches or upgrades any required data schema, and redeploys the application using the new rules.
 `custom` |  Use this option for any upgrade in which you complete portions of the upgrade process in steps. Supported upgrade steps are: `enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`. To specify which steps to include in your custom upgrade, specify them in your pega.yaml file using the `upgrade.upgradeSteps` parameter.
-`out-of-place-rules` | Use this option to complete an out-of-place upgrade of rules that the upgrade process migrates to the new rules schema. This schema will become the rules schema after your upgrade is complete.
-`out-of-place-data` |Use this option to complete an out-of-place upgrade of data the upgrade process migrates to a new, temporary data schema. The upgrade process removes this temporary schema after your application is running with updated data.
+`out-of-place-rules` | Use this option to migrate a copy of the rules to a new rules schema and run an out-of-place upgrade in that copied schema. This schema will become the rules schema after your upgrade is complete.
+`out-of-place-data` |Use this option to complete an out-of-place upgrade of the data schema.  This is the final step of the out of place upgrade.
 `in-place`      | Use this option to upgrade both rules and data in a single run.  This will upgrade your environment as quickly as possible but will result in application downtime.
 `out-of-place` | `Deprecated and supported only with Helm charts prior to version 1.4`: For patches using Helm charts from 1.4 or earlier, you can use this process to apply a patch with zero-downtime; for upgrades from 1.4 or earlier this upgrade type minimizes downtime, but still requires some downtime. For patches or upgrades the process places the existing rules in your application into a read-only state, migrates the rules to your designated "new rules schema", and then applies the patch only to changed rules or upgrades all of the rules. With the new rules in place, the process performs a rolling reboot, patches or upgrades the data, and then redeploys your application using the new rules.
 
@@ -833,10 +866,27 @@ installer:
 ### Mount the custom certificates into the Tomcat container
 
 Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
+#### (Optional) Support for providing custom certificates using External Secrets Operator
+To avoid directly entering your  certificates in plain text, Pega supports Kubernetes secrets to secure certificates. Your certificates can be stored in any secrets manager provider.
 
+• Mount secrets into your Docker containers using the External Secrets Operator([https://external-secrets.io/v0.5.3/](https://external-secrets.io/v0.5.1/)).
+
+To support this option,
+
+1) Create two files following the Kubernetes documentation for External Secrets Operator :
+    - An external secret file that specifies what information in your secret to fetch.
+    - A secret store to define access how to access the external and placing the required files in your Helm directory.
+2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
+3) Update your local Helm repository to the latest version using the command:
+    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
+4) Update your values.yaml file to refer to the external secret manager for certificates.
+5) Add multiple custom certificates that you maintain as an externally-managed secret, each as a string, separated by a comma in the certificatesSecrets parameter.
+
+• You can either pass certificates as external secrets or as plain text to the Pega values.yaml, but not both. If you provide both, the deployment mounts only external secrets into the tomcat container.
 Example:
 
 ```yaml
+certificatesSecrets: ["secret-to-be-created1","secret-to-be-created2"]
 certificates:
     badssl.cer: |
       "-----BEGIN CERTIFICATE-----\n<<certificate content>>\n-----END CERTIFICATE-----\n"
@@ -894,3 +944,119 @@ hazelcast:
   password: ""
 ```
 
+
+### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
+
+Using Helm version `2.2.0`, Pega supports mounting and passing TLS certificates into the container to enable TLS between loadbalancer/ingress and pods during your Pega Platform deployment. Pega supports the keystore formats such as .jks, .keystore. To mount and pass your TLS certificates, use the `tls` section under `service` to specify the keystore content, the keystore password and the specified ports for https under 'web' tier in the `values.yaml` file using the format in the following example.
+
+Parameter   | Description   | Default value
+---         | ---           | ---
+`service.tls.port` | The port of the tier to be exposed to the cluster. For HTTPS this is generally `443` | `443`
+`service.tls.targetPort` | The target port of the container to expose. The TLS-enabled Pega container exposes web traffic on port `8443`. | `8443`
+`service.tls.enabled` | Set as `true` if TLS is enabled for the tier, otherwise `false`. | `false`
+`service.tls.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator) | `""` 
+`service.tls.keystore` | The keystore content for the tier. If you leave this value empty, the deployment uses the default keystore. | `""`
+`service.tls.keystorepassword` | The keystore password for the tier. If you leave this value empty, the deployment uses the default password for the default keystore. | `""`
+`service.tls.cacertificate` | The CA certificate for the tier. If you leave this value empty, the deployment uses the default CA certificate for the default keystore. | `""`
+`service.tls.traefik.enabled` | Set as `true` if you enabled Traefik for the tier and deployed the Traefik addon Helm charts; otherwise set it to `false`. | `false`
+`service.tls.traefik.serverName` | The server name for the tier, SAN(Subject Alternative Name) of the certificate present inside the container | `""`
+`service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
+
+##### Important Points to note
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
+- To encode your keystore and certificates using the following command:
+     o	Linux:  cat ca_bundle.crt | base64 -w 0
+     o	Windows: type keystore.jks | openssl base64  (needs openssl)
+- Add the required, encoded content in the values.yaml using the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate.
+- Create a keystore file with the SAN(Subject Alternate Name) field present in case of Traefik ingress controller.
+- You must use the latest Docker images in order to use this feature; if you use Helm chart version `2.2.0`, with outdated Docker images and set `service.tls.enabled` to `true`, the deployment logs a `Bad Gateway` error. Helm chart version `2.2.0`, you must update your Pega Platform version to the latest patch version or set `service.tls.enabled` to `false`.
+
+#### Example:
+After you enable TLS for the web tier, deploy the traefik addon for `k8s` provider, and configure the keystore file and password using the external secret operator, set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   external_secret_name: secret-to-be-crated
+   keystore: 
+   keystorepassword: 
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: 
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: true
+      serverName: "<< SAN name of the certificate >>"
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: false
+
+```
+
+With TLS enabled for the web tier and the traefik addon deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   external_secret_name: 
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: true
+      serverName: "<< SAN name of the certificate >>"
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: false
+
+```
+
+With TLS enabled for the web tier and the traefik addon is NOT deployed for `k8s` provider, you set the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: true
+   external_secret_name:
+   keystore: "<< encoded keystore content >>"
+   keystorepassword: "<< keystore password >>"
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: "<< encoded CA certificate >>"
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
+
+```
+
+Without TLS enabled, and no traefik addon in use, there is no reason to add and verify the certificate. You can use the following parameters in the `values.yaml`:
+
+```yaml
+# To configure TLS between the ingress/load balancer and the backend, set the following:
+tls:
+   enabled: false
+   external_secret_name:
+   keystore: ""
+   keystorepassword: ""
+   port: 443
+   targetPort: 8443
+   # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+   cacertificate: ""
+   # set enabled=true, only if traefik addon chart is deployed and traefik is enabled
+   traefik:
+      enabled: false
+      serverName: ""
+      # set insecureSkipVerify=true, if the certificate verification has to be skipped
+      insecureSkipVerify: true
+
+```

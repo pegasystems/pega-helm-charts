@@ -1,0 +1,48 @@
+---
+global:
+  certificatesSecrets: ["secret-to-be-created1", "secret-to-be-created2"]
+  certificates:
+    cert1: |
+      "cert-data1"
+    cert2: |
+      "cert-data2"
+  tier:
+    - name: "web"
+      nodeType: "WebUser"
+      requestor:
+        passivationTimeSec: 900
+      replicas: 1
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      livenessProbe:
+        port: 8081
+      # Values for test - web
+      custom:
+    - name: "batch"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+      replicas: 1
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      livenessProbe:
+        port: 8081
+      # Values for test - batch
+      custom:
+    - name: "stream"
+      nodeType: "Stream"
+      requestor:
+        passivationTimeSec: 900
+      replicas: 1
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
+      livenessProbe:
+        port: 8081
+      # Values for test - stream
+      custom:

@@ -156,9 +156,9 @@ To customize these files, you must download them from the source github reposito
 ```bash
   $ helm search repo pega
   NAME                  CHART VERSION   APP VERSION     DESCRIPTION
-  pega/pega             1.6.1                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
-  pega/addons           1.6.1           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
-  pega/backingservices  1.6.1                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment
+  pega/pega             2.2.0                           Helm chart to configure required installation and deployment configuration settings in your environment for your deployment.
+  pega/addons           2.2.0           1.0             Helm chart to configure supporting services and tools in your environment for your deployment.
+  pega/backingservices  2.2.0                           Helm Chart to provision the latest Search and Reporting Service (SRS) for your Pega Infinity deployment.
 ```
 
 The addons charts is not required for OpenShift deployments of Pega Platform. Use of the backingservices chart is optional, but recommended for delivering your ElasticSearch service for Pega Infinity 8.6 and later.
@@ -240,6 +240,8 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Specify host names for your web and stream tiers.
 
+- Enable encryption of traffic between the ingress/load balancer and the pods by specifying SSL certificates for your web tiers.
+
 - Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/openshift-demo, enter:
@@ -265,6 +267,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
     | docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
     | docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
     | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. Pega supports specifying certificates for an ingress using the same methods that OpenShift supports. Note that if you configure both secrets and pre-shared certificates on the ingress, the load balancer ignores the secrets and uses the list of pre-shared certificates. For details, see [Using multiple SSL certificates in HTTP(s) load balancing with Ingress](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-multi-ssl).  | <ul><li>tier.name: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li></ul> |
+    | tier.name: ”web” tier.service.tls:| Set this parameter as `true` to encrypt the traffic between the load balancer/ingress and pods. Beginning with Helm version `2.2.0` Pega provides a default self-signed certificate; Pega also supports specifying your own CA certificate. | <ul><li>tier.service.tls.enabled: set to `true` to enable the traffic encryption </li><li>tier.service.tls.port: 443</li><li>tier.service.tls.targetPort: 8443</li><li>tier.service.tls.external_secret_name: The external secret name for fetching certificates from a secure location. For details, see [this option in the Pega Helm chart](../charts/pega#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)</li><li>tier.service.tls.keystore: The base64 encoded content of the keystore file. Leave this value empty to use the default, Pega-provided self-signed certificate.</li><li>tier.service.tls.keystorepassword: the password of the keystore file</li><li>tier.service.tls.cacertificate: the base64 encrypted content of the destination CA certificate. Leave this empty in case of using default Pega shipped certificate or use this parameter to specify the CA certificate chain for the certificate which is present in the keystore. The openshift uses this to validate the endpoint certificate in the keystore, securing the connection from the loadbalancer/ingress to the destination pods. (This value cannot be given as a secret, should be given here only.)</li><li>tier.service.traefik.enabled: set to `false` as this option is for `k8s` provider not for `openshift`</li></ul> |
     | tier.name: ”stream” tier.ingress.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress. See step 12 to support the management of the certificates in your deployment.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul> |
     | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul> |
     | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
@@ -274,6 +277,16 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
     | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
 
 3. Save the file.
+
+#### (Optional) Add Support for providing DB credentials using External Secrets Operator
+
+Create two files following the Kubernetes documentation for External Secrets Operator [External Secrets Operator](https://external-secrets.io/v0.5.3/) :
+•	An external secret file that specifies what information in your secret to fetch.
+•	A secret store to define access how to access the external and placing the required files in your Helm directory.
+
+- Copy both files into the pega-helm-charts/charts/pega/templates directory of your Helm
+- Update repo to the latest-> helm repo update pega https://pegasystems.github.io/pega-helm-charts
+- Update Pega.yaml file to refer to the external secret manager for DB password.
 
 ### Deploying Pega Platform using the command line
 

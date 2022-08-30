@@ -25,7 +25,7 @@ ls
 helm package --version ${CHART_VERSION} ./charts/pega/
 helm package --version ${CHART_VERSION} ./charts/addons/
 helm package --version ${CHART_VERSION} ./charts/backingservices/
-tar -czvf ${DEPLOY_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/config deploy/context.xml.tmpl deploy/server.xml deploy/prconfig.xml deploy/prlog4j2.xml
+tar -czvf ${DEPLOY_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/config deploy/context.xml.tmpl deploy/server.xml.tmpl deploy/prconfig.xml deploy/prlog4j2.xml
 mkdir -p ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/migrateSystem.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prbootstrap.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prconfig.xml.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prlog4j2.xml ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/prpcUtils.properties.tmpl ./charts/pega/charts/installer/config/installer && cp ./charts/pega/charts/installer/config/setupDatabase.properties.tmpl ./charts/pega/charts/installer/config/installer && tar -czvf ${INSTALLER_CONFIGURATIONS_FILE_NAME} --directory=./charts/pega/charts/installer/config installer/migrateSystem.properties.tmpl installer/prbootstrap.properties.tmpl installer/prconfig.xml.tmpl installer/prlog4j2.xml installer/prpcUtils.properties.tmpl installer/setupDatabase.properties.tmpl
 # and merge it
 helm repo index --merge index.yaml --url https://pegasystems.github.io/pega-helm-charts/ .
