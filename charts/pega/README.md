@@ -120,7 +120,7 @@ Pega requires a database driver JAR to be provided for connecting to the relatio
 
 Use the `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` to provide an APIKey value and dedicated APIKey header details if you host the driver in a custom artifactory that requires Basic or APIKey Authentication.
 
-If you configured a secret in an external secrets operator for customArtifactory credentials, enter the secret name in `customArtifactory.authentication.external_secret_name` parameter . For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
+If you configured a secret in an external secrets operator for customArtifactory credentials, enter the secret name in `customArtifactory.authentication.external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 If your artifactory domain server certificate is not issued by Certificate Authority, you must provide the server certificate using the `customArtifactory.certificate` parameter. To disable SSL verification, you can set `customArtifactory.enableSSLVerification` to `false` and leave the `CustomArtifactory.certificate` parameter blank.
 
@@ -659,7 +659,7 @@ If you are planning to use Cassandra (usually as a part of Pega Customer Decisio
 
 To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and configure the `dds` section to reference your deployment.
 
-If you configured a secret in an external secrets operator, enter the secret name in external_secret_name parameter . For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
+If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 Example:
 
