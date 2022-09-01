@@ -76,34 +76,6 @@ false
     defaultMode: 420
 {{- end}}
 
-{{- define "pegaCustomArtifactoryCertificateConfig" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-custom-artifactory-certificate-config
-{{- end }}
-
-{{- define "pegaVolumeCustomArtifactoryCertificate" }}pega-volume-custom-artifactory-certificate{{- end }}
-
-{{- define "pegaCustomArtifactoryCertificateTemplate" }}
-- name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-  configMap:
-    # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaCustomArtifactoryCertificateConfig" $ }}
-    # Used to specify permissions on files within the volume.
-    defaultMode: 420
-{{- end}}
-
-{{- define "customArtifactorySSLVerificationEnabled" }}
-{{- if (.Values.global.customArtifactory) }}
-{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
-{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
-true
-{{- else -}}
-false
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
-
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
