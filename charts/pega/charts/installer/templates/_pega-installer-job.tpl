@@ -91,11 +91,6 @@ spec:
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
 {{- end }}
-{{- if .root.Values.custom }}
-{{- if .root.Values.custom.volumeMounts }}
-{{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
-{{- end }}
-{{- end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
         - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
