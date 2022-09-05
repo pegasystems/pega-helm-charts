@@ -359,9 +359,21 @@ true
     sources:
     - secret:
         name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
+  {{ if ((.Values.global.jdbc).external_secret_name) }}
     - secret:
         name: {{ .Values.global.jdbc.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.hazelcast).external_secret_name)}}
+    - secret:
+        name: {{ .Values.hazelcast.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
+    - secret:
+        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.dds).external_secret_name)}}
+    - secret:
+        name: {{ .Values.dds.external_secret_name }}
   {{- end }}
 {{- end}}
 

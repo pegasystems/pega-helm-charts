@@ -71,7 +71,8 @@
                relaxedPathChars="[ ]"
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
-               connectionTimeout="20000" />
+               connectionTimeout="20000"
+               maxHeaderCount="50" />
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
@@ -79,6 +80,7 @@
 	       maxThreads="1"/>
 
     <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
+
     {{ if or (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") (exists "/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_FILE") }}
 
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
@@ -104,6 +106,7 @@
 
                        </SSLHostConfig>
     </Connector>
+
 
     {{ end }}
 

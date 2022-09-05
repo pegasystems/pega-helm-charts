@@ -118,6 +118,9 @@ To support this option,
 Pega requires a database driver JAR to be provided for connecting to the relational database.  This JAR may either be baked into your image by extending the Pega provided Docker image, or it may be pulled in dynamically when the container is deployed.  If you want to pull in the driver during deployment, you will need to specify a URL to the driver using the `jdbc.driverUri` parameter.  This address must be visible and accessible from the process running inside the container.
 
 Use the `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` to provide an APIKey value and dedicated APIKey header details if you host the driver in a custom artifactory that requires Basic or APIKey Authentication.
+
+If you configured a secret in an external secrets operator for customArtifactory credentials, enter the secret name in `customArtifactory.authentication.external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
+
 If your artifactory domain server certificate is not issued by Certificate Authority, you must provide the server certificate using the `customArtifactory.certificate` parameter. To disable SSL verification, you can set `customArtifactory.enableSSLVerification` to `false` and leave the `CustomArtifactory.certificate` parameter blank.
 
 The Pega Docker images use Java 11, which requires that the JDBC driver that you specify is compatible with Java 11.
@@ -655,6 +658,8 @@ If you are planning to use Cassandra (usually as a part of Pega Customer Decisio
 
 To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and configure the `dds` section to reference your deployment.
 
+If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
+
 Example:
 
 ```yaml
@@ -666,6 +671,7 @@ dds:
   port: "9042"
   username: "cassandra_username"
   password: "cassandra_password"
+  external_secret_name: ""
 ```
 
 ### Deploying Cassandra with Pega
@@ -932,6 +938,7 @@ Parameter   | Description   | Default value
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster | `3`
 `hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication | `""`
 `hazelcast.password` | Password to be used in client-server Hazelcast model for authentication | `""`
+`hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)  | `""`
 
 #### Example
 ```yaml
@@ -941,6 +948,7 @@ hazelcast:
   replicas: 3
   username: ""
   password: ""
+  external_secret_name: ""
 ```
 
 
