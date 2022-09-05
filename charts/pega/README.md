@@ -219,7 +219,7 @@ Three values.yaml files are provided to showcase real world deployment examples.
 
 For more information about the architecture for how Pega Platform runs in a Pega cluster, see [How Pega Platform and applications are deployed on Kubernetes](https://community.pega.com/knowledgebase/articles/cloud-choice/how-pega-platform-and-applications-are-deployed-kubernetes).
 
-#### Standard deployment using three tiers
+#### Standard deployment using two tiers
 
 To provision a three tier Pega cluster, use the default example in the helm chart, which is a good starting point for most deployments:
 
@@ -227,7 +227,7 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`. The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.
+stream (Deprecated)        | The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” `nodetype`.
 
 #### Small deployment with a single tier
 
@@ -235,7 +235,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | One tier handles all foreground and background processing and is given a `nodeType` of "WebUser,BackgroundProcessing,search,Stream".The "Stream" `nodetype` is deprecated, please enable External Kafka configuration under External Services.
+pega        | One tier handles all foreground and background processing and is given a `nodeType` of "WebUser,BackgroundProcessing,search,Stream".If external Kafka is enabled, then we should remove stream from the node type listing.
 
 #### Large deployment for production isolation of processing
 
@@ -245,7 +245,7 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | Nodes that run an embedded deployment of Kafka and are exposed to the load balancer. Pega recommends that these node use the node classification “Stream” `nodetype`.The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.
+stream (Deprecated)     | The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these node use the node classification “Stream” `nodetype`.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -758,40 +758,61 @@ pegasearch:
 ```
 ## Deploying Pega with external kafka for stream
 
-
+Deployment of stream with external kafka requires Pega Infinity 8.4 or later.
 Starting from 8.7 embedded stream (Stream tier or “Stream” `nodetype`) is deprecated. Pega recommends deployment of stream with external kafka.
 Configure external Kafka as a stream service provider to use your own managed Kafka infrastructure.
+For more information about configuring Kafka, see the [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
+
+#### Kafka version
+* Pega recommends Apache Kafka versions 2.3.1 or later (Verified 3.2.1)
+
+#### Kafka minimum resource requirements
+
+Deployment  | CPU     | Memory | Disk Space | Replicas
+---         | ---     | ---    | ---        | ---
+Development | 2 cores | 8Gi    | 100G*      | At least 2
+Production  | 4 cores | 16Gi   | 200G*      | At least 3
+
+* Disk Space depends on the required throughput (Number and size of messages) and retention period.
+* Above configuration would easily support up to 1000 kafka partitions, increase resources accordingly if kafka partitions are more.
 
 ### Stream (External Kafka) settings
 
 ```yaml
 # Stream (External Kafka) settings.
-# Disabled by default, you must not use stream tier when this setting is enabled.
-# Parameters trustStore,trustStorePassword,keyStore,keyStorePassword and jaasConfig are optional, their value depends on the securityProtocol.
-# For truststore/keystore certificate names, specify the Kubernetes secret that you have created to store SSL certificates for your deployment. For compatibility, see provider support for SSL certificate injection.
-# For more details please check "Support for providing credentials/certificates using External Secrets Operator". 
-# Please note for stream add certificate names in 'global.certificatesSecrets','stream.trustStore', and 'stream.keyStore' as appropriate. 
-# Pega does not support truststore and keystore certificates as plain text for stream.
-# By default, Pega supports only Java Key Store (.jks) format for truststore and keystore certificates.
-# Provide trustStorePassword, KeystorePassword, and jaasConfig values in Plain text. Alternatively, to secure the values leave values empty and configure them in the External Secrets Manager, make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
 stream:
+  # Disabled by default, you must not use stream tier when this setting is enabled.
   enabled: false
   # Provide external kafka broker urls
   bootstrapServer: ""
-  # Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+  # Provide Security Protocol used to communicate with brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
   securityProtocol: PLAINTEXT
+  # If required, provide a Kubernetes secret name that holds the trustStore certificate
+  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too
+  # Pega supports only Java Key Store (.jks) format for truststore
   trustStore: ""
+  # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
+  # If required, provide a Kubernetes secret name that holds the keyStore certificate
+  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too
+  # Pega supports only Java Key Store (.jks) format for keystore
   keyStore: ""
+  # If required, provide keyStore value in plain text.
   keyStorePassword: ""
+  # If required, provide jaasConfig value in plain text.
   jaasConfig: ""
+  # If required, provide SASL Mechanism, Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512,
   saslMechanism: PLAIN
   # By default, topics originating from Pega Platform have the pega- prefix,
   # so that it is easy to distinguish them from topics created by other applications.
-  # You can configure this pattern, to customize topic names per environment
+  # You can configure the name pattern to customize topic names per environment
   streamNamePattern: "pega-{stream.name}"
   # Value of replicationFactor cannot be more than number of brokers
   replicationFactor: "1"
+  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
+  # configure them in External Secrets Manager, and enter the external secret name here.
+  # make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
+  external_secret_name: ""
 ```
 ## Pega database installation and upgrades
 

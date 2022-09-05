@@ -363,6 +363,10 @@ true
     - secret:
         name: {{ .Values.global.jdbc.external_secret_name }}
   {{- end }}
+  {{ if ((.Values.stream).external_secret_name)}}
+    - secret:
+        name: {{ .Values.stream.external_secret_name }}
+  {{- end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}

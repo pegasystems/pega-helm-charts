@@ -235,8 +235,8 @@ global:
       # Create a stream tier for queue processing.  This tier deploys
       # as a stateful set to ensure durability of queued data. It may
       # be optionally exposed to the load balancer.
-      # Note: Stream tier is deprecated, please enable External Kafka
-      # configuration under External Services
+      # Note: Stream tier is deprecated, please enable External Kafka configuration under External Services.
+      # When external Kafka is enabled, we should remove the entire stream tier.
       nodeType: "Stream"
 
       # Pega requestor specific properties
@@ -355,29 +355,36 @@ hazelcast:
   password: ""
 
 # Stream (External Kafka) settings.
-# Disabled by default, you must not use stream tier when this setting is enabled.
-# Parameters trustStore,trustStorePassword,keyStore,keyStorePassword and jaasConfig are optional, their value depends on the securityProtocol.
-# For truststore/keystore certificate names, specify the Kubernetes secret that you have created to store SSL certificates for your deployment. For compatibility, see provider support for SSL certificate injection.
-# For more details please check "Support for providing credentials/certificates using External Secrets Operator".
-# Please note for stream add certificate names in 'global.certificatesSecrets','stream.trustStore', and 'stream.keyStore' as appropriate.
-# Pega does not support truststore and keystore certificates as plain text for stream.
-# By default, Pega supports only Java Key Store (.jks) format for truststore and keystore certificates.
-# Provide trustStorePassword, KeystorePassword, and jaasConfig values in Plain text. Alternatively, to secure the values leave values empty and configure them in the External Secrets Manager, make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
 stream:
+  # Disabled by default, you must not use stream tier when this setting is enabled.
   enabled: false
-  # Provide external kafka broker urls
+  # Provide external kafka broker urls.
   bootstrapServer: ""
-  # Protocol used to communicate with brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL
+  # Provide Security Protocol used to communicate with brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
   securityProtocol: PLAINTEXT
+  # If required, provide a Kubernetes secret name that holds the trustStore certificate
+  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too
+  # Pega supports only Java Key Store (.jks) format for truststore.
   trustStore: ""
+  # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
+  # If required, provide a Kubernetes secret name that holds the keyStore certificate.
+  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too.
+  # Pega supports only Java Key Store (.jks) format for keystore.
   keyStore: ""
+  # If required, provide keyStore value in plain text.
   keyStorePassword: ""
+  # If required, provide jaasConfig value in plain text.
   jaasConfig: ""
+  # If required, provide SASL Mechanism, Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
   saslMechanism: PLAIN
   # By default, topics originating from Pega Platform have the pega- prefix,
   # so that it is easy to distinguish them from topics created by other applications.
-  # You can configure this pattern, to customize topic names per environment
+  # You can configure the name pattern to customize topic names per environment.
   streamNamePattern: "pega-{stream.name}"
-  # Value of replicationFactor cannot be more than number of brokers
+  # Value of replicationFactor cannot be more than number of brokers.
   replicationFactor: "1"
+  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
+  # configure them in External Secrets Manager, and enter the external secret name here.
+  # make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
+  external_secret_name: ""
