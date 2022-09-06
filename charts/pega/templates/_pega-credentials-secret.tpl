@@ -46,11 +46,27 @@ data:
   # Base64 encoded password for the cassandra key store
   CASSANDRA_KEYSTORE_PASSWORD: {{ .Values.dds.keyStorePassword | b64enc }}
   {{- end }}
+  {{ if .Values.stream.trustStorePassword -}}
+  # Base64 encoded password for the stream trust store
+  STREAM_TRUSTSTORE_PASSWORD: {{ .Values.stream.trustStorePassword | b64enc }}
+  {{- end }}
+  {{ if .Values.stream.keyStorePassword -}}
+  # Base64 encoded password for the stream key store
+  STREAM_KEYSTORE_PASSWORD: {{ .Values.stream.keyStorePassword | b64enc }}
+  {{- end }}
+  {{ if .Values.stream.jaasConfig -}}
+  # Base64 encoded password for the stream trust store
+  STREAM_JAAS_CONFIG: {{ .Values.stream.jaasConfig | b64enc }}
+  {{- end }}
   {{ if $.Values.hazelcast.enabled }}
   # Base64 encoded username used for authentication in Hazelcast client-server mode
+  {{ if .Values.hazelcast.username -}}
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
+  {{ end }}
   # Base64 encoded password used for authentication in Hazelcast client-server mode
+  {{ if .Values.hazelcast.password -}}
   HZ_CS_AUTH_PASSWORD: {{ .Values.hazelcast.password | b64enc }}
+  {{ end }}
   {{ end }}
   {{ range $index, $dep := .Values.global.tier}}
   {{ if and ($dep.pegaDiagnosticUser) (eq $dep.name "web") }}

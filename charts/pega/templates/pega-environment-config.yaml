@@ -76,4 +76,34 @@ data:
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
+{{ if .Values.stream.enabled }}
+  # Whether to enable connecting to an external stream cluster.  "true" for enabled, "false for disabled"
+  EXTERNAL_STREAM: "true"
+  # Provided bootstrap server
+  STREAM_BOOTSTRAP_SERVERS: "{{ .Values.stream.bootstrapServer }}"
+  STREAM_SECURITY_PROTOCOL: "{{ .Values.stream.securityProtocol }}"
+  STREAM_SASL_MECHANISM: "{{ .Values.stream.saslMechanism }}"
+  # Path to a mounted trust store file for Stream encryption
+  {{- if .Values.stream.trustStore }}
+  {{- if .Values.stream.trustStoreType }}
+  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}.{{ .Values.stream.trustStoreType }}"
+  {{- else }}
+  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}.jks"
+  {{- end }}
+  {{- end }}
+  # Only jks type certificates are supported
+  STREAM_TRUSTSTORE_TYPE: "{{ .Values.stream.trustStoreType }}"
+  # Path to a mounted key store file for Stream encryption
+  {{- if .Values.stream.keyStore }}
+  {{- if .Values.stream.keyStoreType }}
+  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}.{{ .Values.stream.keyStoreType }}"
+  {{- else }}
+  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}.jks"
+  {{- end }}
+  {{- end }}
+  # Only jks type certificates are supported
+  STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
+  STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
+  STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
+{{- end }}
 {{ end }}

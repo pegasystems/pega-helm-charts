@@ -41,7 +41,7 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
-        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-config.yaml") .root | sha256sum }}
+        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-secret.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
@@ -60,7 +60,7 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
-{{ if .root.Values.global.certificates }}
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
@@ -69,7 +69,8 @@ spec:
 {{- end }}
 {{- end }}
 {{- if ((.node.service).tls).enabled }}
-{{- include "pegaVolumeTomcatKeystoreTemplate" .root | indent 6 }}
+{{- $data := dict "root" .root "node" .node }}
+{{- include "pegaVolumeTomcatKeystoreTemplate" $data | indent 6 }}
 {{ end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
@@ -196,7 +197,7 @@ spec:
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
         #mount custom certificates
-{{ if .root.Values.global.certificates }}
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{ end }}

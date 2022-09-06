@@ -11,7 +11,7 @@ metadata:
 {{- include "generatedHazelcastServiceAnnotations" . | indent 8 }}
 spec:
   ports:
-  - name: hazelcast
+  - name: tcp-hzport
     port: 5701
     targetPort: 5701   
   clusterIP: None
