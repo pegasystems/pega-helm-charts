@@ -50,7 +50,7 @@ func VerifyHazelcastService(t *testing.T, yamlContent string, options *helm.Opti
 			require.Equal(t, "pega-hazelcast-service", hazelcastServiceObj.Name)
 			require.Equal(t, "Hazelcast", hazelcastServiceObj.Spec.Selector["component"])
 			require.Equal(t, "pega-hazelcast", hazelcastServiceObj.Spec.Selector["app"])
-			require.Equal(t, "hazelcast", hazelcastServiceObj.Spec.Ports[0].Name)
+			require.Equal(t, "tcp-hzport", hazelcastServiceObj.Spec.Ports[0].Name)
 			require.Equal(t, int32(5701), hazelcastServiceObj.Spec.Ports[0].Port)
 			require.Equal(t, intstr.FromInt(5701), hazelcastServiceObj.Spec.Ports[0].TargetPort)
 		}
