@@ -32,8 +32,8 @@ func TestPegaExternalStreamEnvironmentConfig(t *testing.T){
 					"stream.bootstrapServer": "localhost:9092",
 					"stream.securityProtocol": "PLAINTEXT",
 					"stream.saslMechanism": "PLAIN",
-					"stream.trustStore": "truststore",
-					"stream.keyStore": "keystore",
+					"stream.trustStore": "truststore.jks",
+					"stream.keyStore": "keystore.jks",
 					"stream.streamNamePattern": "pega-{stream.name}",
 					"stream.replicationFactor": "1",
 				},
@@ -124,17 +124,17 @@ func TestPegaExternalStreamEnvironmentConfigWithPEM(t *testing.T){
 					"stream.bootstrapServer": "localhost:9092",
 					"stream.securityProtocol": "PLAINTEXT",
 					"stream.saslMechanism": "PLAIN",
-					"stream.trustStore": "truststore",
-					"stream.trustStoreType": "pem",
-					"stream.keyStore": "keystore",
-					"stream.keyStoreType": "pem",
+					"stream.trustStore": "truststore.pem",
+					"stream.trustStoreType": "PEM",
+					"stream.keyStore": "keystore.pem",
+					"stream.keyStoreType": "PEM",
 					"stream.streamNamePattern": "pega-{stream.name}",
 					"stream.replicationFactor": "1",
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, "/opt/pega/certs/truststore.pem", "/opt/pega/certs/keystore.pem", "pem", "pem", options)
+			VerifyPegaWithExternalStreamEnvironmentConfig(t,yamlContent, "/opt/pega/certs/truststore.pem", "/opt/pega/certs/keystore.pem", "PEM", "PEM", options)
 
 		}
 	}

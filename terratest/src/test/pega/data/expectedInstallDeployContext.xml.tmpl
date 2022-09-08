@@ -78,32 +78,6 @@
   <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
   {{ end }}
 
-  {{ if .Env.EXTERNAL_STREAM }}
-  <Environment name="prconfig/services/stream/validate" value="true" type="java.lang.String"/>
-  <Environment name="prconfig/services/stream/provider" value="ExternalKafka" type="java.lang.String" />
-  <Environment name="prconfig/services/stream/broker/url" value="{{ .Env.STREAM_BOOTSTRAP_SERVERS }}" type="java.lang.String" />
-  <Environment name="prconfig/services/stream/encryption/security/protocol" value="{{ .Env.STREAM_SECURITY_PROTOCOL }}" type="java.lang.String" />
-  <Environment name="prconfig/services/stream/encryption/sasl/mechanism" value="{{ .Env.STREAM_SASL_MECHANISM }}" type="java.lang.String" />
-  {{ if .Env.STREAM_TRUSTSTORE }}
-  <Environment name="prconfig/services/stream/encryption/truststore/path" value="{{ .Env.STREAM_TRUSTSTORE }}" type="java.lang.String"/>
-  {{ end }}
-  {{ if .Env.STREAM_TRUSTSTORE_TYPE }}
-  <Environment name="prconfig/services/stream/encryption/truststore/type" value="{{ .Env.STREAM_TRUSTSTORE_TYPE }}" type="java.lang.String" />
-  {{ end }}
-  {{ if .Env.STREAM_KEYSTORE }}
-  <Environment name="prconfig/services/stream/encryption/keystore/path" value="{{ .Env.STREAM_KEYSTORE }}" type="java.lang.String"/>
-  {{ end }}
-  {{ if .Env.STREAM_KEYSTORE_TYPE }}
-  <Environment name="prconfig/services/stream/encryption/keystore/type" value="{{ .Env.STREAM_KEYSTORE_TYPE }}" type="java.lang.String" />
-  {{ end }}
-  {{ if .Env.STREAM_NAME_PATTERN }}
-  <Environment name="prconfig/services/stream/name/pattern" value="{{ .Env.STREAM_NAME_PATTERN }}" type="java.lang.String" />
-  {{ end }}
-  {{ if .Env.STREAM_REPLICATION_FACTOR }}
-  <Environment name="prconfig/services/stream/external/replication/factor" value="{{ .Env.STREAM_REPLICATION_FACTOR }}" type="java.lang.String" />
-  {{ end }}
-  {{ end }}
-
   {{ if .Env.CONTEXT_XML_SNIPPET }}
   {{ .Env.CONTEXT_XML_SNIPPET }}
   {{ end }}

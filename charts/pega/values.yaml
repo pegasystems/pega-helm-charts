@@ -379,14 +379,14 @@ stream:
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
   securityProtocol: PLAINTEXT
-  # If required, provide a Kubernetes secret name that holds the trustStore certificate
-  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too
+  # If required, provide trustStore certificate file name
+  # Please add the Kubernetes secret name, that holds the trustStore certificate, in 'global.certificatesSecrets'.
   # Pega supports only Java Key Store (.jks) format for truststore.
   trustStore: ""
   # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
-  # If required, provide a Kubernetes secret name that holds the keyStore certificate.
-  # Please add the Kubernetes secret name in 'global.certificatesSecrets' too.
+  # If required, provide keyStore certificate file name
+  # Please add the Kubernetes secret name, that holds the keyStore certificate, in 'global.certificatesSecrets'.
   # Pega supports only Java Key Store (.jks) format for keystore.
   keyStore: ""
   # If required, provide keyStore value in plain text.

@@ -85,21 +85,13 @@ data:
   STREAM_SASL_MECHANISM: "{{ .Values.stream.saslMechanism }}"
   # Path to a mounted trust store file for Stream encryption
   {{- if .Values.stream.trustStore }}
-  {{- if .Values.stream.trustStoreType }}
-  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}.{{ .Values.stream.trustStoreType }}"
-  {{- else }}
-  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}.jks"
+  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}"
   {{- end }}
-  {{- end }}
-  # Only jks type certificates are supported
+  # Only JKS type certificates are supported
   STREAM_TRUSTSTORE_TYPE: "{{ .Values.stream.trustStoreType }}"
   # Path to a mounted key store file for Stream encryption
   {{- if .Values.stream.keyStore }}
-  {{- if .Values.stream.keyStoreType }}
-  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}.{{ .Values.stream.keyStoreType }}"
-  {{- else }}
-  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}.jks"
-  {{- end }}
+  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}"
   {{- end }}
   # Only jks type certificates are supported
   STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
