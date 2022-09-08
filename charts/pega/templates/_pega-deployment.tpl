@@ -211,32 +211,40 @@ spec:
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
+{{- $useStartupProbe := false }}
+{{- $livenessProbe := .node.livenessProbe }}
+{{- $readinessProbe := .node.readinessProbe }}
+{{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
+{{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+  {{- $useStartupProbe = true }}
+  {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
+  {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
+{{- end }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
-        {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
+          initialDelaySeconds: {{ $livenessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
           periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
         # ReadinessProbe: indicates whether the container is ready to service requests.
-        {{- $readinessProbe := .node.readinessProbe }}
         readinessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
+          initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
         # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
+{{- if ( $useStartupProbe ) }}
         {{- $startupProbe := .node.startupProbe }}
         startupProbe:
           httpGet:
@@ -248,32 +256,8 @@ spec:
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
           failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
-{{- else }}
-        # LivenessProbe: indicates whether the container is live, i.e. running.
-        {{- $livenessProbe := .node.livenessProbe }}
-        livenessProbe:
-          httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: {{ $livenessProbe.port | default 8080 }}
-            scheme: HTTP
-          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 200 }}
-          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
-          successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
-        # ReadinessProbe: indicates whether the container is ready to service requests.
-        {{- $readinessProbe := .node.readinessProbe }}
-        readinessProbe:
-          httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: {{ $readinessProbe.port | default 8080 }}
-            scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
-          successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
 {{- end }}
+
 {{- if .custom }}
 {{- if .custom.sidecarContainers }}
       # Additional custom sidecar containers
