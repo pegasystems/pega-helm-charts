@@ -215,11 +215,28 @@ spec:
 {{- $livenessProbe := .node.livenessProbe }}
 {{- $readinessProbe := .node.readinessProbe }}
 {{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
+{{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
+{{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
 {{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
   {{- $useStartupProbe = true }}
   {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
   {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
+{{- end }}
+{{- $classloadingMaxRetries := 0 }}
+{{- $classloadingRetryTimeout := 0 }}
+{{- if .root.Values.global.classloading }}
+  {{- if .root.Values.global.classloading.maxRetries }}
+    {{- $classloadingMaxRetries = .root.Values.global.classloading.maxRetries }}
+  {{- end }}
+  {{- if .root.Values.global.classloading.retryTimout }}
+    {{- $classloadingRetryTimeout = .root.Values.global.classloading.retryTimout }}
+  {{- end }}
+{{- end }}
+{{- if gt (mul $classloadingMaxRetries $classloadingRetryTimeout) (mul $livenessProbeFailureThreshold $livenessProbePeriodSeconds) }}
+  {{- $updatedLivenessProbeFailureThreshold := add (round (div (mul $classloadingMaxRetries $classloadingRetryTimeout) $livenessProbePeriodSeconds) 0) 1 }}
+        # Adjusting liveness probe failure threshold from {{ $livenessProbeFailureThreshold }} to {{ $updatedLivenessProbeFailureThreshold }} to accommodate db failover for Pega classloader.
+  {{- $livenessProbeFailureThreshold = $updatedLivenessProbeFailureThreshold }}
 {{- end }}
         # LivenessProbe: indicates whether the container is live, i.e. running.
         livenessProbe:
@@ -229,9 +246,9 @@ spec:
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
+          periodSeconds: {{ $livenessProbePeriodSeconds }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
+          failureThreshold: {{ $livenessProbeFailureThreshold }}
         # ReadinessProbe: indicates whether the container is ready to service requests.
         readinessProbe:
           httpGet:
