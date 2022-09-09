@@ -77,3 +77,12 @@ data:
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
 {{ end }}
+  # Classloader Timeout settings
+{{ if .Values.global.classloading }}
+{{ if .Values.global.classloading.retryTimout }}
+  RETRY_TIMEOUT: "{{ .Values.global.classloading.retryTimout }}"
+{{- end }}
+{{ if .Values.global.classloading.maxRetries }}
+  MAX_RETRIES: "{{ .Values.global.classloading.maxRetries }}"
+{{- end }}
+{{- end }}
