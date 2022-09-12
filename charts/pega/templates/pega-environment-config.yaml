@@ -79,8 +79,8 @@ data:
 {{ end }}
   # Classloader Timeout settings
 {{ if .Values.global.classloading }}
-{{ if .Values.global.classloading.retryTimout }}
-  RETRY_TIMEOUT: "{{ .Values.global.classloading.retryTimout }}"
+{{ if .Values.global.classloading.retryTimeout }}
+  RETRY_TIMEOUT: "{{ .Values.global.classloading.retryTimeout }}"
 {{- end }}
 {{ if .Values.global.classloading.maxRetries }}
   MAX_RETRIES: "{{ .Values.global.classloading.maxRetries }}"

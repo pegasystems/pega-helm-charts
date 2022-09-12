@@ -229,8 +229,8 @@ spec:
   {{- if .root.Values.global.classloading.maxRetries }}
     {{- $classloadingMaxRetries = .root.Values.global.classloading.maxRetries }}
   {{- end }}
-  {{- if .root.Values.global.classloading.retryTimout }}
-    {{- $classloadingRetryTimeout = .root.Values.global.classloading.retryTimout }}
+  {{- if .root.Values.global.classloading.retryTimeout }}
+    {{- $classloadingRetryTimeout = .root.Values.global.classloading.retryTimeout }}
   {{- end }}
 {{- end }}
 {{- if gt (mul $classloadingMaxRetries $classloadingRetryTimeout) (mul $livenessProbeFailureThreshold $livenessProbePeriodSeconds) }}
