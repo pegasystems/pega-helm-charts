@@ -19,8 +19,6 @@
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
-    testOnBorrow="true"
-    testOnReturn="true"
     />
 
   {{ if or .Env.SET_RW .Env.JDBC_RW_URL }}
@@ -39,8 +37,6 @@
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};socketTimeout=1200;statement_timeout=1200500;idle_in_transaction_session_timeout=1200500;"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
-    testOnBorrow="true"
-    testOnReturn="true"
     />
   {{ end }}
 
@@ -60,8 +56,6 @@
     connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
-    testOnBorrow="true"
-    testOnReturn="true"
     />
 
 
