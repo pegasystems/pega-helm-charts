@@ -1,4 +1,4 @@
-{{ if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") }}
+{{ if or (eq (include "performInstallAndDeployment" .) "true") (and (eq (include "performOnlyUpgrade" .) "true") (not (eq .Values.upgrade.upgradeType "custom"))) }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: Role
 metadata:
