@@ -136,11 +136,3 @@
 {{ . }}
 {{ end }}
 {{- end -}}
-
-{{- define "createJobsReaderRole" }}
-  {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
