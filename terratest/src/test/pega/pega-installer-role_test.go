@@ -11,7 +11,7 @@ import (
 
 func TestPegaInstallerRole(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install-deploy", "upgrade"}
+	var supportedOperations = []string{"install-deploy", "upgrade-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
