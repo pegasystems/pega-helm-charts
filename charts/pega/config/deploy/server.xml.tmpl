@@ -72,7 +72,7 @@
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
                connectionTimeout="20000"
-               maxHeaderCount="50" />
+               maxHeaderCount="100" />
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
@@ -89,7 +89,8 @@
                        relaxedPathChars="[ ]"
                        maxHttpHeaderSize="16384"
                        maxSavePostSize="65536"
-                       connectionTimeout="20000" >
+                       connectionTimeout="20000"
+                       maxHeaderCount="100" >
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
                            {{ if ( and (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
