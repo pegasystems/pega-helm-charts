@@ -20,8 +20,8 @@ func TestPegaInstallerStatusRoleBinding(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":       vendor,
-					"global.actions.execute":operation,
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}
