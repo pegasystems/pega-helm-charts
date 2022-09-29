@@ -18,13 +18,6 @@ func TestPegaTierDeploymentWithDBFailover(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
 
-    var dbFailoverConfigs = []dbFailoverConfig {
-                dbFailoverConfig {3, 4, 3},
-                dbFailoverConfig{3, 40, 5},
-                dbFailoverConfig {4, 3, 3},
-                dbFailoverConfig{40, 3, 5},
-        }
-
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -32,48 +25,62 @@ func TestPegaTierDeploymentWithDBFailover(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-			for _, dbFailoverConfig := range dbFailoverConfigs {
+            fmt.Println(vendor + "-" + operation)
 
-				fmt.Println(vendor + "-" + operation)
+            var options = &helm.Options{
+                ValuesFiles: []string{"data/values_with_overidden_liveness_probe_config.yaml"},
+                SetValues: map[string]string{
+                    "global.provider":               vendor,
+                    "global.actions.execute":        operation,
+                    "installer.upgrade.upgradeType": "zero-downtime",
+                },
+            }
 
-				var options = &helm.Options{
-					SetValues: map[string]string{
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
-						"global.classloading.maxRetries": strconv.Itoa(dbFailoverConfig.maxRetries),
-						"global.classloading.retryTimeout": strconv.Itoa(dbFailoverConfig.retryTimeout),
-						"installer.upgrade.upgradeType": "zero-downtime",
-					},
-				}
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+            yamlSplit := strings.Split(yamlContent, "---")
 
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-				yamlSplit := strings.Split(yamlContent, "---")
-				assertLivenessProbeFailureThreshold(t, yamlSplit[1], dbFailoverConfig.expectedFailureThreshold)
-				assertLivenessProbeFailureThreshold(t, yamlSplit[2], dbFailoverConfig.expectedFailureThreshold)
-				assertLivenessProbeFailureThreshold(t, yamlSplit[3], dbFailoverConfig.expectedFailureThreshold)
-			}
+            //web tier uses defaults not in values.yaml (failure threshold: 3, period seconds: 30)
+            assertLivenessProbeFailureThreshold(t, yamlSplit[1], 4, 30)
+
+            //batch tier uses (failure threshold: 5, period seconds: 100)
+            assertLivenessProbeFailureThreshold(t, yamlSplit[2], 6, 100)
+
+            //stream tier uses (failure threshold: 7, period seconds: 300) -- retryTimeout has max of 180s
+            //so we get into more interesting math...
+            assertLivenessProbeFailureThreshold(t, yamlSplit[3], 12, 180)
 		}
 	}
 }
 
-func assertLivenessProbeFailureThreshold(t *testing.T, yaml string, expectedFailureThreshold int) {
+func assertLivenessProbeFailureThreshold(t *testing.T, yaml string, expectedMaxRetries int, expectedRetryTimeout int) {
     if (strings.Contains(yaml, "kind: StatefulSet")) {
         var statefulsetObj appsv1beta2.StatefulSet
 	    UnmarshalK8SYaml(t, yaml, &statefulsetObj)
-	    VerifyPodSpecLivenessFailureThreshold(t, &statefulsetObj.Spec.Template.Spec, expectedFailureThreshold)
+	    VerifyPodSpecClassloaderRetrySettings(t, &statefulsetObj.Spec.Template.Spec, expectedMaxRetries, expectedRetryTimeout)
     } else {
 	    var deploymentObj appsv1.Deployment
 	    UnmarshalK8SYaml(t, yaml, &deploymentObj)
-	    VerifyPodSpecLivenessFailureThreshold(t, &deploymentObj.Spec.Template.Spec,  expectedFailureThreshold)
+	    VerifyPodSpecClassloaderRetrySettings(t, &deploymentObj.Spec.Template.Spec,  expectedMaxRetries, expectedRetryTimeout)
     }
 }
 
-func VerifyPodSpecLivenessFailureThreshold(t *testing.T, pod *k8score.PodSpec, expectedFailureThreshold int) {
-	require.Equal(t, int32(expectedFailureThreshold), pod.Containers[0].LivenessProbe.FailureThreshold)
+func VerifyPodSpecClassloaderRetrySettings(t *testing.T, pod *k8score.PodSpec, expectedMaxRetries int, expectedRetryTimeout int) {
+	maxRetries := ""
+	retryTimeout := ""
+
+	for _, envItem := range pod.Containers[0].Env {
+	    if (envItem.Name=="RETRY_TIMEOUT") {
+            retryTimeout = envItem.Value
+	    }
+        if (envItem.Name=="MAX_RETRIES") {
+            maxRetries = envItem.Value
+        }
+	}
+
+	require.NotEqual(t, "", retryTimeout)
+	require.NotEqual(t, "", maxRetries)
+
+	require.Equal(t, strconv.Itoa(expectedRetryTimeout), retryTimeout)
+	require.Equal(t, strconv.Itoa(expectedMaxRetries), maxRetries)
 }
 
-type dbFailoverConfig struct {
-	maxRetries                  int
-	retryTimeout                int
-	expectedFailureThreshold    int
-}

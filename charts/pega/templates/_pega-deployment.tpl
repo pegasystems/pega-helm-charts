@@ -1,4 +1,17 @@
 {{- define  "pega.deployment" -}}
+{{- $useStartupProbe := false }}
+{{- $livenessProbe := .node.livenessProbe }}
+{{- $readinessProbe := .node.readinessProbe }}
+{{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
+{{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
+{{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
+{{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
+{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+  {{- $useStartupProbe = true }}
+  {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
+  {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
+{{- end }}
+
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
@@ -152,6 +165,10 @@ spec:
         # Tier of the Pega node
         - name: NODE_TIER
           value: {{ .tierName }}
+        - name: RETRY_TIMEOUT
+          value: {{ include "tierClassloaderRetryTimeout" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
+        - name: MAX_RETRIES
+          value: {{ include "tierClassloaderMaxRetries" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
@@ -211,33 +228,7 @@ spec:
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
-{{- $useStartupProbe := false }}
-{{- $livenessProbe := .node.livenessProbe }}
-{{- $readinessProbe := .node.readinessProbe }}
-{{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
-{{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
-{{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
-{{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
-{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
-  {{- $useStartupProbe = true }}
-  {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
-  {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
-{{- end }}
-{{- $classloadingMaxRetries := 0 }}
-{{- $classloadingRetryTimeout := 0 }}
-{{- if .root.Values.global.classloading }}
-  {{- if .root.Values.global.classloading.maxRetries }}
-    {{- $classloadingMaxRetries = .root.Values.global.classloading.maxRetries }}
-  {{- end }}
-  {{- if .root.Values.global.classloading.retryTimeout }}
-    {{- $classloadingRetryTimeout = .root.Values.global.classloading.retryTimeout }}
-  {{- end }}
-{{- end }}
-{{- if gt (mul $classloadingMaxRetries $classloadingRetryTimeout) (mul $livenessProbeFailureThreshold $livenessProbePeriodSeconds) }}
-  {{- $updatedLivenessProbeFailureThreshold := add (round (div (mul $classloadingMaxRetries $classloadingRetryTimeout) $livenessProbePeriodSeconds) 0) 1 }}
-        # Adjusting liveness probe failure threshold from {{ $livenessProbeFailureThreshold }} to {{ $updatedLivenessProbeFailureThreshold }} to accommodate db failover for Pega classloader.
-  {{- $livenessProbeFailureThreshold = $updatedLivenessProbeFailureThreshold }}
-{{- end }}
+
         # LivenessProbe: indicates whether the container is live, i.e. running.
         livenessProbe:
           httpGet:

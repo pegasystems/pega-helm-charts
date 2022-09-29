@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"testing"
 	"fmt"
-	"strconv"
 )
 
 
@@ -17,41 +16,27 @@ func TestPegaEnvironmentConfig(t *testing.T){
 	var supportedOperations =  []string{"deploy","install-deploy","upgrade-deploy"}
     var deploymentNames = []string{"pega","myapp-dev"}
 
-    var dbFailoverConfigs = []dbFailoverConfig {
-                dbFailoverConfig {3, 4, 3},
-                dbFailoverConfig{3, 40, 5},
-                dbFailoverConfig {4, 3, 3},
-                dbFailoverConfig{40, 3, 5},
-        }
-
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
-
 
 	for _,vendor := range supportedVendors{
 
 		for _,operation := range supportedOperations{
 
             for _, depName := range deploymentNames {
+                fmt.Println(vendor + "-" + operation + "-" +depName)
 
-                for _, dbFailoverConfig := range dbFailoverConfigs {
-
-                    fmt.Println(vendor + "-" + operation + "-" +depName)
-
-                    var options = &helm.Options{
-                        SetValues: map[string]string{
-                            "global.deployment.name": depName,
-                            "global.provider":        vendor,
-                            "global.actions.execute": operation,
-                            "global.classloading.maxRetries": strconv.Itoa(dbFailoverConfig.maxRetries),
-                            "global.classloading.retryTimeout": strconv.Itoa(dbFailoverConfig.retryTimeout),
-                            "installer.upgrade.upgradeType": "zero-downtime",
-                        },
-                    }
-
-                    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-                    VerifyEnvironmentConfig(t,yamlContent, options)
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                        "installer.upgrade.upgradeType": "zero-downtime",
+                    },
                 }
+
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+                VerifyEnvironmentConfig(t,yamlContent, options)
             }
 		}
 	}
@@ -82,6 +67,4 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
     require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
-    require.Equal(t, envConfigData["RETRY_TIMEOUT"], options.SetValues["global.classloading.retryTimeout"])
-    require.Equal(t, envConfigData["MAX_RETRIES"], options.SetValues["global.classloading.maxRetries"])
 }
