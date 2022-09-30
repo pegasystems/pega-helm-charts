@@ -229,7 +229,7 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” `nodetype`.
+stream (Deprecated)        | For Pega Platform release 8.8 and later, use of embedded "Stream tier" is deprecated; for new deployments, Pega recommends you enable an Externalized Kafka configuration under External Services. For existing deployments, Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” `nodetype`.
 
 #### Small deployment with a single tier
 
@@ -237,7 +237,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | One tier handles all foreground and background processing and is given a `nodeType` of "WebUser,BackgroundProcessing,search,Stream".If external Kafka is enabled, then we should remove stream from the node type listing.
+pega        | One tier handles all foreground and background processing using the `nodeType` classification "WebUser,BackgroundProcessing,search,Stream". When your Pega Platform deployment uses an externalize Kafka configuration, your deployment no longer uses the "Stream" node type.
 
 #### Large deployment for production isolation of processing
 
@@ -247,7 +247,7 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | The "Stream tier" is deprecated, please enable External Kafka configuration under External Services.Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these node use the node classification “Stream” `nodetype`.
+stream (Deprecated)     | For Pega Platform release 8.8 and later, use of embedded "Stream tier" is deprecated; for new deployments, Pega recommends you enable an Externalized Kafka configuration under External Services. For existing deployments, Nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these node use the node classification “Stream” `nodetype`.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -763,10 +763,9 @@ pegasearch:
 ```
 ## Deploying Pega with external kafka for stream
 
-Deployment of stream with external kafka requires Pega Infinity 8.4 or later.
-Starting from 8.7 embedded stream (Stream tier or “Stream” `nodetype`) is deprecated. Pega recommends deployment of stream with external kafka. More details are [here](MigrationToExternalStream.md).
-Configure external Kafka as a stream service provider to use your own managed Kafka infrastructure.
-For more information about configuring Kafka, see [Kafka Cluster requirements](KafkaClusterRequirement.md).
+Deployment of stream with external kafka requires Pega Infinity 8.4 or later. Starting from 8.7 Pega deprecated the use of embedded stream (Stream tier or “Stream” nodetype).
+For new deployments, Pega recommends deploying Pega Platform using an external Kafka configuration as a stream service provider to use your own managed Kafka infrastructure. Pega provides parameters for this configuration in the Pega Helm chart so your stream service starts when your Pega nodes start. For details and requirements about configuring Kafka, see [Kafka Cluster requirements](KafkaClusterRequirement.md).
+Pega supports migrating existing deployments to use an external Kafka configuration as a stream service provider using the Helm charts. To use your own managed Kafka infrastructure without the use of stream nodes, Pega provides instructions to run a migration with downtime and potential data loss or with minimal downtime and no downtime. For migration steps, see [Switch from embedded Stream to External Kafka](MigrationToExternalStream.md).
 
 ### Stream (External Kafka) settings
 

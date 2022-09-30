@@ -2,7 +2,11 @@
 Configure your own managed Kafka infrastructure as per the below details.
 
 ### Deployment
-See [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka) for deployments
+Kafka is a separate technology and needs to be independently managed.
+Pega does **not** provide or manage a Kafka service when deploying stream with external kafka.
+You may choose to use enterprise grade Kafka services offered by leading public cloud vendors or manage your own Kafka infrastructure.
+If you decide to manage a kafka deployment on a kubernetes cluster then you may use [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
+Please note, this is not the only way to deploy kafka on kubernetes.In general, choose a deployment type that is aligned with your company's policy.
 
 #### Version
 Pega recommends Apache Kafka versions 2.3.1 or later (Verified version 3.2.1)
@@ -16,7 +20,7 @@ Production  | 4 cores | 16Gi   | 200G*      | At least 3
 
 * Disk Space depends on the required throughput (Number and size of messages) and retention period.
 * In order to enable compression, it is enough to set `compression.type` in your kafka configuration.
-* Above configuration would support up to 1000 kafka partitions, increase resources accordingly if kafka partitions are more.
+* The above configuration can easily support up to 1000 kafka partitions, you should increase resources accordingly if your deployment requires more kafka partitions.
 * Define appropriate quotas on network bandwidth and request rate if you want to share your kafka cluster across different environments.
 
 #### Miscellaneous configuration
@@ -42,10 +46,10 @@ If external kafka is configured with authentication and authorization through Ka
 
 Principal |Resource Type  | Resource Name     | Operation | Permission Type | Patter Type
 ---         |---         | ---     | ---    | ---        | ---
-User:<user-name> | TOPIC       | \<Prefix\> as in 'stream.streamNamePattern' | ALL    | ALLOW      | PREFIXED
-User:<user-name> |TRANSACTIONAL_ID  | * | READ/WRITE   | ALLOW      | LITERAL
-User:<user-name> |GROUP  | * | ALL   | ALLOW      | LITERAL
-User:<user-name> |CLUSTER  | \<Cluster-Name\> | IDEMPOTENT_WRITE   |ALLOW      | LITERAL
+User:\<user-name\> | TOPIC       | \<Prefix\> as in 'stream.streamNamePattern' | ALL    | ALLOW      | PREFIXED
+User:\<user-name\> |TRANSACTIONAL_ID  | * | READ/WRITE   | ALLOW      | LITERAL
+User:\<user-name\> |GROUP  | * | ALL   | ALLOW      | LITERAL
+User:\<user-name\> |CLUSTER  | \<Cluster-Name\> | IDEMPOTENT_WRITE   |ALLOW      | LITERAL
 
 
 

@@ -203,35 +203,38 @@ hazelcast:
 
 # Stream (External Kafka) settings.
 stream:
-  # Disabled by default, you must not use stream tier when this setting is enabled.
+  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
   enabled: false
   # Provide external kafka broker urls.
   bootstrapServer: ""
-  # Provide Security Protocol used to communicate with brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+  # Provide Security Protocol used to communicate with kafka brokers.** Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
   securityProtocol: PLAINTEXT
   # If required, provide trustStore certificate file name
-  # Please add the Kubernetes secret name, that holds the trustStore certificate, in 'global.certificatesSecrets'.
-  # Pega supports only Java Key Store (.jks) format for truststore.
+  # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
   trustStore: ""
   # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
   # If required, provide keyStore certificate file name
-  # Please add the Kubernetes secret name, that holds the keyStore certificate, in 'global.certificatesSecrets'.
-  # Pega supports only Java Key Store (.jks) format for keystore.
+  # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support keyStores using the Java Key Store (.jks) format.
   keyStore: ""
   # If required, provide keyStore value in plain text.
   keyStorePassword: ""
   # If required, provide jaasConfig value in plain text.
   jaasConfig: ""
-  # If required, provide SASL Mechanism, Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+  # If required, provide a SASL mechanism**.** Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
   saslMechanism: PLAIN
   # By default, topics originating from Pega Platform have the pega- prefix,
   # so that it is easy to distinguish them from topics created by other applications.
-  # You can configure the name pattern to customize topic names per environment.
+  # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
   streamNamePattern: "pega-{stream.name}"
-  # Value of replicationFactor cannot be more than number of brokers.
+  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
   replicationFactor: "1"
   # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
-  # configure them in External Secrets Manager, and enter the external secret name here.
-  # make sure the keys in the secret are STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG respectively.
+  # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+  # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
+  # Enter the external secret name below.
   external_secret_name: ""

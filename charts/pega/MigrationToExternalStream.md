@@ -6,7 +6,8 @@ Stream tier stores data on the volumes attached to the stream pods.
 External kafka also stores data on the filesystem, but their storage will be different from the volumes attached to the stream pods.
 Hence, existing stream data will not be migrated.
 
-Having said this, switch can be done in two ways.
+The switch can be done in two ways.
+Switch requires a deployment upgrade, please do not perform Pega Platform upgrade during the switch.
 
 #### Switch non-production environments with a potential data loss.
 1. Edit pega chart
@@ -16,6 +17,8 @@ Having said this, switch can be done in two ways.
    1.2 Configure and enable external kafka.
 
 2. Upgrade deployment.
+   
+   2.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
 
 3. After restarts, new pods will connect to external kafka.
 
@@ -27,6 +30,8 @@ Having said this, switch can be done in two ways.
    1.2 If a tier is producing as well as consuming then stop producer process.
    
 2. Upgrade deployment.
+   
+   2.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
 
 3. Wait for all the consuming tiers for e.g. BackgroundProcessing, Batch, etc to process remaining stream data.
    
@@ -49,6 +54,8 @@ Having said this, switch can be done in two ways.
    4.3 Configure and enable external kafka.
 
 5. Upgrade deployment.
+   
+   5.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
 
 6. After restarts, both producers and consumers tiers will connect to external kafka.
 
