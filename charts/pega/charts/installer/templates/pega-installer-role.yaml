@@ -1,9 +1,5 @@
-{{ if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") }}
-{{ if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .Capabilities.KubeVersion.GitVersion)) }}
+{{ if (eq (include "createJobsReaderRole" .) "true") }}
 apiVersion: rbac.authorization.k8s.io/v1
-{{- else }}
-apiVersion: rbac.authorization.k8s.io/v1beta1
-{{ end }}
 kind: Role
 metadata:
   name: {{ template "installerJobReaderRole" }}

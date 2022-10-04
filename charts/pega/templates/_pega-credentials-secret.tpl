@@ -48,9 +48,13 @@ data:
   {{- end }}
   {{ if $.Values.hazelcast.enabled }}
   # Base64 encoded username used for authentication in Hazelcast client-server mode
+  {{ if .Values.hazelcast.username -}}
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
+  {{ end }}
   # Base64 encoded password used for authentication in Hazelcast client-server mode
+  {{ if .Values.hazelcast.password -}}
   HZ_CS_AUTH_PASSWORD: {{ .Values.hazelcast.password | b64enc }}
+  {{ end }}
   {{ end }}
   {{ range $index, $dep := .Values.global.tier}}
   {{ if and ($dep.pegaDiagnosticUser) (eq $dep.name "web") }}
