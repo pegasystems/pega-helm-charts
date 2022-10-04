@@ -61,7 +61,8 @@ This section covers the details necessary to obtain your AWS credentials and con
 
 ### Creating your IAM user access keys
 
-In order to create an EKS cluster, Pega recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credentials, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
+In order to create an EKS cluster, Peg
+a recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credentials, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
 
 Use the following steps, which are sourced from the AWS documentation, **Access Key and Secret Access Key** on the page, [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
 
@@ -511,7 +512,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
-- For new deployments, Pega recommends deploying Pega Platform using an external Kafka configuration as a stream service provider to use your own managed Kafka infrastructure.Deployment of stream with external kafka requires Pega Infinity 8.4 or later.
+- For new deployments, Pega recommends deploying Pega Platform using an externalized Kafka configuration as a stream service provider to use your own managed Kafka infrastructure. Deployment of stream with externalized Kafka configuration requires Pega Infinity 8.4 or later.
 
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 

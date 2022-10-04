@@ -478,7 +478,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
 
 - Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
-- For new deployments, Pega recommends deploying Pega Platform using an external Kafka configuration as a stream service provider to use your own managed Kafka infrastructure.Deployment of stream with external kafka requires Pega Infinity 8.4 or later.
+- For new deployments, Pega recommends deploying Pega Platform using an externalized Kafka configuration as a stream service provider to use your own managed Kafka infrastructure. Deployment of stream with externalized Kafka configuration requires Pega Infinity 8.4 or later.
 
 1. To download the pega.yaml Helm chart to the \<local filepath>\aks-demo, enter:
 
