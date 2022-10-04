@@ -233,7 +233,7 @@ global:
       # Create a stream tier for queue processing.  This tier deploys
       # as a stateful set to ensure durability of queued data. It may
       # be optionally exposed to the load balancer.
-      # Note: Stream tier is deprecated, please enable External Kafka configuration under External Services.
+      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
       # When your Pega Platform deployment uses an externalize Kafka configuration, your deployment no longer uses the "Stream" node type.
       nodeType: "Stream"
 
@@ -410,13 +410,13 @@ hazelcast:
   # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
   external_secret_name: ""
 
-# Stream (External Kafka) settings.
+# Stream (externalized Kafka service) settings.
 stream:
   # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
   enabled: false
-  # Provide external kafka broker urls.
+  # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
-  # Provide Security Protocol used to communicate with kafka brokers.** Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+  # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
   securityProtocol: PLAINTEXT
   # If required, provide trustStore certificate file name
   # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
@@ -434,7 +434,7 @@ stream:
   keyStorePassword: ""
   # If required, provide jaasConfig value in plain text.
   jaasConfig: ""
-  # If required, provide a SASL mechanism**.** Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+  # If required, provide a SASL mechanism**. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
   saslMechanism: PLAIN
   # By default, topics originating from Pega Platform have the pega- prefix,
   # so that it is easy to distinguish them from topics created by other applications.

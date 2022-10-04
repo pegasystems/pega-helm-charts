@@ -1,37 +1,36 @@
-### Switch from embedded Stream to External Kafka
-Pega recommends deployment of stream with external kafka. This means existing deployment may switch from embedded stream to external kafka.
+### Switch from embedded Stream to externalized Kafka service
+Beginning in 8.8, Pega is deprecating the use of a dedicated stream tier in Pega Platform deployments. Pega recommends you update your data streaming configuration in your deployments to use an externalized Kafka service. Use this article to migrate an embedded stream configuration to an externalized Kafka configuration in an existing deployment. This process requires that you use Pega Helm chart versions 2.2 or later so your deployment rely on configurations exclusively set in Pega-provided Helms and not in Pega Platform configuration files such as prconfig.
 
-Kafka stores data on the filesystem.
-Stream tier stores data on the volumes attached to the stream pods.
-External kafka also stores data on the filesystem, but their storage will be different from the volumes attached to the stream pods.
-Hence, existing stream data will not be migrated.
+Kafka stores data on the filesystem. In deployments using embedded stream tier, the stream tier stores data on the volumes attached to the stream pods; in deployments using an externalized Kafka service, your application also stores data on the filesystem, but the storage configuration will be different from the volumes attached to the stream pods. Because of this difference, existing stream data will not be migrated.
 
-The switch can be done in two ways.
-Switch requires a deployment upgrade, please do not perform Pega Platform upgrade during the switch.
+Pega supports two processes to migrate a previously-existing Pega Platform deployment infrastructure using embedded stream nodes one using a Helm-chart-based, externalized Kafka configuration:
+#### A non-production migration that could involve data loss
+#### A migration with minimal or no data loss. Pega requires that clients migrating a production deployment use this process
+See the appropriate section below for details. During a deployment update, you must not update Pega Platform software.
 
-#### Switch non-production environments with a potential data loss.
+#### A non-production migration that could involve data loss
 1. Edit pega chart
    
    1.1 Remove stream tier.
    
-   1.2 Configure and enable external kafka.
+   1.2 Configure and enable externalized Kafka service.
 
-2. Upgrade deployment.
+2. Update deployment.
    
-   2.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+   2.1 Invoke the update process by using the `helm upgrade release --namespace mypega` command.
 
-3. After restarts, new pods will connect to external kafka.
+3. After restarts, new pods will connect to externalized Kafka service.
 
-#### Switch with minimal or no data loss, recommended for production environments.
+#### A migration with minimal or no data loss. Pega requires that clients migrating a production deployment use this process
 1. Edit pega chart, 
    
    1.1 Set replica count to 0 for all the tiers producing stream data for e.g. Web.
    
    1.2 If a tier is producing as well as consuming then stop producer process.
    
-2. Upgrade deployment.
+2. Update deployment.
    
-   2.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+   2.1 Invoke the Update process by using the `helm upgrade release --namespace mypega` command.
 
 3. Wait for all the consuming tiers for e.g. BackgroundProcessing, Batch, etc to process remaining stream data.
    
@@ -51,12 +50,12 @@ Switch requires a deployment upgrade, please do not perform Pega Platform upgrad
    
    4.2 Remove stream tier
    
-   4.3 Configure and enable external kafka.
+   4.3 Configure and enable externalized Kafka service.
 
-5. Upgrade deployment.
+5. Update deployment.
    
-   5.1 Invoke the upgrade process by using the `helm upgrade release --namespace mypega` command.
+   5.1 Invoke the Update process by using the `helm upgrade release --namespace mypega` command.
 
-6. After restarts, both producers and consumers tiers will connect to external kafka.
+6. After restarts, both producers and consumers tiers will connect to externalized Kafka service.
 
 7. If required, start producer processes stopped in step 1.2

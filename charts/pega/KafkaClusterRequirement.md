@@ -2,11 +2,9 @@
 Configure your own managed Kafka infrastructure as per the below details.
 
 ### Deployment
-Kafka is a separate technology and needs to be independently managed.
-Pega does **not** provide or manage a Kafka service when deploying stream with external kafka.
-You may choose to use enterprise grade Kafka services offered by leading public cloud vendors or manage your own Kafka infrastructure.
-If you decide to manage a kafka deployment on a kubernetes cluster then you may use [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
-Please note, this is not the only way to deploy kafka on kubernetes.In general, choose a deployment type that is aligned with your company's policy.
+Pega supports Client-managed cloud clients to configure an externalized Kafka configuration that connects to your organization's Kafka service infrastructure. These configuration options support both enterprise grade Kafka services offered by leading public cloud vendors or your a Kafka infrastructure that you manage across your enterprise.
+
+Pega Platform deployments using Pega-provided Helm charts starting at version 2.2 s or later provide Pega Helm chart settings that allow you configure the connection and authentication details required by your organization's Kafka service infrastructure. These latest, Kafka-specific Pega Helm chart enhancements provide a scalable Kafka configuration for your Pega applications running in your preferred Kubernetes environment while offering great flexibility in connecting to a Kafka service infrastructure using your company's preferred streaming policy and security profiles. To manage your externalized Kafka configuration in your deployment see [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
 
 #### Version
 Pega recommends Apache Kafka versions 2.3.1 or later (Verified version 3.2.1)
@@ -20,7 +18,7 @@ Production  | 4 cores | 16Gi   | 200G*      | At least 3
 
 * Disk Space depends on the required throughput (Number and size of messages) and retention period.
 * In order to enable compression, it is enough to set `compression.type` in your kafka configuration.
-* The above configuration can easily support up to 1000 kafka partitions, you should increase resources accordingly if your deployment requires more kafka partitions.
+* The above configuration can easily support up to 1000 kafka partitions; you can increase resources accordingly if your deployment requires more kafka partitions.
 * Define appropriate quotas on network bandwidth and request rate if you want to share your kafka cluster across different environments.
 
 #### Miscellaneous configuration
@@ -35,14 +33,14 @@ For best practices, see [this page.](https://docs.pega.com/decision-management/8
 
 ### Security
 
-Pega supports SSL for encryption of traffic as well as authentication to communicate with external Kafka. 
+Pega supports SSL for network traffic encryption an authentication for communicate with your organization's existing Kafka service. 
 
 In order to secure, mount necessary certificates(trustStore and keyStore) during the Pega Platform deployment. For details, see [this section.](README.md#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 You may also securely pass settings like trustStorePassword,keyStorePassword, and jaasConfig through a secret in an external secret operator. For details, see [this section.](README.md#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 #### Permissions
-If external kafka is configured with authentication and authorization through Kafka Access control lists then Pega requires following user permissions
+To configure an externalized Kafka service connection using authentication and authorization profiles in Kafka Access control lists, your Pega profiles require following user permissions. To review configuration details, see [Kafka documentation for Authorization and ACLs](https://kafka.apache.org/documentation/#security_authz).
 
 Principal |Resource Type  | Resource Name     | Operation | Permission Type | Patter Type
 ---         |---         | ---     | ---    | ---        | ---
