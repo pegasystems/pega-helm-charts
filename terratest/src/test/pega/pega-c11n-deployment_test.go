@@ -41,7 +41,7 @@ func assertConstellationDeployment(t *testing.T, deploymentYaml string, options 
 	UnmarshalK8SYaml(t, deploymentYaml, &constellationDeploymentObj)
 	require.Equal(t, *constellationDeploymentObj.Spec.Replicas, int32(2))
 	deploymentSpec := constellationDeploymentObj.Spec.Template.Spec
-	require.Equal(t, "/c11n/v102/ping", deploymentSpec.Containers[0].LivenessProbe.HTTPGet.Path)
+	require.Equal(t, "/c11n/v860/ping", deploymentSpec.Containers[0].LivenessProbe.HTTPGet.Path)
 }
 
 func assertConstellationService(t *testing.T, constellationService string, options *helm.Options) {

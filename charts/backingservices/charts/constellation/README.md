@@ -16,7 +16,7 @@ The values.yaml file provides configuration options to define the values for the
 Example:
 
 ```yaml
-image: pega-docker.downloads.pega.com/constellationui/service:8.7.0-ga-44
+image: pega-docker.downloads.pega.com/constellationui/service:8.7.3-ga-37
 # log level : error, warn, info, debug.  use error for production
 logLevel: info
 enabled: true
