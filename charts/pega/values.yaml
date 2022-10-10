@@ -189,7 +189,8 @@ global:
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
+      securityContext:
+        fsGroup: 0
       #   runAsUser: 9001
 
       hpa:
@@ -226,7 +227,8 @@ global:
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
+      securityContext:
+        fsGroup: 0
       #   runAsUser: 9001
 
       hpa:
@@ -275,7 +277,8 @@ global:
 
       # To configure an alternative user for your custom image, set value for runAsUser
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
+      securityContext:
+        fsGroup: 0
       #   runAsUser: 9001
 
       replicas: 2
