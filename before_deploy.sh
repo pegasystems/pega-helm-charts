@@ -14,7 +14,7 @@ export BACKINGSERVICES_FILE_NAME=backingservices-${CHART_VERSION}.tgz
 export DEPLOY_CONFIGURATIONS_FILE_NAME=deploy-config-${CHART_VERSION}.tgz
 export INSTALLER_CONFIGURATIONS_FILE_NAME=installer-config-${CHART_VERSION}.tgz
 # Get the latest index.yaml from github.io
-curl -o index.yaml https://pegasystems.github.io/pega-helm-charts/index.yaml
+curl -o index.yaml https://pega-narasimharao-meda.github.io/pega-helm-charts/index.yaml
 # Clone the versions from gh-pages to a temp directory - xyz
 # The versions will be re-installed in temporary directory - temp_gh_pages
 git clone --single-branch --branch gh-pages https://github.com/${GITHUB_REPOSITORY} temp_gh_pages
