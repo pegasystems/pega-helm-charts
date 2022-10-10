@@ -18,9 +18,7 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, vendor := range supportedVendors {
-
 		for _, operation := range supportedOperations {
-
 			for _, depName := range deploymentNames {
 				fmt.Println(vendor + "-" + operation + "-" + depName)
 
