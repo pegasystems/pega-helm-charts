@@ -22,6 +22,9 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
+{{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.labels }}
+{{ toYaml .root.Values.global.pegaTier.labels | indent 4 }}
+{{- end }}{{- end }}
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
