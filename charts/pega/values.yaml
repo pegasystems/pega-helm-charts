@@ -191,7 +191,7 @@ global:
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       securityContext:
         fsGroup: 3000
-        # runAsUser: 9001
+        runAsUser: 8001
 
       hpa:
         enabled: true
@@ -229,7 +229,7 @@ global:
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       securityContext:
         fsGroup: 3000
-        # runAsUser: 9001
+        runAsUser: 8001
 
       hpa:
         enabled: true
@@ -279,7 +279,7 @@ global:
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       securityContext:
         fsGroup: 3000
-        # runAsUser: 9001
+        runAsUser: 8001
 
       replicas: 2
 
