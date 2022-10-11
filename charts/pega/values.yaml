@@ -19,7 +19,7 @@ global:
   # to support multiple custom certificates as external secrets, specify each of your external secrets
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
-  certificates:
+  certificates: "test"
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
