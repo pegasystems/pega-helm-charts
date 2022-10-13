@@ -3,17 +3,21 @@
 # For more info, see https://help.github.com/en/articles/about-code-owners
 
 # These owners will be the default owners for everything in the repo.
-*       @dcasavant @pegasystems/deployment
+*       @pegasystems/deployment
 
 # Documentation
 *.md        @taz-pega-work
 docs/*      @taz-pega-work
 
-# Addons Chart
-charts/pega/addons/*  @pegasystems/deployment
+# Chart Defaults
+charts/*  @pegasystems/deployment
 
 # Pega Chart
-charts/pega/pega/*    @pegasystems/deployment
+charts/pega/*    @pegasystems/deployment
+
+# Constellation Chart
+charts/pega/charts/constellation/*    @pegasystems/UIServices
+charts/backingservices/charts/constellation/*  @pegasystems/UIServices
 
 # SRS Chart
 charts/backingservices/charts/srs/*  @pegasystems/searchservice

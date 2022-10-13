@@ -375,6 +375,10 @@ true
     - secret:
         name: {{ .Values.dds.external_secret_name }}
   {{- end }}
+  {{ if ((.Values.stream).external_secret_name)}}
+    - secret:
+        name: {{ .Values.stream.external_secret_name }}
+  {{- end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
@@ -457,3 +461,19 @@ serviceName: ssl-redirect
 servicePort: use-annotation
 {{- end }}
 {{- end }}
+
+{{- define "tierClassloaderRetryTimeout" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+180
+{{- else -}}
+{{- add .periodSeconds 0}}
+{{- end -}}
+{{- end -}}
+
+{{- define "tierClassloaderMaxRetries" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+{{- add (round (div (mul .periodSeconds .failureThreshold) 180) 0) 1 -}}
+{{- else -}}
+{{- add .failureThreshold 1 -}}
+{{- end -}}
+{{- end -}}

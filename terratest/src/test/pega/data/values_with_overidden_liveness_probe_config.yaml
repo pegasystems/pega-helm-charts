@@ -1,8 +1,7 @@
 ---
 global:
-  # This values.yaml file is an example of a large Pega deployment.
-  # For more information about each configuration option, see the
-  # project readme.
+  # This values.yaml file is an example.  For more information about
+  # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
@@ -14,6 +13,7 @@ global:
   # Deploy Pega nodes
   actions:
     execute: "deploy"
+
   # Add custom certificates to be mounted to container
   # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
   # to support multiple custom certificates as external secrets, specify each of your external secrets
@@ -46,7 +46,7 @@ global:
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
-    # configure JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
@@ -120,6 +120,7 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
@@ -151,7 +152,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
-        # For help configuring the ingress block, see the Helm chart documentation
+        # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
 
         # Enter the domain name to access web nodes via a load balancer.
@@ -160,20 +161,12 @@ global:
         tls:
           # Enable TLS encryption
           enabled: true
-          secretName:
-          # For GKE Managed Certificate, mention true if Google Managed Certificate has to be created and annotation specified
-          useManagedCertificate: false
-          # Provide appropriate certificate annotations for EKS or GKE
-          # For EKS, use alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
-          # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
-          # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
-          ssl_annotation:
-
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       replicas: 1
       javaOpts: ""
-      # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
-      catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
 
@@ -185,6 +178,19 @@ global:
 
       livenessProbe:
         port: 8081
+
+      # Optionally overridde default resource specifications
+      # cpuRequest: 2
+      # memRequest: "12Gi"
+      # cpuLimit: 4
+      # memLimit: "12Gi"
+      # initialHeap: "4096m"
+      # maxHeap: "8192m"
+
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -201,7 +207,7 @@ global:
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
       # the load balancer.
-      nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
 
       replicas: 1
       javaOpts: ""
@@ -217,6 +223,14 @@ global:
 
       livenessProbe:
         port: 8081
+        failureThreshold: 5
+        periodSeconds: 100
+
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
 
       hpa:
         enabled: true
@@ -233,8 +247,6 @@ global:
       # Create a stream tier for queue processing.  This tier deploys
       # as a stateful set to ensure durability of queued data. It may
       # be optionally exposed to the load balancer.
-      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
-      # When your Pega Platform deployment uses an externalize Kafka configuration, your deployment no longer uses the "Stream" node type.
       nodeType: "Stream"
 
       # Pega requestor specific properties
@@ -246,93 +258,37 @@ global:
         port: 7003
         targetPort: 7003
 
+      # If a nodeSelector is required for this or any tier, it may be specified here:
+      # nodeSelector:
+      #  disktype: ssd
+
       ingress:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_STREAM_NODE_DOMAIN"
         tls:
+          # Enable TLS encryption
           enabled: true
-          # Give the name of the secret that contains certificate information - works for GKE, AKS and K8S
-          secretName:
-          # For GKE Managed Certificate, mention true if Google Managed Certificate has to be created and annotation specified
-          useManagedCertificate: false
-          # Provide appropriate certificate annotations for EKS or GKE
-          # For EKS, use alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
-          # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
-          # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
-          ssl_annotation:
-
-      replicas: 2
-      javaOpts: ""
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       livenessProbe:
         port: 8081
+        failureThreshold: "7"
+        periodSeconds: "300"
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
+      replicas: 2
 
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
-
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
-      pdb:
-        enabled: false
-        minAvailable: 1
-        # maxUnavailable: "50%"
-
-    - name: "bix"
-      # Create a background tier for BIX processing.  This tier uses
-      # the BIX node type and will not be exposed to the load balancer.
-      nodeType: "BIX"
-
-      replicas: 1
-      javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-
-      deploymentStrategy:
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
-        type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
-
-      hpa:
-        enabled: true
-
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
-      pdb:
-        enabled: false
-        minAvailable: 1
-        # maxUnavailable: "50%"
-
-    - name: "realtime"
-      # Create a dedicated tier for real-time data grid processing.
-      nodeType: "RealTime"
-
-      replicas: 1
-      javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-
-      deploymentStrategy:
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
-        type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
-
-      hpa:
-        enabled: true
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
@@ -364,6 +320,11 @@ dds:
   port: "9042"
   username: "dnode_ext"
   password: "dnode_ext"
+  clientEncryption: false
+  trustStore: ""
+  trustStorePassword: ""
+  keyStore: ""
+  keyStorePassword: ""
   # To avoid exposing username,password,trustStorePassword,keyStorePassword parameters, configure the
   # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be CASSANDRA_USERNAME, CASSANDRA_PASSWORD , CASSANDRA_TRUSTSTORE_PASSWORD , CASSANDRA_KEYSTORE_PASSWORD
@@ -376,10 +337,13 @@ dds:
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
+  replicas: 1
 
-# Pega Installer settings
+# Pega Installer settings.
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
+  # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
+  # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
   # Upgrade specific properties
   upgrade:
@@ -408,42 +372,4 @@ hazelcast:
   # To avoid exposing username,password parameters, configure the
   # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
-  external_secret_name: ""
-
-# Stream (externalized Kafka service) settings.
-stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
-  # Provide externalized Kafka service broker urls.
-  bootstrapServer: ""
-  # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
-  securityProtocol: PLAINTEXT
-  # If required, provide trustStore certificate file name
-  # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
-  # in the global.certificatesSecrets parameter.
-  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
-  trustStore: ""
-  # If required provide trustStorePassword value in plain text.
-  trustStorePassword: ""
-  # If required, provide keyStore certificate file name
-  # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
-  # in the global.certificatesSecrets parameter.
-  # Pega deployments only support keyStores using the Java Key Store (.jks) format.
-  keyStore: ""
-  # If required, provide keyStore value in plain text.
-  keyStorePassword: ""
-  # If required, provide jaasConfig value in plain text.
-  jaasConfig: ""
-  # If required, provide a SASL mechanism**. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
-  saslMechanism: PLAIN
-  # By default, topics originating from Pega Platform have the pega- prefix,
-  # so that it is easy to distinguish them from topics created by other applications.
-  # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
-  streamNamePattern: "pega-{stream.name}"
-  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
-  replicationFactor: "1"
-  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
-  # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
-  # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
-  # Enter the external secret name below.
   external_secret_name: ""
