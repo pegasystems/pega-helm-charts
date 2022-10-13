@@ -19,13 +19,11 @@ func TestPegaEnvironmentConfig(t *testing.T){
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-
 	for _,vendor := range supportedVendors{
 
 		for _,operation := range supportedOperations{
 
             for _, depName := range deploymentNames {
-
                 fmt.Println(vendor + "-" + operation + "-" +depName)
 
                 var options = &helm.Options{
@@ -33,7 +31,7 @@ func TestPegaEnvironmentConfig(t *testing.T){
                         "global.deployment.name": depName,
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
-						"installer.upgrade.upgradeType": "zero-downtime",
+                        "installer.upgrade.upgradeType": "zero-downtime",
                     },
                 }
 
@@ -68,5 +66,5 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
-        require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+    require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }

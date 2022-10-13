@@ -438,7 +438,7 @@ To deploy Pega platform and Hazelcast using this client-server deployment model,
 `platform/clustering-service` to your Docker repository and use with the Hazelcast subchart under [Pega charts](../charts/pega/charts).For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
 
 The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](../charts/backingservices/charts/srs) under [backing services](../charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is optional and is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md).
-The docker image format is different for backing services and does not follow the datestamp pattern. For installations of or upgrades to Pega Infinity 8.6, you may configure Docker image `platform-services/search-n-reporting-service` with `<srs-version>` compatible with the Pega version as provided in [compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix).
+The docker image format is different for backing services and does not follow the datestamp pattern. For installations of or upgrades to Pega Infinity 8.6, you may configure Docker image `platform-services/search-n-reporting-service` with `<srs-version>` compatible with the Pega version as provided in [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix).
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
 
@@ -595,7 +595,7 @@ It is a best practice to retag each of your Pega Docker images by including your
 
     After you push these downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
 
-14. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag when you enter:
+14. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag (refer [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix)) when you enter:
  
     ```bash
     $ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>

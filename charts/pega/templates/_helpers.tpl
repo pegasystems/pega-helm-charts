@@ -461,3 +461,19 @@ serviceName: ssl-redirect
 servicePort: use-annotation
 {{- end }}
 {{- end }}
+
+{{- define "tierClassloaderRetryTimeout" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+180
+{{- else -}}
+{{- add .periodSeconds 0}}
+{{- end -}}
+{{- end -}}
+
+{{- define "tierClassloaderMaxRetries" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+{{- add (round (div (mul .periodSeconds .failureThreshold) 180) 0) 1 -}}
+{{- else -}}
+{{- add .failureThreshold 1 -}}
+{{- end -}}
+{{- end -}}
