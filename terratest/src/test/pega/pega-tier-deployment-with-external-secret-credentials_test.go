@@ -47,11 +47,12 @@ func assertCredentialVolumeAndMount(t *testing.T, tierYaml string, options *helm
 		if vol.Name == "pega-volume-credentials" {
 			sources := vol.VolumeSource.Projected.Sources
 			fmt.Println(sources[0].Secret.LocalObjectReference.Name)
-			require.Equal(t, len(sources), 4)
+			require.Equal(t, len(sources), 5)
 			require.Equal(t, sources[0].Secret.LocalObjectReference.Name, "pega-credentials-secret")
 			require.Equal(t, sources[1].Secret.LocalObjectReference.Name, "hazelcast-secret")
 			require.Equal(t, sources[2].Secret.LocalObjectReference.Name, "customArtifactory-secret")
 			require.Equal(t, sources[3].Secret.LocalObjectReference.Name, "dds-secret")
+			require.Equal(t, sources[4].Secret.LocalObjectReference.Name, "kafka-secret")
 			foundVol = true
 			break
 		}
