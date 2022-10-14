@@ -37,3 +37,5 @@ set_data_owner_on_startup: false
 # Additional custom fields, such as environment variables
 custom:
   env: []
+# If a custom storage class is required for the search pod, it can be specified here:
+customStorageClassName: ""
