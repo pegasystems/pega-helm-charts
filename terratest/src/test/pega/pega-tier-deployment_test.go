@@ -38,6 +38,7 @@ func TestPegaTierDeployment(t *testing.T) {
 						"global.actions.execute":        operation,
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.customStorageClassName": "custom-storage-class",
 					},
 				}
 
@@ -80,6 +81,8 @@ func assertWeb(t *testing.T, webYaml string, options *helm.Options) {
 func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment, options *helm.Options) {
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.VolumeClaimTemplates[0].Name)
 	require.Equal(t, k8score.PersistentVolumeAccessMode("ReadWriteOnce"), statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0])
+	storageClassName := "custom-storage-class"
+	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.ServiceName)
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
 	require.Equal(t, getObjName(options, "-stream"), statefulsetSpec.Containers[0].VolumeMounts[1].Name)

@@ -32,7 +32,7 @@ func TestPegaSearchDeployment(t *testing.T){
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-						"pegasearch.customStorageClassName": "custom-storage-class",
+						"global.customStorageClassName": "custom-storage-class",
                     },
                 }
 
