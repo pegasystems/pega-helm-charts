@@ -72,7 +72,9 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 					"global.actions.execute":                 "deploy",
 					"global.deployment.name":                 "pega",
 					"installer.upgrade.upgradeType":          "zero-downtime",
-					"global.tier[0].securityContext.fsGroup": key,
+					"global.tier[0].securityContext.fsGroup": key, // web tier
+					"global.tier[1].securityContext.fsGroup": key, // batch tier
+					"global.tier[2].securityContext.fsGroup": key, // stream tier
 				},
 			}
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
