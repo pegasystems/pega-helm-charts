@@ -52,6 +52,38 @@ func TestPegaTierDeployment(t *testing.T) {
 	}
 }
 
+func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
+	customFsGroups := map[string]int64{
+		"1000": 1000,
+		"2000": 2000,
+		"3000": 3000,
+	}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	for _, vendor := range supportedVendors {
+		for key, value := range customFsGroups {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                        vendor,
+					"global.actions.execute":                 "deploy",
+					"global.deployment.name":                 "pega",
+					"installer.upgrade.upgradeType":          "zero-downtime",
+					"global.tier[0].securityContext.fsGroup": key,
+				},
+			}
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+			yamlSplit := strings.Split(yamlContent, "---")
+
+			UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+			require.Equal(t, value, *depObj.Spec.Template.Spec.SecurityContext.FSGroup)
+		}
+	}
+}
+
 func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)

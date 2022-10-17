@@ -188,9 +188,11 @@ global:
       # maxHeap: "8192m"
 
       # To configure an alternative user for custom image, set value for runAsUser.
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       hpa:
         enabled: true
@@ -225,9 +227,11 @@ global:
         port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       hpa:
         enabled: true
@@ -276,9 +280,11 @@ global:
         port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       replicas: 2
 
