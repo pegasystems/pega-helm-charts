@@ -32,7 +32,7 @@ func TestPegaSearchDeployment(t *testing.T){
                         "global.provider":        vendor,
                         "global.actions.execute": operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
-						"global.customStorageClassName": "custom-storage-class",
+						"global.storageClassName": "storage-class",
                     },
                 }
 
@@ -47,7 +47,7 @@ func TestPegaSearchDeployment(t *testing.T){
 
 func VerifySearchDeployment(t *testing.T, yamlContent string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
-	storageClassName := "custom-storage-class"
+	storageClassName := "storage-class"
 	UnmarshalK8SYaml(t, yamlContent, &statefulsetObj)
 	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-search"))
 	require.Equal(t, *statefulsetObj.Spec.Replicas, int32(1))
