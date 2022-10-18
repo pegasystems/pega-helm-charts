@@ -29,6 +29,7 @@ func TestPegaDeploymentWithSidecar(t *testing.T) {
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName": "storage-class",
 					},
 				}
 				deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
