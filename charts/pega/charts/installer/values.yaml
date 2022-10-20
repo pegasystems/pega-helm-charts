@@ -87,3 +87,7 @@ shareProcessNamespace: false
 # sidecarContainers:
 #  - name: <SIDECAR_CONTAINER_NAME>
 #    image: <SIDECAR_IMAGE>
+
+# If a nodeSelector is required for the installer pod, it may be specified here:
+# nodeSelector:
+#   label: value
