@@ -65,6 +65,10 @@ spec:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
+{{- if .root.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .root.Values.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
