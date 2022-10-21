@@ -1,0 +1,19 @@
+#Deploy only when the constellation flag has been enabled in the values yaml.
+{{ if and .Values.enabled (eq .Values.enabled true) }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: constellation
+  labels:
+    app: constellation
+    # component: constellation
+spec:
+  selector:
+    app: constellation
+    # component: constellation
+  ports:
+  - protocol: TCP
+    port: 3000
+    targetPort: 3000
+  type: LoadBalancer
+{{ end }}
