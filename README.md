@@ -74,7 +74,7 @@ $ helm inspect values pega/backingservices > backingservices.yaml
 * [Instructions to configure the Pega addons](charts/addons/README.md)
 * [Instructions to configure the Pega backingservices](charts/backingservices/README.md)
 
-When making customizations for your environment, check the [Pega Platform Support Guide Resources](https://community.pega.com/knowledgebase/articles/pega-platform-support-guide-resources) to verify that those changes are supported by your Pega Platform version.
+When making customizations for your environment, check the [Pega Platform Support Guide Resources](https://docs-previous.pega.com/platform-support-guide) to verify that those changes are supported by your Pega Platform version.
 
 5. Create namespaces for your Pega deployment, backingservices and the addons (if applicable for your environment).
 
@@ -96,7 +96,7 @@ $ helm install backingservices pega/backingservices --namespace pegabackingservi
 $ helm install addons pega/addons --namespace pegaaddons --values addons.yaml
 ```
 
-8. With addons and backservices deployed, you are ready to deploy Pega Infinity using the pega chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://community.pega.com/knowledgebase/articles/deploying-pega-platform-using-kubernetes) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace. After you edit the chart with your configuration requirements, run the following command to install the pega chart. 
+8. With addons and backservices deployed, you are ready to deploy Pega Infinity using the pega chart. Before installing using the chart, it is a good idea to review the detailed [deployment guide](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/containerized-deployments-kubernetes.html) to understand how Pega deploys as a distributed system. Running a Helm installation using the pega chart installs a Pega Infinity instance into a specified namespace. After you edit the chart with your configuration requirements, run the following command to install the pega chart. 
 
 ```bash
 $ helm install mypega pega/pega --namespace mypega --values pega.yaml
@@ -126,7 +126,7 @@ To upgrade your strategic application, use the latest Upgrade Guide available fo
 
 ## Patches
 
-To apply a Pega Platform patch with zero downtime to your existing Pega platform software, you must download the latest installer Docker images from Pega Digital Software Delivery and change several options in your Pega Helm chart. For details and helpful resources explaining the Pega Platform patch process, including the Pega Infinity patch policy, see [Applying the latest patch](https://community.pega.com/knowledgebase/articles/keeping-current-pega/86/applying-latest-patch). For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md).
+To apply a Pega Platform patch with zero downtime to your existing Pega platform software, you must download the latest installer Docker images from Pega Digital Software Delivery and change several options in your Pega Helm chart. For details and helpful resources explaining the Pega Platform patch process, including the Pega Infinity patch policy, see [Applying the latest patch](https://docs.pega.com/bundle/keeping-current/page/keeping-current/kc/updates-patches-hotfixes.html). For step-by-step guidance to apply a Pega Platform patch, see the Pega-provided runbook, [Patching Pega Platform in your deployment](/docs/patching-pega-deployment.md).
 
 # Downloading Docker images for your deployment
 
@@ -141,7 +141,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
-For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs-previous.pega.com/client-managed-cloud/87/pega-provided-docker-images).
+For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
 
