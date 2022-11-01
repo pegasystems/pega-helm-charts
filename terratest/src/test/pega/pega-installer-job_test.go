@@ -78,6 +78,31 @@ func TestPegaInstallerJob(t *testing.T) {
 	}
 }
 
+func TestPegaInstallerJobWithNodeSelector(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":         "install-ns",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+			"installer.upgrade.upgradeType":  "zero-downtime",
+			"installer.nodeSelector.mylabel": "myvalue",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+	require.Equal(t, "myvalue", jobObj.Spec.Template.Spec.NodeSelector["mylabel"])
+
+}
+
 func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *helm.Options, pullPolicy string) {
 	var jobObj k8sbatch.Job
 	UnmarshalK8SYaml(t, jobYaml, &jobObj)
