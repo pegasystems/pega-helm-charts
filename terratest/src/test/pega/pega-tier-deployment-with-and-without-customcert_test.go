@@ -1,12 +1,12 @@
 package pega
 
 import (
-	"github.com/gruntwork-io/terratest/modules/helm"
-	"github.com/stretchr/testify/require"
-	appsv1 "k8s.io/api/apps/v1"
 	"path/filepath"
 	"strings"
 	"testing"
+	"github.com/gruntwork-io/terratest/modules/helm"
+	"github.com/stretchr/testify/require"
+	appsv1 "k8s.io/api/apps/v1"
 )
 
 func TestPegaDeploymentWithAndWithoutCustomCerts(t *testing.T) {
