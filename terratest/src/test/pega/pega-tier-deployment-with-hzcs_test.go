@@ -27,7 +27,6 @@ func TestHazelcast(t *testing.T) {
                         "global.actions.execute": operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
                         "hazelcast.enabled":  "true",
-						"global.storageClassName": "storage-class",
                     },
                 }
                 deploymentYaml := RenderTemplate(t, hazelcastOptions, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})

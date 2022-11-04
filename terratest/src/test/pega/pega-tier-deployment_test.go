@@ -47,10 +47,19 @@ func TestPegaTierDeployment(t *testing.T) {
 				assertWeb(t, yamlSplit[1], options)
 				assertBatch(t, yamlSplit[2], options)
 				assertStream(t, yamlSplit[3], options)
+				assertStreamWithSorageClass(t, yamlSplit[3], options)
 
 			}
 		}
 	}
+}
+
+func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
+	var statefulsetObj appsv1beta2.StatefulSet
+	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
+	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
+	storageClassName := "storage-class"
+	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
 }
 
 func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
@@ -81,8 +90,6 @@ func assertWeb(t *testing.T, webYaml string, options *helm.Options) {
 func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment, options *helm.Options) {
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.VolumeClaimTemplates[0].Name)
 	require.Equal(t, k8score.PersistentVolumeAccessMode("ReadWriteOnce"), statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0])
-	storageClassName := "storage-class"
-	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.ServiceName)
 	statefulsetSpec := statefulsetObj.Spec.Template.Spec
 	require.Equal(t, getObjName(options, "-stream"), statefulsetSpec.Containers[0].VolumeMounts[1].Name)
