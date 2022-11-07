@@ -658,6 +658,21 @@ If you are planning to use Cassandra (usually as a part of Pega Customer Decisio
 
 To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and configure the `dds` section to reference your deployment.
 
+The following parameters are available for configuration of the connection to the external Cassandra cluster.
+
+Parameter     | Description                                                                                                                                                                                                                                                                                                                   | Default value
+---           |-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---
+`externalNodes`    | A comma separated list of hosts in the Cassandra cluster. | Empty
+`port` | TCP Port to connect to cassandra. | 9042
+`username` | The username for authentication with the Cassandra cluster. | dnode_ext
+`password` | The password for authentication with the Cassandra cluster. | dnode_ext
+`clientEncryption` | Whether to enable client encryption on the Cassandra connection. | false
+`trustStore` | If required, provide the trustStore certificate file name<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores using the Java Key Store (.jks) format. | Empty
+`trustStorePassword` | If required provide trustStorePassword value in plain text. | Empty
+`keyStore` | If required, provide the keystore certificate file name<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystore using the Java Key Store (.jks) format. | Empty
+`keyStorePassword` | If required provide keyStorePassword value in plain text. | Empty
+
+
 If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 Example:

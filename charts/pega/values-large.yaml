@@ -360,9 +360,13 @@ cassandra:
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
 dds:
+  # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
+  # TCP Port to connect to cassandra.
   port: "9042"
+  # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
+  # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
   # To avoid exposing username,password,trustStorePassword,keyStorePassword parameters, configure the
   # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
