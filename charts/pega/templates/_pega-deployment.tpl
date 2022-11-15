@@ -294,6 +294,9 @@ spec:
       resources:
         requests:
           storage: {{ .node.volumeClaimTemplate.resources.requests.storage }}
+{{- if ( .root.Values.global.storageClassName ) }}
+      storageClassName: {{ .root.Values.global.storageClassName }}
+{{ end }}
   serviceName: {{ .name }}
 {{- end }}
 ---
