@@ -38,6 +38,7 @@ func TestPegaTierDeployment(t *testing.T) {
 						"global.actions.execute":        operation,
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName": "storage-class",
 					},
 				}
 
@@ -46,10 +47,19 @@ func TestPegaTierDeployment(t *testing.T) {
 				assertWeb(t, yamlSplit[1], options)
 				assertBatch(t, yamlSplit[2], options)
 				assertStream(t, yamlSplit[3], options)
+				assertStreamWithSorageClass(t, yamlSplit[3], options)
 
 			}
 		}
 	}
+}
+
+func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
+	var statefulsetObj appsv1beta2.StatefulSet
+	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
+	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
+	storageClassName := "storage-class"
+	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
 }
 
 func TestPegaTierDeploymentWithFSGroup(t *testing.T) {

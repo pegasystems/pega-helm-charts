@@ -116,5 +116,8 @@ spec:
       resources:
         requests:
           storage: {{ .Values.volumeSize }}
+{{- if ( .Values.global.storageClassName ) }}
+      storageClassName: {{ .Values.global.storageClassName }}
+{{ end }}
 {{ end }}
 {{ end }}
