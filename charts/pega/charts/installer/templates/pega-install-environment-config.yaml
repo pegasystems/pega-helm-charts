@@ -29,7 +29,9 @@ data:
   # Creates the system with this production level
   PRODUCTION_LEVEL: {{ .Values.productionLevel | quote}}
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
-  MULTITENANT_SYSTEM: {{ .Values.multitenantSystem | quote}}
+{{- if .Values.multitenant_system }}
+  MT_SYSTEM: {{ .Values.multitenant_system | quote}}
+{{- end }}
   # Temporary password for administrator@pega.com that is used to install Pega Platform
   ADMIN_PASSWORD: {{ .Values.adminPassword }}
   # Run the Static Assembler ('true' to run, 'false' to not run)
