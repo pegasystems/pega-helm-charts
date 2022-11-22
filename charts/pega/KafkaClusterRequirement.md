@@ -52,7 +52,7 @@ User:\<user-name\> |CLUSTER  | \<Cluster-Name\> | IDEMPOTENT_WRITE   |ALLOW     
 
 ### Stream (externalized Kafka service) test example with bitnami kafka
 
-For testing purpose you can install bitnami kafka using below commands 
+For testing purpose, deploy a bitnami kafka cluster using the provided Helm command example where my-kafka is the namespace of your Kafka service deployment.
 
 ```
 helm repo add bitnami https://charts.bitnami.com/bitnami
