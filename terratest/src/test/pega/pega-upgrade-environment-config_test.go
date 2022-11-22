@@ -47,7 +47,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "zero-downtime")
-	require.Equal(t, upgradeEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, upgradeEnvConfigData["MT_SYSTEM"], "")
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, upgradeEnvConfigData["DB2ZOS_UDF_WLM"], "")

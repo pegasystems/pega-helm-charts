@@ -45,7 +45,7 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
 	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
-	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, installEnvConfigData["MT_SYSTEM"], "")
 	require.Equal(t, "ADMIN_PASSWORD", installEnvConfigData["ADMIN_PASSWORD"])
 	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "true")
