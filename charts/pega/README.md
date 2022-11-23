@@ -291,8 +291,8 @@ requestor:
 ```
 ### Security context
 
-By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user. To configure an alternative user for your custom image, set value for `runAsUser`. Note that pegasystems/pega image works only with pegauser(9001).
-`runAsUser` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user and volume mounts uses `root`(0) as the group. To configure an alternative user for your custom image, set value for `runAsUser` and to configure an alternative group for volume mounts, set value for `fsGroup`. Note that pegasystems/pega image works only with pegauser(9001).
+`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 Example:
 
@@ -301,6 +301,7 @@ tier:
   - name: my-tier
     securityContext:
       runAsUser: RUN_AS_USER
+      fsGroup: FS_GROUP
 ```
 ### service
 
@@ -658,6 +659,21 @@ If you are planning to use Cassandra (usually as a part of Pega Customer Decisio
 
 To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and configure the `dds` section to reference your deployment.
 
+Use the following parameters to configure the connection to your external Cassandra cluster
+
+Parameter     | Description | Default value
+---           |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---
+`externalNodes`    | A comma separated list of hosts in the Cassandra cluster. | Empty
+`port` | TCP Port to connect to cassandra. | 9042
+`username` | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
+`password` | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
+`clientEncryption` | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
+`trustStore` | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
+`trustStorePassword` | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
+`keyStore` | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
+`keyStorePassword` | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+
+
 If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 Example:
@@ -916,6 +932,20 @@ installer:
     annotation-name1: annotation-value1
     annotation-name2: annotation-value2
 ```
+
+
+### Installer Node Selector
+
+You can add node selector to the installer pod to launch the pod on specific node
+
+Example:
+
+```yaml
+installer:
+  nodeSelector:
+    label: value
+```
+
 ### Mount the custom certificates into the Tomcat container
 
 Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.

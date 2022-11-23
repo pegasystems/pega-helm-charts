@@ -110,11 +110,20 @@ spec:
 {{- end }}
 {{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
-        fsGroup: 0
 {{- if .node.securityContext }}
+{{- if .node.securityContext.runAsUser }}
         runAsUser: {{ .node.securityContext.runAsUser }}
 {{- else }}
         runAsUser: 9001
+{{- end }}
+{{- if .node.securityContext.fsGroup }}
+        fsGroup: {{ .node.securityContext.fsGroup }}
+{{- else }}
+        fsGroup: 0
+{{- end }}
+{{- else }}
+        runAsUser: 9001
+        fsGroup: 0
 {{- end }}
 {{- end }}
       containers:
@@ -294,6 +303,9 @@ spec:
       resources:
         requests:
           storage: {{ .node.volumeClaimTemplate.resources.requests.storage }}
+{{- if ( .root.Values.global.storageClassName ) }}
+      storageClassName: {{ .root.Values.global.storageClassName }}
+{{ end }}
   serviceName: {{ .name }}
 {{- end }}
 ---
