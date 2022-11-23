@@ -14,8 +14,14 @@ global:
   actions:
     execute: "deploy"
 
-  # Add custom certificates to be mounted to container, as a map
+  # Add custom certificates to be mounted to container
+  # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
+  # to support multiple custom certificates as external secrets, specify each of your external secrets
+  # as an array of comma-separated strings using the certificatesSecrets parameter.
+  certificatesSecrets: []
   certificates:
+  # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
+  storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
@@ -41,9 +47,10 @@ global:
     driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
-    # To avoid exposing a password, leave the jdbc.password parameter empty (no quotes), configure a JDBC password
-    # in the External Secrets Manager, and enter the external secret for the JDBC password.
-    external_secret_name: "YOUR_EXTERNAL_SECRETS_NAME"
+    # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
+    # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
+    external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
@@ -59,11 +66,15 @@ global:
     authentication:
       # Provide the basic authentication credentials or the API key authentication details to satisfy your custom artifactory authentication mechanism.
       basic:
-        username: "YOUR_ARTIFACTORY_USERNAME"
-        password: "YOUR_ARTIFACTORY_PASSWORD"
+        username: ""
+        password: ""
       apiKey:
-        headerName: "YOUR_ARTIFACTORY_DEDICATED_APIKEY_HEADER"
-        value: "YOUR_ARTIFACTORY_API_KEY"
+        headerName: ""
+        value: ""
+      # To avoid exposing basic.username,basic.password,apiKey.headerName,apiKey.value parameters, configure the
+      # basic.username,basic.password,apiKey.headerName,apiKey.value parameters in External Secrets Manager, and enter the external secret for the credentials
+      # make sure the keys in the secret should be CUSTOM_ARTIFACTORY_USERNAME , CUSTOM_ARTIFACTORY_PASSWORD , CUSTOM_ARTIFACTORY_APIKEY_HEADER , CUSTOM_ARTIFACTORY_APIKEY
+      external_secret_name: ""
     # Leave customArtifactory.enableSSLVerification enabled to ensure secure access to your custom artifactory;
     # when customArtifactory.enableSSLVerification is false, SSL verification is skipped and establishes an insecure connection.
     enableSSLVerification: true
@@ -129,8 +140,12 @@ global:
           port: 443
           targetPort: 8443
           # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
+          # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
           cacertificate:
-          # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
+          # provide the SSL certificate and private key as a PEM format
+          certificateFile:
+          certificateKeyFile:
+          # if you will deploy traefik addon chart and enable traefik, set enabled=true; otherwise leave the default setting.
           traefik:
             enabled: false
             # the SAN of the certificate present inside the container
@@ -175,9 +190,11 @@ global:
       # maxHeap: "8192m"
 
       # To configure an alternative user for custom image, set value for runAsUser.
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       hpa:
         enabled: true
@@ -212,9 +229,11 @@ global:
         port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       hpa:
         enabled: true
@@ -231,6 +250,8 @@ global:
       # Create a stream tier for queue processing.  This tier deploys
       # as a stateful set to ensure durability of queued data. It may
       # be optionally exposed to the load balancer.
+      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
+      # When externalized Kafka service is enabled, we should remove the entire stream tier.
       nodeType: "Stream"
 
       # Pega requestor specific properties
@@ -261,9 +282,11 @@ global:
         port: 8081
 
       # To configure an alternative user for your custom image, set value for runAsUser
+      # To configure an alternative group for volume mounts, set value for fsGroup
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
 
       replicas: 2
 
@@ -298,15 +321,32 @@ cassandra:
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
 dds:
+  # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
+  # TCP Port to connect to cassandra.
   port: "9042"
+  # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
+  # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
+  # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # If required, provide the trustStore certificate file name.
+  # When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.
+  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
   trustStore: ""
+  # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
+  # If required, provide the keystore certificate file name.
+  # When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.
+  # Pega deployments only support keystore using the Java Key Store (.jks) format.
   keyStore: ""
+  # If required provide keyStorePassword value in plain text.
   keyStorePassword: ""
+  # To avoid exposing username,password,trustStorePassword,keyStorePassword parameters, configure the
+  # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
+  # make sure the keys in the secret should be CASSANDRA_USERNAME, CASSANDRA_PASSWORD , CASSANDRA_TRUSTSTORE_PASSWORD , CASSANDRA_KEYSTORE_PASSWORD
+  external_secret_name: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
@@ -347,3 +387,45 @@ hazelcast:
   username: ""
   # Password to be used in client-server Hazelcast model for authentication
   password: ""
+  # To avoid exposing username,password parameters, configure the
+  # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
+  # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
+  external_secret_name: ""
+
+# Stream (externalized Kafka service) settings.
+stream:
+  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
+  enabled: false
+  # Provide externalized Kafka service broker urls.
+  bootstrapServer: ""
+  # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+  securityProtocol: PLAINTEXT
+  # If required, provide trustStore certificate file name
+  # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
+  trustStore: ""
+  # If required provide trustStorePassword value in plain text.
+  trustStorePassword: ""
+  # If required, provide keyStore certificate file name
+  # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support keyStores using the Java Key Store (.jks) format.
+  keyStore: ""
+  # If required, provide keyStore value in plain text.
+  keyStorePassword: ""
+  # If required, provide jaasConfig value in plain text.
+  jaasConfig: ""
+  # If required, provide a SASL mechanism**. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+  saslMechanism: PLAIN
+  # By default, topics originating from Pega Platform have the pega- prefix,
+  # so that it is easy to distinguish them from topics created by other applications.
+  # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
+  streamNamePattern: "pega-{stream.name}"
+  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
+  replicationFactor: "1"
+  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
+  # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+  # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
+  # Enter the external secret name below.
+  external_secret_name: ""

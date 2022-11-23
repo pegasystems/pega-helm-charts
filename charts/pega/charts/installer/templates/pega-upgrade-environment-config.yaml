@@ -37,7 +37,9 @@ data:
   UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
 {{- end }}
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
-  MULTITENANT_SYSTEM: {{ .Values.multitenantSystem | quote}}
+{{- if .Values.multitenant_system }}
+  MT_SYSTEM: {{ .Values.multitenant_system | quote}}
+{{- end }}
   # UDF generation will be skipped if this property is set to true
   BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
   # Z/OS SITE-SPECIFIC PROPERTIES FILE

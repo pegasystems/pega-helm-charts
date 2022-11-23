@@ -65,6 +65,10 @@ spec:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
+{{- if .root.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .root.Values.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
@@ -90,6 +94,11 @@ spec:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
+{{- end }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.volumeMounts }}
+{{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
+{{- end }}
 {{- end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}

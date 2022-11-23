@@ -29,7 +29,7 @@ The Pega zero-downtime upgrade process for Client-managed cloud automates the Pe
 
    ![Migrates the rules structure and content and data structure](media/upgrade-rules-rnew-schema.png "Migrates the rules structure and content and data structure")
 
-4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content; the process discards these tables and data after the upgrade completes.
+4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content.
 
 5. For deployments running in Oracle, grants access to the new rules schema tables to generate the necessary rules objects (GRANT statements) which will link the existing data schema to the new rules schema after you upgrade the new rules schema.
 
@@ -62,6 +62,8 @@ The process to upgrade your deployment with zero-downtime assumes:
 - Your deployment is running Pega Platform 8.4.2 or later.
 
 - You use the Pega-provided Helm charts that support ZDT upgrades (version 1.6.0 and later).
+
+- To update your software to version 8.8 or later, please review the infrastructure requirements to use an externalized Kafka streaming service managed using Pega-provided Helm charts. Before you complete a software update, Pega recommends that you migrate the deployment infrastructure from using embedded stream nodes to one that uses an externalized Kafka configuration. For details, see [Kafka cluster requirements](../charts/pega/KafkaClusterRequirement.md) and [Switch from embedded Stream to externalized Kafka service](../charts/pega/MigrationToExternalStream.md).
 
 ## Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes
 

@@ -1,4 +1,17 @@
 {{- define  "pega.deployment" -}}
+{{- $useStartupProbe := false }}
+{{- $livenessProbe := .node.livenessProbe }}
+{{- $readinessProbe := .node.readinessProbe }}
+{{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
+{{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
+{{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
+{{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
+{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+  {{- $useStartupProbe = true }}
+  {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
+  {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
+{{- end }}
+
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
@@ -9,6 +22,9 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
+{{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.labels }}
+{{ toYaml .root.Values.global.pegaTier.labels | indent 4 }}
+{{- end }}{{- end }}
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
@@ -41,7 +57,7 @@ spec:
 {{- end }}
         config-check: {{ include (print .root.Template.BasePath "/pega-environment-config.yaml") .root | sha256sum }}
         config-tier-check: {{ include "pega.config" (dict "root" .root "dep" .node) | sha256sum }}
-        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-config.yaml") .root | sha256sum }}
+        certificate-check: {{ include (print .root.Template.BasePath "/pega-certificates-secret.yaml") .root | sha256sum }}
 {{- include "generatedPodAnnotations" .root | indent 8 }}
 
     spec:
@@ -60,7 +76,7 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
-{{ if .root.Values.global.certificates }}
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
@@ -94,11 +110,20 @@ spec:
 {{- end }}
 {{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
-        fsGroup: 0
 {{- if .node.securityContext }}
+{{- if .node.securityContext.runAsUser }}
         runAsUser: {{ .node.securityContext.runAsUser }}
 {{- else }}
         runAsUser: 9001
+{{- end }}
+{{- if .node.securityContext.fsGroup }}
+        fsGroup: {{ .node.securityContext.fsGroup }}
+{{- else }}
+        fsGroup: 0
+{{- end }}
+{{- else }}
+        runAsUser: 9001
+        fsGroup: 0
 {{- end }}
 {{- end }}
       containers:
@@ -152,6 +177,10 @@ spec:
         # Tier of the Pega node
         - name: NODE_TIER
           value: {{ .tierName }}
+        - name: RETRY_TIMEOUT
+          value: {{ include "tierClassloaderRetryTimeout" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
+        - name: MAX_RETRIES
+          value: {{ include "tierClassloaderMaxRetries" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
@@ -197,7 +226,7 @@ spec:
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
         #mount custom certificates
-{{ if .root.Values.global.certificates }}
+{{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
         - name: {{ template "pegaVolumeImportCertificates" }}
           mountPath: "/opt/pega/certs"
 {{ end }}
@@ -211,32 +240,31 @@ spec:
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
-{{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+
         # LivenessProbe: indicates whether the container is live, i.e. running.
-        {{- $livenessProbe := .node.livenessProbe }}
         livenessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 0 }}
+          initialDelaySeconds: {{ $livenessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
+          periodSeconds: {{ $livenessProbePeriodSeconds }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
+          failureThreshold: {{ $livenessProbeFailureThreshold }}
         # ReadinessProbe: indicates whether the container is ready to service requests.
-        {{- $readinessProbe := .node.readinessProbe }}
         readinessProbe:
           httpGet:
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
             port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 0 }}
+          initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
         # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
+{{- if ( $useStartupProbe ) }}
         {{- $startupProbe := .node.startupProbe }}
         startupProbe:
           httpGet:
@@ -248,32 +276,8 @@ spec:
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
           failureThreshold: {{ $startupProbe.failureThreshold | default 30 }}
-{{- else }}
-        # LivenessProbe: indicates whether the container is live, i.e. running.
-        {{- $livenessProbe := .node.livenessProbe }}
-        livenessProbe:
-          httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: {{ $livenessProbe.port | default 8080 }}
-            scheme: HTTP
-          initialDelaySeconds: {{ $livenessProbe.initialDelaySeconds | default 200 }}
-          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default 20 }}
-          periodSeconds: {{ $livenessProbe.periodSeconds | default 30 }}
-          successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $livenessProbe.failureThreshold | default 3 }}
-        # ReadinessProbe: indicates whether the container is ready to service requests.
-        {{- $readinessProbe := .node.readinessProbe }}
-        readinessProbe:
-          httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: {{ $readinessProbe.port | default 8080 }}
-            scheme: HTTP
-          initialDelaySeconds: {{ $readinessProbe.initialDelaySeconds | default 30 }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
-          successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
 {{- end }}
+
 {{- if .custom }}
 {{- if .custom.sidecarContainers }}
       # Additional custom sidecar containers
@@ -299,6 +303,9 @@ spec:
       resources:
         requests:
           storage: {{ .node.volumeClaimTemplate.resources.requests.storage }}
+{{- if ( .root.Values.global.storageClassName ) }}
+      storageClassName: {{ .root.Values.global.storageClassName }}
+{{ end }}
   serviceName: {{ .name }}
 {{- end }}
 ---

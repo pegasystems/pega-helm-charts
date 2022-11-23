@@ -4,20 +4,28 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
-{{- define "pegaImportCertificatesConfig" }}
+{{- define "pegaImportCertificatesSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-import-certificates-config
+{{- $depName -}}-import-certificates-secret
 {{- end }}
 
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
 
 {{- define "pegaImportCertificatesTemplate" }}
 - name: {{ template "pegaVolumeImportCertificates" }}
-  configMap:
-    # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaImportCertificatesConfig" $ }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (.Values.global.certificatesSecrets) }}
+  {{- range .Values.global.certificatesSecrets }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaImportCertificatesSecret" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaCustomArtifactoryCertificateConfig" }}
@@ -351,9 +359,25 @@ true
     sources:
     - secret:
         name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
+  {{ if ((.Values.global.jdbc).external_secret_name) }}
     - secret:
         name: {{ .Values.global.jdbc.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.hazelcast).external_secret_name)}}
+    - secret:
+        name: {{ .Values.hazelcast.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
+    - secret:
+        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.dds).external_secret_name)}}
+    - secret:
+        name: {{ .Values.dds.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.stream).external_secret_name)}}
+    - secret:
+        name: {{ .Values.stream.external_secret_name }}
   {{- end }}
 {{- end}}
 
@@ -437,3 +461,19 @@ serviceName: ssl-redirect
 servicePort: use-annotation
 {{- end }}
 {{- end }}
+
+{{- define "tierClassloaderRetryTimeout" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+180
+{{- else -}}
+{{- add .periodSeconds 0}}
+{{- end -}}
+{{- end -}}
+
+{{- define "tierClassloaderMaxRetries" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+{{- add (round (div (mul .periodSeconds .failureThreshold) 180) 0) 1 -}}
+{{- else -}}
+{{- add .failureThreshold 1 -}}
+{{- end -}}
+{{- end -}}

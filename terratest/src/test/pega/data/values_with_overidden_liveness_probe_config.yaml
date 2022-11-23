@@ -1,23 +1,25 @@
 ---
 global:
-  # This values.yaml file is an example of a minimal Pega
-  # deployment configuration.  For more information about
-  # configuration options, see the project readme.
+  # This values.yaml file is an example.  For more information about
+  # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
-  provider: "k8s"
+  provider: "YOUR_KUBERNETES_PROVIDER"
+
+  deployment:
+    # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+    name: "pega"
 
   # Deploy Pega nodes
   actions:
     execute: "deploy"
+
   # Add custom certificates to be mounted to container
   # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
   # to support multiple custom certificates as external secrets, specify each of your external secrets
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
   certificates:
-  # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
-  storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
@@ -44,7 +46,7 @@ global:
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
-    # configure JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
@@ -62,11 +64,11 @@ global:
     authentication:
       # Provide the basic authentication credentials or the API key authentication details to satisfy your custom artifactory authentication mechanism.
       basic:
-        username: ""
-        password: ""
+        username: "YOUR_ARTIFACTORY_USERNAME"
+        password: "YOUR_ARTIFACTORY_PASSWORD"
       apiKey:
-        headerName: ""
-        value: ""
+        headerName: "YOUR_ARTIFACTORY_DEDICATED_APIKEY_HEADER"
+        value: "YOUR_ARTIFACTORY_API_KEY"
       # To avoid exposing basic.username,basic.password,apiKey.headerName,apiKey.value parameters, configure the
       # basic.username,basic.password,apiKey.headerName,apiKey.value parameters in External Secrets Manager, and enter the external secret for the credentials
       # make sure the keys in the secret should be CUSTOM_ARTIFACTORY_USERNAME , CUSTOM_ARTIFACTORY_PASSWORD , CUSTOM_ARTIFACTORY_APIKEY_HEADER , CUSTOM_ARTIFACTORY_APIKEY
@@ -94,20 +96,36 @@ global:
     k8s_wait_for:
       image: dcasavant/k8s-wait-for
       imagePullPolicy: "IfNotPresent"
+      # waitTimeSeconds: 2
+
+  # Upgrade specific properties
+  upgrade:
+    # Configure only for aks/pks
+    # Run "kubectl cluster-info" command to get the service host and https service port of kubernetes api server.
+    # Example - Kubernetes master is running at https://<service_host>:<https_service_port>
+    kube-apiserver:
+      serviceHost: "API_SERVICE_ADDRESS"
+      httpsServicePort: "SERVICE_PORT_HTTPS"
 
   # Specify the Pega tiers to deploy
-  # For a minimal deployment, use a single tier to reduce resource consumption.
-  # Note: The nodeType Stream is deprecated, please remove it and enable externalized Kafka service
-  # configuration under External Services
   tier:
-    - name: "minikube"
-      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+    - name: "web"
+      # Create a an interactive tier for web users.  This tier uses
+      # the WebUser node type and will be exposed via a service to
+      # the load balancer.
+      nodeType: "WebUser"
+
+      # Pega requestor specific properties
+      requestor:
+        # Inactivity time after which requestor is passivated
+        passivationTimeSec: 900
+
 
       service:
+        # For help configuring the service block, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         port: 80
         targetPort: 8080
-        # Without a load balancer, use a direct NodePort instead.
-        serviceType: "NodePort"
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
@@ -134,44 +152,179 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        # For help configuring the ingress block including TLS, see the Helm chart documentation
+        # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
+
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
-        domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+        domain: "YOUR_WEB_NODE_DOMAIN"
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
-      # Set resource consumption to minimal levels
       replicas: 1
-      cpuRequest: 200m
-      memRequest: "6Gi"
-      cpuLimit: 2
-      memLimit: "6Gi"
       javaOpts: ""
-      initialHeap: "4096m"
-      maxHeap: "4096m"
       pegaDiagnosticUser: ""
       pegaDiagnosticPassword: ""
+
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
+
+      # Optionally overridde default resource specifications
+      # cpuRequest: 2
+      # memRequest: "12Gi"
+      # cpuLimit: 4
+      # memLimit: "12Gi"
+      # initialHeap: "4096m"
+      # maxHeap: "8192m"
+
+      # To configure an alternative user for custom image, set value for runAsUser.
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
+      hpa:
+        enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
+    - name: "batch"
+      # Create a background tier for batch processing.  This tier uses
+      # a collection of background node types and will not be exposed to
+      # the load balancer.
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+
+      replicas: 1
+      javaOpts: ""
+
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+
+      livenessProbe:
+        port: 8081
+        failureThreshold: 5
+        periodSeconds: 100
+
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
+      hpa:
+        enabled: true
+
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
+    - name: "stream"
+      # Create a stream tier for queue processing.  This tier deploys
+      # as a stateful set to ensure durability of queued data. It may
+      # be optionally exposed to the load balancer.
+      nodeType: "Stream"
+
+      # Pega requestor specific properties
+      requestor:
+        # Inactivity time after which requestor is passivated
+        passivationTimeSec: 900
+
+      service:
+        port: 7003
+        targetPort: 7003
+
+      # If a nodeSelector is required for this or any tier, it may be specified here:
+      # nodeSelector:
+      #  disktype: ssd
+
+      ingress:
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_STREAM_NODE_DOMAIN"
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
+
+      livenessProbe:
+        port: 8081
+        failureThreshold: "7"
+        periodSeconds: "300"
+
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+
+      replicas: 2
+
       volumeClaimTemplate:
         resources:
           requests:
             storage: 5Gi
 
+      # Set enabled to true to include a Pod Disruption Budget for this tier.
+      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
+      # value and comment out the other parameter.
+      pdb:
+        enabled: false
+        minAvailable: 1
+        # maxUnavailable: "50%"
+
 # External services
 
 # Cassandra automatic deployment settings.
-# Disabled by default for minimal deployments.
 cassandra:
-  enabled: false
+  enabled: true
+  persistence:
+    enabled: true
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: 2
+    limits:
+      memory: "8Gi"
+      cpu: 4
 
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
 dds:
-  # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
-  # TCP Port to connect to cassandra.
   port: "9042"
-  # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
-  # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
+  clientEncryption: false
+  trustStore: ""
+  trustStorePassword: ""
+  keyStore: ""
+  keyStorePassword: ""
   # To avoid exposing username,password,trustStorePassword,keyStorePassword parameters, configure the
   # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be CASSANDRA_USERNAME, CASSANDRA_PASSWORD , CASSANDRA_TRUSTSTORE_PASSWORD , CASSANDRA_KEYSTORE_PASSWORD
@@ -184,11 +337,25 @@ dds:
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
+  replicas: 1
 
-# Pega Installer settings
+# Pega Installer settings.
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
+  # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
+  # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
+  # Upgrade specific properties
+  upgrade:
+    # Type of upgrade
+    # Valid upgradeType values are 'in-place' , 'zero-downtime' , 'custom' , 'out-of-place-rules' , 'out-of-place-data' .
+    upgradeType: "in-place"
+    # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
+    targetRulesSchema: ""
+    # Specify a name for a target data schema that the upgrade process creates for patches and upgrades.
+    # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
+    # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
+    targetDataSchema: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
@@ -205,42 +372,4 @@ hazelcast:
   # To avoid exposing username,password parameters, configure the
   # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
-  external_secret_name: ""
-
-# Stream (externalized Kafka service) settings.
-stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
-  # Provide externalized Kafka service broker urls.
-  bootstrapServer: ""
-  # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
-  securityProtocol: PLAINTEXT
-  # If required, provide trustStore certificate file name
-  # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
-  # in the global.certificatesSecrets parameter.
-  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
-  trustStore: ""
-  # If required provide trustStorePassword value in plain text.
-  trustStorePassword: ""
-  # If required, provide keyStore certificate file name
-  # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
-  # in the global.certificatesSecrets parameter.
-  # Pega deployments only support keyStores using the Java Key Store (.jks) format.
-  keyStore: ""
-  # If required, provide keyStore value in plain text.
-  keyStorePassword: ""
-  # If required, provide jaasConfig value in plain text.
-  jaasConfig: ""
-  # If required, provide a SASL mechanism**. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
-  saslMechanism: PLAIN
-  # By default, topics originating from Pega Platform have the pega- prefix,
-  # so that it is easy to distinguish them from topics created by other applications.
-  # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
-  streamNamePattern: "pega-{stream.name}"
-  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
-  replicationFactor: "1"
-  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
-  # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
-  # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
-  # Enter the external secret name below.
   external_secret_name: ""
