@@ -3,7 +3,7 @@
 {{- if ($dep.ingress) }}
 {{- if ($dep.ingress.tls) }}
 {{- if ($dep.ingress.tls.useManagedCertificate) }}
-{{ template "gkemanagedcertificate" dict "name" (printf "managed-certificate-%s" $dep.name) "domain" $dep.ingress.domain }}
+{{ template "gkemanagedcertificate" dict "root" $ "name" (printf "managed-certificate-%s" $dep.name) "domain" $dep.ingress.domain }}
 {{- end -}}
 {{- end -}}
 {{- end -}}
