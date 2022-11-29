@@ -46,7 +46,7 @@ Principal |Resource Type  | Resource Name     | Operation | Permission Type | Pa
 ---         |---         | ---     | ---    | ---        | ---
 User:\<user-name\> | TOPIC       | \<Prefix\> as in 'stream.streamNamePattern' | ALL    | ALLOW      | PREFIXED
 User:\<user-name\> |TRANSACTIONAL_ID  | * | READ/WRITE   | ALLOW      | LITERAL
-User:\<user-name\> |GROUP  | * | ALL   | ALLOW      | LITERAL
+User:\<user-name\> |GROUP  | \<Prefix\> as in 'stream.streamNamePattern' | ALL   | ALLOW      | PREFIXED
 User:\<user-name\> |CLUSTER  | \<Cluster-Name\> | IDEMPOTENT_WRITE   |ALLOW      | LITERAL
 
 
