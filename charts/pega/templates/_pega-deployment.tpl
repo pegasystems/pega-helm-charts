@@ -163,6 +163,38 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
+{{- if .node.dds.keyspacesPrefix }}
+        - name: CASSANDRA_KEYSPACES_PREFIX
+          value: {{ .node.dds.keyspacesPrefix }}
+{{- end }}
+{{- if .node.dds.extendedTokenAwarePolicy }}
+        - name: CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY
+          value: "{{ .node.dds.extendedTokenAwarePolicy }}"
+{{- end }}
+{{- if .node.dds.latencyAwarePolicy }}
+        - name: CASSANDRA_LATENCY_AWARE_POLICY
+          value: "{{ .node.dds.latencyAwarePolicy }}"
+{{- end }}
+{{- if .node.dds.customRetryPolicy }}
+        - name: CASSANDRA_CUSTOM_RETRY_POLICY
+          value: "{{ .node.dds.customRetryPolicy }}"
+{{- end }}
+{{- if .node.dds.speculativeExecutionPolicy }}
+        - name: CASSANDRA_SPECULATIVE_EXECUTION_POLICY
+          value: "{{ .node.dds.speculativeExecutionPolicy }}"
+{{- end }}
+{{- if .node.dds.jmxMetricsEnabled }}
+        - name: CASSANDRA_JMX_METRICS_ENABLED
+          value: "{{ .node.dds.jmxMetricsEnabled }}"
+{{- end }}
+{{- if .node.dds.csvMetricsEnabled }}
+        - name: CASSANDRA_CSV_METRICS_ENABLED
+          value: "{{ .node.dds.csvMetricsEnabled }}"
+{{- end }}
+{{- if .node.dds.logMetricsEnabled }}
+        - name: CASSANDRA_LOG_METRICS_ENABLED
+          value: "{{ .node.dds.logMetricsEnabled }}"
+{{- end }}
 {{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
           value: "Pega-UIEngine/cosmosservicesURI=/c11n"
