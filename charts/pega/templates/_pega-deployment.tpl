@@ -163,10 +163,6 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
-{{- if .node.dds.keyspacesPrefix }}
-        - name: CASSANDRA_KEYSPACES_PREFIX
-          value: {{ .node.dds.keyspacesPrefix }}
-{{- end }}
 {{- if .node.dds.extendedTokenAwarePolicy }}
         - name: CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY
           value: "{{ .node.dds.extendedTokenAwarePolicy }}"
