@@ -176,18 +176,20 @@ Pega Platform deployments support commercial and GovCloud regions. Specify a nam
 `eksctl create cluster -f ./my-EKS-cluster-spec.yaml`
 
  It takes 10 to 15 minutes for the cluster provisioning to complete. During deployment this command copies the required Kubernetes configuration file to the cluster and into your default ~/.kube directory.
- 
- 3. After provisioning is complete, verify that the worker nodes joined the cluster and are in Ready state, by entering:
+
+3. From EKS 1.23 and above install the Amazon EBS CSI driver in your cluster.For instructions on how to install the Amazon EBS CSI driver on your cluster, see [Amazon EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
+
+4. After provisioning is complete, verify that the worker nodes joined the cluster and are in Ready state, by entering:
 
 `kubectl get nodes`
 
 With your cluster created and running as expected, you must create a database resource for your Pega Platform installation. If you have to delete your cluster for some reason before you have namespaces deployed in it, use the command, `eksctl delete cluster --name <cluster-name>'.
 
-4. To deploy the Kubernetes dashboard and see your EKS cluster, enter:
+5. To deploy the Kubernetes dashboard and see your EKS cluster, enter:
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
 
-5. Create a Service Account and Cluster Role Binding, each named `eks-admin` to securely connect to the dashboard with administrator-level permissions, since by default, the Kubernetes dashboard limits permissions.
+6. Create a Service Account and Cluster Role Binding, each named `eks-admin` to securely connect to the dashboard with administrator-level permissions, since by default, the Kubernetes dashboard limits permissions.
 
 For client convenience, Pega suggests saving the following text, to define the service account and cluster role binding for your deployment, to a file named similar to `eks-admin-service-account.yaml` in your EKS-demo folder.
 
@@ -212,30 +214,30 @@ subjects:
  namespace: kube-system
 ```
 
-6. Apply the service account and cluster role binding to your cluster.
+7. Apply the service account and cluster role binding to your cluster.
 
 ```yaml
 $ kubectl apply -f eks-admin-service-account.yaml
 service account/eks-admin created
 ```
 
-7. To generate an authentication token for the eks-admin service account required to connect to the dashboard of your administrative service account, enter:
+8. To generate an authentication token for the eks-admin service account required to connect to the dashboard of your administrative service account, enter:
 
 `kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')`
 
-8. Copy the <authentication_token> value to connect to the Kubernetes dashboard.
+9. Copy the <authentication_token> value to connect to the Kubernetes dashboard.
 
-9. To start the proxy server for the Kubernetes dashboard, enter:
+10. To start the proxy server for the Kubernetes dashboard, enter:
 
     `$ kubectl proxy`
 
-10. To access the Dashboard UI, open a web browser and navigate to the following URL:
+11. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
     `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
-11. In the **Kubernetes Dashboard** sign in window, choose to use a cluster Kubeconfig token: select **Token** and paste the <authentication_token> value that you just generated into the **Enter token** area.
+12. In the **Kubernetes Dashboard** sign in window, choose to use a cluster Kubeconfig token: select **Token** and paste the <authentication_token> value that you just generated into the **Enter token** area.
 
-12. Click **SIGN IN**.
+13. Click **SIGN IN**.
 
     You can now view your EKS cluster details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment. Without a deployment, only EKS resources display. The dashboard does not display your EKS cluster name or your resource name, which is expected behavior.
 
