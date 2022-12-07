@@ -1,0 +1,127 @@
+{{ if and (and (eq (include "performDeployment" .) "true") (eq (include "isMigrationInit" .) "true"))
+   (and (eq (include "isHazelcastEnabled" .) "true") (eq (include "isClusteringServiceEnabled" .) "true")) }}
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ template "clusteringServiceName" . }}-migration-job
+  namespace: {{ .Release.Namespace }}
+spec:
+  template:
+    metadata:
+      name: {{ template "clusteringServiceName" . }}-migration-job
+    spec:
+      serviceAccountName: {{ template "clusteringServiceName" . }}-migration-sa
+      containers:
+        - name: migration-job
+          image: bitnami/kubectl:latest
+          command:
+            - bin/bash
+            - -c
+            - |
+              kubectl -n myproject exec pega-minikube-0 -- curl -XPOST -H "Content-type: application/json" -d '{
+                "content": {
+                	"SERVER_HOSTNAME": "{{ template "clusteringServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local",
+                	"HZ_USERNAME": "{{ .Values.username }}",
+                	"HZ_PASSWORD": "{{ .Values.password }}",
+                	"CLUSTER_NAME": "{{ .Values.server.clustering_service_group_name }}",
+                	"CLIENT_MODE_ENABLED": "true",
+                	"ENCRYPTION_ENABLED": "false",
+                	"HZONK8S": "true"
+                }
+                       }' 'http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/client-server/configurations'
+              echo "DSS added successfully..."
+              mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              echo "Migration Status :: '$mig_status'"
+
+              # Init Step
+              echo "Status Before Init :: '$mig_status'"
+              if  [ $mig_status == 'NOT_STARTED' ] || [ $mig_status == 'INITIALIZATION_FAILED' ] ; then
+                 echo "Initializing v5 client..."
+                 actions=$(kubectl -n myproject exec pega-minikube-0 -- curl -X POST http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/cluster/latest/startup)
+                 sleep 10
+                 mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              fi
+
+              while  [  $mig_status == 'INITIALIZATION_IN_PROGRESS' ]
+              do
+                 sleep 30
+              	  mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              done
+
+              if  [ $mig_status == 'INITIALIZATION_FAILED' ] ; then
+                 echo "V5 initialization failed..."
+                 exit
+              fi
+
+              # Migration Step
+              echo "Status Before Migration Start :: '$mig_status'"
+              if  [  $mig_status == 'INITIALIZATION_COMPLETED' ] || [  $mig_status == 'MIGRATION_FAILED' ] ; then
+                 actions=$(kubectl -n myproject exec pega-minikube-0 -- curl -X POST http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/migration/initiate)
+                 sleep 10
+                 mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              fi
+
+              while  [  $mig_status == 'MIGRATION_IN_PROGRESS' ]
+              do
+                 sleep 10
+                 mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              done
+
+              if [ $mig_status == 'MIGRATION_FAILED' ] ; then
+                 echo "Migration failed..."
+                 exit
+              fi
+
+              # Shutdown Step
+              echo "Status Before v4 shutdown :: '$mig_status'"
+              if  [  $mig_status == 'MIGRATION_COMPLETED' ] || [  $mig_status == 'SHUTDOWN_FAILED' ] ; then
+                 actions=$(kubectl -n myproject exec pega-minikube-0 -- curl -X POST http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/cluster/old/shutdown)
+                 sleep 10
+                 mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              fi
+
+              while  [  $mig_status == 'SHUTDOWN_IN_PROGRESS' ]
+              do
+                 sleep 30
+                 mig_status="$(kubectl -n myproject exec pega-minikube-0 -- curl http://localhost:8080/prweb/api/CloudRemoteAPI/v1/pzcluster/hazelcast-v5-upgrade/status)"
+              done
+
+              echo "Status :: '$mig_status'"
+      restartPolicy: Never
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ template "clusteringServiceName" . }}-migration-sa
+  namespace: {{ .Release.Namespace }}
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ template "clusteringServiceName" . }}-migration-role
+  namespace: {{ .Release.Namespace }}
+rules:
+- apiGroups: [""]
+  resources: ["pods", "pods/log"]
+  verbs: ["get", "list"]
+- apiGroups: [""]
+  resources: ["pods/exec"]
+  verbs: ["create"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ template "clusteringServiceName" . }}-migration-role-binding
+  namespace: {{ .Release.Namespace }}
+subjects:
+  - kind: ServiceAccount
+    name: {{ template "clusteringServiceName" . }}-migration-sa
+roleRef:
+  kind: Role
+  name: {{ template "clusteringServiceName" . }}-migration-role
+  apiGroup: rbac.authorization.k8s.io
+{{ end }}
