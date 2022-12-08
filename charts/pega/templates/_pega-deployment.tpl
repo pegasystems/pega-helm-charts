@@ -164,31 +164,31 @@ spec:
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
 {{- if .node.dds }}
-{{- if .node.dds.extendedTokenAwarePolicy }}
+{{- if ne .node.dds.extendedTokenAwarePolicy nil }}
         - name: CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY
           value: "{{ .node.dds.extendedTokenAwarePolicy }}"
 {{- end }}
-{{- if .node.dds.latencyAwarePolicy }}
+{{- if ne .node.dds.latencyAwarePolicy nil }}
         - name: CASSANDRA_LATENCY_AWARE_POLICY
           value: "{{ .node.dds.latencyAwarePolicy }}"
 {{- end }}
-{{- if .node.dds.customRetryPolicy }}
+{{- if ne .node.dds.customRetryPolicy nil }}
         - name: CASSANDRA_CUSTOM_RETRY_POLICY
           value: "{{ .node.dds.customRetryPolicy }}"
 {{- end }}
-{{- if .node.dds.speculativeExecutionPolicy }}
+{{- if ne .node.dds.speculativeExecutionPolicy nil }}
         - name: CASSANDRA_SPECULATIVE_EXECUTION_POLICY
           value: "{{ .node.dds.speculativeExecutionPolicy }}"
 {{- end }}
-{{- if .node.dds.jmxMetricsEnabled }}
+{{- if ne .node.dds.jmxMetricsEnabled nil }}
         - name: CASSANDRA_JMX_METRICS_ENABLED
           value: "{{ .node.dds.jmxMetricsEnabled }}"
 {{- end }}
-{{- if .node.dds.csvMetricsEnabled }}
+{{- if ne .node.dds.csvMetricsEnabled nil }}
         - name: CASSANDRA_CSV_METRICS_ENABLED
           value: "{{ .node.dds.csvMetricsEnabled }}"
 {{- end }}
-{{- if .node.dds.logMetricsEnabled }}
+{{- if ne .node.dds.logMetricsEnabled nil }}
         - name: CASSANDRA_LOG_METRICS_ENABLED
           value: "{{ .node.dds.logMetricsEnabled }}"
 {{- end }}
