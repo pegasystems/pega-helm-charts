@@ -163,6 +163,7 @@ spec:
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
 {{- end }}
+{{- if .node.dds }}
 {{- if .node.dds.extendedTokenAwarePolicy }}
         - name: CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY
           value: "{{ .node.dds.extendedTokenAwarePolicy }}"
@@ -190,6 +191,7 @@ spec:
 {{- if .node.dds.logMetricsEnabled }}
         - name: CASSANDRA_LOG_METRICS_ENABLED
           value: "{{ .node.dds.logMetricsEnabled }}"
+{{- end }}
 {{- end }}
 {{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
