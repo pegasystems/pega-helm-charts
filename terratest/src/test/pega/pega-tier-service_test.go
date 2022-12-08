@@ -67,10 +67,10 @@ func VerifyPegaServices(t *testing.T, yamlContent string, options *helm.Options)
 func VerifyPegaService(t *testing.T, serviceObj *k8score.Service, expectedService pegaServices, options *helm.Options) {
 	provider := options.SetValues["global.provider"]
 	if provider == "k8s" {
-		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/affinity"], "true")
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/service.sticky.cookie"], "true")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/load-balancer-method"], "drr")
 		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/max-conn-amount"], "10")
-		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/session-cookie-name"], "UNIQUE-PEGA-COOKIE-NAME")
+		require.Equal(t, serviceObj.Annotations["traefik.ingress.kubernetes.io/service.sticky.cookie.name"], "UNIQUE-PEGA-COOKIE-NAME")
 		require.Equal(t, serviceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
 	} else if provider == "gke" {
 		require.Equal(t, `{"ingress": true}`, serviceObj.Annotations["cloud.google.com/neg"])
