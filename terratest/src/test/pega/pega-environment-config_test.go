@@ -38,6 +38,65 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 	}
 }
 
+
+func TestPegaEnvironmentConfigJDBCTimeouts(t * testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    var options = &helm.Options{
+        SetValues: map[string]string{
+            "global.provider":               "k8s",
+            "global.actions.execute":        "deploy",
+        },
+    }
+
+    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES")
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+
+    options.SetValues["global.jdbc.connectionTimeoutProperties"] = "socketTimeout=90;"
+    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+
+    options.SetValues["global.jdbc.writerConnectionTimeoutProperties"] = "socketTimeout=120;"
+    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
+    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+
+    options.SetValues["global.jdbc.readerConnectionTimeoutProperties"] = "socketTimeout=150;"
+    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
+}
+
+func VerifyEnvNotPresent(t *testing.T, yamlContent string, entry string) {
+    var envConfigMap k8score.ConfigMap
+    UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+    envConfigData := envConfigMap.Data
+
+    _, previouslySet := envConfigData[entry]
+    require.Equal(t, false, previouslySet)
+}
+
+func VerifyEnvValue(t *testing.T, yamlContent string, entry string, value string) {
+    var envConfigMap k8score.ConfigMap
+    UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+    envConfigData := envConfigMap.Data
+
+    val, previouslySet := envConfigData[entry]
+    require.Equal(t, true, previouslySet)
+    require.Equal(t, value, val)
+}
+
 func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
 
 	var envConfigMap k8score.ConfigMap
