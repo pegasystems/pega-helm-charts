@@ -694,10 +694,17 @@ cassandra:
 dds:
   externalNodes: "CASSANDRA_NODE_IPS"
   port: "9042"
-  username: "cassandra_username"
-  password: "cassandra_password"
-  external_secret_name: ""
+  username: ""
+  password: ""
+  keyspacesPrefix: "dev01"
+  trustStore: "/opt/pega/certs/cass-truststore.jks"
+  keyStore: "/opt/pega/certs/cass-keystore.jks"
   extendedTokenAwarePolicy: true
+  customRetryPolicy: true
+  csvMetricsEnabled: false
+  logMetricsEnabled: false
+  # The external secret below contains passwords with the following keys: CASSANDRA_USERNAME, CASSANDRA_PASSWORD, CASSANDRA_TRUSTSTORE_PASSWORD, CASSANDRA_KEYSTORE_PASSWORD
+  external_secret_name: "dev02-credentials-secret"
 ```
 In addition to being configured at the cluster level, the parameters above that are marked with an asterisk may be specified at the tier level. The following example shows how to configure the Dataflow tier to use the latency aware load balancing policy.
 
