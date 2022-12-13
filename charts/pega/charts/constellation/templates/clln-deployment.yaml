@@ -18,7 +18,13 @@ spec:
         app: constellation
     spec:
       imagePullSecrets:
+{{- if .Values.global.docker.image_pull_secret_names }}
+{{- range .Values.global.docker.image_pull_secret_names }}
+      - name: {{ . }}
+{{- end }}
+{{- else }}
       - name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
       containers:
       - name: constellation
         imagePullPolicy: {{ .Values.imagePullPolicy }}

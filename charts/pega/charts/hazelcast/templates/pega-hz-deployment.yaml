@@ -67,5 +67,11 @@ spec:
       # Volume used to mount secret files.
       {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
+{{- if (.Values.global.docker.image_pull_secret_names) }}
+{{- range .Values.global.docker.image_pull_secret_names }}
+      - name: {{ . }}
+{{- end }}
+{{- else }}
       - name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
 {{ end }}
