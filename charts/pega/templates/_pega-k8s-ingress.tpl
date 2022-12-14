@@ -32,7 +32,10 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: ImplementationSpecific
+      - pathType: {{ include "hostPathType" . }}
+        {{- if .node.ingress.path }}
+        path: {{ .node.ingress.path }}
+        {{- end }}
         backend:
 {{ include "ingressBackend" . }}
 
