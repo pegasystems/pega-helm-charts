@@ -153,7 +153,7 @@ Specify the location for the Pega Docker image.  This image is available on Dock
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
-To avoid specifying the docker registry credentials in values.yaml, create secrets for docker registry credentials. Specify secret names as a list of comma-separated strings using `docker.image_pull_secret_names` parameter.
+To avoid specifying the docker registry credentials in values.yaml, create secrets for docker registry credentials. Refer to [Kubernetes secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create docker registry secrets. Specify secret names as a list of comma-separated strings using `docker.imagePullSecretNames` parameter. Kubernetes checks each registry secret of image pull secrets to pull an image from repository, If the specified image is available in one of the provided secrets, kubernetes pull it from that repository. To create docker registry secrets from external secrets, refer [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).
 
 When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `pegasystems/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
 
@@ -167,7 +167,7 @@ docker:
     url: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-  image_pull_secret_names: []
+  imagePullSecretNames: []
   pega:
     image: "pegasystems/pega:8.4.4"
     imagePullPolicy: "Always"
@@ -212,7 +212,7 @@ app1-dev-stream-1                 1/1     Running   0          18m
 app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
 app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
 ```
-The default value is "pega" if it is unset.
+The default value is "p[eg](| docker.imagePullSecretNames | Specify the docker registry secrets to pull an image from private repo. Refer to [Kubernetes Secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create docker registry secrets. |)a" if it is unset.
 
 ## Tiers of a Pega deployment
 
