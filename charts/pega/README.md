@@ -212,7 +212,7 @@ app1-dev-stream-1                 1/1     Running   0          18m
 app1-dev-web-788cfb8cc4-6c5nz     1/1     Running   0          8m57s
 app1-dev-web-788cfb8cc4-gcltx     1/1     Running   0          24m
 ```
-The default value is "p[eg](| docker.imagePullSecretNames | Specify the docker registry secrets to pull an image from private repo. Refer to [Kubernetes Secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create docker registry secrets. |)a" if it is unset.
+The default value is "pega" if it is unset.
 
 ## Tiers of a Pega deployment
 
