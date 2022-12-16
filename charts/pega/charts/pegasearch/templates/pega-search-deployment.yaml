@@ -107,13 +107,7 @@ spec:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
       imagePullSecrets:
-{{- if (.Values.global.docker.image_pull_secret_names) }}
-{{- range .Values.global.docker.image_pull_secret_names }}
-      - name: {{ . }}
-{{- end }}
-{{- else }}
-      - name: {{ template "pegaRegistrySecret" $}}
-{{- end }}
+{{- include "pegaImagePullRegistrySecrets" . | indent 6 }}
   volumeClaimTemplates:
   - metadata:
       name: esstorage

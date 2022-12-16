@@ -481,3 +481,12 @@ servicePort: use-annotation
 {{- add .failureThreshold 1 -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "pegaImagePullRegistrySecrets" }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{ if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}

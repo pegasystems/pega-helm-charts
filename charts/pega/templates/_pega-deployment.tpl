@@ -291,13 +291,7 @@ spec:
       # Secret which is used to pull the image from the repository.  This secret contains docker login details for the particular user.
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
-{{- if (.root.Values.global.docker.image_pull_secret_names) }}
-{{- range .root.Values.global.docker.image_pull_secret_names }}
-      - name: {{ . }}
-{{- end }}
-{{- else }}
-      - name: {{ template "pegaRegistrySecret" .root }}
-{{- end }}
+{{- include "pegaImagePullRegistrySecrets" .root | indent 6 }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:

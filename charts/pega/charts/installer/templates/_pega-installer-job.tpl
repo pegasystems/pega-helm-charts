@@ -124,12 +124,6 @@ spec:
 {{- end }}                
       restartPolicy: Never
       imagePullSecrets:
-{{- if (.root.Values.global.docker.image_pull_secret_names) }}
-{{- range .root.Values.global.docker.image_pull_secret_names }}
-      - name: {{ . }}
-{{- end }}
-{{- else }}
-      - name: {{ template "pegaRegistrySecret" .root }}
-{{- end }}
+{{- include "pegaImagePullRegistrySecrets" .root | indent 6 }}
 ---
 {{- end -}}
