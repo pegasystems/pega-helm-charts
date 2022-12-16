@@ -46,9 +46,9 @@ func TestPegaDeploymentWithImagePullSecrets(t *testing.T) {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"global.docker.image_pull_secret_names": "{\"secret1\",\"secret2\"}",
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"global.docker.imagePullSecretNames": "{\"secret1\",\"secret2\"}",
 				},
 			}
 			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
@@ -97,10 +97,10 @@ func TestHazelcastDeploymentWithImagePullSecrets(t *testing.T) {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"hazelcast.enabled":                     "true",
-					"global.docker.image_pull_secret_names": "{\"secret1\",\"secret2\"}",
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"hazelcast.enabled":                  "true",
+					"global.docker.imagePullSecretNames": "{\"secret1\",\"secret2\"}",
 				},
 			}
 
@@ -156,10 +156,10 @@ func TestPegaSearchDeploymentWithImagePullSecrets(t *testing.T) {
 
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.deployment.name":                depName,
-						"global.provider":                       vendor,
-						"global.actions.execute":                operation,
-						"global.docker.image_pull_secret_names": "{\"secret1\",\"secret2\"}",
+						"global.deployment.name":             depName,
+						"global.provider":                    vendor,
+						"global.actions.execute":             operation,
+						"global.docker.imagePullSecretNames": "{\"secret1\",\"secret2\"}",
 					},
 				}
 
@@ -205,10 +205,10 @@ func TestConstellationDeploymentWithImagePullSecrets(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"constellation.enabled":                 "true",
-					"global.docker.image_pull_secret_names": "{\"secret1\",\"secret2\"}",
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"constellation.enabled":              "true",
+					"global.docker.imagePullSecretNames": "{\"secret1\",\"secret2\"}",
 				},
 			}
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/constellation/templates/clln-deployment.yaml"})
@@ -227,7 +227,8 @@ func assertWithImagePullSecrets(t *testing.T, webYaml string) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
 	imagePullSecrets := deploymentObj.Spec.Template.Spec.ImagePullSecrets
-	require.Equal(t, imagePullSecrets[0].Name, "secret1")
-	require.Equal(t, imagePullSecrets[1].Name, "secret2")
-	require.Equal(t, len(imagePullSecrets), 2)
+	require.Equal(t, imagePullSecrets[0].Name, "pega-registry-secret")
+	require.Equal(t, imagePullSecrets[1].Name, "secret1")
+	require.Equal(t, imagePullSecrets[2].Name, "secret2")
+	require.Equal(t, len(imagePullSecrets), 3)
 }
