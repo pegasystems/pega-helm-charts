@@ -19,7 +19,7 @@ spec:
             - bin/bash
             - -c
             - |
-              podname="$(kubectl get pod -l app=pega-web -n {{ .Release.Namespace }} -o json | jq '.items[0].metadata.name')"
+              podname="$(kubectl get pod -l app=pega-web -n {{ .Release.Namespace }} -o json | jq -r '.items[0].metadata.name')"
               kubectl -n {{ .Release.Namespace }} exec $podname -- curl -XPOST -H "Content-type: application/json" -d '{
                 "content": {
                 	"SERVER_HOSTNAME": "{{ template "clusteringServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local",

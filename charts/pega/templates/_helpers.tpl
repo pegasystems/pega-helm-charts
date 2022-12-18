@@ -477,3 +477,19 @@ servicePort: use-annotation
 {{- add .failureThreshold 1 -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "serviceName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration) -}}
+{{ template "hazelcastName" }}
+{{- else -}}
+{{ template "clusteringServiceName" }}
+{{- end -}}
+{{- end -}}
+
+{{- define "hzClusterName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration) -}}
+{{ .Values.hazelcast.client.clusterName }}
+{{- else -}}
+{{ .Values.hazelcast.server.clustering_service_group_name }}
+{{- end -}}
+{{- end -}}
