@@ -530,7 +530,7 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
    `$ helm inspect values pega/pega > pega.yaml`
 
- Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your EKS requirements:
+2. Use a text editor to open the pega.yaml file and update the following parameters in the chart based on your EKS requirements:
 
    | Chart parameter name    | Purpose                                   | Your setting |
    |-------------------------|-------------------------------------------|--------------|
