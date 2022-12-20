@@ -40,7 +40,7 @@ func TestPegaTierConfigWithWeb(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
-			VerifyTierConfgWithWeb(t, yamlContent, options)
+			VerifyTierConfigWithWeb(t, yamlContent, options)
 
 		}
 	}
@@ -68,8 +68,8 @@ func CopyFile(src, dest string) (err error) {
 	return out.Close()
 }
 
-// VerifyTierConfg - Performs the tier specific configuration assetions with the values as provided in default values.yaml
-func VerifyTierConfgWithWeb(t *testing.T, yamlContent string, options *helm.Options) {
+// VerifyTierConfig - Performs the tier specific configuration assertions with the values as provided in default values.yaml
+func VerifyTierConfigWithWeb(t *testing.T, yamlContent string, options *helm.Options) {
 	var pegaConfigMap k8score.ConfigMap
 	configSlice := strings.Split(yamlContent, "---")
 	for index, configData := range configSlice {
@@ -78,6 +78,7 @@ func VerifyTierConfgWithWeb(t *testing.T, yamlContent string, options *helm.Opti
 			pegaConfigMapData := pegaConfigMap.Data
 			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
 			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
+			compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["server.xml.tmpl"], "data/expectedInstallDeployServer.xml.tmpl")
 			compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
