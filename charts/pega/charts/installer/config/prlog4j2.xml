@@ -111,16 +111,16 @@
 			<AppenderRef ref="ALERTSECURITY" level="ALERT"/>													
 		</asyncRoot>
 		
-		<Logger name="com.pega.pegarules.deploy.internal.util.SyncRptGenerator" level="info" additivity="true">
+		<Logger name="com.pega.pegarules.deploy.internal.util.SyncRptGenerator" level="info" additivity="false">
 	     <AppenderRef ref="UPGRADE"/>
 	    </Logger>
 	    
-	    <Logger name="com.pega.pegarules.deploy.internal.archive.importer.synchronization.SiblingRulesCleanupSynchronizer" level="info" additivity="true">
+	    <Logger name="com.pega.pegarules.deploy.internal.archive.importer.synchronization.SiblingRulesCleanupSynchronizer" level="info" additivity="false">
 	     <AppenderRef ref="SIBLINGCLEANER"/>
 	     <AppenderRef ref="CONSOLE"/>
 	    </Logger>
 	    
-	    <Logger name="ServicePAL" level="info" additivity="true">
+	    <Logger name="ServicePAL" level="info" additivity="false">
 	     <AppenderRef ref="SERVICES-PAL"/>
 	    </Logger>
 	    
@@ -133,11 +133,11 @@
 		<Logger name="com.pega.pegarules.deploy.external.maintenance.MaintenanceDownloader" level="info">
 		</Logger>
 
-		<Logger name="com.hazelcast" additivity="true" level="info">
+		<Logger name="com.hazelcast" additivity="false" level="info">
 			<AppenderRef ref="CLUSTER"/>
 		</Logger>
 
-		<Logger name="com.pega.hazelcast" additivity="true" level="info">
+		<Logger name="com.pega.hazelcast" additivity="false" level="info">
 			<AppenderRef ref="CLUSTER"/>
 		</Logger>
 
