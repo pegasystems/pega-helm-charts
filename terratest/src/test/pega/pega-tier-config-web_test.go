@@ -74,13 +74,13 @@ func VerifyTierConfigWithWeb(t *testing.T, yamlContent string, options *helm.Opt
 	configSlice := strings.Split(yamlContent, "---")
 	for index, configData := range configSlice {
 		if index >= 1 && index <= 3 {
-			UnmarshalK8SYaml(t, configData, &pegaConfigMap)
-			pegaConfigMapData := pegaConfigMap.Data
-			compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
-			compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
-			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
+            UnmarshalK8SYaml(t, configData, &pegaConfigMap)
+            pegaConfigMapData := pegaConfigMap.Data
+            compareConfigMapData(t, pegaConfigMapData["prconfig.xml"], "data/expectedInstallDeployPrconfig.xml")
+            compareConfigMapData(t, pegaConfigMapData["context.xml.tmpl"], "data/expectedInstallDeployContext.xml.tmpl")
+            compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
             compareConfigMapData(t, pegaConfigMapData["server.xml.tmpl"], "data/expectedInstallDeployServer.xml.tmpl")
-			compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
+            compareConfigMapData(t, pegaConfigMapData["web.xml"], "data/expectedInstallDeployWeb.xml")
 		}
 	}
 }
