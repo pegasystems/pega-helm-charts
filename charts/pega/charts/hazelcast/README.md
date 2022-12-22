@@ -39,6 +39,7 @@ Name                                           | Description                    
 `server.event_thread_count` | Number of event handler threads | `""`
 `server.max_join_seconds`  | Join timeout, maximum time to try to join before giving. | `""`
 `server.group_name`  | Specifies the name of the cluster created by Hazelcast nodes |  `PRPC`
+`server.clustering_service_group_name`  | Specifies the name of the cluster created by clustering service (Hazelcast) nodes |  `prpchz`
 `server.mancenter_url`  | URL of the Hazelcast Management center to which the Hazelcast nodes can connect | `""`
 `server.graceful_shutdown_max_wait_seconds` | Maximum wait in seconds during graceful shutdown. | `600`
 `server.service_dns_timeout` | Custom time for how long the DNS Lookup is checked | `""`
@@ -53,9 +54,13 @@ Name                                           | Description                    
 
 ```yaml
 image: "YOUR_HAZELCAST_IMAGE:TAG"
+clusteringServiceImage: "YOUR_HAZELCAST_IMAGE:TAG"
+migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
 imagePullPolicy: "Always"
 replicas: 3
 enabled: true
+clusteringServiceEnabled: false
+migration: false
 username: ""
 password: ""
 
@@ -81,6 +86,7 @@ server:
   event_thread_count: ""
   max_join_seconds: ""
   group_name: "PRPC"
+  clustering_service_group_name: "prpchz"
   mancenter_url: ""
   graceful_shutdown_max_wait_seconds: "600"
   service_dns_timeout: ""

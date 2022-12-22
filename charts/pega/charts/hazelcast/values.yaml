@@ -1,6 +1,7 @@
 ---
 image: "YOUR_HAZELCAST_IMAGE:TAG"
-clusteringServiceImage: "YOUR_HAZELCAST_IMAGE:TAG"
+clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
+migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
 imagePullPolicy: "Always"
 # Enter the number of initial members in Hazelcast cluster.
 replicas: 3

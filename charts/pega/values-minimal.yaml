@@ -194,6 +194,7 @@ installer:
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   clusteringServiceImage: "YOUR_HAZELCAST_IMAGE:TAG"
+  migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
