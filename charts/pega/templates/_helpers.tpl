@@ -479,7 +479,7 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "serviceName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration) -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.skipRestart) -}}
 {{ template "hazelcastName" }}
 {{- else -}}
 {{ template "clusteringServiceName" }}
@@ -487,7 +487,7 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzClusterName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration) -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.skipRestart) -}}
 {{ .Values.hazelcast.client.clusterName }}
 {{- else -}}
 {{ .Values.hazelcast.server.clustering_service_group_name }}

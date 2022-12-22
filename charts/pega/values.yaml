@@ -383,8 +383,19 @@ hazelcast:
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
+
+  # Setting below true to Migrate 4x embedded HZ to C/s 5x.
+  embeddedToCSMigration: false
+
+  # Setting up while deleting the 4x Hazelcast, set it true when changing 'hazelcast.enabled=false'
+  skipRestart: false
+
+  # Setting up for 8.8 and above fresh install and for HZ upgrade
   clusteringServiceEnabled: false
+
+  # Setting up to start the migration job.
   migration: false
+
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client-server Hazelcast model for authentication
