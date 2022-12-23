@@ -29,6 +29,7 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"hazelcast.enabled": "true",
+					"hazelcast.embeddedToCSMigration": "false",
 				},
 			}
 
@@ -37,7 +38,6 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 
 		}
 	}
-
 
     for _,vendor := range supportedVendors{
 
@@ -50,12 +50,37 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
                     "global.provider":        vendor,
                     "global.actions.execute": operation,
                     "hazelcast.enabled": "false",
+                    "hazelcast.skipRestart": "false",
                     "hazelcast.clusteringServiceEnabled": "true",
+                    "hazelcast.embeddedToCSMigration": "false",
                 },
             }
 
             yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
             VerifyClusteringServiceEnvironmentConfigForClient(t,yamlContent, options)
+
+        }
+    }
+
+    for _,vendor := range supportedVendors{
+
+        for _,operation := range supportedOperations{
+
+            fmt.Println(vendor + "-" + operation)
+
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.provider":        vendor,
+                    "global.actions.execute": operation,
+                    "hazelcast.enabled": "false",
+                    "hazelcast.skipRestart": "true",
+                    "hazelcast.clusteringServiceEnabled": "true",
+                    "hazelcast.embeddedToCSMigration": "false",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+            VerifyPegaHazelcastEnvironmentConfigForClient(t,yamlContent, options)
 
         }
     }

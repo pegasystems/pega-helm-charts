@@ -31,7 +31,6 @@ func TestClusteringServiceMigration(t *testing.T) {
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"hazelcast.migration":  "true",
-					"hazelcast.enabled":  "true",
 					"hazelcast.clusteringServiceEnabled":  "true",
 				},
 			}
