@@ -15,7 +15,7 @@ spec:
       serviceAccountName: {{ template "clusteringServiceName" . }}-migration-sa
       containers:
         - name: migration-job
-          image: {{ .Values.migratorImage }}
+          image: {{ .Values.migration.migrationJobImage }}
           command:
             - bin/bash
             - -c

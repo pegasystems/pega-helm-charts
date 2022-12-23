@@ -67,7 +67,7 @@ data:
 {{- end }}
 {{- end }}
 
-{{ if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.embeddedToCSMigration)) }}
+{{ if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.migration.embeddedToCSMigration)) }}
 
   HZ_DISCOVERY_K8S: "true"
   HZ_CLIENT_MODE: "true"

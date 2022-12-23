@@ -194,22 +194,24 @@ installer:
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   clusteringServiceImage: "YOUR_HAZELCAST_IMAGE:TAG"
-  migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
 
-  # Setting below true to Migrate 4x embedded HZ to C/s 5x.
-  embeddedToCSMigration: false
-
-  # Setting up while deleting the 4x Hazelcast, set it true when changing 'hazelcast.enabled=false'
-  skipRestart: false
-
   # Setting up for 8.8 and above fresh install and for HZ upgrade
   clusteringServiceEnabled: false
 
-  # Setting up to start the migration job.
-  migration: false
+  # Setting related to Hazelcast migration.
+  migration:
+    # Setting up to initiate the migration job.(Only for CMC/CloudK have InfinityOps service for migration task.)
+    enabled: false
+    # Migration job docker image with bash and kubernetes
+    migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+    # Setting up to true while starting the new hazelcast pods in case of embedded to c/s migration process.
+    embeddedToCSMigration: false
+    # Setting up to true while deleting the old hazelcast pods after Migration.
+    skipRestart: false
 
   # No. of initial members to join
   replicas: 3
