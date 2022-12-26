@@ -29,7 +29,7 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"hazelcast.enabled": "true",
-					"hazelcast.embeddedToCSMigration": "false",
+					"hazelcast.migration.embeddedToCSMigration": "false",
 				},
 			}
 
@@ -50,9 +50,9 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
                     "global.provider":        vendor,
                     "global.actions.execute": operation,
                     "hazelcast.enabled": "false",
-                    "hazelcast.skipRestart": "false",
+                    "hazelcast.migration.skipRestart": "false",
                     "hazelcast.clusteringServiceEnabled": "true",
-                    "hazelcast.embeddedToCSMigration": "false",
+                    "hazelcast.migration.embeddedToCSMigration": "false",
                 },
             }
 
@@ -73,9 +73,9 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
                     "global.provider":        vendor,
                     "global.actions.execute": operation,
                     "hazelcast.enabled": "false",
-                    "hazelcast.skipRestart": "true",
+                    "hazelcast.migration.skipRestart": "true",
                     "hazelcast.clusteringServiceEnabled": "true",
-                    "hazelcast.embeddedToCSMigration": "false",
+                    "hazelcast.migration.embeddedToCSMigration": "false",
                 },
             }
 
