@@ -54,13 +54,16 @@ Name                                           | Description                    
 
 ```yaml
 image: "YOUR_HAZELCAST_IMAGE:TAG"
-clusteringServiceImage: "YOUR_HAZELCAST_IMAGE:TAG"
-migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
 imagePullPolicy: "Always"
 replicas: 3
 enabled: true
 clusteringServiceEnabled: false
-migration: false
+migration:
+  enabled: false
+  migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+  embeddedToCSMigration: false
+  skipRestart: false
 username: ""
 password: ""
 

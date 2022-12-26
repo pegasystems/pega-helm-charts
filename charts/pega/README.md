@@ -1002,8 +1002,8 @@ The default and recommended deployment strategy for Hazelcast is client-server, 
 Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.4 or later patch version. 
-\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.2 or later patch version. 
+\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version. 
+\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version. 
 
 
 #### Configuration Settings
@@ -1014,10 +1014,12 @@ Parameter   | Description   | Default value
 ---         | ---           | ---
 `hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_HAZELCAST_IMAGE:TAG`
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
-`hazelcast.migratorImage` | Reference the `platform/clustering-service-kubectl` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
 `hazelcast.enabled` |  Set as true if client-server deployment of Pega Platform is required, otherwise false. Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail | `true`
 `hazelcast.clusteringServiceEnabled` |  Set as true if client-server deployment of Pega Platform is required, otherwise false. Note: Set this value as false for Pega platform versions below 8.8, if not set the installation will fail | `false`
-`hazelcast.migration` |  Set as true after creating prallel cluster to migrate the data and client switch over to new Hazelcast service | `false`
+`hazelcast.migration.enabled` |  Set as true after creating parallel cluster to migrate the data and client switch over to new Hazelcast service | `false`
+`hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
+`hazelcast.migration.embeddedToCSMigration` |  Set as true while creating parallel cluster in case of embedded source system | `false`
+`hazelcast.migration.skipRestart` |  Set as true while removing old hazelcast cluster after migration to avoid restart | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster | `3`
 `hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication | `""`
 `hazelcast.password` | Password to be used in client-server Hazelcast model for authentication | `""`
@@ -1028,10 +1030,13 @@ Parameter   | Description   | Default value
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
-  migratorImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   enabled: true
   clusteringServiceEnabled: false
-  migration: false
+  migration:
+    enabled: false
+    migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+    embeddedToCSMigration: false
+    skipRestart: false
   replicas: 3
   username: ""
   password: ""
