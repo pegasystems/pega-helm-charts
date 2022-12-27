@@ -43,9 +43,11 @@ spec:
   {{- end }}
   # Specification of on which port the service is enabled
   ports:
+{{- if .node.service.port }}
   - name: http
     port: {{ .node.service.port }}
     targetPort: {{ .node.service.targetPort }}
+{{- end }}
 {{- if (.node.service.tls).enabled }}
   - name: https
     port: {{ .node.service.tls.port }}
