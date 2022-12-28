@@ -104,6 +104,7 @@ global:
       nodeType: "Stream,BackgroundProcessing,WebUser,Search"
 
       service:
+        httpEnabled: true
         port: 80
         targetPort: 8080
         # Without a load balancer, use a direct NodePort instead.
