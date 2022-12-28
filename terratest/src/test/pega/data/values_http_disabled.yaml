@@ -127,6 +127,9 @@ global:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         # To configure TLS between the ingress/load balancer and the backend, set the following:
+        httpEnabled: false
+        port: 80
+        targetPort: 8080
         tls:
           enabled: true
           # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
