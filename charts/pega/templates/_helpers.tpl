@@ -484,7 +484,7 @@ servicePort: use-annotation
 {{- end -}}
 {{- end -}}
 
-{{- define "pegaImagePullRegistrySecrets" }}
+{{- define "imagePullSecrets" }}
 {{- if .Values.global.docker.registry }}
 - name: {{ template "pegaRegistrySecret" $ }}
 {{- end }}

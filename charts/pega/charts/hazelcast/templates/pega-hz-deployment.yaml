@@ -67,5 +67,5 @@ spec:
       # Volume used to mount secret files.
       {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
-{{- include "pegaImagePullRegistrySecrets" . | indent 6 }}
+{{- include "imagePullSecrets" . | indent 6 }}
 {{ end }}

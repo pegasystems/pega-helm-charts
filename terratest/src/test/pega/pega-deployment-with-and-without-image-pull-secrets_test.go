@@ -217,6 +217,57 @@ func TestConstellationDeploymentWithImagePullSecrets(t *testing.T) {
 	}
 }
 
+func TestPegaDeploymentWithoutRegistryBlock(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"global.docker.registry": "",
+				},
+			}
+			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+			yamlSplit := strings.Split(deploymentYaml, "---")
+			assertWithoutRegistryBlock(t, yamlSplit[1])
+		}
+	}
+}
+
+func TestPegaDeploymentWithoutRegistryBlockWithExternalSecrets(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"global.docker.registry":             "",
+					"global.docker.imagePullSecretNames": "{\"secret1\",\"secret2\"}",
+				},
+			}
+			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+			yamlSplit := strings.Split(deploymentYaml, "---")
+			assertWithoutRegistryBlockWithExternalSecrets(t, yamlSplit[1])
+		}
+	}
+}
+
 func assertWithoutImagePullSecrets(t *testing.T, webYaml string) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
@@ -231,4 +282,20 @@ func assertWithImagePullSecrets(t *testing.T, webYaml string) {
 	require.Equal(t, imagePullSecrets[1].Name, "secret1")
 	require.Equal(t, imagePullSecrets[2].Name, "secret2")
 	require.Equal(t, len(imagePullSecrets), 3)
+}
+
+func assertWithoutRegistryBlock(t *testing.T, webYaml string) {
+	var deploymentObj appsv1.Deployment
+	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
+	imagePullSecrets := deploymentObj.Spec.Template.Spec.ImagePullSecrets
+	require.Equal(t, len(imagePullSecrets), 0)
+}
+
+func assertWithoutRegistryBlockWithExternalSecrets(t *testing.T, webYaml string) {
+	var deploymentObj appsv1.Deployment
+	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
+	imagePullSecrets := deploymentObj.Spec.Template.Spec.ImagePullSecrets
+	require.Equal(t, len(imagePullSecrets), 2)
+	require.Equal(t, imagePullSecrets[0].Name, "secret1")
+	require.Equal(t, imagePullSecrets[1].Name, "secret2")
 }

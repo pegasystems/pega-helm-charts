@@ -124,6 +124,6 @@ spec:
 {{- end }}                
       restartPolicy: Never
       imagePullSecrets:
-{{- include "pegaImagePullRegistrySecrets" .root | indent 6 }}
+{{- include "imagePullSecrets" .root | indent 6 }}
 ---
 {{- end -}}
