@@ -1,7 +1,11 @@
 {{- define "pega.hpa" -}}
 {{- if .hpa.enabled -}}
 # The Horizontal Pod Autoscaler for {{ .deploymentName }} deployment
+{{- if(semverCompare ">= 1.23.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: autoscaling/v2
+{{- else }}
 apiVersion: autoscaling/v2beta2
+{{- end }}
 kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .name | quote}}

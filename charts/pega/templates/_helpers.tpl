@@ -310,7 +310,11 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- end }}
 
 {{- define "gkemanagedcertificate" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: networking.gke.io/v1
+{{- else }}
 apiVersion: networking.gke.io/v1beta1
+{{- end }}
 kind: ManagedCertificate
 metadata:
   name: {{ .name }}
