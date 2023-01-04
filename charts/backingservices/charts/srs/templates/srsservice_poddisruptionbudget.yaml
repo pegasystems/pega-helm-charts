@@ -1,6 +1,10 @@
 {{ if .Values.enabled }}
 ---
+{{- if (semverCompare ">= 1.21.0-0" (trimPrefix "v" .Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: policy/v1
+{{- else }}
 apiVersion: policy/v1beta1
+{{- end }}
 kind: PodDisruptionBudget
 metadata:
   name: {{ template "srs.fullname" . }}
