@@ -663,22 +663,33 @@ To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and 
 
 Use the following parameters to configure the connection to your external Cassandra cluster
 
-Parameter     | Description | Default value
----           |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---
-`externalNodes`    | A comma separated list of hosts in the Cassandra cluster. | Empty
-`port` | TCP Port to connect to cassandra. | 9042
-`username` | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
-`password` | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
-`clientEncryption` | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
-`trustStore` | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
-`trustStorePassword` | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
-`keyStore` | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
-`keyStorePassword` | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+Parameter     | Tier Level Environment Variable | Description | Default value
+---           |:---:| ---|:---:
+`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
+`port` | N/A | TCP Port to connect to cassandra. | 9042
+`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
+`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
+`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
+`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
+`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
+`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
+`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations. | false
+`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra. | Empty
+`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner. | false
+`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average). | false
+`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once. | false
+`speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. | false
+`jmxMetricsEnabled` | CASSANDRA_JMX_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX interface; disabling also limits the metrics being collected using the DDS landing page. | true
+`csvMetricsEnabled` | CASSANDRA_CSV_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor your Cassandra service. If you enable this property, use the Pega Platform DSS: dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By default, after you enable this property, CSV files will be written to the Pega Platform work directory. | true
+`logMetricsEnabled` | CASSANDRA_LOG_METRICS_ENABLED | Enable reporting of DDS SDK metrics to your Pega Platform logs. | false
 
 
 If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 Example:
+
+This example configuration shows the parameters required for a deployment that connects to an SSL encrypted Cassandra service. It configures an extended token aware policy for browse operations and custom retries for all queries. Metrics logging to CSV and Pega Logs are disabled. Usernames and passwords are all supplied by Kubernetes secrets.
 
 ```yaml
 cassandra:
@@ -687,9 +698,29 @@ cassandra:
 dds:
   externalNodes: "CASSANDRA_NODE_IPS"
   port: "9042"
-  username: "cassandra_username"
-  password: "cassandra_password"
-  external_secret_name: ""
+  username: ""
+  password: ""
+  keyspacesPrefix: "dev01"
+  trustStore: "/opt/pega/certs/cass-truststore.jks"
+  keyStore: "/opt/pega/certs/cass-keystore.jks"
+  extendedTokenAwarePolicy: true
+  customRetryPolicy: true
+  csvMetricsEnabled: false
+  logMetricsEnabled: false
+  # The external secret below contains passwords with the following keys: CASSANDRA_USERNAME, CASSANDRA_PASSWORD, CASSANDRA_TRUSTSTORE_PASSWORD, CASSANDRA_KEYSTORE_PASSWORD
+  external_secret_name: "dev02-credentials-secret"
+```
+In addition to being configured at the cluster level, the parameters above that have a corresponding tier level environement variable may be specified at the tier level. The following example shows how to configure the Dataflow tier to use the latency aware load balancing policy.
+
+```yaml
+  tier:
+    - name: "Dataflow"
+      nodeType: "BackgroundProcessing,Dataflow"
+
+      custom:
+        env:
+        - name: CASSANDRA_LATENCY_AWARE_POLICY
+          value: "true"
 ```
 
 ### Deploying Cassandra with Pega
