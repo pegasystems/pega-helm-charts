@@ -83,8 +83,8 @@ global:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-    # To avoid exposing docker registry details, create secrets for docker registry credentials.
-    # Specify secret names as an array of comma-separated strings using the imagePullSecretNames parameter. e.g. ["secret1", "secret2"]
+    # To avoid exposing Docker registry details, create secrets to manage your Docker registry credentials.
+    # Specify secret names as an array of comma-separated strings in double quotation marks using the imagePullSecretNames parameter. For example: ["secret1", "secret2"]
     imagePullSecretNames: []
     # Docker image information for the Pega docker image, containing the application server.
     pega:
