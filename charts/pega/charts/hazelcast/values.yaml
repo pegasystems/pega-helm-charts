@@ -11,9 +11,9 @@ clusteringServiceEnabled: false
 
 # Setting related to Hazelcast migration.
 migration:
-  # Setting up to initiate the migration job.(Only for CMC/CloudK have InfinityOps service for migration task.)
+  # Setting up to initiate the migration job.
   enabled: false
-  # Migration job docker image with bash and kubernetes
+  # Migration job docker image with bash and kubernetes.
   migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   # Setting up to true while starting the new hazelcast pods in case of embedded to c/s migration process.
   embeddedToCSMigration: false
