@@ -32,12 +32,6 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: {{ include "hostPathType" . }}
-        {{- if .node.ingress.path }}
-        path: {{ .node.ingress.path }}
-        {{- end }}
-        backend:
-{{ include "ingressBackend" . }}
-
----     
+{{ include "defaultIngressRule" . | indent 6 }}
+---
 {{- end }}

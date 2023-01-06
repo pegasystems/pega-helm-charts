@@ -165,6 +165,15 @@ false
  {{- end }}
 {{- end }}
 
+{{- define "defaultIngressRule" }}
+- pathType: {{ include "hostPathType" $ }}
+  {{- if .node.ingress.path }}
+  path: {{ .node.ingress.path }}
+  {{- end }}
+  backend:
+    {{ include "ingressBackend" $ }}
+{{- end }}
+
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true

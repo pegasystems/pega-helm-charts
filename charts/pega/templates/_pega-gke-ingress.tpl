@@ -50,12 +50,7 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: {{ include "hostPathType" . }}
-        {{- if .node.ingress.path }}
-        path: {{ .node.ingress.path }}
-        {{- end }}
-        backend: 
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{ include "ingressBackend" . }}
+{{ include "defaultIngressRule" . | indent 6 }}
 ---
 {{- end }}
