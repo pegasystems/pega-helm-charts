@@ -207,13 +207,13 @@ To configure the use of a the Traefik load balancer and enable EFK for log aggre
 #### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
 To configure the parameters in the backingservices.yaml file, download the file in the charts/backingservices folder, edit it with a text editor, and then save it to your local system using the same filename.
- 
+
 1. To download the backingservices.yaml Helm chart to the \<local filepath>\TKGI-demo, enter:
- 
+
   `$ helm inspect values pega/backingservices > <local filepath>/TKGI-demo/backingservices.yaml`
- 
+
 2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your PKS requirements:
- 
+
 | Chart parameter name    | Purpose                                   | Your setting |
 |-------------------------|-------------------------------------------|--------------|
 |global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul>|
