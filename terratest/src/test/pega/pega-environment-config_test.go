@@ -52,23 +52,23 @@ func TestPegaEnvironmentConfigJDBCTimeouts(t * testing.T) {
 
     yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.connectionTimeoutProperties"] = "socketTimeout=90;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.writerConnectionTimeoutProperties"] = "socketTimeout=120;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.readerConnectionTimeoutProperties"] = "socketTimeout=150;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
