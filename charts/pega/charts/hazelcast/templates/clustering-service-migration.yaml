@@ -21,7 +21,7 @@ spec:
             - -c
             - |
               {{ range $index, $dep := .Values.global.tier}}
-              {{ if (eq $dep.nodeType "WebUser") }}
+              {{ if (eq $index 0) }}
               labelName="pega-{{ $dep.name }}"
               {{ end }}
               {{ end }}
@@ -115,7 +115,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
 rules:
 - apiGroups: [""]
-  resources: ["pods", "pods/log"]
+  resources: ["pods"]
   verbs: ["get", "list"]
 - apiGroups: [""]
   resources: ["pods/exec"]
