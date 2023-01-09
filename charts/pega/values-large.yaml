@@ -413,13 +413,13 @@ hazelcast:
 
   # Setting related to Hazelcast migration.
   migration:
-    # Setting up true to initiate the migration job.
+    # Set to `true` to initiate the migration job.
     enabled: false
-    # Migration job Docker image with bash and kubernetes.
+    # Reference the `platform/clustering-service-kubectl` Docker image to create the migration job.
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
-    # Setting up to true while starting the new hazelcast pods in case of embedded to c/s migration process.
+    # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Setting up to true during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail.
+    # Set to `true` during a deployment that removes an older Hazelcast cluster prevents a Pega pod restart.
     skipRestart: false
 
   # No. of initial members to join

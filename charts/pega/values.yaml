@@ -412,22 +412,22 @@ hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
 
-  # Setting below to true will deploy the infinity in client-server Hazelcast model.
-  # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
+  # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.6 through 8.7.x.
+  # Note: Make sure to set this value as "false" in case of Pega Platform version before "8.6". If not set this will fail the installation.
   enabled: true
 
-  # Setting up for Pega 8.8 and above fresh install and for HZ upgrade
+  # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
 
   # Setting related to Hazelcast migration.
   migration:
-    # Setting up true to initiate the migration job.
+    # Set to `true` to initiate the migration job.
     enabled: false
-    # Migration job Docker image with bash and kubernetes.
+    # Reference the `platform/clustering-service-kubectl` Docker image to create the migration job.
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
-    # Setting up to true while starting the new hazelcast pods in case of embedded to c/s migration process.
+    # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Setting up to true during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail.
+    # Set to `true` during a deployment that removes an older Hazelcast cluster prevents a Pega pod restart.
     skipRestart: false
 
   # No. of initial members to join

@@ -1054,7 +1054,7 @@ Parameter   | Description   | Default value
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
 `hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
 `hazelcast.password` | Password to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
-`hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)  | `""`
+`hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 
 #### Example
 ```yaml
