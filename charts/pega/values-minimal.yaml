@@ -199,18 +199,18 @@ hazelcast:
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
 
-  # Setting up for 8.8 and above fresh install and for HZ upgrade
+  # Setting up for Pega 8.8 and above fresh install and for HZ upgrade
   clusteringServiceEnabled: false
 
   # Setting related to Hazelcast migration.
   migration:
-    # Setting up to initiate the migration job.(Only for CMC/CloudK have InfinityOps service for migration task.)
+    # Setting up true to initiate the migration job.
     enabled: false
-    # Migration job docker image with bash and kubernetes
+    # Migration job Docker image with bash and kubernetes.
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Setting up to true while starting the new hazelcast pods in case of embedded to c/s migration process.
     embeddedToCSMigration: false
-    # Setting up to true while deleting the old hazelcast pods after Migration.
+    # Setting up to true during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail.
     skipRestart: false
 
   # No. of initial members to join

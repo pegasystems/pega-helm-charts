@@ -482,7 +482,7 @@ servicePort: use-annotation
 {{- end -}}
 {{- end -}}
 
-{{- define "serviceName" -}}
+{{- define "hzServiceName" -}}
 {{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
 {{ template "hazelcastName" }}
 {{- else -}}

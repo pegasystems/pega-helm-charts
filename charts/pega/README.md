@@ -1033,8 +1033,8 @@ The default and recommended deployment strategy for Hazelcast is client-server, 
 Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version of clustering service. 
-\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version clustering service. 
+\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later upto 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version of clustering service. 
+\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version of clustering service. 
 
 
 #### Configuration Settings
@@ -1045,15 +1045,15 @@ Parameter   | Description   | Default value
 ---         | ---           | ---
 `hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_HAZELCAST_IMAGE:TAG`
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
-`hazelcast.enabled` |  Set to `true` if client-server deployment of Pega Platform is required, otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6. | `true`
-`hazelcast.clusteringServiceEnabled` |  Set to `true` if client-server deployment of Pega Platform is required, otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8, if not set the installation will fail. | `false`
-`hazelcast.migration.enabled` |  Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data. | `false`
+`hazelcast.enabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6. | `true`
+`hazelcast.clusteringServiceEnabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8; if not set the installation will fail. | `false`
+`hazelcast.migration.enabled` |  Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster. | `false`
 `hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
-`hazelcast.migration.embeddedToCSMigration` |  Set to `true` while creating parallel cluster in case of embedded source system,  leave this value set to `false` in case of c/s to c/s migration. | `false`
-`hazelcast.migration.skipRestart` |  Set to `true` while removing old hazelcast cluster after migration to avoid pega pods restart | `false`
+`hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
+`hazelcast.migration.skipRestart` |  Set to `true` during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail. | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
-`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication. | `""`
-`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication. | `""`
+`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
+`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)  | `""`
 
 #### Example
