@@ -1,10 +1,23 @@
 ---
 # Parameters for constellation operation:
+deployment:
+  # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
+  name: "constellation"
 # Docker repos and tag for image
-image: IMAGE_REPO_URL_HERE
+docker:
+    # If using a custom Docker registry, supply the credentials here to pull Docker images.
+    registry:
+      url: "YOUR_DOCKER_REGISTRY"
+      username: "YOUR_DOCKER_REGISTRY_USERNAME"
+      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+    # Docker image information for the Pega docker image, containing the application server.
+    pega:
+      image: 
 # log level : error, warn, info, debug.  use error for production
+domainName: "YOUR_DOMAIN_NAME_HERE"
 logLevel: info
-enabled: false
+enabled: true
+urlPath: /c11n
 replicas: 2
 livenessProbe:
   initialDelaySeconds: 5

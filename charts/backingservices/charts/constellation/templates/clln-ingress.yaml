@@ -1,0 +1,15 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: constellationingress
+spec:
+  rules:
+  - host: {{ .Values.domainName }}
+    http:
+      paths:
+      - path: {{ .Values.urlPath }}
+        backend:
+          service:
+            name: constellation
+            port:
+              number: 3000
