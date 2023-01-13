@@ -95,7 +95,9 @@ false
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
 {{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "performOnlyDeployment" }}
@@ -479,5 +481,16 @@ servicePort: use-annotation
 {{- add (round (div (mul .periodSeconds .failureThreshold) 180) 0) 1 -}}
 {{- else -}}
 {{- add .failureThreshold 1 -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
