@@ -139,6 +139,8 @@ spec:
         ports:
         - containerPort: 8080
           name: pega-web-port
+        - containerPort: 8443
+          name: pega-tls-port
 {{- if .custom }}
 {{- if .custom.ports }}
         # Additional custom ports
