@@ -26,17 +26,23 @@ data:
   # The connection properties that will be sent to our JDBC driver when establishing new connections
   JDBC_CONNECTION_PROPERTIES: {{ .Values.global.jdbc.connectionProperties }}
 {{- end }}
+# The jdbc connection timeout properties for the primary PegaRULES datasource.
 {{- if .Values.global.jdbc.connectionTimeoutProperties }}
-  # The jdbc connection timeout properties for the primary PegaRULES datasource.
   JDBC_TIMEOUT_PROPERTIES: {{ .Values.global.jdbc.connectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES: ""
 {{- end }}
+# The jdbc connection timeout properties for the PegaRULESLongRW datasource.
 {{- if .Values.global.jdbc.writerConnectionTimeoutProperties }}
-  # The jdbc connection timeout properties for the PegaRULESLongRW datasource.
   JDBC_TIMEOUT_PROPERTIES_RW: {{ .Values.global.jdbc.writerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RW: ""
 {{- end }}
-{{- if .Values.global.jdbc.readerConnectionTimeoutProperties }}
   # The jdbc connection timeout properties for the PegaRULESReadOnly datasource.
+{{- if .Values.global.jdbc.readerConnectionTimeoutProperties }}
   JDBC_TIMEOUT_PROPERTIES_RO: {{ .Values.global.jdbc.readerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RO: ""
 {{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}

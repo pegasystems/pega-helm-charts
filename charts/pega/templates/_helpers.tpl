@@ -95,7 +95,9 @@ false
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
 {{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "performOnlyDeployment" }}
@@ -495,5 +497,16 @@ servicePort: use-annotation
 {{ .Values.hazelcast.client.clusterName }}
 {{- else -}}
 {{ .Values.hazelcast.server.clustering_service_group_name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
 {{- end -}}
 {{- end -}}
