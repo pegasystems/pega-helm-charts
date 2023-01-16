@@ -60,7 +60,7 @@ func assertRole(t *testing.T, roleYaml string, options *helm.Options) {
     require.Equal(t, roleObj.ObjectMeta.Name, "clusteringservice-migration-role")
     require.Equal(t, roleObj.ObjectMeta.Namespace, "default")
 	require.Equal(t, roleObj.Rules[0].APIGroups, []string{""})
-	require.Equal(t, roleObj.Rules[0].Resources, []string{"pods", "pods/log"})
+	require.Equal(t, roleObj.Rules[0].Resources, []string{"pods"})
 	require.Equal(t, roleObj.Rules[0].Verbs, []string{"get", "list"})
     require.Equal(t, roleObj.Rules[1].APIGroups, []string{""})
     require.Equal(t, roleObj.Rules[1].Resources, []string{"pods/exec"})
