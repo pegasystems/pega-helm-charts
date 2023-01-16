@@ -500,6 +500,14 @@ servicePort: use-annotation
 {{- end -}}
 {{- end -}}
 
+{{- define "hazelcastCSConfigRequired" }}
+  {{- if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.migration.embeddedToCSMigration)) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "imagePullSecrets" }}
 {{- if .Values.global.docker.registry }}
 - name: {{ template "pegaRegistrySecret" $ }}

@@ -417,7 +417,7 @@ hazelcast:
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.
-    enabled: false
+    initiateMigration: false
     # Reference the `platform/clustering-service-kubectl` Docker image to create the migration job.
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Set to `true` when migrating from embedded Hazelcast.

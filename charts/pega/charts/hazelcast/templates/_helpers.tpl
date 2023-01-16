@@ -22,7 +22,7 @@
 {{- end }}
 
 {{- define "isMigrationInit" }}
- {{- if .Values.migration.enabled -}}
+ {{- if .Values.migration.initiateMigration -}}
   true
  {{- else -}}
   false
