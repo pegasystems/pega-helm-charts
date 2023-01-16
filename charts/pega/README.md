@@ -314,6 +314,7 @@ Configuration parameters:
 
 Parameter | Description                       | Default value
 ---       | ---                               | ---
+`httpEnabled`    | Use this to disable the http port `80` on Pega web service. Make sure `tls` is enabled if http port is disabled. | `true`
 `port`    | The port of the tier to be exposed to the cluster. For HTTP this is generally `80`. | `80`
 `targetPort`    | The target port of the container to expose. The Pega container exposes web traffic on port `8080`. | `8080`
 `serviceType`    | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose. | `LoadBalancer`

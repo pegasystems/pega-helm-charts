@@ -87,9 +87,6 @@ global:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
-    # To avoid exposing Docker registry details, create secrets to manage your Docker registry credentials.
-    # Specify secret names as an array of comma-separated strings in double quotation marks using the imagePullSecretNames parameter. For example: ["secret1", "secret2"]
-    imagePullSecretNames: []
     # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
@@ -129,12 +126,12 @@ global:
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
-        httpEnabled: true
+        # To configure TLS between the ingress/load balancer and the backend, set the following:
+        httpEnabled: false
         port: 80
         targetPort: 8080
-        # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
-          enabled: false
+          enabled: true
           # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
           # values in the External Secrets Manager, and enter the external secret name below
           # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
@@ -351,38 +348,6 @@ dds:
   # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
   # make sure the keys in the secret should be CASSANDRA_USERNAME, CASSANDRA_PASSWORD , CASSANDRA_TRUSTSTORE_PASSWORD , CASSANDRA_KEYSTORE_PASSWORD
   external_secret_name: ""
-  # Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will
-  # not interrupt Dataset save operations.
-  asyncProcessingEnabled: false
-  # Specify a prefix to use when creating Pega-managed keyspaces in Cassandra.
-  keyspacesPrefix: ""
-  # Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a
-  # token from the token range to determine which Cassandra node to send the request. Before you can enable this policy,
-  # you must configure the token range partitioner.
-  extendedTokenAwarePolicy: false
-  # Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains
-  # a per-node latency score (an average).
-  latencyAwarePolicy: false
-  # Enable the use of a customized retry policy for your Pega Platform deployment. After enabling this policy in your
-  # deployment configuration, Cassandra queries that timeout will be retried. The number of retries may be configured
-  # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. If not configured, queries
-  # will be retried once.
-  customRetryPolicy: false
-  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
-  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
-  # provides lower perceived latencies at the client, but puts greater load on your Cassandra service.
-  speculativeExecutionPolicy: false
-  # Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to
-  # monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX
-  # interface; disabling also limits the metrics being collected using the DDS landing page.
-  jmxMetricsEnabled: true
-  # Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor
-  # your Cassandra service. If you enable this property, use the Pega Platform DSS:
-  # dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By
-  # default, after you enable this property, CSV files will be written to the Pega Platform work directory.
-  csvMetricsEnabled: false
-  # Enable reporting of DDS SDK metrics to your Pega Platform logs.
-  logMetricsEnabled: false
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
