@@ -484,6 +484,30 @@ servicePort: use-annotation
 {{- end -}}
 {{- end -}}
 
+{{- define "hzServiceName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{ template "hazelcastName" }}
+{{- else -}}
+{{ template "clusteringServiceName" }}
+{{- end -}}
+{{- end -}}
+
+{{- define "hzClusterName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{ .Values.hazelcast.client.clusterName }}
+{{- else -}}
+{{ .Values.hazelcast.server.clustering_service_group_name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "hazelcastCSConfigRequired" }}
+  {{- if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.migration.embeddedToCSMigration)) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "imagePullSecrets" }}
 {{- if .Values.global.docker.registry }}
 - name: {{ template "pegaRegistrySecret" $ }}
