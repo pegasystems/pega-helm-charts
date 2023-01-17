@@ -3,7 +3,7 @@ enabled: true
 deployment:
   name: "constellation"
 # Cloud provider details. Accepted values are aws or gcp
-cloudProvider: aws
+cloudProvider: "aws"
 # For aws cloud provider enter your acm certificate ARN here.
 awsCertificateArn : arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
 domainName: helm-test.constellation.pega.io

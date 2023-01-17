@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: constellationingress
   annotations:
-    {{ if (eq .Values.cloudProvider aws) }}
+    {{ if (eq .Values.cloudProvider "aws") }}
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.awsCertificateArn }}
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
