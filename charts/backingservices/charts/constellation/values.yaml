@@ -9,7 +9,7 @@ awsCertificateArn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
 domainName: YOUR_CUSTOM_DOMAIN_NAME_HERE
 # Docker repos and tag for image
 docker:
-    # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
   registry:
     url: YOUR_DOCKER_REGISTRY_URL
     username: YOUR_DOCKER_REGISTRY_USERNAME
@@ -32,4 +32,3 @@ readinessProbe:
   periodSeconds: 30
   successThreshold: 1
   failureThreshold: 3
-  
