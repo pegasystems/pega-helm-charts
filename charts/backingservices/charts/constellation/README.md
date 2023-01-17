@@ -92,3 +92,5 @@ readinessProbe:
 
 3. Once the charts are deployed an application load balancer should be created automatically. You can then configure the records of your custom domain to route to the loadbalancer accordingly. For AWS a simple Route53 record in the correct hosted zone of your custom domain should do it. 
 
+4. You can now set the URL from the previous step as the value for Infinity DSS ConstellationSvcURL to be able to work with the app-static service.
+
