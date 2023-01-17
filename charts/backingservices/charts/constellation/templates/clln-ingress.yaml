@@ -2,12 +2,24 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: constellationingress
+  annotations:
+    {{ if eq .Values.cloudProvider aws }}
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.awsCertificateArn }}
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
+    alb.ingress.kubernetes.io/target-type: ip
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/healthcheck-path: /c11n/buildInfo.json
+    alb.ingress.kubernetes.io/healthcheck-port: traffic-port
+    {{ end }}
 spec:
   rules:
   - host: {{ .Values.domainName }}
     http:
       paths:
       - path: {{ .Values.urlPath }}
+        pathType: Prefix
         backend:
           service:
             name: constellation

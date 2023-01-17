@@ -1,24 +1,24 @@
 ---
 # Parameters for constellation operation:
 deployment:
-  # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
   name: "constellation"
 # Docker repos and tag for image
+cloudProvider: 
 docker:
     # If using a custom Docker registry, supply the credentials here to pull Docker images.
     registry:
-      url: "YOUR_DOCKER_REGISTRY"
-      username: "YOUR_DOCKER_REGISTRY_USERNAME"
-      password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+      url: "cirrus-docker.jfrog.io"
+      username: "cameng2"
+      password: "d8538894e2"
     # Docker image information for the Pega docker image, containing the application server.
-    pega:
-      image: 
-# log level : error, warn, info, debug.  use error for production
-domainName: "YOUR_DOMAIN_NAME_HERE"
+    constellation:
+      image: cirrus-docker.jfrog.io/constellation-appstatic-service/docker-image:1.0.8-20221228123724
+domainName: helm-test.constellation.pega.io
 logLevel: info
 enabled: true
 urlPath: /c11n
-replicas: 2
+awsCertificateArn : 
+replicas: 1
 livenessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 5

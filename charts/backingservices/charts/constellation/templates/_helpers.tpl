@@ -7,4 +7,4 @@
 {{- $depName -}}-registry-secret
 {{- end }}
 
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.deployment) }}{{ if (.Values.deployment.name) }}{{ $deploymentNamePrefix = .Values.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+{{- define "deploymentName" }}{{ $deploymentNamePrefix := "constellation" }}{{ if (.Values.deployment) }}{{ if (.Values.deployment.name) }}{{ $deploymentNamePrefix = .Values.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
