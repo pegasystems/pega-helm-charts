@@ -32,6 +32,16 @@
   {{- end -}}
 {{- end -}}
 
+{{- define "k8sWaitForMaxRetries" -}}
+  {{- if (.Values.global.utilityImages.k8s_wait_for) -}}
+    {{- if (.Values.global.utilityImages.k8s_wait_for.maxRetries) -}}
+      {{ .Values.global.utilityImages.k8s_wait_for.maxRetries }}
+    {{- else -}}
+      1
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
 {{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "performInstall" }}
@@ -66,6 +76,8 @@
   env:  
     - name: WAIT_TIME
       value: "{{ template "k8sWaitForWaitTime" }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries"}}"
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -76,6 +88,8 @@
   env:  
     - name: WAIT_TIME
       value: "{{ template "k8sWaitForWaitTime" }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries"}}"
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -87,6 +101,8 @@
   env:  
     - name: WAIT_TIME
       value: "{{ template "k8sWaitForWaitTime" }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries"}}"
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -128,6 +144,10 @@
     value: {{ $apiserver.httpsServicePort | quote }}
   - name: KUBERNETES_SERVICE_PORT
     value: {{ $apiserver.httpsServicePort | quote }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries"}}"
 {{- end }}
 {{- end }}
 

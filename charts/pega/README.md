@@ -184,7 +184,7 @@ utilityImages:
     image: "busybox:1.31.0"
     imagePullPolicy: "IfNotPresent"
   k8s_wait_for:
-    image: "dcasavant/k8s-wait-for"
+    image: "pegasystems/k8s-wait-for"
     imagePullPolicy: "IfNotPresent"
 ```
 
