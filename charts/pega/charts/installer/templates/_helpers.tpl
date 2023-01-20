@@ -75,9 +75,9 @@
   args: [ 'job', '{{ template "pegaDBInstall" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
-      value: "{{ template "k8sWaitForMaxRetries"}}"
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -87,9 +87,9 @@
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
-      value: "{{ template "k8sWaitForMaxRetries"}}"
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -100,9 +100,9 @@
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
-      value: "{{ template "k8sWaitForMaxRetries"}}"
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -145,9 +145,9 @@
   - name: KUBERNETES_SERVICE_PORT
     value: {{ $apiserver.httpsServicePort | quote }}
   - name: WAIT_TIME
-    value: "{{ template "k8sWaitForWaitTime" }}"
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
-    value: "{{ template "k8sWaitForMaxRetries"}}"
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 {{- end }}
 
