@@ -56,8 +56,6 @@ data:
   # Specify the workload manager to load UDFs into db2zos
   DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
 {{- end }}
-  # Specify Database Type
-  DB_TYPE: {{ .Values.global.jdbc.dbType}}
   # Action to be performed by installer image
   ACTION: {{ .Values.global.actions.execute }}
 {{- if .Values.distributionKitURL }}
