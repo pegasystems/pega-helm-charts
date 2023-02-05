@@ -26,17 +26,23 @@ data:
   # The connection properties that will be sent to our JDBC driver when establishing new connections
   JDBC_CONNECTION_PROPERTIES: {{ .Values.global.jdbc.connectionProperties }}
 {{- end }}
+# The jdbc connection timeout properties for the primary PegaRULES datasource.
 {{- if .Values.global.jdbc.connectionTimeoutProperties }}
-  # The jdbc connection timeout properties for the primary PegaRULES datasource.
   JDBC_TIMEOUT_PROPERTIES: {{ .Values.global.jdbc.connectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES: ""
 {{- end }}
+# The jdbc connection timeout properties for the PegaRULESLongRW datasource.
 {{- if .Values.global.jdbc.writerConnectionTimeoutProperties }}
-  # The jdbc connection timeout properties for the PegaRULESLongRW datasource.
   JDBC_TIMEOUT_PROPERTIES_RW: {{ .Values.global.jdbc.writerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RW: ""
 {{- end }}
-{{- if .Values.global.jdbc.readerConnectionTimeoutProperties }}
   # The jdbc connection timeout properties for the PegaRULESReadOnly datasource.
+{{- if .Values.global.jdbc.readerConnectionTimeoutProperties }}
   JDBC_TIMEOUT_PROPERTIES_RO: {{ .Values.global.jdbc.readerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RO: ""
 {{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
@@ -110,15 +116,16 @@ data:
   PEGA_STREAM_URL: {{ .Values.stream.url }}
 {{- end }}
 {{- end }}
-{{ if .Values.hazelcast.enabled }}
+
+{{ if (eq (include "hazelcastCSConfigRequired" .) "true") }}
   HZ_DISCOVERY_K8S: "true"
   HZ_CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}
   # Hazelcast Cluster Name
-  HZ_CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
+  HZ_CLUSTER_NAME: {{ template "hzClusterName" . }}
 {{- end }}
   # Hostname of Hazelcast server
-  HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+  HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"

@@ -18,7 +18,7 @@ spec:
         app: constellation
     spec:
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" $ }}
+{{- include "imagePullSecrets" . | indent 6 }}
       containers:
       - name: constellation
         imagePullPolicy: {{ .Values.imagePullPolicy }}
