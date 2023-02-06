@@ -5,7 +5,7 @@ global:
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
 
-# srs-service configuration
+# Search and Reporting Service (SRS) Configuration
 srs:
   # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
   enabled: true

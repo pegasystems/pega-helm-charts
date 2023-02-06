@@ -1,0 +1,51 @@
+#Deploy only when the constellation flag has been enabled in the values yaml.
+{{ if and .Values.enabled (eq .Values.enabled true) }}
+
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: constellation
+  labels:
+    app: constellation
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: constellation
+  template:
+    metadata:
+      labels:
+        app: constellation
+    spec:
+      imagePullSecrets:
+      - name: {{ template "pegaRegistrySecret" $ }}
+      containers:
+      - name: constellation
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.image }}
+        args:
+        - port=3000
+        # constellation URL path, if you change it, you need to change ingress template files too 
+        - urlPath=/c11n
+        - logLevel={{ .Values.logLevel }}
+        livenessProbe:
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          httpGet:
+            path: /c11n/v860/ping
+            port: 3000
+        readinessProbe:
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          httpGet:
+            path: /c11n/v860/ping
+            port: 3000
+        ports:
+        - containerPort: 3000
+{{ end }}

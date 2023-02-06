@@ -1,6 +1,8 @@
 # Deploying Pega Platform on an Amazon EKS cluster
 
-Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
+Deploy Pega Platform™ on an Amazon Elastic Kubernetes Service (Amazon EKS) cluster using an Amazon Relational Database Service (Amazon RDS). The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a EKS cluster.
+
+Pega Platform deployments in EKS environments support commercial and GovCloud regions.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a EKS cluster without much experience in either EKS configurations or Pega Platform deployments.
 
@@ -37,6 +39,8 @@ The following account, resources, and application versions are required for use 
 
 - An Amazon AWS account with a payment method set up to pay for the Amazon cluster and RDS resources you create and appropriate AWS account permissions and knowledge to:
 
+  -	Set up an AWS Load Balancer Controller with an appropriate IAM role and policy for your region. For GovCloud deployments, there are specific requirements. For details, see [Installing the AWS Load Balancer Controller add-on]( https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html)
+
   - Create an Amazon RDS DB instance.
 
   - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.
@@ -46,6 +50,10 @@ The following account, resources, and application versions are required for use 
 - Pega Platform 8.3.1 or later.
 
 - Pega Docker images – your deployment requires the use of several Docker images that you download and make available in a private Docker registry. For step-by-step details, see [Downloading and managing Pega Platform docker images (linux)](prepping-local-system-runbook-linux.md#downloading-and-managing-pega-platform-docker-images) or [Downloading and managing Pega Platform docker images (windows)](prepping-local-system-runbook-windows.md#downloading-and-managing-pega-platform-docker-images).
+
+- Clients deploying to GovCloud region must upload their Pega-provided Docker images to an ECR repository and reference them in the Pega yaml file before they can use the Helm charts to deploy Pega Platform.
+
+- Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.Pega Platform deployments support commercial and GovCloud regions.
 
 - Helm 3.0 or later. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
 
@@ -61,7 +69,8 @@ This section covers the details necessary to obtain your AWS credentials and con
 
 ### Creating your IAM user access keys
 
-In order to create an EKS cluster, Pega recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credentials, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
+In order to create an EKS cluster, Peg
+a recommends using IAM user access keys for deployment authentications. If your organization does not support using IAM credentials, refer to your organization's guidance for how to manage authentication between your deployment in your EKS cluster and your organization.
 
 Use the following steps, which are sourced from the AWS documentation, **Access Key and Secret Access Key** on the page, [Quickly Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html#cli-quick-configuration).
 
@@ -93,6 +102,8 @@ When you create an access key, the key pair is active by default, and you can us
 ### Configuring your AWS CLI credentials
 
 To save your IAM user access keys and other preferences for your EKS deployment to a configuration file on your local system, use the `aws configure` command. this command prompts you for four pieces of information you must specify in order to deploy an EKS cluster in your AWS account (access key, secret access key, AWS Region, and output format). For complete details about what this information includes, see the overview article, [Configuring the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html). To see details that may be useful to customize your stored credentials to meet your organization's business needs, see [Configuration and Credential File Settings](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html).
+
+Pega Platform deployments support commercial and GovCloud regions.
 
 To setup your local system and save your AWS credentials and profile to the $USER/.aws file, enter:
 
@@ -158,25 +169,27 @@ nodeGroups:
 instanceType: m5.xlarge
 minSize: 2
 ```
-You should use a name and region here to reflect the version of Pega Platform you want to deploy and specify the region in which your cluster will run.
+Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the version of Pega Platform you want to deploy and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller.
 
 2. To create your Amazon EKS cluster and Windows and Linux worker nodes, from your /EKS-demo folder, enter.
 
 `eksctl create cluster -f ./my-EKS-cluster-spec.yaml`
 
  It takes 10 to 15 minutes for the cluster provisioning to complete. During deployment this command copies the required Kubernetes configuration file to the cluster and into your default ~/.kube directory.
- 
- 3. After provisioning is complete, verify that the worker nodes joined the cluster and are in Ready state, by entering:
+
+3. From EKS 1.23 and above install the Amazon EBS CSI driver in your cluster.For instructions on how to install the Amazon EBS CSI driver on your cluster, see [Amazon EBS CSI driver](https://docs.aws.amazon.com/eks/latest/userguide/ebs-csi.html)
+
+4. After provisioning is complete, verify that the worker nodes joined the cluster and are in Ready state, by entering:
 
 `kubectl get nodes`
 
 With your cluster created and running as expected, you must create a database resource for your Pega Platform installation. If you have to delete your cluster for some reason before you have namespaces deployed in it, use the command, `eksctl delete cluster --name <cluster-name>'.
 
-4. To deploy the Kubernetes dashboard and see your EKS cluster, enter:
+5. To deploy the Kubernetes dashboard and see your EKS cluster, enter:
 
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/dashboard/v2.0.0-beta4/aio/deploy/recommended.yaml
 
-5. Create a Service Account and Cluster Role Binding, each named `eks-admin` to securely connect to the dashboard with administrator-level permissions, since by default, the Kubernetes dashboard limits permissions.
+6. Create a Service Account and Cluster Role Binding, each named `eks-admin` to securely connect to the dashboard with administrator-level permissions, since by default, the Kubernetes dashboard limits permissions.
 
 For client convenience, Pega suggests saving the following text, to define the service account and cluster role binding for your deployment, to a file named similar to `eks-admin-service-account.yaml` in your EKS-demo folder.
 
@@ -201,30 +214,30 @@ subjects:
  namespace: kube-system
 ```
 
-6. Apply the service account and cluster role binding to your cluster.
+7. Apply the service account and cluster role binding to your cluster.
 
 ```yaml
 $ kubectl apply -f eks-admin-service-account.yaml
 service account/eks-admin created
 ```
 
-7. To generate an authentication token for the eks-admin service account required to connect to the dashboard of your administrative service account, enter:
+8. To generate an authentication token for the eks-admin service account required to connect to the dashboard of your administrative service account, enter:
 
 `kubectl -n kube-system describe secret $(kubectl -n kube-system get secret | grep eks-admin | awk '{print $1}')`
 
-8. Copy the <authentication_token> value to connect to the Kubernetes dashboard.
+9. Copy the <authentication_token> value to connect to the Kubernetes dashboard.
 
-9. To start the proxy server for the Kubernetes dashboard, enter:
+10. To start the proxy server for the Kubernetes dashboard, enter:
 
     `$ kubectl proxy`
 
-10. To access the Dashboard UI, open a web browser and navigate to the following URL:
+11. To access the Dashboard UI, open a web browser and navigate to the following URL:
 
     `http://localhost:8001/api/v1/namespaces/kube-system/services/https:kubernetes-dashboard:/proxy/`
 
-11. In the **Kubernetes Dashboard** sign in window, choose to use a cluster Kubeconfig token: select **Token** and paste the <authentication_token> value that you just generated into the **Enter token** area.
+12. In the **Kubernetes Dashboard** sign in window, choose to use a cluster Kubeconfig token: select **Token** and paste the <authentication_token> value that you just generated into the **Enter token** area.
 
-12. Click **SIGN IN**.
+13. Click **SIGN IN**.
 
     You can now view your EKS cluster details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment. Without a deployment, only EKS resources display. The dashboard does not display your EKS cluster name or your resource name, which is expected behavior.
 
@@ -434,8 +447,8 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
 - Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
 - Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
-- Uncomment and specify the Amazon EKS Amazon ECR image repository in the image.repository: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
-- Specify complete  required required annotation to specify the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
+- Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
+- Specify the complete required annotation to the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
 To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
 
@@ -453,7 +466,7 @@ To configure the parameters in the backingservices.yaml file, download the file 
 |:---------------------------------|:-------------------------------------------|:--------------|
 | global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
 | srs.deploymentName:        | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
-| srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/README.md#srs-version-compatibility-matrix).    |
+| srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix).    |
 | srs.srsStorage.provisionInternalESCluster: | Enabled by default to provision an Elasticsearch cluster. | <ul><li>Set srs.srsStorage.provisionInternalESCluster:`true` and run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`</li><li>Set srs.srsStorage.provisionInternalESCluster:`false` if you want to use an existing, externally provisioned ElasticSearch cluster. </li></ul> |
 | srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. For an Elasticsearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS Elasticsearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS Elasticsearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li>     <li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li>     <li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |
 | elasticsearch: volumeClaimTemplate: resources: requests: storage: | Specify the Elasticsearch cluster disk volume size. Default is 30Gi, set this value to at least three times the size of your estimated search data size | <ul><li>elasticsearch: volumeClaimTemplate: resources: requests: storage:  "\<30Gi>” </li></ul> |
@@ -511,6 +524,8 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
 
 - Enable Hazelcast client-server model for Pega Platform 8.6 and later.
 
+- For new deployments, Pega recommends deploying Pega Platform using an externalized Kafka configuration as a stream service provider to use your own managed Kafka infrastructure. Deployment of stream with externalized Kafka configuration requires Pega Infinity 8.4 or later.
+
 1. To download the pega.yaml Helm chart to the \<local filepath\>/EKS-demo, enter:
 
    `$ helm inspect values pega/pega > pega.yaml`
@@ -530,17 +545,19 @@ Configure the parameters so the pega.yaml Helm chart matches your deployment res
    | customArtifactory.authentication: basic.username: basic.password: apiKey.headerName: apiKey.value: | To download a JDBC driver from your custom artifactory which is secured with Basic or APIKey Authentication. Use `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` section to provide APIKey value and dedicated APIKey header details. | <ul><li>basic.username: "\<Custom artifactory basic Authentication username\>"</li><li>basic.password: "\<Custom artifactory basic Authentication password\>"</li><li>apiKey.headerName: "\<Custom artifactory dedicated APIKey Authentication header name\>"</li><li>apiKey.value: "\<Custom artifactory APIKey value for APIKey authentication\>"</li> </ul> |
    | customArtifactory.certificate: | Custom artifactory SSL certificate verification is enabled by default. If your custom artifactory domain has a self-signed SSL certificate, provide the certificate. You can disable SSL certificate verification by setting `customArtifactory.enableSSLVerification` to `false`;however, this setting establishes an insecure connection. | <ul><li> certificate: "\<custom artifactory SSL certificate to be verified\>"</li></ul> |
    | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
+   | docker.imagePullSecretNames | Specify the Docker registry secrets to pull an image from a private Docker repository. Refer to [Kubernetes Secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create Docker registry secrets. | imagePullSecretNames: ["secret1", "secret2"] |
    | docker.pega.image:       | Specify the Pega-provided `Pega` image that you downloaded and pushed to your Docker registry.  | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
    | tier.name: ”web” tier.service.domain:| Set a host name for the pega-web service of the DNS zone. To support the use of HTTPS for ingress connectivity enable SSL/TLS termination protocols on the tier ingress and provide your ARN certificate, where `alb.ingress.kubernetes.io/certificate-arn` is the required annotation name and `<certificate-arn>` takes the form, `arn:aws:acm:<region>:<AWS account>:certificate/xxxxxxx` which you copy from the AWS console view of the load balancer configuration.| <ul><li>domain: "\<the host name for your web service tier\>" </li><li>ingress.tls.enabled: "true"</li><li>ingress.ssl_annotation: alb.ingress.kubernetes.io/certificate-arn: \<certificate-arn></li><li>Assign this host name with the DNS host name that the load balancer associates with the web tier; after the deployment is complete, you can log into Pega Platform with your host name in the URL. Your web tier host name must comply with your networking standards and be available on an external network.</li></ul> |
-   | tier.name: ”web” tier.service.tls:| Set this parameter as `true` to encrypt the traffic between the load balancer/ingress and pods. Beginning with Helm version `2.2.0` Pega provides a default self-signed certificate; Pega also supports specifying your own CA certificate. | <ul><li>tier.service.tls.enabled: set to `true` to enable the traffic encryption </li><li>tier.service.tls.port: 443</li><li>tier.service.tls.targetPort: 8443</li><li>tier.service.tls.external_secret_name: The external secret name for fetching certificates from a secure location. For details, see [this option in the Pega Helm chart](../charts/pega#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)</li><li>tier.service.tls.keystore: The base64 encoded content of the keystore file. Leave this value empty to use the default, Pega-provided self-signed certificate.</li><li>tier.service.tls.keystorepassword: the password of the keystore file</li><li>tier.service.tls.cacertificate: the base64 encrypted content of the root CA certificate.  You can leave this value empty for EKS deployments.</li><li>tier.service.traefik.enabled:  set to `false` as this option is for `k8s` provider not for `EKS`</li></ul> |
-   | tier.name: ”stream” tier.service.domain: | Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards. </li></ul> |
+   | tier.name: ”web” tier.service.tls:| Set this parameter as `true` to encrypt the traffic between the load balancer/ingress and pods. Beginning with Helm version `2.2.0` Pega provides a default self-signed certificate; Pega also supports specifying your own CA certificate. | <ul><li>tier.service.tls.enabled: set to `true` to enable the traffic encryption </li><li>tier.service.tls.port: 443</li><li>tier.service.tls.targetPort: 8443</li><li>tier.service.tls.keystore: The base64 encoded content of the keystore file. Leave this value empty to use the default, Pega-provided self-signed certificate.</li><li>tier.service.tls.keystorepassword: the password of the keystore file</li><li>tier.service.tls.cacertificate: the base64 encrypted content of the root CA certificate.  You can leave this value empty for EKS deployments.</li><li>tier.service.traefik.enabled:  set to `false` as this option is for `k8s` provider not for `EKS`</li></ul> |
+   | tier.name: ”stream” (Deprecated) tier.ingress.domain: | The "Stream tier" is deprecated, please enable externalized Kafka service configuration under External Services.Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul> |
    | pegasearch: | For Pega Platform 8.6 and later, Pega recommends using the chart 'backingservices' to enable Pega SRS. To deploy this service, you must configure your SRS cluster using the backingservices Helm charts and provide the SRS URL for your Pega Infinity deployment. | <ul><li>externalSearchService: true</li><li>externalURL: pegasearch.externalURL For example, http://srs-service.mypega-pks-demo.svc.cluster.local </li></ul> |
    | installer.image:        | Specify the Pega-provided Docker `installer` image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".     | adminPassword: "\<initial password\>"  |
    | hazelcast: | For Pega Platform 8.6 and later, Pega recommends using Hazelcast in client-server model. Embedded deployment would not be supported in future platform releases.| |
    | hazelcast.image:        | Specify the Pega-provided `clustering-service` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
-
+   | stream.enabled: stream.bootstrapServer: stream.securityProtocol: stream.trustStore: stream.trustStorePassword: stream.keyStore: stream.keyStorePassword: stream.saslMechanism: stream.jaasConfig: stream.streamNamePattern: stream.replicationFactor: stream.external_secret_name:| Enable an externalized kafka configuration to connect to your existing stream service, by configuring these required settings | <ul><li>enabled: true/false <br/> Set to true if you want to deploy Pega Platform to use an externalized Kafka configuration, otherwise leave set to false. Note: Pega recommends enabling an externalized Kafka configuration and has deprecated using a stream tier configuration starting at version 8.7.</li><li>bootstrapServer: Provide your existing Kafka broker URLs separated by commas.</li><li>securityProtocol: Provide the required security protocol that your deployment will use to communicate with your existing brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.</li><li> trustStore: When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate, in the global.certificatesSecrets parameter. Pega deployments only support trustStores using the Java Key Store (.jks) format.</li><li> trustStorePassword: If required, provide keyStore value in plain text.</li><li> keyStore: When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate, in the global.certificatesSecrets parameter. Pega deployments only support keyStores using the Java Key Store (.jks) format.<li> keyStorePassword: If required, provide keyStore value in plain text.</li><li> jaasConfig: If required, provide jaasConfig value in plain text.</li><li> saslMechanism: If required, provide SASL Mechanism. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.</li> <li> streamNamePattern: By default, topics originating from Pega Platform have the "pega-" prefix, so that it is easy to distinguish them from topics created by other applications. Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.</li> <li> replicationFactor: Your replicationFactor value cannot be more than the number of Kafka brokers and 3.</li> <li> external_secret_name: To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and configure them using an External Secrets Manager, making sure that you configure the keys in the secret in the order:STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG. Enter the external secret name.</li></ul> |
+   
 3. Save the file.
 
 4. To use an internal Elasticsearch cluster (srs.srsStorage.requireInternetAccess:true) for your deployment, you must download the Makefile file from the repository ( path from root : pega-helm-charts/charts/backingservices/Makefile) and replace <YOUR_NAMESPACE> with the namespace you used for the deployment, then run `$ es-prerequisite`.

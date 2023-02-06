@@ -1,0 +1,61 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isClusteringServiceEnabled" .) "true") }}
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "clusteringServiceEnvironmentConfig" }}
+  namespace: {{ .Release.Namespace }}
+data:
+  # Key Value pairs
+  NAMESPACE: {{ .Release.Namespace }}
+  JAVA_OPTS: {{ .Values.server.java_opts | quote }}
+  SERVICE_NAME: {{ template "clusteringServiceName" . }}-service
+  MIN_CLUSTER_SIZE: {{ .Values.replicas | quote }}
+{{- if .Values.server.jmx_enabled }}
+  JMX_ENABLED: {{ .Values.server.jmx_enabled | quote }}
+{{- end }}
+{{- if .Values.server.health_monitoring_level }}
+  HEALTH_MONITORING_LEVEL: {{ .Values.server.health_monitoring_level | quote }}
+{{- end }}
+{{- if .Values.server.operation_generic_thread_count }}
+  OPERATION_GENERIC_THREAD_COUNT: {{ .Values.server.operation_generic_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.operation_thread_count }}
+  OPERATION_THREAD_COUNT: {{ .Values.server.operation_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.io_thread_count }}
+  IO_THREAD_COUNT: {{ .Values.server.io_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.event_thread_count }}
+  EVENT_THREAD_COUNT: {{ .Values.server.event_thread_count | quote }}
+{{- end }}
+{{- if .Values.server.max_join_seconds }}
+  MAX_JOIN_SECONDS: {{ .Values.server.max_join_seconds | quote }}
+{{- end }}
+{{- if .Values.server.group_name }}
+  GROUP_NAME: {{ .Values.server.clustering_service_group_name | quote }}
+{{- end }}
+{{- if .Values.server.mancenter_url }}
+  MANCENTER_URL: {{ .Values.server.mancenter_url | quote }}
+{{- end }}
+{{- if .Values.server.graceful_shutdown_max_wait_seconds }}
+  GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS: {{ .Values.server.graceful_shutdown_max_wait_seconds | quote }}
+{{- end }}
+{{- if .Values.server.service_dns_timeout }}
+  SERVICE_DNS_TIMEOUT: {{ .Values.server.service_dns_timeout | quote }}
+{{- end }}
+{{- if .Values.server.logging_level }}
+  LOGGING_LEVEL: {{ .Values.server.logging_level | quote }}
+{{- end }}
+{{- if .Values.server.diagnostics_enabled }}
+  DIAGNOSTICS_ENABLED: {{ .Values.server.diagnostics_enabled | quote }}
+{{- end }}
+{{- if .Values.server.diagnostics_metric_level }}
+  DIAGNOSTICS_METRIC_LEVEL: {{ .Values.server.diagnostics_metric_level | quote }}
+{{- end }}
+{{- if .Values.server.diagnostics_file_count }}
+  DIAGNOSTICS_FILE_COUNT: {{ .Values.server.diagnostics_file_count | quote }}
+{{- end }}
+{{- if .Values.server.diagnostic_log_file_size_mb }}
+  DIAGNOSTIC_LOG_FILE_SIZE_MB: {{ .Values.server.diagnostic_log_file_size_mb | quote }}
+{{- end }}
+{{ end }}

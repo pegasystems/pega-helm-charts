@@ -71,7 +71,8 @@
                relaxedPathChars="[ ]"
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
-               connectionTimeout="20000" />
+               connectionTimeout="20000"
+               maxHeaderCount="100" />
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
@@ -79,17 +80,35 @@
 	       maxThreads="1"/>
 
     <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
-    {{ if and .Env.TOMCAT_KEYSTORE_DIR .Env.TOMCAT_KEYSTORE_PASSWORD }}
 
-	<Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
-                   scheme="https" secure="true" SSLEnabled="true"
-                   keystoreFile="{{ .Env.TOMCAT_KEYSTORE_DIR }}"
-                   keystorePass="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}"
-                   clientAuth="false" sslProtocol="TLS" relaxedQueryChars="[ ]"
-                   relaxedPathChars="[ ]"
-                   maxHttpHeaderSize="16384"
-                   maxSavePostSize="65536"
-                   connectionTimeout="20000" />
+    {{ if or (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") (exists "/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_FILE") }}
+
+    <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
+                       scheme="https" secure="true" SSLEnabled="true"
+                        relaxedQueryChars="[ ]"
+                       relaxedPathChars="[ ]"
+                       maxHttpHeaderSize="16384"
+                       maxSavePostSize="65536"
+                       connectionTimeout="20000"
+                       maxHeaderCount="100" >
+                       <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
+                           {{ if ( and (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
+
+                           <Certificate certificateKeystoreFile="/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT"
+                                        certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
+
+                           {{ else }}
+
+                           <Certificate certificateFile="/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_FILE"
+                                       certificateKeyFile="/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_KEY_FILE"
+                                       certificateChainFile="/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_CHAIN_FILE" />
+
+                           {{ end }}
+
+                       </SSLHostConfig>
+    </Connector>
+
+
     {{ end }}
 
     <!-- A "Connector" using the shared thread pool-->

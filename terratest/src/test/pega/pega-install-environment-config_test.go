@@ -3,7 +3,7 @@ package pega
 import (
 	"path/filepath"
 	"testing"
-
+    "strings"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
@@ -45,7 +45,7 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, installEnvConfigData["SYSTEM_NAME"], "pega")
 	require.Equal(t, installEnvConfigData["PRODUCTION_LEVEL"], "2")
-	require.Equal(t, installEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, installEnvConfigData["MT_SYSTEM"], "")
 	require.Equal(t, "ADMIN_PASSWORD", installEnvConfigData["ADMIN_PASSWORD"])
 	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "true")
@@ -59,5 +59,13 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
 	require.Equal(t, "", installEnvConfigData["DISTRIBUTION_KIT_URL"])
-        require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+    require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+
+    assertNoDupesInConfigMap(t, configYaml, &installEnvConfigMap)
+}
+
+func assertNoDupesInConfigMap(t *testing.T, configYaml string, cm *k8score.ConfigMap) {
+    for key := range cm.Data {
+       require.Equal(t, 1, strings.Count(configYaml, " " + key + ": "))
+    }
 }
