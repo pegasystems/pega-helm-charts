@@ -47,14 +47,20 @@ spec:
   {{ if (.node.service.domain) }}
   - http:
       paths:
-      - pathType: ImplementationSpecific
+      - pathType: {{ include "hostPathType" . }}
+        {{- if .node.ingress.path }}
+        path: {{ .node.ingress.path }}
+        {{- end }}
         backend:
 {{ include "ingressServiceSSLRedirect" . | indent 10 }}
   {{ else }}
   {{ if ( include "ingressTlsEnabled" . ) }}
   - http:
       paths:
-      - pathType: ImplementationSpecific
+      - pathType: {{ include "hostPathType" . }}
+        {{- if .node.ingress.path }}
+        path: {{ .node.ingress.path }}
+        {{- end }}
         backend:
 {{ include "ingressServiceSSLRedirect" . | indent 10 }}
   {{ end }}
@@ -70,9 +76,7 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: ImplementationSpecific
-        backend:
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{ include "ingressBackend" . }}
+{{ include "defaultIngressRule" . | indent 6 }}
 ---
 {{- end }}

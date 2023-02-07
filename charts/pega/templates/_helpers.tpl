@@ -159,6 +159,23 @@ false
      secretName: {{ .node.ingress.tls.secretName }}
 {{- end }}
 
+{{- define "hostPathType" }}
+ {{- if .node.ingress.pathType -}}
+   {{ .node.ingress.pathType }}
+ {{- else -}}
+   ImplementationSpecific
+ {{- end }}
+{{- end }}
+
+{{- define "defaultIngressRule" }}
+- pathType: {{ include "hostPathType" $ }}
+  {{- if .node.ingress.path }}
+  path: {{ .node.ingress.path }}
+  {{- end }}
+  backend:
+    {{ include "ingressBackend" $ }}
+{{- end }}
+
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true
