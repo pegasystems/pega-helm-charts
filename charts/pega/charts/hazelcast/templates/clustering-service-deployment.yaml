@@ -1,29 +1,29 @@
-{{ if and (eq (include "performDeployment" .) "true") (eq (include "isHazelcastEnabled" .) "true") }}
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isClusteringServiceEnabled" .) "true") }}
 kind: StatefulSet
 apiVersion: apps/v1
 metadata:
-  name: {{ template "hazelcastName" . }}
+  name: {{ template "clusteringServiceName" . }}
   namespace: {{ .Release.Namespace }}
 spec:
   selector:
     matchLabels:
-      app: {{ template "hazelcastName" . }}
+      app: {{ template "clusteringServiceName" . }}
       component: "Hazelcast"
-  serviceName: {{ template "hazelcastName" . }}-service
+  serviceName: {{ template "clusteringServiceName" . }}-service
   replicas: {{ .Values.replicas }}
   template:
     metadata:
       labels:
-        app: {{ template "hazelcastName" . }}
+        app: {{ template "clusteringServiceName" . }}
         component: "Hazelcast"
         ops.identifier: "hazelcast" 
       annotations:
-{{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
+{{- include "generatedClusteringServicePodAnnotations" . | indent 8 }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.server.graceful_shutdown_max_wait_seconds }}
       containers:
       - name: hazelcast
-        image: {{ .Values.image }}
+        image: {{ .Values.clusteringServiceImage }}
   {{- if ( .Values.imagePullPolicy ) }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
   {{- end }}
@@ -34,7 +34,7 @@ spec:
           mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
-            name: {{ template "hazelcastEnvironmentConfig" }}
+            name: {{ template "clusteringServiceEnvironmentConfig" }}
         resources:
           requests:
             cpu: "{{ .Values.resources.requests.cpu }}"
@@ -67,5 +67,5 @@ spec:
       # Volume used to mount secret files.
       {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
-{{- include "imagePullSecrets" . | indent 6 }}
+      - name: {{ template "pegaRegistrySecret" $ }}
 {{ end }}

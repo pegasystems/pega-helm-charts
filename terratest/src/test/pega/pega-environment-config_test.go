@@ -52,23 +52,23 @@ func TestPegaEnvironmentConfigJDBCTimeouts(t * testing.T) {
 
     yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.connectionTimeoutProperties"] = "socketTimeout=90;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.writerConnectionTimeoutProperties"] = "socketTimeout=120;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
     VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
-    VerifyEnvNotPresent(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO")
+    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
     options.SetValues["global.jdbc.readerConnectionTimeoutProperties"] = "socketTimeout=150;"
     yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
@@ -121,5 +121,14 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
+	require.Equal(t, envConfigData["CASSANDRA_ASYNC_PROCESSING_ENABLED"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_KEYSPACES_PREFIX"], "")
+	require.Equal(t, envConfigData["CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_LATENCY_AWARE_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_CUSTOM_RETRY_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_SPECULATIVE_EXECUTION_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_JMX_METRICS_ENABLED"], "true")
+	require.Equal(t, envConfigData["CASSANDRA_CSV_METRICS_ENABLED"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_LOG_METRICS_ENABLED"], "false")
 	require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }

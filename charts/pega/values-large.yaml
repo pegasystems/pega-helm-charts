@@ -87,6 +87,9 @@ global:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+    # To avoid exposing Docker registry details, create secrets to manage your Docker registry credentials.
+    # Specify secret names as an array of comma-separated strings in double quotation marks using the imagePullSecretNames parameter. For example: ["secret1", "secret2"]
+    imagePullSecretNames: []
     # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
@@ -96,9 +99,10 @@ global:
       image: busybox:1.31.0
       imagePullPolicy: IfNotPresent
     k8s_wait_for:
-      image: dcasavant/k8s-wait-for
+      image: pegasystems/k8s-wait-for
       imagePullPolicy: "IfNotPresent"
       # waitTimeSeconds: 2
+      # maxRetries: 1
 
   # Upgrade specific properties
   upgrade:
@@ -125,6 +129,7 @@ global:
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
+        httpEnabled: true
         port: 80
         targetPort: 8080
         # To configure TLS between the ingress/load balancer and the backend, set the following:
@@ -159,6 +164,9 @@ global:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
+        # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
+        # path:
+        # pathType:
         tls:
           # Enable TLS encryption
           enabled: true
@@ -402,9 +410,26 @@ installer:
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
+  clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
+
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
+
+  # Setting up for Pega 8.8 and above fresh install and for HZ upgrade
+  clusteringServiceEnabled: false
+
+  # Setting related to Hazelcast migration.
+  migration:
+    # Set to `true` to initiate the migration job.
+    initiateMigration: false
+    # Reference the `platform/clustering-service-kubectl` Docker image to create the migration job.
+    migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+    # Set to `true` when migrating from embedded Hazelcast.
+    embeddedToCSMigration: false
+    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
+    skipRestart: false
+
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client-server Hazelcast model for authentication

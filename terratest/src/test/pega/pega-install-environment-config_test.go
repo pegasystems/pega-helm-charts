@@ -3,7 +3,7 @@ package pega
 import (
 	"path/filepath"
 	"testing"
-
+    "strings"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
@@ -59,5 +59,13 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, installEnvConfigData["ACTION"], options.SetValues["global.actions.execute"])
 	require.Equal(t, "", installEnvConfigData["DISTRIBUTION_KIT_URL"])
-        require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+    require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+
+    assertNoDupesInConfigMap(t, configYaml, &installEnvConfigMap)
+}
+
+func assertNoDupesInConfigMap(t *testing.T, configYaml string, cm *k8score.ConfigMap) {
+    for key := range cm.Data {
+       require.Equal(t, 1, strings.Count(configYaml, " " + key + ": "))
+    }
 }

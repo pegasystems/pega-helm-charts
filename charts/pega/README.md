@@ -153,6 +153,8 @@ Specify the location for the Pega Docker image.  This image is available on Dock
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
+To avoid specifying Docker registry credentials in values.yaml, create secrets for Docker registry credentials to avoid exposing these credentials. Refer to [Kubernetes secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create Docker registry secrets. Specify secret names as a list of comma-separated strings using the `docker.imagePullSecretNames` parameter. Kubernetes checks each registry secret of image pull secrets to pull an image from the repository. If the specified image is available in one of the provided secrets, kubernetes will pull it from that repository. To create Docker registry secrets from external secrets, refer to [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).
+
 When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `pegasystems/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
 
 For this reason, it is also recommended that you specify the `docker.pega.imagePullPolicy: "IfNotPresent"` option in production, since it will ensure that a new generic tagged image will not overwrite the locally cached version.
@@ -165,6 +167,7 @@ docker:
     url: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  imagePullSecretNames: []
   pega:
     image: "pegasystems/pega:8.4.4"
     imagePullPolicy: "Always"
@@ -181,7 +184,7 @@ utilityImages:
     image: "busybox:1.31.0"
     imagePullPolicy: "IfNotPresent"
   k8s_wait_for:
-    image: "dcasavant/k8s-wait-for"
+    image: "pegasystems/k8s-wait-for"
     imagePullPolicy: "IfNotPresent"
 ```
 
@@ -213,7 +216,7 @@ The default value is "pega" if it is unset.
 
 ## Tiers of a Pega deployment
 
-Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. To avoid misconfiguration, use a single helm chart to deploy all your tiers simultaneously. Pega does not support using separate charts for different tiers in a single deployment. Use the tier section in the helm chart to complete your tier deployment with appropriate nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
@@ -311,6 +314,7 @@ Configuration parameters:
 
 Parameter | Description                       | Default value
 ---       | ---                               | ---
+`httpEnabled`    | Use this to disable the http port `80` on Pega web service. Make sure `tls` is enabled if http port is disabled. | `true`
 `port`    | The port of the tier to be exposed to the cluster. For HTTP this is generally `80`. | `80`
 `targetPort`    | The target port of the container to expose. The Pega container exposes web traffic on port `8080`. | `8080`
 `serviceType`    | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose. | `LoadBalancer`
@@ -332,6 +336,8 @@ Specify the `ingress` yaml block to expose a Pega tier to access from outside Ku
 Parameter | Description
 ---       | ---
 `domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
+`path`  | Specify custom path to the host.
+`pathType`  | Specify pathType for routing based on the Ingress controller chosen. Default is `ImplementationSpecific`
 `appContextPath`  | Specify the path for access to the Pega application on a specific tier. If not specified, users will have access to the Pega application via /prweb 
 `tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
@@ -661,22 +667,33 @@ To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and 
 
 Use the following parameters to configure the connection to your external Cassandra cluster
 
-Parameter     | Description | Default value
----           |-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---
-`externalNodes`    | A comma separated list of hosts in the Cassandra cluster. | Empty
-`port` | TCP Port to connect to cassandra. | 9042
-`username` | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
-`password` | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
-`clientEncryption` | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
-`trustStore` | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
-`trustStorePassword` | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
-`keyStore` | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
-`keyStorePassword` | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+Parameter     | Tier Level Environment Variable | Description | Default value
+---           |:---:| ---|:---:
+`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
+`port` | N/A | TCP Port to connect to cassandra. | 9042
+`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
+`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
+`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
+`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
+`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
+`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
+`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations. | false
+`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra. | Empty
+`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner. | false
+`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average). | false
+`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once. | false
+`speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. | false
+`jmxMetricsEnabled` | CASSANDRA_JMX_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX interface; disabling also limits the metrics being collected using the DDS landing page. | true
+`csvMetricsEnabled` | CASSANDRA_CSV_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor your Cassandra service. If you enable this property, use the Pega Platform DSS: dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By default, after you enable this property, CSV files will be written to the Pega Platform work directory. | true
+`logMetricsEnabled` | CASSANDRA_LOG_METRICS_ENABLED | Enable reporting of DDS SDK metrics to your Pega Platform logs. | false
 
 
 If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
 Example:
+
+This example configuration shows the parameters required for a deployment that connects to an SSL encrypted Cassandra service. It configures an extended token aware policy for browse operations and custom retries for all queries. Metrics logging to CSV and Pega Logs are disabled. Usernames and passwords are all supplied by Kubernetes secrets.
 
 ```yaml
 cassandra:
@@ -685,9 +702,29 @@ cassandra:
 dds:
   externalNodes: "CASSANDRA_NODE_IPS"
   port: "9042"
-  username: "cassandra_username"
-  password: "cassandra_password"
-  external_secret_name: ""
+  username: ""
+  password: ""
+  keyspacesPrefix: "dev01"
+  trustStore: "/opt/pega/certs/cass-truststore.jks"
+  keyStore: "/opt/pega/certs/cass-keystore.jks"
+  extendedTokenAwarePolicy: true
+  customRetryPolicy: true
+  csvMetricsEnabled: false
+  logMetricsEnabled: false
+  # The external secret below contains passwords with the following keys: CASSANDRA_USERNAME, CASSANDRA_PASSWORD, CASSANDRA_TRUSTSTORE_PASSWORD, CASSANDRA_KEYSTORE_PASSWORD
+  external_secret_name: "dev02-credentials-secret"
+```
+In addition to being configured at the cluster level, the parameters above that have a corresponding tier level environement variable may be specified at the tier level. The following example shows how to configure the Dataflow tier to use the latency aware load balancing policy.
+
+```yaml
+  tier:
+    - name: "Dataflow"
+      nodeType: "BackgroundProcessing,Dataflow"
+
+      custom:
+        env:
+        - name: CASSANDRA_LATENCY_AWARE_POLICY
+          value: "true"
 ```
 
 ### Deploying Cassandra with Pega
@@ -1002,7 +1039,8 @@ The default and recommended deployment strategy for Hazelcast is client-server, 
 Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6                 | \= 1.0.3                     | Pega Infinity 8.6 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later. 
+\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later upto 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version of clustering service. 
+\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version of clustering service. 
 
 
 #### Configuration Settings
@@ -1012,17 +1050,30 @@ here: [Additional Parameters](charts/hazelcast/README.md)
 Parameter   | Description   | Default value
 ---         | ---           | ---
 `hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_HAZELCAST_IMAGE:TAG`
-`hazelcast.enabled` |  Set as true if client-server deployment of Pega Platform is required, otherwise false. Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail | `true`
-`hazelcast.replicas` | Number of initial members to join the Hazelcast cluster | `3`
-`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication | `""`
-`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication | `""`
-`hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)  | `""`
+`hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
+`hazelcast.enabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6. | `true`
+`hazelcast.clusteringServiceEnabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8; if not set the installation will fail. | `false`
+`hazelcast.migration.initiateMigration` |  Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster. | `false`
+`hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
+`hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
+`hazelcast.migration.skipRestart` |  Set to `true` during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail. | `false`
+`hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
+`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
+`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
+`hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 
 #### Example
 ```yaml
 hazelcast:
   image: "YOUR_HAZELCAST_IMAGE:TAG"
+  clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
   enabled: true
+  clusteringServiceEnabled: false
+  migration:
+    initiateMigration: false
+    migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+    embeddedToCSMigration: false
+    skipRestart: false
   replicas: 3
   username: ""
   password: ""

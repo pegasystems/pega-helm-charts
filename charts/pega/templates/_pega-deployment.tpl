@@ -139,6 +139,8 @@ spec:
         ports:
         - containerPort: 8080
           name: pega-web-port
+        - containerPort: 8443
+          name: pega-tls-port
 {{- if .custom }}
 {{- if .custom.ports }}
         # Additional custom ports
@@ -291,7 +293,7 @@ spec:
       # Secret which is used to pull the image from the repository.  This secret contains docker login details for the particular user.
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" .root }}
+{{- include "imagePullSecrets" .root | indent 6 }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:
