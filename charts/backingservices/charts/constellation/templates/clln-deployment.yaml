@@ -21,8 +21,7 @@ spec:
       - name: {{ template "pegaRegistrySecret" $ }}
       containers:
       - name: constellation
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        image: {{ .Values.image }}
+        image: {{ .Values.docker.constellation.image }}
         args:
         - port=3000
         # constellation URL path, if you change it, you need to change ingress template files too 
@@ -35,7 +34,7 @@ spec:
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/v860/ping
+            path: /c11n/buildInfo.json
             port: 3000
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
@@ -44,7 +43,7 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/v860/ping
+            path: /c11n/buildInfo.json
             port: 3000
         ports:
         - containerPort: 3000
