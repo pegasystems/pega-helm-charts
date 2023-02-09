@@ -32,9 +32,6 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: ImplementationSpecific
-        backend:
-{{ include "ingressBackend" . }}
-
----     
+{{ include "defaultIngressRule" . | indent 6 }}
+---
 {{- end }}
