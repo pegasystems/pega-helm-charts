@@ -46,4 +46,16 @@
 {{- define "generatedClusteringServiceAnnotations" }}
 {{- end }}
 
+{{- define "hazelcastVolumeCredentials" }}hazelcast-volume-credentials{{- end }}
+
+{{- define "hazelcastVolumeTemplate" }}
+- name: {{ template "hazelcastVolumeCredentials" }}
+  projected:
+    defaultMode: 420
+    sources:
+  {{ if (.Values.external_secret_name)}}
+    - secret:
+        name: {{ .Values.external_secret_name }}
+  {{- end }}
+{{- end}}
 
