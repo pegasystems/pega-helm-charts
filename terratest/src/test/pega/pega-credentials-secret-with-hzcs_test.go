@@ -32,6 +32,7 @@ func TestPegaCredentialsSecretWhenHazelcastIsEnabled(t *testing.T){
 					"global.actions.execute": operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
 					"hazelcast.enabled": "true",
+					"hazelcast.migration.embeddedToCSMigration": "false",
 					"hazelcast.username": HZ_CS_AUTH_USERNAME,
 					"hazelcast.password": HZ_CS_AUTH_PASSWORD,
 			 	},
@@ -41,6 +42,30 @@ func TestPegaCredentialsSecretWhenHazelcastIsEnabled(t *testing.T){
 			VerifyCredentialsSecretWhenHazelcastIsEnabled(t,yamlContent)
 		}
 	}
+
+    for _,vendor := range supportedVendors{
+
+        for _,operation := range supportedOperations{
+
+            fmt.Println(vendor + "-" + operation)
+
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.provider":        vendor,
+                    "global.actions.execute": operation,
+                    "installer.upgrade.upgradeType": "zero-downtime",
+                    "hazelcast.enabled": "false",
+                    "hazelcast.clusteringServiceEnabled": "true",
+                    "hazelcast.migration.embeddedToCSMigration": "false",
+                    "hazelcast.username": HZ_CS_AUTH_USERNAME,
+                    "hazelcast.password": HZ_CS_AUTH_PASSWORD,
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-credentials-secret.yaml"})
+            VerifyCredentialsSecretWhenHazelcastIsEnabled(t,yamlContent)
+        }
+    }
 
 
 }

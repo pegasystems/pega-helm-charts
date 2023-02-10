@@ -1,0 +1,21 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isClusteringServiceEnabled" .) "true") }}
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ template "clusteringServiceName" . }}-service
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "clusteringServiceName" . }}
+    component: Pega
+  annotations:
+{{- include "generatedClusteringServiceAnnotations" . | indent 8 }}
+spec:
+  ports:
+  - name: tcp-hzport
+    port: 5701
+    targetPort: 5701   
+  clusterIP: None
+  selector:
+    app: {{ template "clusteringServiceName" . }}
+    component: Hazelcast
+{{ end }}

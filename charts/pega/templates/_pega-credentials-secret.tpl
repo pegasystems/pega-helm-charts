@@ -58,7 +58,7 @@ data:
   # Base64 encoded password for the stream trust store
   STREAM_JAAS_CONFIG: {{ .Values.stream.jaasConfig | b64enc }}
   {{- end }}
-  {{ if $.Values.hazelcast.enabled }}
+  {{ if (eq (include "hazelcastCSConfigRequired" .) "true") }}
   # Base64 encoded username used for authentication in Hazelcast client-server mode
   {{ if .Values.hazelcast.username -}}
   HZ_CS_AUTH_USERNAME: {{ .Values.hazelcast.username | b64enc }}
