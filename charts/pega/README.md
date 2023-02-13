@@ -1024,7 +1024,8 @@ starts a cluster of Hazelcast server nodes. For the discovery of Hazelcast membe
 Out of the two discovery strategies that the latter plugin provides - Kubernetes API and DNS Lookup, the client-server model with Hazelcast uses DNS lookup to resolve the IP addressing of PODs running Hazelcast.
 For additional information on Hazelcast member discovery, refer the plugin: [Hazelcast-Kubernetes Plugin](https://github.com/hazelcast/hazelcast-kubernetes)
 
-Specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.image` and set `hazelcast.enabled` as true to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
+For platform version 8.6 through 8.7.x, specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.image` and set `hazelcast.enabled` as `true` to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
+For platform version 8.8 and later, specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.clusteringServiceImage` and set `hazelcast.clusteringServiceEnabled` as `true` to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
 **Using Clustering service for client-server form of deployment is only supported from Pega Platform 8.6 or later.**
 
 In this model, nodes running Hazelcast start independently and simultaneously with the Pega web tier nodes and create a cluster with a member count you must specify using `hazelcast.replicas` parameter. Pega web tier nodes then connect to this Hazelcast cluster in a client-sever model.
@@ -1058,8 +1059,8 @@ Parameter   | Description   | Default value
 `hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
 `hazelcast.migration.skipRestart` |  Set to `true` during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail. | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
-`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
-`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
+`hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
+`hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 
 #### Example
