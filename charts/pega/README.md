@@ -184,7 +184,7 @@ utilityImages:
     image: "busybox:1.31.0"
     imagePullPolicy: "IfNotPresent"
   k8s_wait_for:
-    image: "dcasavant/k8s-wait-for"
+    image: "pegasystems/k8s-wait-for"
     imagePullPolicy: "IfNotPresent"
 ```
 
@@ -216,7 +216,7 @@ The default value is "pega" if it is unset.
 
 ## Tiers of a Pega deployment
 
-Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. Use the tier section in the helm chart to specify into which tiers you wish to deploy the tier with nodes dedicated to the logical tasks of the tier.
+Pega supports deployments using a multi-tier architecture model that separates application processing from k8s functions. Isolating processing in its own tier supports unique deployment configurations, including the Pega application prconfig, resource allocations, and scaling characteristics. To avoid misconfiguration, use a single helm chart to deploy all your tiers simultaneously. Pega does not support using separate charts for different tiers in a single deployment. Use the tier section in the helm chart to complete your tier deployment with appropriate nodes dedicated to the logical tasks of the tier.
 
 ### Tier examples
 
@@ -336,6 +336,8 @@ Specify the `ingress` yaml block to expose a Pega tier to access from outside Ku
 Parameter | Description
 ---       | ---
 `domain`  | Specify a domain on your network in which you create an ingress to the load balancer.
+`path`  | Specify custom path to the host.
+`pathType`  | Specify pathType for routing based on the Ingress controller chosen. Default is `ImplementationSpecific`
 `appContextPath`  | Specify the path for access to the Pega application on a specific tier. If not specified, users will have access to the Pega application via /prweb 
 `tls.enabled` | Specify the use of HTTPS for ingress connectivity. If the `tls` block is omitted, TLS will not be enabled.
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).

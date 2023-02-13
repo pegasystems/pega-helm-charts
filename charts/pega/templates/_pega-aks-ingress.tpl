@@ -33,9 +33,7 @@ spec:
   - host: {{ template "domainName" dict "node" .node }}
     http:
       paths:
-      - pathType: ImplementationSpecific
-        backend:
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{ include "ingressBackend" . }}
+{{ include "defaultIngressRule" . | indent 6 }}
 ---     
 {{- end }}
