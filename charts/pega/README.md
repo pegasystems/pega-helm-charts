@@ -762,6 +762,21 @@ dds:
   username: "dnode_ext"
   password: "dnode_ext"
 ```
+### Deploying Pega without Cassandra
+You may configure Pega without any Cassandra datastore. When deploying in this mode set `cassandra.enabled` to `false` and comment out or delete the `dds` section.
+
+Example:
+
+```yaml
+cassandra:
+  enabled: false
+
+#dds:
+#  externalNodes: ""
+#  port: "9042"
+#  username: "dnode_ext"
+#  password: "dnode_ext"
+```
 
 ## Search deployment
 
