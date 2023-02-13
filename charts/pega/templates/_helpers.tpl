@@ -374,6 +374,10 @@ true
 {{- define "generatedPodAnnotations" }}
 {{- end }}
 
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedPodLabels" }}
+{{- end }}
+
 #Override this template in a subchart if your secret values are provided by seperate secrets
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}

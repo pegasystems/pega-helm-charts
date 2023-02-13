@@ -164,3 +164,7 @@
     false
   {{- end -}}
 {{- end -}}
+
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedInstallerPodLabels" }}
+{{- end }}
