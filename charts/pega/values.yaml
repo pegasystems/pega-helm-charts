@@ -329,7 +329,7 @@ cassandra:
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
 # To run Pega without Cassandra comment out or delete the following dds section and set
-# the cassandra.enabled property above to false
+# the cassandra.enabled property above to false.
 dds:
   # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
