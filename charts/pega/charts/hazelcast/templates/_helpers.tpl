@@ -29,23 +29,6 @@
  {{- end -}}
 {{- end }}
 
-
-# Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedHazelcastServicePodAnnotations" }}
-{{- end }}
-
-# Override this template to generate additional service annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedHazelcastServiceAnnotations" }}
-{{- end }}
-
-# Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedClusteringServicePodAnnotations" }}
-{{- end }}
-
-# Override this template to generate additional service annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedClusteringServiceAnnotations" }}
-{{- end }}
-
 {{- define "hazelcastVolumeCredentials" }}hazelcast-volume-credentials{{- end }}
 
 {{- define "hazelcastVolumeTemplate" }}
@@ -59,3 +42,27 @@
   {{- end }}
 {{- end}}
 
+
+# Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedHazelcastServicePodAnnotations" }}
+{{- end }}
+
+# Override this template to generate additional service annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedHazelcastServiceAnnotations" }}
+{{- end }}
+
+# Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedClusteringServicePodAnnotations" }}
+{{- end }}
+
+# Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedHazelcastServicePodLabels" }}
+{{- end }}
+
+# Override this template to generate additional service annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedClusteringServiceAnnotations" }}
+{{- end }}
+
+# Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedClusteringServicePodLabels" }}
+{{- end }}
