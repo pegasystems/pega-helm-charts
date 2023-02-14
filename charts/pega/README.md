@@ -763,7 +763,7 @@ dds:
   password: "dnode_ext"
 ```
 ### Deploying Pega without Cassandra
-You may configure Pega without any Cassandra datastore. When deploying in this mode set `cassandra.enabled` to `false` and comment out or delete the `dds` section.
+To configure a Pega platform deployment without a Cassandra datastore (DDS), set `cassandra.enabled` to `false` and comment out or delete the `dds` section.
 
 Example:
 
