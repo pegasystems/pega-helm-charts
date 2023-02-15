@@ -95,7 +95,7 @@ To configure the parameters in the pega.yaml Helm, download the file in the char
 
 To complete an upgrade with zero downtime,  configure the following settings in your pega.yaml:
 
-- Specify `action.execute: upgrade` to upgrade your application using the software version contained in your Pega-provided "installer" image.
+- Specify `action.execute: upgrade-deploy` to upgrade your application using the software version contained in your Pega-provided "installer" image.
 - Specify the source schema names in your database:
   - `jdbc.rulesSchema: "YOUR_RULES_SCHEMA"`
   - `jdbc.dataSchema: "YOUR_DATA_SCHEMA"`
@@ -138,6 +138,9 @@ You can leave the existing customized parameters as is; the upgrade process will
    | installer.upgrade.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
    | installer.upgrade.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process.| targetRulesSchema: ""  |
    | installer.upgrade.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process. You must delete this schema from your database after you complete your upgrade. For upgrades starting at earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
+   | installer.upgrade.pegaRESTServerURL | For upgrades to 8.7.5 or 8.8.3 and later, specify Pega REST server URL within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration. For upgrades to earlier versions, you can leave this value empty, as is (do not leave it blank).                                                                                          | pegaRESTServerURL: "" |
+   | installer.upgrade.pegaRESTUsername | For upgrades from 8.7.5 or 8.8.3 and later, specify username to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration. For upgrades to earlier versions, you can leave this value empty, as is (do not leave it blank).                                                                         | pegaRESTUsername: "" |
+   | installer.upgrade.pegaRESTPassword | For upgrades from 8.7.5 or 8.8.3 and later, specify user's password to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration. For upgrades to earlier versions, you can leave this value empty, as is (do not leave it blank).                                                                  | pegaRESTPassword: "" |
 
 2. Save the file.
 
