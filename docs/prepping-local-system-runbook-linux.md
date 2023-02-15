@@ -253,7 +253,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 5.  To verify the AWS IAM Authenticator is working, enter:
 
    ```bash
-   $ ws-iam-authenticator help
+   $ aws-iam-authenticator help
    A tool to authenticate to Kubernetes using AWS IAM credentials
 
    Usage:
