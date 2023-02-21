@@ -143,6 +143,9 @@ global:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_MINIKUBE_NODE_DOMAIN"
+        # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
+        # path:
+        # pathType:
 
       # Set resource consumption to minimal levels
       replicas: 1
