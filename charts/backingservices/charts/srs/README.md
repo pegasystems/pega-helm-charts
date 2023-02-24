@@ -39,10 +39,10 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 ### Enabling security between SRS and Elasticsearch
 To configure a secure connection between the SRS cluster and Elasticsearch, add the following the settings in your backingservices configuration file to reflect your organization's connectivity setup.
 
-| Configuration                            | Usage                                                                                                                                                                                                                                              |
-|------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `tls`                                    | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                    |
-| `srsStorage.provisionInternalESCluster`  | <ul><li>Set to `true` to enable this parameter to provide an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT>`.    |
+| Configuration                            | Usage                                                                                                                                                                                                                                            |
+|------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `tls`                                    | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                  |
+| `srsStorage.provisionInternalESCluster`  | <ul><li>Set to `true` to enable this parameter to provide an internally managed and secured Elasticsearch cluster to be used with the SRS cluster; this Requires you to run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION>`. |
 
 To connect to external elasticsearch below configuration needs to be made.
 Certificates used by external elasticsearch need to be placed in an accessible location for make command to use.
