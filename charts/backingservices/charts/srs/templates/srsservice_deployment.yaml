@@ -86,6 +86,8 @@ spec:
               value: "{{ .Values.srsRuntime.env.AuthEnabled | default "false" }}"
             - name: PUBLIC_KEY_URL
               value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
+            - name: OAUTH_PUBLIC_KEY_URL
+                value: "{{ .Values.srsRuntime.env.OAuthPublicKeyURL }}"
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
       volumes:

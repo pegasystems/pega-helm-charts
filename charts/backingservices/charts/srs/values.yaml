@@ -22,4 +22,4 @@ srsRuntime:
   env:
     # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
     AuthEnabled: false
-    PublicKeyURL:
+    OAuthPublicKeyURL:

@@ -96,8 +96,8 @@ srs:
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
-      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
-      PublicKeyURL: ""
+      # Set the value for parameter 'OAuthPublicKeyURL' when AuthEnabled is true.
+      OAuthPublicKeyURL: ""
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
