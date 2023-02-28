@@ -27,6 +27,9 @@ spec:
   backoffLimit: 0
   template:
     metadata:
+      labels:
+        installer-job: {{ .name }}
+{{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}
 {{ toYaml .root.Values.podAnnotations | indent 8 }}

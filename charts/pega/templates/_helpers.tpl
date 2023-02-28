@@ -159,6 +159,23 @@ false
      secretName: {{ .node.ingress.tls.secretName }}
 {{- end }}
 
+{{- define "hostPathType" }}
+ {{- if .node.ingress.pathType -}}
+   {{ .node.ingress.pathType }}
+ {{- else -}}
+   ImplementationSpecific
+ {{- end }}
+{{- end }}
+
+{{- define "defaultIngressRule" }}
+- pathType: {{ include "hostPathType" $ }}
+  {{- if .node.ingress.path }}
+  path: {{ .node.ingress.path }}
+  {{- end }}
+  backend:
+    {{ include "ingressBackend" $ }}
+{{- end }}
+
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
     true
@@ -355,6 +372,10 @@ true
 
 #Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
 {{- define "generatedPodAnnotations" }}
+{{- end }}
+
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedPodLabels" }}
 {{- end }}
 
 #Override this template in a subchart if your secret values are provided by seperate secrets

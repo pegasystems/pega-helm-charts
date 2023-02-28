@@ -50,6 +50,7 @@ spec:
         app: {{ .name }}
 {{- if .node.podLabels }}
 {{ toYaml .node.podLabels | indent 8 }}
+{{- include "generatedPodLabels" .root | indent 8 }}
 {{- end }}
       annotations:
 {{- if .node.podAnnotations }}
