@@ -417,7 +417,6 @@ installer:
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
     # Specify Pega REST server URL, username and password to access pega REST server to be used to perform pre-upgrade/post-upgrade actions in zero-downtime upgrade.
-    # Setting these values is required when upgrading to version 8.7.5 or 8.8.3 and later using zero-downtime upgrade type.
     pegaRESTServerURL: ""
     pegaRESTUsername: ""
     pegaRESTPassword: ""
