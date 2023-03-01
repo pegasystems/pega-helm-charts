@@ -165,6 +165,9 @@ global:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
+        # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
+        # path:
+        # pathType:
         tls:
           # Enable TLS encryption
           enabled: true
@@ -325,6 +328,8 @@ cassandra:
 
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
+# To deploy Pega without Cassandra, comment out or delete the following dds section and set
+# the cassandra.enabled property above to false.
 dds:
   # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
