@@ -13,7 +13,7 @@ import (
 
 func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 	var supportedDbs = []string{"postgres", "mssql", "oracledate", "udb", "db2zos"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
