@@ -31,7 +31,7 @@ func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
-					"installer.upgrade.upgradeType": "zero-downtime",
+					"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
 					"dds.trustStorePassword": trustStorePassword,
 					"dds.keyStorePassword":   keyStorePassword,
 				},
