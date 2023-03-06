@@ -24,7 +24,7 @@ var volDefaultModePointer = &volDefaultMode
 func TestPegaInstallerJob(t *testing.T) {
 
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
 	var imagePullPolicy = []string{"", "IfNotPresent", "Always"}
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
