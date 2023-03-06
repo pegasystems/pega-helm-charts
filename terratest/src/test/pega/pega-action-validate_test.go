@@ -21,7 +21,7 @@ func TestPegaActonValidate_WithValidAction(t *testing.T){
 			SetValues: map[string]string{
 				"global.provider":        "k8s",
 				"global.actions.execute": operation,
-				"installer.upgrade.upgradeType": "zero-downtime",
+				"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
 		 	},
 	    }
 
