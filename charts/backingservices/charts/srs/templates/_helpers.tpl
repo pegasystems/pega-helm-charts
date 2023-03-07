@@ -174,11 +174,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end}}
 {{- end}}
 
+{{- define "oAuthPublicKeyUrl" -}}
 {{- if .Values.srsRuntime.env.AuthEnabled }}
     {{- if and (not (eq .Values.srsRuntime.env.OAuthPublicKeyURL "")) (not (eq .Values.srsRuntime.env.OAuthPublicKeyURL nil)) }}
     {{- .Values.srsRuntime.env.OAuthPublicKeyURL | quote }}
     {{- else }}
     {{- fail "A valid entry is required for srsRuntime.env.OAuthPublicKeyURL, when request authentication mechanism(IDP) in place between SRS and Pega Infinity i.e. srsRuntime.env.AuthEnabled is true " | quote}}
+{{- end }}
 {{- end }}
 {{- end }}
 
