@@ -84,10 +84,10 @@ spec:
               value: "8080"
             - name: AUTH_ENABLED
               value: "{{ .Values.srsRuntime.env.AuthEnabled | default "false" }}"
+            - name: OAUTH_PUBLIC_KEY_URL
+              value: "{{ .Values.srsRuntime.env.OAuthPublicKeyURL }}"
             - name: PUBLIC_KEY_URL
               value: ""
-            - name: OAUTH_PUBLIC_KEY_URL
-                value: "{{ .Values.srsRuntime.env.OAuthPublicKeyURL }}"
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
       volumes:
