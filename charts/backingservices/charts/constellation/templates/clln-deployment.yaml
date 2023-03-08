@@ -1,6 +1,5 @@
-#Deploy only when the constellation flag has been enabled in the values yaml.
-{{ if and .Values.enabled (eq .Values.enabled true) }}
-
+# Deploy only when the constellation flag has been enabled in the values yaml.
+{{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
 metadata:
