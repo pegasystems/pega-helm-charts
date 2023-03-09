@@ -1,4 +1,3 @@
-# Deploy only when the constellation flag has been enabled in the values yaml.
 {{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
@@ -23,7 +22,7 @@ spec:
         image: {{ .Values.docker.constellation.image }}
         args:
         - port=3000
-        # constellation URL path, if you change it, you need to change ingress template files too 
+        # constellation URL path, if you change it, you need to change ingress template files too
         - urlPath=/c11n
         - logLevel={{ .Values.logLevel }}
         livenessProbe:
