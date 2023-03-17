@@ -19,11 +19,20 @@ The service deployment provisions runtime service pods along with a dependency o
 |-----------------------|-------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | < 8.6                 | NA          | NA                    | SRS can be used with Pega Infinity 8.6 and later                                                                                                                                                                                                                                                                      |
 | \>= 8.6 & \<= 8.8.0              | \>= 1.17.10 & \< 1.20.7  | 7.10.2 or 7.16.3      | Pega Infinity 8.6 through 8.8.0 supports using a Pega-provided platform-services/search-n-reporting-service Docker image. While all SRS Docker image versions starting at 1.12.0 are certified against Elasticsearch versions 7.10.2 and 7.16.3, Pega recommends using the latest available SRS image - 1.20.7 or later.                                                                                                                                                                                                                                                                     |
-| \>= 8.6              | \>= 1.20.7  | 7.10.2 or 7.16.3 or 7.17.9     | Pega Infinity 8.6 and later supports using Pega-provided platform-services/search-n-reporting-service Docker Image version 1.20.7 or later with Elasticsearch version, 7.17.9. Pega Infinity 8.8.1 and later requires Docker image 1.20.7 or later. Docker image version 1.20.7  is backward-compatible with Elasticsearch version 7.10.2 and 7.16.3;|
+| \>= 8.6              | \>= 1.20.7  | 7.10.2 or 7.16.3 or 7.17.9     | Pega Infinity 8.6 and later supports using Pega-provided platform-services/search-n-reporting-service Docker Image version 1.20.7 or later with Elasticsearch version, 7.17.9 . Pega Infinity 8.8.1 and later requires Docker image 1.20.7 or later. Docker image version 1.20.7 is backward-compatible with Elasticsearch version 7.10.2 and 7.16.3 .|
 
-**Note**: Upgrade startegy to migrate to elasticsearch version 7.17.9 from the elasticsearch version 7.10.2 or 7.16.3.
--  Upgrade SRS Docker image version to v1.20.7 (which supports Elasticsearch version 7.10 & 7.16)
-- Then upgrade elasticsearch to 7.17.9
+**Note**: Upgrade startegy to migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 .
+
+- Upgrade SRS Docker image version to v1.20.7 (which supports Elasticsearch version 7.10 & 7.16)
+
+&emsp; **For internally-provisioned Elasticsearch:**
+
+- Update Elasticsearch's `dependencies.version` parameter in the  [requirement.yaml](../../requirements.yaml) to 7.17.3 .
+- Then upgrade Elasticsearch to 7.17.9 .
+
+&emsp; **For externally managed Elasticsearch:**
+
+- You may take help of any Elasticsearch official document(s) such as: [Upgrade Elasticsearch | Elasticsearch Guide [7.17] | Elastic](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/setup-upgrade.html).
 
 ### SRS runtime configuration
 
