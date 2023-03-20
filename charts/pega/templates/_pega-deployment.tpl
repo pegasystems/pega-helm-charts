@@ -76,6 +76,9 @@ spec:
           name: {{ .name }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
+{{- if .root.Values.global.kerberos }}
+{{- include "pegaKerberosVolumeTemplate" .root | indent 6 }}
+{{- end }}
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
@@ -216,6 +219,10 @@ spec:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeConfig" }}
           mountPath: "/opt/pega/config"
+{{- if .root.Values.global.kerberos }}
+        - name: {{ template "pegaKerberosConfig" }}-config
+          mountPath: "/opt/pega/config"
+{{- end }}
 {{- if (.node.volumeClaimTemplate) }}
         - name: {{ .name }}
           mountPath: "/opt/pega/kafkadata"
