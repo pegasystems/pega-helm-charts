@@ -77,9 +77,7 @@
   {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
   <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
   {{ end }}
-  {{ if .Env.CIRCUIT_BREAKER_OPEN_MODE }}
-  <Environment name="prconfig/circuitbreaker/startInOpenMode/default" value="{{ .Env.CIRCUIT_BREAKER_OPEN_MODE }}" type="java.lang.String" />
-  {{ end }}
+  <Environment name="prconfig/circuitbreaker/startInOpenMode/default" value="{{ default .Env.CIRCUIT_BREAKER_OPEN_MODE "false" }}" type="java.lang.String" />
 
   {{ if .Env.CONTEXT_XML_SNIPPET }}
   {{ .Env.CONTEXT_XML_SNIPPET }}
