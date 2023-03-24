@@ -9,12 +9,17 @@ This project provides Helm charts and basic examples for deploying Pega on Kuber
 
 Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS environments.
 
-* Open-source Kubernetes (and [MiniKube for personal deployments](docs/RUNBOOK_MINIKUBE.md))
+* Open-source Kubernetes 
+* MiniKube for personal deployments - see the [MiniKube runbook](docs/RUNBOOK_MINIKUBE.md)
 * Microsoft Azure Kubernetes Service (AKS) - see the [AKS runbook](docs/Deploying-Pega-on-AKS.md)
 * Amazon Elastic Kubernetes Service (EKS) - see the [EKS runbook](docs/Deploying-Pega-on-EKS.md)
 * Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
 * Red Hat OpenShift Container Platform (Self-managed) - see the [OpenShift runbook](docs/Deploying-Pega-on-openshift.md)
 * VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) - see the [TKGI runbook](docs/Deploying-Pega-on-PKS.md)
+
+Pega provides multiple runbooks that are Kubernetes-environment specific for clients looking for minimum guidance for configuring and deploying Pega Platform in their organization's Kubernetes account. Pega also provides runbooks for patching or updating Pega Platform with near-zero-downtime. To access the runbooks, click on the appropriate link in the list above.
+
+Because open-source Kubernetes depends on your specific configuration, Pega does not provide a single open-source Kubernetes runbook. Use the Pega helm charts documentation to configure your deployment, with [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md), [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md), and the Getting started section below as your starting points.
 
 The helm charts currently only support running on Kubernetes nodes with x86-64 CPUs.  ARM CPUs are currently unsupported.
 
