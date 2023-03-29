@@ -2,7 +2,7 @@
 global:
   kerberos:
     krb5.conf: |
-      ----THIS IS MY CERT----
+      ----SAMPLE KRB5.CONF----
   tier:
     - name: "web"
       nodeType: "WebUser"
