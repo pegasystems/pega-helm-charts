@@ -425,6 +425,16 @@ dnsConfig:
 {{- template "searchURL" $d2 }}
 {{- end -}}
 
+{{- define "srsAuthPrivateKey" -}}
+{{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
+    {{- if (.Values.pegasearch.srsAuth).privateKey }}
+        {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
+    {{- else }}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
+    {{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "ingressApiVersion" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.k8s.io/v1
