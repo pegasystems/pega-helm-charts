@@ -89,6 +89,9 @@ spec:
 {{- $data := dict "root" .root "node" .node }}
 {{- include "pegaVolumeTomcatKeystoreTemplate" $data | indent 6 }}
 {{ end }}
+{{- if .root.Values.global.kerberos }}
+{{- include "pegaKerberosVolumeTemplate" .root | indent 6 }}
+{{- end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -242,6 +245,10 @@ spec:
         - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
+{{- end }}
+{{- if .root.Values.global.kerberos }}
+        - name: {{ template "pegaKerberosConfig" }}-config
+          mountPath: "/opt/pega/kerberos"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.

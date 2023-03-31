@@ -9,6 +9,11 @@
 {{- $depName -}}-import-certificates-secret
 {{- end }}
 
+{{- define "pegaImportKerberosConfigMap" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-import-kerberos-configmap
+{{- end }}
+
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
 
 {{- define "pegaImportCertificatesTemplate" }}
@@ -77,6 +82,8 @@ false
 {{- end}}
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
+
+{{- define "pegaKerberosConfig" }}pega-import-kerberos{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 
@@ -406,6 +413,17 @@ true
     - secret:
         name: {{ .Values.stream.external_secret_name }}
   {{- end }}
+{{- end}}
+
+#Kerberos config map
+{{- define "pegaKerberosVolumeTemplate" }}
+# Volume used to mount config files.
+- name: {{ template "pegaKerberosConfig" }}-config
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaImportKerberosConfigMap" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
