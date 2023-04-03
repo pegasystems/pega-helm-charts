@@ -1,8 +1,8 @@
-# Pega does not actively update this Elasticsearch dependency. To use the SRS to provide an Elasticsearch service to your deployment you must:
-# * Update the elasticsearch 'version' value parameter below. This version value must match the 'elasticsearch.imageTag' in the backingservices values.yaml).
-# * For kubernetes version >=1.25 or Elasticsearch image version 7.17.9 use Elasticsearch helm chart version 7.17.3, or
-# * Disable deploying Elasticsearch in SRS by setting 'srs.srsStorage.provisionInternalESCluster' in backingservices values.yaml to false.
-dependencies:
+# Pega does not actively update this Elasticsearch dependency. To use the SRS to provide an Elasticsearch service to your deployment you must 
+# update the elasticsearch 'version' parameter value below to match the 'elasticsearch.imageTag' in the backingservices values.yaml.
+# NOTE: For kubernetes version >=1.25 or Elasticsearch version 7.17.9, 
+# use 7.17.3 for the elasticsearch 'version' parameter below (for Elasticsearch version 7.17.9, you will still use 7.17.9 in the backingservices values.yaml).
+# To disable deploying Elasticsearch in SRS, set the 'srs.srsStorage.provisionInternalESCluster' parameter in backingservices values.yaml to false.
 - name: elasticsearch
   version: "7.10.2"
   repository: https://helm.elastic.co/
