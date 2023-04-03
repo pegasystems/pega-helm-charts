@@ -801,6 +801,32 @@ pegasearch:
   externalURL: "http://srs-service.namespace.svc.cluster.local"
 ```
 
+To configure authorization for the connection between Pega Infinity and the Search and Reporting Service (SRS) use the OAuth authorization service. For more information, see ['backingservices'](../backingservices). To configure the connection to the authorization service in SRS you must configure the following authorization parameters in the Pega values.yaml as shown in the following table and example:
+
+| Parameter             | Description                                                                                                                                                                                           | Default value      |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`             | Set the `pegasearch.srsAuth.enabled` to 'true' to use OAuth between Infinity and SRS.                                                                                                                 | false              |
+| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth service endpoint to get the token for SRS.                                                                                             | `""`               |
+| `clientId`            | Set the `pegasearch.srsAuth.clientId` value to the client id used in OAuth service.                                                                                                                   | `""`               |
+| `scopes`              | Set the `pegasearch.srsAuth.scopes` value to "pega.search:full", the scope set in the OAuth service required to grant access to SRS.                                                                  | "pega.search:full" |
+| `privateKey`          | Set the `pegasearch.srsAuth,privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
+| `privateKeyAlgorithm` | Set the `pegasearch.srsAuth.privateKeyAlgorithm` value to the algorithm used to generate a private key used by the OAuth client. Allowed values: RS256 (default), RS384, RS512, ES256, ES384, ES512.  | "RS256"            |
+
+Example:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.srs-namespace.svc.cluster.local"
+  srsAuth:
+    enabled: true
+    url: "https:/your-authorization-service-host/oauth2/v1/token"
+    clientId: "your-client-id"
+    scopes: "pega.search:full"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
+    privateKeyAlgorithm: "RS256"
+```
+
 Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
 
 Parameter   | Description   | Default value
