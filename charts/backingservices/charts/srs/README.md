@@ -15,10 +15,24 @@ The service deployment provisions runtime service pods along with a dependency o
 
 ### SRS Version compatibility matrix
 
-| Pega Infinity version | SRS version | ElasticSearch version | Description                                                                                                                                                                                                                                                                                                           |
+| Pega Infinity version | SRS version | Elasticsearch version | Description                                                                                                                                                                                                                                                                                                           |
 |-----------------------|-------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | < 8.6                 | NA          | NA                    | SRS can be used with Pega Infinity 8.6 and later                                                                                                                                                                                                                                                                      |
-| \>= 8.6               | \>=1.17.10  | 7.10.2 or 7.16.3      | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image. While all SRS Docker image versions starting at 1.12.0 are certified against Elasticsearch versions 7.10.2 and 7.16.3, Pega recommends using the latest available SRS image - 1.17.10 or later. |
+| \>= 8.6 & \<= 8.8.0              | \>= 1.17.10 & \< 1.20.7  | 7.10.2 or 7.16.3      | Pega Infinity 8.6 through 8.8.0 supports using a Pega-provided platform-services/search-n-reporting-service Docker image. While all SRS Docker image versions starting at 1.12.0 are certified against Elasticsearch versions 7.10.2 and 7.16.3, Pega recommends using the latest available SRS image - 1.20.7 and later.                                                                                                                                                                                                                                                                     |
+| \>= 8.6              | \>= 1.20.7  | 7.10.2 or 7.16.3 or 7.17.9     | Pega Infinity 8.6 and later supports using Pega-provided platform-services/search-n-reporting-service Docker Image version 1.20.7 or later with Elasticsearch version, 7.17.9. Pega Infinity 8.8.1 and later requires Docker image 1.20.7 and later. Docker image version 1.20.7 is backward-compatible with Elasticsearch version 7.10.2 and 7.16.3.|
+
+**Note**: 
+
+**If your deployment uses the internally-provisioned Elasticsearch:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
+
+* Update the SRS Docker image version to use v1.20.7, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
+* Update Elasticsearch to 7.17.9.
+
+**If your deployment connects to an externally-managed Elasticsearch service:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
+
+* Update the SRS Docker image version to use v1.20.7, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Complete the version upgrade to 7.17.9. Refer to Elasticsearch version 7.17 documentation. For example, see [Upgrade Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/setup-upgrade.html).
 
 ### SRS runtime configuration
 
