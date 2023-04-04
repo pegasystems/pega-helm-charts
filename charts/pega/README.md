@@ -104,7 +104,7 @@ To support this option,
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
 4) Update your values.yaml file to refer to the external secret manager for DB password.
 
-•  Pass secrets directly to your deployment using your organization's recommend practices. Please make sure the External Secrets Provider used is from  the providers list: https://external-secrets.io/v0.8.1/provider/aws-secrets-manager/
+•  Pass secrets directly to your deployment using your organization's recommend practices. Please make sure the External Secrets Provider used is from the providers list: https://external-secrets.io/v0.8.1/provider/aws-secrets-manager/
 
 ##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
