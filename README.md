@@ -23,7 +23,7 @@ Because open-source Kubernetes depends on your specific configuration, Pega does
 
 The helm charts currently only support running on Kubernetes nodes with x86-64 CPUs.  ARM CPUs are currently unsupported.
 
-The helm charts support running on Kubernetes versions that are in Maintenance and Active Support at the time of the helm chart’s release. For more information, see [Kubernetes EOL policy](https://endoflife.date/kubernetes).
+The helm charts support running on Kubernetes releases that are in Maintenance and Active Support at the time of the helm chart’s release. To review the date of a Pega helm chart release, see [Releases](https://github.com/pegasystems/pega-helm-charts/releases); to review the latest matrix of Kubernetes release support,  see [Kubernetes EOL policy](https://endoflife.date/kubernetes).
 
 # Getting started
 
