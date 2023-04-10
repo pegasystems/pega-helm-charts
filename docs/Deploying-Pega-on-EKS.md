@@ -160,14 +160,14 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-name: pega-85-demo
-region: us-east-1
-version: '1.15'
+  name: pega-85-demo
+  region: us-east-1
+  version: '1.15'
 
 nodeGroups:
 - name: linux-ng
-instanceType: m5.xlarge
-minSize: 2
+  instanceType: m5.xlarge
+  minSize: 2
 ```
 Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the version of Pega Platform you want to deploy and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller.
 
