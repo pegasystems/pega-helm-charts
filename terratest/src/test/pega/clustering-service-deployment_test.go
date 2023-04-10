@@ -1,6 +1,7 @@
 package pega
 
 import (
+	"fmt"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
@@ -8,34 +9,31 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-	"fmt"
 )
 
-
-func TestClusteringServiceDeployment(t *testing.T){
-	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
-	var supportedOperations =  []string{"deploy","install-deploy"}
+func TestClusteringServiceDeployment(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
+	for _, vendor := range supportedVendors {
 
-	for _,vendor := range supportedVendors{
+		for _, operation := range supportedOperations {
 
-		for _,operation := range supportedOperations{
-
-		    fmt.Println(vendor + "-" + operation)
+			fmt.Println(vendor + "-" + operation)
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"hazelcast.clusteringServiceEnabled":  "true",
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"hazelcast.clusteringServiceEnabled": "true",
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-deployment.yaml"})
-			VerifyClusteringServiceDeployment(t,yamlContent)
+			VerifyClusteringServiceDeployment(t, yamlContent)
 
 		}
 	}
@@ -57,12 +55,12 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, "1", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
 			require.Equal(t, "1Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
 			require.Equal(t, statefulsetSpec.Volumes[0].Name, "logs")
-            require.Equal(t, statefulsetSpec.Volumes[1].Name, "pega-volume-credentials")
-            require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[0].Secret.Name, "pega-credentials-secret")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "logs")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "pega-volume-credentials")
-            require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/secrets")
+			require.Equal(t, statefulsetSpec.Volumes[1].Name, "hazelcast-volume-credentials")
+			require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[0].Secret.Name, "pega-credentials-secret")
+			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "logs")
+			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
+			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "hazelcast-volume-credentials")
+			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/secrets")
 		}
 	}
 }
