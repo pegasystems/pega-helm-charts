@@ -11,7 +11,7 @@ import (
 
 func TestPegaInstallerConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -20,8 +20,8 @@ func TestPegaInstallerConfig(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":               vendor,
+					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
 				},
 			}

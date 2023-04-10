@@ -9,9 +9,8 @@
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBZDTUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaPostDBUpgrade" .) "action" "post-upgrade" "initContainers" (list "waitForPegaDBZDTUpgrade" "waitForRollingUpdates") }}
 {{ end }}
-{{ if ( and (eq (include "performOnlyUpgrade" .) "true") (or (eq .Values.upgrade.upgradeType "zero-downtime") (eq .Values.upgrade.upgradeType "out-of-place"))) }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" }}
-{{ template "pega.installer" dict "root" $ "name" (include "pegaDBZDTUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
+{{ if ( and (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "out-of-place")) }}
+{{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPUpgrade" .) "action" "upgrade" }}
 {{ end }}
 {{ if ( and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "custom")) }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBCustomUpgrade" .) "action" "upgrade" }}

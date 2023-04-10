@@ -56,11 +56,27 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
-{{- if .Values.pegasearch.externalSearchService }}
+{{- if and (.Values.pegasearch.externalSearchService) (not (.Values.pegasearch.srsAuth).enabled) }}
   # Search deployment type so that the engine knows to connect to the search service
   PEGA_SEARCH_TYPE: "ExternalSearchService" 
   # URL to connect to Search and Reporting service
   SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
+{{- else if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
+  # Search deployment type so that the engine knows to connect to the search service
+  PEGA_SEARCH_TYPE: "ExternalSearchService" 
+  # URL to connect to Search and Reporting service
+  SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
+  # URL of the OAuth endpoint to get the token for Search and Reporting service
+  SERV_AUTH_URL: "{{ .Values.pegasearch.srsAuth.url }}"
+  # OAuth scopes to grant permissions for Pega Infinity in Search and Reporting service
+  # The required value is "pega.search:full"
+  SERV_AUTH_SCOPES: {{ .Values.pegasearch.srsAuth.scopes | default "pega.search:full" | quote }}
+  # OAuth Client ID
+  SERV_AUTH_CLIENT_ID: "{{ .Values.pegasearch.srsAuth.clientId }}"
+  # Algorithm used to generate a private key used by OAuth client
+  # Allowed values: RS256, RS384, RS512, ES256, ES384, ES512
+  # Default value: RS256
+  SERV_AUTH_PRIVATE_KEY_ALGORITHM: {{ .Values.pegasearch.srsAuth.privateKeyAlgorithm | default "RS256" | quote }}
 {{- else }}
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ include "pegaSearchURL" $ }}

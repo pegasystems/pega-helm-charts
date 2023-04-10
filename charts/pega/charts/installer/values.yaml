@@ -69,6 +69,10 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
+  # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+  pegaRESTServerURL: ""
+  pegaRESTUsername: ""
+  pegaRESTPassword: ""
 
 # Memory and CPU settings for installer
 resources:

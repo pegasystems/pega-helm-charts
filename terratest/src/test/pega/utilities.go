@@ -92,3 +92,11 @@ func getDeploymentName(options *helm.Options) string {
 func getObjName(options *helm.Options, suffix string) string {
 	return getDeploymentName(options) + suffix
 }
+
+func getUpgradeTypeForUpgradeAction(action string) string {
+	if action == "upgrade-deploy" {
+		return "zero-downtime"
+	} else {
+		return "out-of-place"
+	}
+}
