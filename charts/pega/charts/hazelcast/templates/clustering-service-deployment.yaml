@@ -31,7 +31,7 @@ spec:
         volumeMounts:
         - name: logs
           mountPath: "/opt/hazelcast/logs"
-        - name: {{ template "pegaVolumeCredentials" }}
+        - name: {{ template "hazelcastVolumeCredentials" }}
           mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
@@ -66,7 +66,7 @@ spec:
       - name: logs
         emptyDir: {}
       # Volume used to mount secret files.
-      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+      {{- include "hazelcastVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" $ }}
 {{ end }}

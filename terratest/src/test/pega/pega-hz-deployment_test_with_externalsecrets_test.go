@@ -10,7 +10,7 @@ import (
 	"testing"
 )
 
-func TestHazelcastDeployment(t *testing.T) {
+func TestHazelcastDeploymentWithExternalsecrets(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
 
@@ -22,6 +22,7 @@ func TestHazelcastDeployment(t *testing.T) {
 		for _, operation := range supportedOperations {
 
 			var options = &helm.Options{
+				ValuesFiles: []string{"data/values_with_externalsecrets.yaml"},
 				SetValues: map[string]string{
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
@@ -30,13 +31,13 @@ func TestHazelcastDeployment(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/pega-hz-deployment.yaml"})
-			VerifyHazelcastDeployment(t, yamlContent)
+			VerifyHazelcastDeploymentWithExternalsecrets(t, yamlContent)
 
 		}
 	}
 }
 
-func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
+func VerifyHazelcastDeploymentWithExternalsecrets(t *testing.T, yamlContent string) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	statefulSlice := strings.Split(yamlContent, "---")
 	for index, statefulInfo := range statefulSlice {
@@ -54,6 +55,8 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, statefulsetSpec.Volumes[0].Name, "logs")
 			require.Equal(t, statefulsetSpec.Volumes[1].Name, "hazelcast-volume-credentials")
 			require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[0].Secret.Name, "pega-credentials-secret")
+			require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[1].Secret.Name, "hazelcast-secret")
+			require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[2].Secret.Name, "customArtifactory-secret")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].Name, "logs")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "hazelcast-volume-credentials")
