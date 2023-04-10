@@ -22,7 +22,7 @@ Production  | 4 cores | 16Gi   | 200G*      | At least 3
 * Define appropriate quotas on network bandwidth and request rate if you want to share your kafka cluster across different environments.
 
 #### Miscellaneous configuration
-* message.max.bytes=5000000 
+* message.max.bytes=5000000
   This is the default maximum message size supported, if you want to increase this value then pass the following jvm arguments to pega tiers as well
   -Dstream.producer.max.request.size=<Max-message-size> -Dstream.producer.buffer.memory=<Max-message-size>
   See more details about JVM arguments [here](README.md#jvm-arguments)
@@ -33,7 +33,7 @@ For best practices, see [this page.](https://docs.pega.com/decision-management/8
 
 ### Security
 
-Pega supports SSL for network traffic encryption an authentication for communicate with your organization's existing Kafka service. 
+Pega supports SSL for network traffic encryption an authentication for communicate with your organization's existing Kafka service.
 
 In order to secure, mount necessary certificates(trustStore and keyStore) during the Pega Platform deployment. For details, see [this section.](README.md#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
 
@@ -42,13 +42,21 @@ You may also securely pass settings like trustStorePassword,keyStorePassword, an
 #### Permissions
 To configure an externalized Kafka service connection using authentication and authorization profiles in Kafka Access control lists, your Pega profiles require following user permissions. To review configuration details, see [Kafka documentation for Authorization and ACLs](https://kafka.apache.org/documentation/#security_authz).
 
-Principal |Resource Type  | Resource Name     | Operation | Permission Type | Patter Type
+Principal |Resource Type  | Resource Name     | Operation | Permission Type | Pattern Type
 ---         |---         | ---     | ---    | ---        | ---
 User:\<user-name\> | TOPIC       | \<Prefix\> as in 'stream.streamNamePattern' | ALL    | ALLOW      | PREFIXED
 User:\<user-name\> |TRANSACTIONAL_ID  | * | READ/WRITE   | ALLOW      | LITERAL
-User:\<user-name\> |GROUP  | * | ALL   | ALLOW      | LITERAL
+User:\<user-name\> |GROUP  | \<Prefix\> as in 'stream.streamNamePattern' | ALL   | ALLOW      | PREFIXED
 User:\<user-name\> |CLUSTER  | \<Cluster-Name\> | IDEMPOTENT_WRITE   |ALLOW      | LITERAL
 
+For e.g.
+```
+# To grant permissions to allow Delete, Create, Write, and Read operations on a topic based on a prefix in the 'stream.streamNamePattern', here prefix is 'pega'.
+./kafka-acls.sh --bootstrap-server <IP:port> --command-config <path_to_admin_config> --add --allow-principal User:<user-name> --operation delete --operation create --operation Write --operation Read  --topic 'pega' --resource-pattern-type PREFIXED
+
+# To grant permissions to allow describe and read operations on a group type resource based on a prefix in the 'stream.streamNamePattern'
+./kafka-acls.sh --bootstrap-server <IP:port> --command-config <path_to_admin_config> --add --allow-principal User:<user-name> --operation Describe --operation Read --group 'pega' --resource-pattern-type PREFIXED
+```
 
 ### Stream (externalized Kafka service) test example with bitnami kafka
 
@@ -100,4 +108,3 @@ stream:
   # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
   # Enter the external secret name below.
   external_secret_name: ""
-

@@ -15,10 +15,24 @@ The service deployment provisions runtime service pods along with a dependency o
 
 ### SRS Version compatibility matrix
 
-| Pega Infinity version | SRS version | ElasticSearch version | Description                                                                                                                                                                                                                                                                                                           |
+| Pega Infinity version | SRS version | Elasticsearch version | Description                                                                                                                                                                                                                                                                                                           |
 |-----------------------|-------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | < 8.6                 | NA          | NA                    | SRS can be used with Pega Infinity 8.6 and later                                                                                                                                                                                                                                                                      |
-| \>= 8.6               | \>=1.17.10  | 7.10.2 or 7.16.3      | Pega Infinity 8.6 and later supports using a Pega-provided platform-services/search-n-reporting-service Docker Image. While all SRS Docker image versions starting at 1.12.0 are certified against Elasticsearch versions 7.10.2 and 7.16.3, Pega recommends using the latest available SRS image - 1.17.10 or later. |
+| \>= 8.6 & \<= 8.8.0              | \>= 1.17.10 & \< 1.20.7  | 7.10.2 or 7.16.3      | Pega Infinity 8.6 through 8.8.0 supports using a Pega-provided platform-services/search-n-reporting-service Docker image. While all SRS Docker image versions starting at 1.12.0 are certified against Elasticsearch versions 7.10.2 and 7.16.3, Pega recommends using the latest available SRS image - 1.20.7 and later.                                                                                                                                                                                                                                                                     |
+| \>= 8.6              | \>= 1.20.7  | 7.10.2 or 7.16.3 or 7.17.9     | Pega Infinity 8.6 and later supports using Pega-provided platform-services/search-n-reporting-service Docker Image version 1.20.7 or later with Elasticsearch version, 7.17.9. Pega Infinity 8.8.1 and later requires Docker image 1.20.7 and later. Docker image version 1.20.7 is backward-compatible with Elasticsearch version 7.10.2 and 7.16.3.|
+
+**Note**: 
+
+**If your deployment uses the internally-provisioned Elasticsearch:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
+
+* Update the SRS Docker image version to use v1.20.7, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
+* Update Elasticsearch to 7.17.9.
+
+**If your deployment connects to an externally-managed Elasticsearch service:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
+
+* Update the SRS Docker image version to use v1.20.7, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Complete the version upgrade to 7.17.9. Refer to Elasticsearch version 7.17 documentation. For example, see [Upgrade Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/setup-upgrade.html).
 
 ### SRS runtime configuration
 
@@ -69,6 +83,18 @@ make external-es-secrets NAMESPACE=pegabackingservices ELASTICSEARCH_VERSION=7.1
 
 Note: Only .p12 and .jks certificates are supported.
 
+
+### Enable request authentication/authorization mechanism using identity provider(IdP) between SRS and Pega Infinity
+To configure authentication/authorization mechanism using identity provider(IdP) between SRS and Pega Infinity, add the following the settings in your backingservices configuration file and then in pega chart's `values.yml` / pega helm inspected `pega.yaml`.
+
+| Configuration                      | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+|------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `srsRuntime.env.AuthEnabled`       | <ul><li>Set to `false` to disable authentication/authorization between SRS and Pega Infinity.</li><li>Set to `true` to enable authentication/authorization using identity provider(IdP) between SRS and Pega Infinity.</li></ul>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| `srsRuntime.env.OAuthPublicKeyURL` | <ul><li>Provide a valid OAuth Public Key URL from IdP, which can be used in SRS to fetch public keys from IdP and validate the request that is coming into SRS.</li><li> Make sure the authorization server of IdP is having 1) A scope with name `pega.search:full` 2) `scp` & `guid` claims under `pega.search:full` scope with scope name(`pega.search:full`) and `<Customer Deployment Id>` respectively</li><li>Example of JWT token payload having `scp` and `guid` claims <pre>{   "ver": 1,   "jti": "AT.EmHCGDFHE18hC5j3stjbarVonh46twW7tWutB9v8hsw",   "iss": "https://prod-pega.okta.com/oauth2/aus8ahm2k777777",   "aud": "srs-cmc-stg",   "iat": 1678097157,   "exp": 1678100757,   "cid": "0oa8acv8gbBPRCZ7I5d7",   "scp": [     "pega.search:full"   ],   "auth_time": 1000,   "sub": "0oa8acv8gbBPRCZ7I5d7",   "guid": "bf0d4cb6-e09f-1111-ab19-9aac5156b618" } </pre></ul> |
+
+### Enable TLS/HTTPS between SRS and Pega Infinity
+There are multiple ways to enable TLS/HTTPS for service which deployed in k8s. It all depends on the k8s setup, environment setup and network policies/restrictions etc. You can work with IT departments to get this done. Some ways to enable TLS/HTTPS are 1. [Using ingress with TLS ](https://kubernetes.io/docs/concepts/services-networking/ingress/#tls). 2. [Using load balancer ](https://kubernetes.io/docs/concepts/services-networking/service/#loadbalancer) etc. Some cloud provided k8s specific ways are 1) AWS: Using combination of [AWS Certificate Manager](https://aws.amazon.com/certificate-manager/), [AWS Load Balancer Controller](https://aws.amazon.com/blogs/opensource/kubernetes-ingress-aws-alb-ingress-controller/), [Kubernetes Nginx Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/#aws). 2. Azure: Using combination of [Azure Key Vault](https://azure.microsoft.com/en-us/services/key-vault/), [Kubernetes Nginx Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/#azure), [Azure Application Gateway](https://docs.microsoft.com/en-us/azure/application-gateway/). 3. GCP: Using combination of [Google-managed SSL certificates](https://cloud.google.com/load-balancing/docs/ssl-certificates/google-managed-certs), [GCP HTTP(S) Load Balancer](https://cloud.google.com/load-balancing/docs/https/), [Kubernetes Nginx Ingress Controller](https://kubernetes.github.io/ingress-nginx/deploy/#gce-gke) etc.
+
 Example:
 
 ```yaml
@@ -95,8 +121,8 @@ srs:
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
-      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
-      PublicKeyURL: ""
+      # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
+      OAuthPublicKeyURL: ""
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:

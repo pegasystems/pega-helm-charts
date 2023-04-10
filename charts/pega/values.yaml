@@ -20,6 +20,11 @@ global:
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
   certificates:
+
+  # Add krb5.conf file content here.
+  # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
+  kerberos:
+
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
@@ -416,6 +421,10 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
+    pegaRESTUsername: ""
+    pegaRESTPassword: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
