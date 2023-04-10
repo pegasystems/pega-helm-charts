@@ -391,7 +391,7 @@ The RDS DB instance must contain a database in order to install Pega Platform in
 
 1. Use a database editor tool, such as pgadmin4, to log into your RDS DB instance.
 
-    You can find your access information and login credentials, by selecting the RDS DB instance in the EKS console.
+    You can find your access information and login credentials, by selecting the RDS DB instance in the AWS console.
 
 2. If you have to create a new database, in the database editor tool, navigate to Databases and create a new database; if you already have a database created, you can review the settings to ensure it meets your organization's database requirements.
 
