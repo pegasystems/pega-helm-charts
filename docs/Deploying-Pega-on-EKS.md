@@ -160,14 +160,14 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-name: pega-85-demo
-region: us-east-1
-version: '1.15'
+  name: pega-85-demo
+  region: us-east-1
+  version: '1.15'
 
 nodeGroups:
 - name: linux-ng
-instanceType: m5.xlarge
-minSize: 2
+  instanceType: m5.xlarge
+  minSize: 2
 ```
 Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the version of Pega Platform you want to deploy and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller.
 
@@ -391,7 +391,7 @@ The RDS DB instance must contain a database in order to install Pega Platform in
 
 1. Use a database editor tool, such as pgadmin4, to log into your RDS DB instance.
 
-    You can find your access information and login credentials, by selecting the RDS DB instance in the EKS console.
+    You can find your access information and login credentials, by selecting the RDS DB instance in the AWS console.
 
 2. If you have to create a new database, in the database editor tool, navigate to Databases and create a new database; if you already have a database created, you can review the settings to ensure it meets your organization's database requirements.
 
