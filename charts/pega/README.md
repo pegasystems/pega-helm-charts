@@ -131,7 +131,7 @@ The simplest way to provide database authorization is via the `jdbc.username` an
 
 ### Connection Properties
 
-You may optionally set your connection properties that will be sent to our JDBC driver when establishing new connections.  The format of the string is `[propertyName=property;]`.
+You may optionally set your connection properties that will be sent to our JDBC driver when establishing new connections.  The format of the string is `[propertyName=property;]`. Otherwise, refer to the `URL and Driver Class` section above to determine the adequate connection properties.
 
 ### Schemas
 
