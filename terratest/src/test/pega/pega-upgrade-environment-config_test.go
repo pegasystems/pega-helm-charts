@@ -11,7 +11,8 @@ import (
 
 func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"upgrade", "upgrade-deploy"}
+	var supportedOperations = []string{"upgrade-deploy"}
+	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "restURL", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -20,19 +21,22 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":               vendor,
-					"global.actions.execute":        operation,
-					"installer.upgrade.upgradeType": "zero-downtime",
+					"global.provider":                     vendor,
+					"global.actions.execute":              operation,
+					"installer.upgrade.upgradeType":       "zero-downtime",
+					"installer.upgrade.pegaRESTServerURL": expectedValues["PEGA_REST_SERVER_URL"],
+					"installer.upgrade.pegaRESTUsername":  expectedValues["PEGA_REST_USERNAME"],
+					"installer.upgrade.pegaRESTPassword":  expectedValues["PEGA_REST_PASSWORD"],
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"})
-			assertUpgradeEnvironmentConfig(t, yamlContent, options)
+			assertUpgradeEnvironmentConfig(t, yamlContent, options, expectedValues)
 		}
 	}
 }
 
-func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *helm.Options) {
+func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *helm.Options, expectedValues map[string]string) {
 	var upgradeEnvConfigMap k8score.ConfigMap
 
 	UnmarshalK8SYaml(t, configYaml, &upgradeEnvConfigMap)
@@ -47,7 +51,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
 	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "zero-downtime")
-	require.Equal(t, upgradeEnvConfigData["MULTITENANT_SYSTEM"], "false")
+	require.Equal(t, upgradeEnvConfigData["MT_SYSTEM"], "")
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, upgradeEnvConfigData["DB2ZOS_UDF_WLM"], "")
@@ -59,6 +63,9 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["UPDATE_APPLICATIONS_SCHEMA"], "false")
 	require.Equal(t, upgradeEnvConfigData["RUN_RULESET_CLEANUP"], "false")
 	require.Equal(t, upgradeEnvConfigData["REBUILD_INDEXES"], "false")
+	require.Equal(t, upgradeEnvConfigData["PEGA_REST_SERVER_URL"], expectedValues["PEGA_REST_SERVER_URL"])
+	require.Equal(t, upgradeEnvConfigData["PEGA_REST_USERNAME"], expectedValues["PEGA_REST_USERNAME"])
+	require.Equal(t, upgradeEnvConfigData["PEGA_REST_PASSWORD"], expectedValues["PEGA_REST_PASSWORD"])
 	require.Equal(t, upgradeEnvConfigData["DISTRIBUTION_KIT_URL"], "")
-        require.Equal(t, upgradeEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+	require.Equal(t, upgradeEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }

@@ -27,6 +27,9 @@ spec:
   backoffLimit: 0
   template:
     metadata:
+      labels:
+        installer-job: {{ .name }}
+{{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
@@ -65,9 +68,16 @@ spec:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
+{{- if .root.Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .root.Values.nodeSelector | indent 8 }}
+{{- end }}
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
         image: {{ .root.Values.image }}
+{{- if .root.Values.imagePullPolicy }}
+        imagePullPolicy: {{ .root.Values.imagePullPolicy  }}
+{{- end }}
         ports:
         - containerPort: 8080
         resources:
@@ -87,6 +97,11 @@ spec:
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
         - name: {{ template "pegaDistributionKitVolume" }}
           mountPath: "/opt/pega/mount/kit"                           
+{{- end }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.volumeMounts }}
+{{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
+{{- end }}
 {{- end }}
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .root.Values.global.customArtifactory.certificate }}
@@ -112,6 +127,6 @@ spec:
 {{- end }}                
       restartPolicy: Never
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" .root }}
+{{- include "imagePullSecrets" .root | indent 6 }}
 ---
 {{- end -}}

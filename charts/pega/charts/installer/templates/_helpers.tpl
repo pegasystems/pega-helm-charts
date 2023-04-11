@@ -14,6 +14,7 @@
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
 {{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
+{{- define "pegaDBOOPUpgrade" -}}pega-db-oop-upgrade{{- end -}}
 {{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
@@ -28,6 +29,16 @@
       {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
     {{- else -}}
       2
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "k8sWaitForMaxRetries" -}}
+  {{- if (.Values.global.utilityImages.k8s_wait_for) -}}
+    {{- if (.Values.global.utilityImages.k8s_wait_for.maxRetries) -}}
+      {{ .Values.global.utilityImages.k8s_wait_for.maxRetries }}
+    {{- else -}}
+      1
     {{- end -}}
   {{- end -}}
 {{- end -}}
@@ -65,7 +76,9 @@
   args: [ 'job', '{{ template "pegaDBInstall" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -75,7 +88,9 @@
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- include "initContainerEnvs" $ }}
 {{- end }}
 
@@ -86,7 +101,9 @@
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
   env:  
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -128,6 +145,10 @@
     value: {{ $apiserver.httpsServicePort | quote }}
   - name: KUBERNETES_SERVICE_PORT
     value: {{ $apiserver.httpsServicePort | quote }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 {{- end }}
 
@@ -136,3 +157,15 @@
 {{ . }}
 {{ end }}
 {{- end -}}
+
+{{- define "createJobsReaderRole" -}}
+  {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedInstallerPodLabels" }}
+{{- end }}

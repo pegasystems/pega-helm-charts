@@ -19,7 +19,9 @@ func TestSRSDeployment(t *testing.T){
 			"srs.srsRuntime.replicaCount": "1",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:latest",
 			"srs.srsRuntime.env.AuthEnabled": "false",
-			"srs.srsRuntime.env.PublicKeyURL": "",
+			"srs.srsRuntime.env.OAuthPublicKeyURL": "",
+			"srs.srsStorage.tls.enabled": "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -42,7 +44,7 @@ func TestSRSDeployment(t *testing.T){
 			esDomain{
 				domain:   "elasticsearch-master.default.svc",
 				port:     "9200",
-				protocol: "http",
+				protocol: "https",
 			},
 		})
 }
@@ -57,17 +59,19 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
 			"srs.srsRuntime.env.AuthEnabled": "true",
-			"srs.srsRuntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
+			"srs.srsRuntime.env.OAuthPublicKeyURL": "https://acme.authenticator.com/OAuthPublicKeyURL",
 			"srs.srsRuntime.resources.limits.cpu": "2",
 			"srs.srsRuntime.resources.limits.memory": "4Gi",
 			"srs.srsRuntime.resources.requests.cpu": "1",
 			"srs.srsRuntime.resources.requests.memory": "2Gi",
 			"srs.srsStorage.provisionInternalESCluster": "false",
+			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
 			"srs.srsStorage.awsIAM.region": "us-east-1",
 			"srs.srsStorage.requireInternetAccess": "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -84,7 +88,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			int32(3),
 			"platform-services/search-n-reporting-service:1.0.0",
 			"true",
-			"https://acme.authenticator.com/PublicKeyURL",
+			"https://acme.authenticator.com/OAuthPublicKeyURL",
 			true,
 			podResources{"2", "4Gi", "1", "2Gi"},
 			esDomain{
@@ -106,7 +110,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
 			"srs.srsRuntime.env.AuthEnabled": "true",
-			"srs.srsRuntime.env.PublicKeyURL": "https://acme.authenticator.com/PublicKeyURL",
+			"srs.srsRuntime.env.OAuthPublicKeyURL": "https://acme.authenticator.com/OAuthPublicKeyURL",
 			"srs.srsRuntime.resources.limits.cpu": "2",
 			"srs.srsRuntime.resources.limits.memory": "4Gi",
 			"srs.srsRuntime.resources.requests.cpu": "1",
@@ -115,8 +119,10 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"srs.srsStorage.domain": "es-id.managed.cloudiest.io",
 			"srs.srsStorage.port": "443",
 			"srs.srsStorage.protocol": "https",
+			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
-			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+		[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
 
 	var srsDeploymentObj appsv1.Deployment
@@ -131,7 +137,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			int32(3),
 			"platform-services/search-n-reporting-service:1.0.0",
 			"true",
-			"https://acme.authenticator.com/PublicKeyURL",
+			"https://acme.authenticator.com/OAuthPublicKeyURL",
 			false,
 			podResources{"2", "4Gi", "1", "2Gi"},
 			esDomain{
@@ -188,6 +194,22 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
     require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
 	envIndex++
 	}
+	if strings.EqualFold("tls", authProvider) {
+	require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+	require.Equal(t, "username", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+	require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+	envIndex++
+	require.Equal(t, "PATH_TO_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "/usr/share/elastic-certificates.p12", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "ELASTICSEARCH_AUTH_PROVIDER", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "tls", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	}
 	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
     require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
     envIndex++
@@ -197,8 +219,8 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "AUTH_ENABLED", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.authEnabled, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
-	require.Equal(t, "PUBLIC_KEY_URL", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, expectedSpec.publicKeyURL, pod.Containers[0].Env[envIndex].Value)
+	require.Equal(t, "OAUTH_PUBLIC_KEY_URL", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, expectedSpec.oauthPublicKeyURL, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 
 	require.Equal(t, expectedSpec.podLimits.cpuLimit, pod.Containers[0].Resources.Limits.Cpu().String())
@@ -222,7 +244,7 @@ type srsDeployment struct {
 	replicaCount			int32
 	imageURI				string
 	authEnabled				string
-	publicKeyURL			string
+	oauthPublicKeyURL		string
 	internetEgress			bool
 	podLimits				podResources
 	elasticsearchEndPoint	esDomain

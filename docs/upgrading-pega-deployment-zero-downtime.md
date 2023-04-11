@@ -29,7 +29,7 @@ The Pega zero-downtime upgrade process for Client-managed cloud automates the Pe
 
    ![Migrates the rules structure and content and data structure](media/upgrade-rules-rnew-schema.png "Migrates the rules structure and content and data structure")
 
-4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content; the process discards these tables and data after the upgrade completes.
+4. Upgrades the new rules schema. This process uses the temporary data schema in which it creates and modifies any necessary data tables to store interim data content.
 
 5. For deployments running in Oracle, grants access to the new rules schema tables to generate the necessary rules objects (GRANT statements) which will link the existing data schema to the new rules schema after you upgrade the new rules schema.
 
@@ -63,6 +63,8 @@ The process to upgrade your deployment with zero-downtime assumes:
 
 - You use the Pega-provided Helm charts that support ZDT upgrades (version 1.6.0 and later).
 
+- To update your software to version 8.8 or later, please review the infrastructure requirements to use an externalized Kafka streaming service managed using Pega-provided Helm charts. Before you complete a software update, Pega recommends that you migrate the deployment infrastructure from using embedded stream nodes to one that uses an externalized Kafka configuration. For details, see [Kafka cluster requirements](../charts/pega/KafkaClusterRequirement.md) and [Switch from embedded Stream to externalized Kafka service](../charts/pega/MigrationToExternalStream.md).
+
 ## Upgrading Pega Platform with zero-downtime using Helm charts – 120 minutes
 
 To keep your system current using the zero-downtime upgrade process by using Helm charts, you must customize your existing `pega` Helm chart with the specific, required or settings. This includes referencing the latest Pega-provided Docker images that are available for your release.
@@ -93,7 +95,7 @@ To configure the parameters in the pega.yaml Helm, download the file in the char
 
 To complete an upgrade with zero downtime,  configure the following settings in your pega.yaml:
 
-- Specify `action.execute: upgrade` to upgrade your application using the software version contained in your Pega-provided "installer" image.
+- Specify `action.execute: upgrade-deploy` to upgrade your application using the software version contained in your Pega-provided "installer" image.
 - Specify the source schema names in your database:
   - `jdbc.rulesSchema: "YOUR_RULES_SCHEMA"`
   - `jdbc.dataSchema: "YOUR_DATA_SCHEMA"`
@@ -136,6 +138,9 @@ You can leave the existing customized parameters as is; the upgrade process will
    | installer.upgrade.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
    | installer.upgrade.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process.| targetRulesSchema: ""  |
    | installer.upgrade.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process. You must delete this schema from your database after you complete your upgrade. For upgrades starting at earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
+   | installer.upgrade.pegaRESTServerURL | For zero-downtime upgrades, specify Pega REST server URL within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                  | pegaRESTServerURL: "" |
+   | installer.upgrade.pegaRESTUsername | For zero-downtime upgrades, specify username to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                  | pegaRESTUsername: "" |
+   | installer.upgrade.pegaRESTPassword | For zero-downtime upgrades, specify user's password to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                  | pegaRESTPassword: "" |
 
 2. Save the file.
 

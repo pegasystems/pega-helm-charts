@@ -38,6 +38,7 @@ func TestPegaTierDeployment(t *testing.T) {
 						"global.actions.execute":        operation,
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName": "storage-class",
 					},
 				}
 
@@ -46,8 +47,54 @@ func TestPegaTierDeployment(t *testing.T) {
 				assertWeb(t, yamlSplit[1], options)
 				assertBatch(t, yamlSplit[2], options)
 				assertStream(t, yamlSplit[3], options)
+				assertStreamWithSorageClass(t, yamlSplit[3], options)
 
 			}
+		}
+	}
+}
+
+func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
+	var statefulsetObj appsv1beta2.StatefulSet
+	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
+	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
+	storageClassName := "storage-class"
+	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
+}
+
+func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
+	customFsGroups := map[string]int64{
+		"1000": 1000,
+		"2000": 2000,
+		"3000": 3000,
+	}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	for _, vendor := range supportedVendors {
+		for key, value := range customFsGroups {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                        vendor,
+					"global.actions.execute":                 "deploy",
+					"global.deployment.name":                 "pega",
+					"installer.upgrade.upgradeType":          "zero-downtime",
+					"global.tier[0].name":                    "web",
+					"global.tier[1].name":                    "batch",
+					"global.tier[2].name":                    "stream",
+					"global.tier[0].securityContext.fsGroup": key, // web tier
+					"global.tier[1].securityContext.fsGroup": key, // batch tier
+					"global.tier[2].securityContext.fsGroup": key, // stream tier
+				},
+			}
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+			yamlSplit := strings.Split(yamlContent, "---")
+
+			UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+			require.Equal(t, value, *depObj.Spec.Template.Spec.SecurityContext.FSGroup)
 		}
 	}
 }
@@ -126,6 +173,8 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "pegasystems/pega", pod.Containers[0].Image)
 	require.Equal(t, "pega-web-port", pod.Containers[0].Ports[0].Name)
 	require.Equal(t, int32(8080), pod.Containers[0].Ports[0].ContainerPort)
+	require.Equal(t, "pega-tls-port", pod.Containers[0].Ports[1].Name)
+	require.Equal(t, int32(8443), pod.Containers[0].Ports[1].ContainerPort)
 	var envIndex int32 = 0
 	require.Equal(t, "NODE_TYPE", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)
@@ -163,9 +212,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "pega-volume-config", pod.Containers[0].VolumeMounts[0].Name)
 	require.Equal(t, "/opt/pega/config", pod.Containers[0].VolumeMounts[0].MountPath)
 
-	//If these tests start failing, check if the K8s version has passed 1.18. If so,
-	//update the values to the 1.18 versions and also enable the StartupProbe test.
-	require.Equal(t, int32(200), pod.Containers[0].LivenessProbe.InitialDelaySeconds)
+	//If these tests start failing, helm version in use is compiled against K8s version < 1.18
+	//https://helm.sh/docs/topics/version_skew/#supported-version-skew
+	require.Equal(t, int32(0), pod.Containers[0].LivenessProbe.InitialDelaySeconds)
 	require.Equal(t, int32(20), pod.Containers[0].LivenessProbe.TimeoutSeconds)
 	require.Equal(t, int32(30), pod.Containers[0].LivenessProbe.PeriodSeconds)
 	require.Equal(t, int32(1), pod.Containers[0].LivenessProbe.SuccessThreshold)
@@ -174,7 +223,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, intstr.FromInt(8081), pod.Containers[0].LivenessProbe.HTTPGet.Port)
 	require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].LivenessProbe.HTTPGet.Scheme)
 
-	require.Equal(t, int32(30), pod.Containers[0].ReadinessProbe.InitialDelaySeconds)
+	require.Equal(t, int32(0), pod.Containers[0].ReadinessProbe.InitialDelaySeconds)
 	require.Equal(t, int32(10), pod.Containers[0].ReadinessProbe.TimeoutSeconds)
 	require.Equal(t, int32(10), pod.Containers[0].ReadinessProbe.PeriodSeconds)
 	require.Equal(t, int32(1), pod.Containers[0].ReadinessProbe.SuccessThreshold)
@@ -183,14 +232,14 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, intstr.FromInt(8080), pod.Containers[0].ReadinessProbe.HTTPGet.Port)
 	require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].ReadinessProbe.HTTPGet.Scheme)
 
-	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.InitialDelaySeconds)
-	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.TimeoutSeconds)
-	//require.Equal(t, int32(10), pod.Containers[0].StartupProbe.PeriodSeconds)
-	//require.Equal(t, int32(1), pod.Containers[0].StartupProbe.SuccessThreshold)
-	//require.Equal(t, int32(30), pod.Containers[0].StartupProbe.FailureThreshold)
-	//require.Equal(t, "/prweb/PRRestService/monitor/pingService/ping", pod.Containers[0].StartupProbe.HTTPGet.Path)
-	//require.Equal(t, intstr.FromInt(8080), pod.Containers[0].StartupProbe.HTTPGet.Port)
-	//require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].StartupProbe.HTTPGet.Scheme)
+	require.Equal(t, int32(10), pod.Containers[0].StartupProbe.InitialDelaySeconds)
+	require.Equal(t, int32(10), pod.Containers[0].StartupProbe.TimeoutSeconds)
+	require.Equal(t, int32(10), pod.Containers[0].StartupProbe.PeriodSeconds)
+	require.Equal(t, int32(1), pod.Containers[0].StartupProbe.SuccessThreshold)
+	require.Equal(t, int32(30), pod.Containers[0].StartupProbe.FailureThreshold)
+	require.Equal(t, "/prweb/PRRestService/monitor/pingService/ping", pod.Containers[0].StartupProbe.HTTPGet.Path)
+	require.Equal(t, intstr.FromInt(8080), pod.Containers[0].StartupProbe.HTTPGet.Port)
+	require.Equal(t, k8score.URIScheme("HTTP"), pod.Containers[0].StartupProbe.HTTPGet.Scheme)
 
 	require.Equal(t, getObjName(options, "-registry-secret"), pod.ImagePullSecrets[0].Name)
 	require.Equal(t, k8score.RestartPolicy("Always"), pod.RestartPolicy)

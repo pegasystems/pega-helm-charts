@@ -2,9 +2,9 @@ name:  Pega Chart Build
 
 env:
   HELM_URL: https://get.helm.sh
-  HELM_TGZ: helm-v3.2.4-linux-amd64.tar.gz
+  HELM_TGZ: helm-v3.6.3-linux-amd64.tar.gz
   YAMLLINT_VERSION: 1.15.0
-  GO_VERSION: 1.13.1
+  GO_VERSION: 1.18.3
 
 
 on: 
@@ -23,10 +23,10 @@ concurrency:
 
 jobs:
   run-lint-job:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install yamllint
         run: |
@@ -38,16 +38,16 @@ jobs:
           yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
 
   run-remark-job:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install node
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: lts/*
-      
+
       - name: Install npm dependencies
         run: |    
           npm install -g --save remark-cli to-vfile remark-preset-lint-recommended remark-validate-links remark-lint-no-dead-urls remark-message-control remark-preset-lint-markdown-style-guide remark-lint
@@ -57,13 +57,13 @@ jobs:
           remark -i .remark_ignore -f -u validate-links .
 
   run-go-tests-job:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     steps:
       - name: Check out repository code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Install GO
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ env.GO_VERSION }}
       - run: export  PATH=$PATH:/usr/local/go/bin
@@ -110,7 +110,7 @@ jobs:
           go test ./backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
 
   run-deploy-job:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     needs: [run-lint-job, run-remark-job, run-go-tests-job]
     if: ( github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') ) &&  success()
     steps:
@@ -122,7 +122,7 @@ jobs:
           mv linux-amd64/helm /usr/local/bin/helm
           
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Now load the helm dependencies
         run: |

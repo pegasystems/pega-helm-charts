@@ -5,6 +5,8 @@ apiVersion: v1
 metadata:
   name: {{ template "pegaEnvironmentConfig" $ }}
   namespace: {{ .Release.Namespace }}
+  labels:
+    ops.identifier: "infinity"
 data:
   # Database Type for installation
   DB_TYPE: {{ .Values.global.jdbc.dbType }}
@@ -24,6 +26,24 @@ data:
   # The connection properties that will be sent to our JDBC driver when establishing new connections
   JDBC_CONNECTION_PROPERTIES: {{ .Values.global.jdbc.connectionProperties }}
 {{- end }}
+# The jdbc connection timeout properties for the primary PegaRULES datasource.
+{{- if .Values.global.jdbc.connectionTimeoutProperties }}
+  JDBC_TIMEOUT_PROPERTIES: {{ .Values.global.jdbc.connectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES: ""
+{{- end }}
+# The jdbc connection timeout properties for the PegaRULESLongRW datasource.
+{{- if .Values.global.jdbc.writerConnectionTimeoutProperties }}
+  JDBC_TIMEOUT_PROPERTIES_RW: {{ .Values.global.jdbc.writerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RW: ""
+{{- end }}
+  # The jdbc connection timeout properties for the PegaRULESReadOnly datasource.
+{{- if .Values.global.jdbc.readerConnectionTimeoutProperties }}
+  JDBC_TIMEOUT_PROPERTIES_RO: {{ .Values.global.jdbc.readerConnectionTimeoutProperties }}
+{{- else }}
+  JDBC_TIMEOUT_PROPERTIES_RO: ""
+{{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
   RULES_SCHEMA: {{ .Values.installer.upgrade.targetRulesSchema }}
@@ -36,27 +56,75 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
-{{- if .Values.pegasearch.externalSearchService }}
+{{- if and (.Values.pegasearch.externalSearchService) (not (.Values.pegasearch.srsAuth).enabled) }}
   # Search deployment type so that the engine knows to connect to the search service
   PEGA_SEARCH_TYPE: "ExternalSearchService" 
   # URL to connect to Search and Reporting service
   SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
+{{- else if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
+  # Search deployment type so that the engine knows to connect to the search service
+  PEGA_SEARCH_TYPE: "ExternalSearchService" 
+  # URL to connect to Search and Reporting service
+  SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
+  # URL of the OAuth endpoint to get the token for Search and Reporting service
+  SERV_AUTH_URL: "{{ .Values.pegasearch.srsAuth.url }}"
+  # OAuth scopes to grant permissions for Pega Infinity in Search and Reporting service
+  # The required value is "pega.search:full"
+  SERV_AUTH_SCOPES: {{ .Values.pegasearch.srsAuth.scopes | default "pega.search:full" | quote }}
+  # OAuth Client ID
+  SERV_AUTH_CLIENT_ID: "{{ .Values.pegasearch.srsAuth.clientId }}"
+  # Algorithm used to generate a private key used by OAuth client
+  # Allowed values: RS256, RS384, RS512, ES256, ES384, ES512
+  # Default value: RS256
+  SERV_AUTH_PRIVATE_KEY_ALGORITHM: {{ .Values.pegasearch.srsAuth.privateKeyAlgorithm | default "RS256" | quote }}
 {{- else }}
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ include "pegaSearchURL" $ }}
 {{- end }}
-  # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled"
+  # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled".
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
-  # Comma separated list of cassandra hosts
+  # Comma separated list of cassandra hosts.
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
-  # Port to connect to cassandra with
+  # Port to connect to cassandra with.
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
-  # Whether to enable client encryption on the Cassandra connection
+  # Whether to enable client encryption on the Cassandra connection.
   CASSANDRA_CLIENT_ENCRYPTION: "{{ .Values.dds.clientEncryption }}"
-  # Path to a mounted trust store file for Cassandra encryption
+  # Path to a mounted trust store file for Cassandra encryption.
   CASSANDRA_TRUSTSTORE: "{{ .Values.dds.trustStore }}"
-  # Path to a mounted key store file for Cassandra encryption
+  # Path to a mounted key store file for Cassandra encryption.
   CASSANDRA_KEYSTORE: "{{ .Values.dds.keyStore }}"
+  # Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will
+  # not interrupt Dataset save operations.
+  CASSANDRA_ASYNC_PROCESSING_ENABLED: "{{ .Values.dds.asyncProcessingEnabled }}"
+  # Specify a prefix to use when creating Pega-managed keyspaces in Cassandra.
+  CASSANDRA_KEYSPACES_PREFIX: "{{ .Values.dds.keyspacesPrefix }}"
+  # Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a
+  # token from the token range to determine which Cassandra node to send the request. Before you can enable this policy,
+  # you must configure the token range partitioner.
+  CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY: "{{ .Values.dds.extendedTokenAwarePolicy }}"
+  # Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains
+  # a per-node latency score (an average).
+  CASSANDRA_LATENCY_AWARE_POLICY: "{{ .Values.dds.latencyAwarePolicy }}"
+  # Enable the use of a customized retry policy for your Pega Platform deployment. After enabling this policy in your
+  # deployment configuration, Cassandra queries that timeout will be retried. The number of retries may be configured
+  # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. If not configured, queries
+  # will be retried once.
+  CASSANDRA_CUSTOM_RETRY_POLICY: "{{ .Values.dds.customRetryPolicy }}"
+  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
+  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
+  # provides lower perceived latencies at the client, but puts greater load on your Cassandra service.
+  CASSANDRA_SPECULATIVE_EXECUTION_POLICY: "{{ .Values.dds.speculativeExecutionPolicy }}"
+  # Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to
+  # monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX
+  # interface; disabling also limits the metrics being collected using the DDS landing page.
+  CASSANDRA_JMX_METRICS_ENABLED: "{{ .Values.dds.jmxMetricsEnabled }}"
+  # Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor
+  # your Cassandra service. If you enable this property, use the Pega Platform DSS:
+  # dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By
+  # default, after you enable this property, CSV files will be written to the Pega Platform work directory.
+  CASSANDRA_CSV_METRICS_ENABLED: "{{ .Values.dds.csvMetricsEnabled }}"
+  # Enable reporting of DDS SDK metrics to your Pega Platform logs.
+  CASSANDRA_LOG_METRICS_ENABLED: "{{ .Values.dds.logMetricsEnabled }}"
   # Unique ID for multitenant backing services
   CUSTOMER_DEPLOYMENT_ID: "{{ include "customerDeploymentID" . }}"
 {{- if .Values.stream }}
@@ -64,16 +132,39 @@ data:
   PEGA_STREAM_URL: {{ .Values.stream.url }}
 {{- end }}
 {{- end }}
-{{ if .Values.hazelcast.enabled }}
+
+{{ if (eq (include "hazelcastCSConfigRequired" .) "true") }}
   HZ_DISCOVERY_K8S: "true"
   HZ_CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}
   # Hazelcast Cluster Name
-  HZ_CLUSTER_NAME: {{ .Values.hazelcast.client.clusterName }}
+  HZ_CLUSTER_NAME: {{ template "hzClusterName" . }}
 {{- end }}
   # Hostname of Hazelcast server
-  HZ_SERVER_HOSTNAME: {{ template "hazelcastName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+  HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
+{{ if .Values.stream.enabled }}
+  # Whether to enable connecting to an external stream cluster.  "true" for enabled, "false for disabled"
+  EXTERNAL_STREAM: "true"
+  # Provided bootstrap server
+  STREAM_BOOTSTRAP_SERVERS: "{{ .Values.stream.bootstrapServer }}"
+  STREAM_SECURITY_PROTOCOL: "{{ .Values.stream.securityProtocol }}"
+  STREAM_SASL_MECHANISM: "{{ .Values.stream.saslMechanism }}"
+  # Path to a mounted trust store file for Stream encryption
+  {{- if .Values.stream.trustStore }}
+  STREAM_TRUSTSTORE: "/opt/pega/certs/{{ .Values.stream.trustStore }}"
+  {{- end }}
+  # Only JKS type certificates are supported
+  STREAM_TRUSTSTORE_TYPE: "{{ .Values.stream.trustStoreType }}"
+  # Path to a mounted key store file for Stream encryption
+  {{- if .Values.stream.keyStore }}
+  STREAM_KEYSTORE: "/opt/pega/certs/{{ .Values.stream.keyStore }}"
+  {{- end }}
+  # Only jks type certificates are supported
+  STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
+  STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
+  STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
+{{- end }}
 {{ end }}

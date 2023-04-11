@@ -32,7 +32,7 @@ spec:
 {{ end }}
 {{ end }}
 {{ end }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
   defaultBackend:
 {{ else }}
   backend:
@@ -50,9 +50,7 @@ spec:
         backend:
 {{ include "ingressServiceC11n" . | indent 10 }}
       {{ end }}
-      - pathType: ImplementationSpecific
-        backend: 
 # protocol will be set to https only when either ingress is enabled or domain is set
-{{ include "ingressBackend" . }}
+{{ include "defaultIngressRule" . | indent 6 }}
 ---
 {{- end }}

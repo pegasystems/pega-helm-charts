@@ -11,7 +11,7 @@ import (
 func TestPegaInstallerAction_WithValidUpgradeType(t *testing.T) {
 
 	var supportedActions = []string{"upgrade"}
-	var supportedUpgradeTypes = []string{"in-place" ,"out-of-place", "zero-downtime", "custom", "out-of-place-rules" ,"out-of-place-data"}
+	var supportedUpgradeTypes = []string{"in-place" ,"out-of-place", "custom", "out-of-place-rules" ,"out-of-place-data"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -36,7 +36,7 @@ func TestPegaInstallerAction_WithValidUpgradeType(t *testing.T) {
 func TestPegaInstallerAction_WithValidUpgradedeployType(t *testing.T) {
 
 	var supportedActions = []string{"upgrade-deploy"}
-	var supportedUpgradeTypes = []string{"zero-downtime" }
+	var supportedUpgradeTypes = []string{"zero-downtime"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)

@@ -1,0 +1,34 @@
+---
+enabled: true
+deployment:
+  name: "constellation"
+# Cloud provider details. Accepted values are aws
+cloudProvider: "aws"
+# For aws cloud provider enter your acm certificate ARN here.
+awsCertificateArn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
+domainName: YOUR_CUSTOM_DOMAIN_NAME_HERE
+# Docker repos and tag for image
+docker:
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  registry:
+    url: YOUR_DOCKER_REGISTRY_URL
+    username: YOUR_DOCKER_REGISTRY_USERNAME
+    password: YOUR_DOCKER_REGISTRY_PASSWORD
+  # Docker image information for the Pega docker image, containing the application server.
+  constellation:
+    image: cirrus-docker.jfrog.io/constellation-appstatic-service/docker-image:1.0.8-20221228123724
+logLevel: info
+urlPath: /c11n
+replicas: 1
+livenessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3

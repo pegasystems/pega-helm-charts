@@ -10,8 +10,6 @@ systemName: "pega"
 # 2 = development;
 # 1 = experimental
 productionLevel: 2
-# Whether this is a Multitenant System ('true' if yes, 'false' if no)
-multitenantSystem: "false"
 # UDF generation will be skipped if this property is set to true
 bypassUdfGeneration: "true"
 # Temporary password for administrator@pega.com that is used to install Pega Platform
@@ -71,6 +69,10 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
+  # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+  pegaRESTServerURL: ""
+  pegaRESTUsername: ""
+  pegaRESTPassword: ""
 
 # Memory and CPU settings for installer
 resources:
@@ -87,3 +89,7 @@ shareProcessNamespace: false
 # sidecarContainers:
 #  - name: <SIDECAR_CONTAINER_NAME>
 #    image: <SIDECAR_IMAGE>
+
+# If a nodeSelector is required for the installer pod, it may be specified here:
+# nodeSelector:
+#   label: value

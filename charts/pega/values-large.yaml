@@ -14,7 +14,19 @@ global:
   # Deploy Pega nodes
   actions:
     execute: "deploy"
+  # Add custom certificates to be mounted to container
+  # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
+  # to support multiple custom certificates as external secrets, specify each of your external secrets
+  # as an array of comma-separated strings using the certificatesSecrets parameter.
+  certificatesSecrets: []
+  certificates:
 
+  # Add krb5.conf file content here.
+  # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
+  kerberos:
+
+  # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
+  storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
   #   If you are installing or upgrading on IBM DB2, update the udb.conf file in the /charts/pega/charts/installer/config/udb directory with any additional connection properties.
   jdbc:
@@ -40,6 +52,10 @@ global:
     driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
+    # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
+    # configure JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
+    external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
@@ -55,11 +71,15 @@ global:
     authentication:
       # Provide the basic authentication credentials or the API key authentication details to satisfy your custom artifactory authentication mechanism.
       basic:
-        username: "YOUR_ARTIFACTORY_USERNAME"
-        password: "YOUR_ARTIFACTORY_PASSWORD"
+        username: ""
+        password: ""
       apiKey:
-        headerName: "YOUR_ARTIFACTORY_DEDICATED_APIKEY_HEADER"
-        value: "YOUR_ARTIFACTORY_API_KEY"
+        headerName: ""
+        value: ""
+      # To avoid exposing basic.username,basic.password,apiKey.headerName,apiKey.value parameters, configure the
+      # basic.username,basic.password,apiKey.headerName,apiKey.value parameters in External Secrets Manager, and enter the external secret for the credentials
+      # make sure the keys in the secret should be CUSTOM_ARTIFACTORY_USERNAME , CUSTOM_ARTIFACTORY_PASSWORD , CUSTOM_ARTIFACTORY_APIKEY_HEADER , CUSTOM_ARTIFACTORY_APIKEY
+      external_secret_name: ""
     # Leave customArtifactory.enableSSLVerification enabled to ensure secure access to your custom artifactory;
     # when customArtifactory.enableSSLVerification is false, SSL verification is skipped and establishes an insecure connection.
     enableSSLVerification: true
@@ -72,6 +92,9 @@ global:
       url: "YOUR_DOCKER_REGISTRY"
       username: "YOUR_DOCKER_REGISTRY_USERNAME"
       password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+    # To avoid exposing Docker registry details, create secrets to manage your Docker registry credentials.
+    # Specify secret names as an array of comma-separated strings in double quotation marks using the imagePullSecretNames parameter. For example: ["secret1", "secret2"]
+    imagePullSecretNames: []
     # Docker image information for the Pega docker image, containing the application server.
     pega:
       image: "pegasystems/pega"
@@ -81,9 +104,10 @@ global:
       image: busybox:1.31.0
       imagePullPolicy: IfNotPresent
     k8s_wait_for:
-      image: dcasavant/k8s-wait-for
+      image: pegasystems/k8s-wait-for
       imagePullPolicy: "IfNotPresent"
       # waitTimeSeconds: 2
+      # maxRetries: 1
 
   # Upgrade specific properties
   upgrade:
@@ -110,18 +134,27 @@ global:
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
+        httpEnabled: true
         port: 80
         targetPort: 8080
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
-          keystore: ""
-          keystorepassword: ""
+          # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
+          # values in the External Secrets Manager, and enter the external secret name below
+          # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
+          external_secret_name: ""
+          keystore:
+          keystorepassword:
           port: 443
           targetPort: 8443
           # set the value of CA certificate here in case of baremetal/openshift deployments - CA certificate should be in base64 format
-          cacertificate: ""
-          # set enabled=true, only if addon chart is deployed and traefik is enabled, else set to false
+          # pass the certificateChainFile file if you are using certificateFile and certificateKeyFile
+          cacertificate:
+          # provide the SSL certificate and private key as a PEM format
+          certificateFile:
+          certificateKeyFile:
+          # if you will deploy traefik addon chart and enable traefik, set enabled=true; otherwise leave the default setting.
           traefik:
             enabled: false
             # the SAN of the certificate present inside the container
@@ -136,6 +169,9 @@ global:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
+        # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
+        # path:
+        # pathType:
         tls:
           # Enable TLS encryption
           enabled: true
@@ -212,6 +248,8 @@ global:
       # Create a stream tier for queue processing.  This tier deploys
       # as a stateful set to ensure durability of queued data. It may
       # be optionally exposed to the load balancer.
+      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
+      # When your Pega Platform deployment uses an externalize Kafka configuration, your deployment no longer uses the "Stream" node type.
       nodeType: "Stream"
 
       # Pega requestor specific properties
@@ -337,10 +375,18 @@ cassandra:
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
 dds:
+  # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
+  # TCP Port to connect to cassandra.
   port: "9042"
+  # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
+  # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
+  # To avoid exposing username,password,trustStorePassword,keyStorePassword parameters, configure the
+  # username,password,trustStorePassword,keyStorePassword parameters in External Secrets Manager, and enter the external secret for the credentials
+  # make sure the keys in the secret should be CASSANDRA_USERNAME, CASSANDRA_PASSWORD , CASSANDRA_TRUSTSTORE_PASSWORD , CASSANDRA_KEYSTORE_PASSWORD
+  external_secret_name: ""
 
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
@@ -365,16 +411,81 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
+    pegaRESTUsername: ""
+    pegaRESTPassword: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
+  # Hazelcast docker image for platform version 8.6 through 8.7.x
   image: "YOUR_HAZELCAST_IMAGE:TAG"
+  # Hazelcast docker image for platform version 8.8 and later
+  clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
+
   # Setting below to true will deploy the infinity in client-server Hazelcast model.
   # Note: Make sure to set this value as "false" in case of platform version below "8.6". If not set this will fail the installation.
   enabled: true
+
+  # Setting up for Pega 8.8 and above fresh install and for HZ upgrade
+  clusteringServiceEnabled: false
+
+  # Setting related to Hazelcast migration.
+  migration:
+    # Set to `true` to initiate the migration job.
+    initiateMigration: false
+    # Reference the `platform/clustering-service-kubectl` Docker image to create the migration job.
+    migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
+    # Set to `true` when migrating from embedded Hazelcast.
+    embeddedToCSMigration: false
+    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
+    skipRestart: false
+
   # No. of initial members to join
   replicas: 3
   # UserName to be used in client-server Hazelcast model for authentication
   username: ""
   # Password to be used in client-server Hazelcast model for authentication
   password: ""
+  # To avoid exposing username,password parameters, configure the
+  # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
+  # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
+  external_secret_name: ""
+
+# Stream (externalized Kafka service) settings.
+stream:
+  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
+  enabled: false
+  # Provide externalized Kafka service broker urls.
+  bootstrapServer: ""
+  # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
+  securityProtocol: PLAINTEXT
+  # If required, provide trustStore certificate file name
+  # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
+  trustStore: ""
+  # If required provide trustStorePassword value in plain text.
+  trustStorePassword: ""
+  # If required, provide keyStore certificate file name
+  # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+  # in the global.certificatesSecrets parameter.
+  # Pega deployments only support keyStores using the Java Key Store (.jks) format.
+  keyStore: ""
+  # If required, provide keyStore value in plain text.
+  keyStorePassword: ""
+  # If required, provide jaasConfig value in plain text.
+  jaasConfig: ""
+  # If required, provide a SASL mechanism**. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.
+  saslMechanism: PLAIN
+  # By default, topics originating from Pega Platform have the pega- prefix,
+  # so that it is easy to distinguish them from topics created by other applications.
+  # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
+  streamNamePattern: "pega-{stream.name}"
+  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
+  replicationFactor: "1"
+  # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
+  # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+  # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
+  # Enter the external secret name below.
+  external_secret_name: ""

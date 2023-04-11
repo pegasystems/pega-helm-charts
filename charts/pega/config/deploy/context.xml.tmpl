@@ -16,7 +16,7 @@
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};{{ .Env.JDBC_TIMEOUT_PROPERTIES }}"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
@@ -34,7 +34,7 @@
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};socketTimeout=1200;statement_timeout=1200500;idle_in_transaction_session_timeout=1200500;"
+    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};{{ .Env.JDBC_TIMEOUT_PROPERTIES_RW }}"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
@@ -53,7 +53,7 @@
     maxIdle="{{ .Env.JDBC_MAX_IDLE }}"
     maxWaitMillis="{{ .Env.JDBC_MAX_WAIT }}"
     initialSize="{{ default .Env.JDBC_RO_INITIAL_SIZE .Env.JDBC_INITIAL_SIZE }}"
-    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }}"
+    connectionProperties="{{ .Env.JDBC_CONNECTION_PROPERTIES }};{{ .Env.JDBC_TIMEOUT_PROPERTIES_RO }}"
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
@@ -77,6 +77,7 @@
   {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
   <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
   {{ end }}
+  <Environment name="prconfig/circuitbreaker/startInOpenMode/default" value="{{ default .Env.CIRCUIT_BREAKER_OPEN_MODE "false" }}" type="java.lang.String" />
 
   {{ if .Env.CONTEXT_XML_SNIPPET }}
   {{ .Env.CONTEXT_XML_SNIPPET }}

@@ -4,20 +4,33 @@
 {{- $depName -}}-environment-config
 {{- end }}
 
-{{- define "pegaImportCertificatesConfig" }}
+{{- define "pegaImportCertificatesSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-import-certificates-config
+{{- $depName -}}-import-certificates-secret
+{{- end }}
+
+{{- define "pegaImportKerberosConfigMap" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-import-kerberos-configmap
 {{- end }}
 
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
 
 {{- define "pegaImportCertificatesTemplate" }}
 - name: {{ template "pegaVolumeImportCertificates" }}
-  configMap:
-    # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaImportCertificatesConfig" $ }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (.Values.global.certificatesSecrets) }}
+  {{- range .Values.global.certificatesSecrets }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaImportCertificatesSecret" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaCustomArtifactoryCertificateConfig" }}
@@ -49,7 +62,7 @@ false
 {{- end }}
 
 {{- define "pegaTomcatKeystoreSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName := printf "%s" (include "deploymentName" .root) -}}
 {{- $depName -}}-tomcat-keystore-secret
 {{- end }}
 
@@ -59,12 +72,18 @@ false
 - name: {{ template "pegaVolumeTomcatKeystore" }}
   secret:
     # This name will be referred in the volume mounts kind.
+  {{ if ((.node.service).tls).external_secret_name }}
+    secretName: {{ ((.node.service).tls).external_secret_name }}
+  {{ else }}
     secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
     # Used to specify permissions on files within the volume.
     defaultMode: 420
 {{- end}}
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
+
+{{- define "pegaKerberosConfig" }}pega-import-kerberos{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 
@@ -83,7 +102,9 @@ false
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
 {{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "performOnlyDeployment" }}
@@ -143,6 +164,23 @@ false
    - hosts:
      - {{ template "domainName" dict "node" .node }}
      secretName: {{ .node.ingress.tls.secretName }}
+{{- end }}
+
+{{- define "hostPathType" }}
+ {{- if .node.ingress.pathType -}}
+   {{ .node.ingress.pathType }}
+ {{- else -}}
+   ImplementationSpecific
+ {{- end }}
+{{- end }}
+
+{{- define "defaultIngressRule" }}
+- pathType: {{ include "hostPathType" $ }}
+  {{- if .node.ingress.path }}
+  path: {{ .node.ingress.path }}
+  {{- end }}
+  backend:
+    {{ include "ingressBackend" $ }}
 {{- end }}
 
 {{- define "performUpgradeAndDeployment" }}
@@ -298,7 +336,11 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- end }}
 
 {{- define "gkemanagedcertificate" }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: networking.gke.io/v1
+{{- else }}
 apiVersion: networking.gke.io/v1beta1
+{{- end }}
 kind: ManagedCertificate
 metadata:
   name: {{ .name }}
@@ -339,6 +381,10 @@ true
 {{- define "generatedPodAnnotations" }}
 {{- end }}
 
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedPodLabels" }}
+{{- end }}
+
 #Override this template in a subchart if your secret values are provided by seperate secrets
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
@@ -347,10 +393,37 @@ true
     sources:
     - secret:
         name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if and (.Values.global.jdbc.external_secret_name) (not .Values.global.jdbc.password) }}
+  {{ if ((.Values.global.jdbc).external_secret_name) }}
     - secret:
         name: {{ .Values.global.jdbc.external_secret_name }}
   {{- end }}
+  {{ if ((.Values.hazelcast).external_secret_name)}}
+    - secret:
+        name: {{ .Values.hazelcast.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
+    - secret:
+        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.dds).external_secret_name)}}
+    - secret:
+        name: {{ .Values.dds.external_secret_name }}
+  {{- end }}
+  {{ if ((.Values.stream).external_secret_name)}}
+    - secret:
+        name: {{ .Values.stream.external_secret_name }}
+  {{- end }}
+{{- end}}
+
+#Kerberos config map
+{{- define "pegaKerberosVolumeTemplate" }}
+# Volume used to mount config files.
+- name: {{ template "pegaKerberosConfig" }}-config
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaImportKerberosConfigMap" $ }}
+    # Used to specify permissions on files within the volume.
+    defaultMode: 420
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
@@ -370,8 +443,18 @@ dnsConfig:
 {{- template "searchURL" $d2 }}
 {{- end -}}
 
+{{- define "srsAuthPrivateKey" -}}
+{{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
+    {{- if (.Values.pegasearch.srsAuth).privateKey }}
+        {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
+    {{- else }}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
+    {{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "ingressApiVersion" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.k8s.io/v1
 {{- else }}
 apiVersion: extensions/v1beta1
@@ -379,7 +462,7 @@ apiVersion: extensions/v1beta1
 {{- end }}
 
 {{- define "ingressService" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: {{ .name }}
   port: 
@@ -391,7 +474,7 @@ servicePort: {{ .node.service.port }}
 {{- end }}
 
 {{- define "ingressServiceHttps" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: {{ .name }}
   port:
@@ -411,7 +494,7 @@ servicePort: {{ .node.service.tls.port }}
 {{- end }}
 
 {{- define "ingressServiceC11n" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: constellation
   port: 
@@ -423,7 +506,7 @@ servicePort: 3000
 {{- end }}
 
 {{- define "ingressServiceSSLRedirect" }}
-{{- if (semverCompare ">= 1.22.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
+{{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 service:
   name: ssl-redirect
   port: 
@@ -433,3 +516,54 @@ serviceName: ssl-redirect
 servicePort: use-annotation
 {{- end }}
 {{- end }}
+
+{{- define "tierClassloaderRetryTimeout" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+180
+{{- else -}}
+{{- add .periodSeconds 0}}
+{{- end -}}
+{{- end -}}
+
+{{- define "tierClassloaderMaxRetries" }}
+{{- if gt (add .periodSeconds 0) 180 -}}
+{{- add (round (div (mul .periodSeconds .failureThreshold) 180) 0) 1 -}}
+{{- else -}}
+{{- add .failureThreshold 1 -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "hzServiceName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{ template "hazelcastName" }}
+{{- else -}}
+{{ template "clusteringServiceName" }}
+{{- end -}}
+{{- end -}}
+
+{{- define "hzClusterName" -}}
+{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{ .Values.hazelcast.client.clusterName }}
+{{- else -}}
+{{ .Values.hazelcast.server.clustering_service_group_name }}
+{{- end -}}
+{{- end -}}
+
+{{- define "hazelcastCSConfigRequired" }}
+  {{- if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.migration.embeddedToCSMigration)) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
