@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/GoogleCloudPlatform/gke-managed-certs v0.3.4
-	github.com/emicklei/go-restful v2.13.0+incompatible // indirect
+	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-openapi/spec v0.19.8 // indirect
 	github.com/go-openapi/swag v0.19.9 // indirect
