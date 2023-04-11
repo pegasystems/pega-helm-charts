@@ -50,6 +50,7 @@ spec:
         app: {{ .name }}
 {{- if .node.podLabels }}
 {{ toYaml .node.podLabels | indent 8 }}
+{{- include "generatedPodLabels" .root | indent 8 }}
 {{- end }}
       annotations:
 {{- if .node.podAnnotations }}
@@ -88,6 +89,9 @@ spec:
 {{- $data := dict "root" .root "node" .node }}
 {{- include "pegaVolumeTomcatKeystoreTemplate" $data | indent 6 }}
 {{ end }}
+{{- if .root.Values.global.kerberos }}
+{{- include "pegaKerberosVolumeTemplate" .root | indent 6 }}
+{{- end }}
 {{- if .custom }}
 {{- if .custom.volumes }}
       # Additional custom volumes
@@ -183,6 +187,13 @@ spec:
           value: {{ include "tierClassloaderRetryTimeout" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
         - name: MAX_RETRIES
           value: {{ include "tierClassloaderMaxRetries" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
+{{- if and (.root.Values.pegasearch.externalSearchService) ((.root.Values.pegasearch.srsAuth).enabled) }}
+        - name: SERV_AUTH_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pega-srs-auth-secret
+              key: privateKey
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
@@ -241,6 +252,10 @@ spec:
         - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
+{{- end }}
+{{- if .root.Values.global.kerberos }}
+        - name: {{ template "pegaKerberosConfig" }}-config
+          mountPath: "/opt/pega/kerberos"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.

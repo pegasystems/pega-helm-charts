@@ -14,6 +14,7 @@
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
 {{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
+{{- define "pegaDBOOPUpgrade" -}}pega-db-oop-upgrade{{- end -}}
 {{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
@@ -164,3 +165,7 @@
     false
   {{- end -}}
 {{- end -}}
+
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedInstallerPodLabels" }}
+{{- end }}

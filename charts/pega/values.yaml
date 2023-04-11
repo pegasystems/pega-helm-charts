@@ -20,6 +20,11 @@ global:
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
   certificates:
+
+  # Add krb5.conf file content here.
+  # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
+  kerberos:
+
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
@@ -328,6 +333,8 @@ cassandra:
 
 # DDS (external Cassandra) connection settings.
 # These settings should only be modified if you are using a custom Cassandra deployment.
+# To deploy Pega without Cassandra, comment out or delete the following dds section and set
+# the cassandra.enabled property above to false.
 dds:
   # A comma separated list of hosts in the Cassandra cluster.
   externalNodes: ""
@@ -414,10 +421,16 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
+    pegaRESTUsername: ""
+    pegaRESTPassword: ""
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
+  # Hazelcast docker image for platform version 8.6 through 8.7.x
   image: "YOUR_HAZELCAST_IMAGE:TAG"
+  # Hazelcast docker image for platform version 8.8 and later
   clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
 
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.6 through 8.7.x.

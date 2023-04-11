@@ -762,6 +762,21 @@ dds:
   username: "dnode_ext"
   password: "dnode_ext"
 ```
+### Deploying Pega without Cassandra
+To configure a Pega platform deployment without a Cassandra datastore (DDS), set `cassandra.enabled` to `false` and comment out or delete the `dds` section.
+
+Example:
+
+```yaml
+cassandra:
+  enabled: false
+
+#dds:
+#  externalNodes: ""
+#  port: "9042"
+#  username: "dnode_ext"
+#  password: "dnode_ext"
+```
 
 ## Search deployment
 
@@ -784,6 +799,32 @@ Example:
 pegasearch:
   externalSearchService: true
   externalURL: "http://srs-service.namespace.svc.cluster.local"
+```
+
+To configure authorization for the connection between Pega Infinity and the Search and Reporting Service (SRS) use the OAuth authorization service. For more information, see ['backingservices'](../backingservices). To configure the connection to the authorization service in SRS you must configure the following authorization parameters in the Pega values.yaml as shown in the following table and example:
+
+| Parameter             | Description                                                                                                                                                                                           | Default value      |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`             | Set the `pegasearch.srsAuth.enabled` to 'true' to use OAuth between Infinity and SRS.                                                                                                                 | false              |
+| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth service endpoint to get the token for SRS.                                                                                             | `""`               |
+| `clientId`            | Set the `pegasearch.srsAuth.clientId` value to the client id used in OAuth service.                                                                                                                   | `""`               |
+| `scopes`              | Set the `pegasearch.srsAuth.scopes` value to "pega.search:full", the scope set in the OAuth service required to grant access to SRS.                                                                  | "pega.search:full" |
+| `privateKey`          | Set the `pegasearch.srsAuth,privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
+| `privateKeyAlgorithm` | Set the `pegasearch.srsAuth.privateKeyAlgorithm` value to the algorithm used to generate a private key used by the OAuth client. Allowed values: RS256 (default), RS384, RS512, ES256, ES384, ES512.  | "RS256"            |
+
+Example:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.srs-namespace.svc.cluster.local"
+  srsAuth:
+    enabled: true
+    url: "https:/your-authorization-service-host/oauth2/v1/token"
+    clientId: "your-client-id"
+    scopes: "pega.search:full"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
+    privateKeyAlgorithm: "RS256"
 ```
 
 Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
@@ -1024,7 +1065,8 @@ starts a cluster of Hazelcast server nodes. For the discovery of Hazelcast membe
 Out of the two discovery strategies that the latter plugin provides - Kubernetes API and DNS Lookup, the client-server model with Hazelcast uses DNS lookup to resolve the IP addressing of PODs running Hazelcast.
 For additional information on Hazelcast member discovery, refer the plugin: [Hazelcast-Kubernetes Plugin](https://github.com/hazelcast/hazelcast-kubernetes)
 
-Specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.image` and set `hazelcast.enabled` as true to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
+For platform version 8.6 through 8.7.x, specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.image` and set `hazelcast.enabled` as `true` to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
+For platform version 8.8 and later, specify the `platform/clustering-service` Docker image that you downloaded in `hazelcast.clusteringServiceImage` and set `hazelcast.clusteringServiceEnabled` as `true` to deploy a Pega Platform web cluster separately from a Hazelcast cluster in a client-server deployment model.
 **Using Clustering service for client-server form of deployment is only supported from Pega Platform 8.6 or later.**
 
 In this model, nodes running Hazelcast start independently and simultaneously with the Pega web tier nodes and create a cluster with a member count you must specify using `hazelcast.replicas` parameter. Pega web tier nodes then connect to this Hazelcast cluster in a client-sever model.
@@ -1058,8 +1100,8 @@ Parameter   | Description   | Default value
 `hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
 `hazelcast.migration.skipRestart` |  Set to `true` during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail. | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
-`hazelcast.username` | UserName to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
-`hazelcast.password` | Password to be used in client-server Hazelcast model for authentication; if not set the installation will fail.  | `""`
+`hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
+`hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 
 #### Example
