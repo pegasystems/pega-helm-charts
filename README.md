@@ -152,27 +152,26 @@ From Helm chart versions `2.2.0` and above, update your Pega Platform version to
 
 # Debugging failed upgrades using helm commands
 
-Sometimes, upgrades using helm chart might fail in the middle due to invalid configurations, networking issue or some platform issue. The first step during the failure event
-should be to do perform basic troubleshooting which is to collect the logs and check for any known issue.
+Upgrades using helm charts may fail in due to a variety issues, including an invalid configuration, a networking issue, or a platform issue. To diagnose the issue or issues to begin troubleshooting, begin by reviewing failure events in the logs and check for a detailed error; after understanding its cause, you can begin troubleshooting the issue or issues.
 
-The logs can be retrieved by running following kubectl commands.
+To help diagnose the issue, you can find the best information by retrieving relevant logs with different context such as the following 'kubectl log' options.
 
 ```kubectl logs <pega-zdt-upgrade-podname> -n <namespace>```
 
-Additionally , You can use below flags to get better logs output.
+You can the following option to improve the usefulness of the log output.
 -f, --follow=false: Specify if the logs should be streamed.
 
 ```kubectl logs -f <pod-id> -n <namespace>```
 
 --tail:
-Lines of recent log file to display. Defaults to -1 with no selector, showing all log lines otherwise 100, if a selector is provided
+Print the last number of lines that you specify in the log file, for example, that last 100 lines in the specified pod. 
+By default this option (with no selector specified so tail=-1) displays all lines of the log file
 
 ```kubectl logs --tail=100 <pod-id>  -n <namespace>```
 
-You can either exec into container, navigate to the required path & access the files. This has to be done while container is running.
-or
-Copy /tmp/foo from a remote pod to /tmp/bar locally
 
+If a container is running, you can log in and run the kubectl log command in the container to review the results, or
+you can copy the log file in /tmp/foo from a pod to a local temporary, directory. /tmp/bar to access the files.
 ```kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar```
 
 # Contributing
