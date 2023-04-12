@@ -126,7 +126,7 @@ With your credentials saved locally, you must push your Pega-provided Docker ima
 
 Pega supports the use of an HTTPS load balancer through a Kubernetes ingress, which requires you to configure the load balancer to present authentication certificates to the client. In EKS clusters, Pega requires that you use an AWS Load Balancer Controller (formerly named AWS ALB Ingress Controller). For an overview, see [Application load balancing on Amazon EKS](https://docs.aws.amazon.com/eks/latest/userguide/alb-ingress.html).
 
-To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, it is a recommend practice to specify an SSL certificate that you create or import into AWS Credential Manager. After you have one your Amazon Resource Name (ARN) credential using this certificate or multiple certificates uploaded to AWS Credential Manager, use one of the following choices for the `annotation` parameter of the web tier ingress configuration:
+To configure this ingress controller, Pega allows your deployment to use the AWS Load Balancer Controller without a certificate for testing purposes; however, for the best security practice, it is a recommend practice to specify an SSL certificate that you create or import into AWS Credential Manager. After you have your Amazon Resource Name (ARN) credential using this certificate or multiple certificates uploaded to AWS Credential Manager, use one of the following choices for the `annotation` parameter of the web tier ingress configuration:
 
 - Leave it blank so that the deployment automatically associates the existing certificate with your ingress controller.
 - Specify an ARN certificate out of multiple certificates or want to provide secondary certificates that the deployment associates with your ingress controller.
@@ -162,14 +162,14 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-name: pega-85-demo
-region: us-east-1
-version: '1.15'
+  name: pega-85-demo
+  region: us-east-1
+  version: '1.15'
 
 nodeGroups:
 - name: linux-ng
-instanceType: m5.xlarge
-minSize: 2
+  instanceType: m5.xlarge
+  minSize: 2
 ```
 Pega Platform deployments support commercial and GovCloud regions. Specify a name and region here that reflects the version of Pega Platform you want to deploy and specify the region in which your cluster will run. The region you select must match the region that you specified in your IAM role and policy on the Load Balancer Controller.
 
@@ -393,7 +393,7 @@ The RDS DB instance must contain a database in order to install Pega Platform in
 
 1. Use a database editor tool, such as pgadmin4, to log into your RDS DB instance.
 
-    You can find your access information and login credentials, by selecting the RDS DB instance in the EKS console.
+    You can find your access information and login credentials, by selecting the RDS DB instance in the AWS console.
 
 2. If you have to create a new database, in the database editor tool, navigate to Databases and create a new database; if you already have a database created, you can review the settings to ensure it meets your organization's database requirements.
 
@@ -448,7 +448,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Specify `aws-load-balancer-controller:> enabled: true` to install an AWS load balance -controller for your deployment.
 - Specify your EKS cluster name in the `clusterName: <YOUR_EKS_CLUSTER_NAME>` parameter.
 - Specify the region of your EKS cluster name in the `region: <YOUR_EKS_CLUSTER_REGION>` parameter. Resources created by the ALB Ingress controller will be prefixed with this string.
-- Specify the the AWS VPC ID of your EKS cluster name in the `VpcID: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
+- Specify the the AWS VPC ID of your EKS cluster name in the `vpcId: <YOUR_EKS_CLUSTER_VPC_ID>` parameter. You must enter your VPC ID here if ec2metadata is unavailable from the controller pod.
 - Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
 - Specify the complete required annotation to the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
