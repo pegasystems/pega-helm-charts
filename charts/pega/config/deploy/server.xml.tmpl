@@ -214,9 +214,12 @@
                resolveHosts="false" />
 
         <Valve className="org.apache.catalina.valves.ErrorReportValve"
-               showReport="false"
+               errorCode.404="webapps/ROOT/error404.html"
+               errorCode.405="webapps/ROOT/error405.html"
+               errorCode.400="webapps/ROOT/error400.html"
+               errorCode.403="webapps/ROOT/error403.html"
+               showReport="true"
                showServerInfo="false" />
-
       </Host>
     </Engine>
   </Service>

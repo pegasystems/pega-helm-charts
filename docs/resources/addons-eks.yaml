@@ -7,8 +7,8 @@ aws-load-balancer-controller:
   clusterName: "YOUR_EKS_CLUSTER_NAME"
   ## AWS region of k8s cluster, required if ec2metadata is unavailable from controller pod.
   region: "YOUR_EKS_CLUSTER_REGION"
-   ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod.
-  VpcID: "YOUR_EKS_CLUSTER_VPC_ID"
+  ## VPC ID of k8s cluster, required if ec2metadata is unavailable from controller pod.
+  vpcId: "YOUR_EKS_CLUSTER_VPC_ID"
   ## To create IAM Role, see https://docs.aws.amazon.com/eks/latest/userguide/create-service-account-iam-policy-and-role.html#create-service-account-iam-role
   ## Create policy with https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/main/docs/install/iam_policy.json
   ## and attach it to the role. See, https://github.com/aws/eks-charts/tree/master/stable/aws-load-balancer-controller for more details
