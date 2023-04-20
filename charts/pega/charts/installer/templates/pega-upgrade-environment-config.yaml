@@ -36,9 +36,40 @@ data:
 {{- if .Values.upgrade.upgradeSteps }}
   UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
 {{- end }}
-{{- if .Values.upgrade.pegaRESTServerURL }}
-  PEGA_REST_SERVER_URL: {{ .Values.upgrade.pegaRESTServerURL }}
+{{- $depName := "pega" }}
+{{- if (.Values.global.deployment) }}
+{{- if (.Values.global.deployment.name) }}
+{{- $depName = .Values.global.deployment.name }}
 {{- end }}
+{{- end }}
+{{- $webTier := "web" }}
+{{- $webTierServiceName := "" }}
+{{- $port := "80" }}
+{{- $protocol := "http" }}
+{{- range $index, $tier := .Values.global.tier }}
+{{- if contains $tier.nodeType "WebUser" }}
+{{- $webTier = $tier.name }}
+{{- if eq "" $webTierServiceName }}
+{{- $webTierServiceName = printf "%s-%s" $depName $webTier }}
+{{- if and $tier.service (and (hasKey $tier.service "httpEnabled") (eq false $tier.service.httpEnabled) ) }}
+{{- $protocol = "https" }}
+{{- $port = "443" }}
+{{- if $tier.service.tls }}{{- if $tier.service.tls.port }}
+{{- $port = $tier.service.tls.port }}
+{{- end }}{{- end }}
+{{- else }}
+{{- if $tier.service.port }}
+{{- $port = $tier.service.port }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- if eq "" $webTierServiceName }}
+{{- $webTierServiceName = printf "%s-web" $depName }}
+{{- else }}
+{{- end }}
+  PEGA_REST_SERVER_URL: "{{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/prweb/PRRestService"
 {{- if .Values.upgrade.pegaRESTUsername }}
   PEGA_REST_USERNAME: {{ .Values.upgrade.pegaRESTUsername }}
 {{- end }}

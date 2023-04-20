@@ -12,7 +12,7 @@ import (
 func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"upgrade-deploy"}
-	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "restURL", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
+	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "http://pega-web:80/prweb/PRRestService", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -33,6 +33,62 @@ func TestPegaUpgradeEnvironmentConfig(t *testing.T) {
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"})
 			assertUpgradeEnvironmentConfig(t, yamlContent, options, expectedValues)
 		}
+	}
+}
+
+type restURLExpectation struct {
+    valuesFile     string
+    expectedURL    string
+}
+
+func TestPegaUpgradeEnvironmentConfig_DetermineRestUrl(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"upgrade-deploy"}
+	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "http://pega-web:80/prweb/PRRestService", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
+
+    var expectations = []restURLExpectation{
+        {
+            valuesFile: "/data/values_zdt_upgrade_http_non_default_port81.yaml",
+            expectedURL: "http://pega-web:81/prweb/PRRestService",
+        },
+        {
+            valuesFile: "/data/values_zdt_upgrade_https_default_port.yaml",
+            expectedURL: "https://pega-web:443/prweb/PRRestService",
+        },
+        {
+            valuesFile: "/data/values_zdt_upgrade_https_non_default_port.yaml",
+            expectedURL: "https://pega-web:5443/prweb/PRRestService",
+        },
+        {
+            valuesFile: "/data/values_zdt_upgrade_http_default_port_renamed_deployment_renamed_tier.yaml",
+            expectedURL: "http://xxx-webcustom:80/prweb/PRRestService",
+        },
+    }
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath, err := filepath.Abs(PegaHelmChartTestsPath)
+	require.NoError(t, err)
+
+    for _, expectation := range expectations {
+        expectedValues["PEGA_REST_SERVER_URL"] = expectation.expectedURL
+        for _, vendor := range supportedVendors {
+            for _, operation := range supportedOperations {
+                var options = &helm.Options{
+                    SetValues: map[string]string{
+                        "global.provider":                     vendor,
+                        "global.actions.execute":              operation,
+                        "installer.upgrade.upgradeType":       "zero-downtime",
+                        "installer.upgrade.pegaRESTUsername":  expectedValues["PEGA_REST_USERNAME"],
+                        "installer.upgrade.pegaRESTPassword":  expectedValues["PEGA_REST_PASSWORD"],
+                    },
+                }
+
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"}, "--values", testsPath+expectation.valuesFile)
+                assertUpgradeEnvironmentConfig(t, yamlContent, options, expectedValues)
+            }
+        }
 	}
 }
 
