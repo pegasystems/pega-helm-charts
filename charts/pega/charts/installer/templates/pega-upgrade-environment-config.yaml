@@ -47,7 +47,8 @@ data:
 {{- $port := "80" }}
 {{- $protocol := "http" }}
 {{- range $index, $tier := .Values.global.tier }}
-{{- if contains $tier.nodeType "WebUser" }}
+{{- if hasKey $tier "nodeType" }}
+{{- if and (contains $tier.nodeType "WebUser") (hasKey $tier "service") }}
 {{- $webTier = $tier.name }}
 {{- if eq "" $webTierServiceName }}
 {{- $webTierServiceName = printf "%s-%s" $depName $webTier }}
@@ -58,8 +59,9 @@ data:
 {{- $port = $tier.service.tls.port }}
 {{- end }}{{- end }}
 {{- else }}
-{{- if $tier.service.port }}
+{{- if and $tier.service $tier.service.port }}
 {{- $port = $tier.service.port }}
+{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
