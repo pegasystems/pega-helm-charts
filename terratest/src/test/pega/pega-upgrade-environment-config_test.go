@@ -61,7 +61,7 @@ func TestPegaUpgradeEnvironmentConfig_DetermineRestUrl(t *testing.T) {
         },
         {
             valuesFile: "/data/values_zdt_upgrade_http_default_port_renamed_deployment_renamed_tier.yaml",
-            expectedURL: "http://xxx-webcustom:80/prweb/PRRestService",
+            expectedURL: "http://xxx-webcustom:80/somethingotherthanprweb/PRRestService",
         },
     }
 
