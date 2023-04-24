@@ -46,6 +46,7 @@ data:
 {{- $webTierServiceName := "" }}
 {{- $port := "80" }}
 {{- $protocol := "http" }}
+{{- $webAppContextPath := "prweb" }}
 {{- range $index, $tier := .Values.global.tier }}
   {{- if hasKey $tier "nodeType" }}
     {{- if and (contains $tier.nodeType "WebUser") (hasKey $tier "service") }}
@@ -67,6 +68,9 @@ data:
           {{- end }}
         {{- end }}
       {{- end }}
+      {{- if $tier.ingress }}{{- if hasKey $tier.ingress "appContextPath" }}
+        {{- $webAppContextPath = trimAll "/" $tier.ingress.appContextPath }}
+      {{- end }}{{- end }}
     {{- end }}
   {{- end }}
 {{- end }}
@@ -74,7 +78,7 @@ data:
 {{- if eq "" $webTierServiceName }}
   {{- $webTierServiceName = printf "%s-web" $depName }}
 {{- end }}
-  PEGA_REST_SERVER_URL: "{{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/prweb/PRRestService"
+  PEGA_REST_SERVER_URL: "{{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/{{- $webAppContextPath -}}/PRRestService"
 {{- if .Values.upgrade.pegaRESTUsername }}
   PEGA_REST_USERNAME: {{ .Values.upgrade.pegaRESTUsername }}
 {{- end }}
