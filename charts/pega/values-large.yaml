@@ -454,8 +454,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Enabled by default. When enabled deployment will use external Kafka as per configuration and doesn't use the "Stream" node type. Disable this setting to use the "Stream" node type.
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
