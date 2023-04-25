@@ -136,7 +136,7 @@ global:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
         httpEnabled: true
-        port: 80
+        port: 81
         targetPort: 8080
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
@@ -421,7 +421,8 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
-    # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
