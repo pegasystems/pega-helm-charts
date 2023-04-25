@@ -8,7 +8,7 @@ global:
 
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
-    name: "pega"
+    name: "xxx"
 
   # Deploy Pega nodes
   actions:
@@ -120,7 +120,7 @@ global:
 
   # Specify the Pega tiers to deploy
   tier:
-    - name: "web"
+    - name: "webcustom"
       # Create a an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
@@ -170,6 +170,9 @@ global:
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_WEB_NODE_DOMAIN"
+
+        appContextPath: "somethingotherthanprweb"
+
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
@@ -421,7 +424,8 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
-    # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
