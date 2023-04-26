@@ -150,6 +150,30 @@ For details about downloading and then pushing Docker images to your repository 
 
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
 
+# Debugging failed upgrades using helm commands
+
+Upgrades using helm charts may fail due to a variety issues, including an invalid configuration, a networking issue, or a platform issue. 
+To diagnose the issue or issues, review failure events in the logs and check for a detailed error; after understanding its cause, you can begin troubleshooting the issue or issues.
+
+To help diagnose an issue, you can find the best information by retrieving relevant logs by trying different contexts such as the following 'kubectl log' options.
+```kubectl logs <pega-zdt-upgrade-podname> -n <namespace>```
+
+You can use the following option to improve the usefulness of the log output
+-f, --follow=false: Specify if the logs should be streamed.
+
+```kubectl logs -f <pod-id> -n <namespace>```
+
+--tail:
+Print the last number of lines that you specify in the log file, for example, that last 100 lines in the specified pod. 
+By default this option (with no selector specified so tail=-1) displays all lines of the log file
+
+```kubectl logs --tail=100 <pod-id>  -n <namespace>```
+
+
+If a container is running, you can log in and run the kubectl log command in the container to review the results, or
+you can copy the log file in /tmp/foo from a pod to a local temporary directory, /tmp/bar to access the files.
+```kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar```
+
 # Contributing
 
 This is an open source project and contributions are welcome.  Please see the [contributing guidelines](./CONTRIBUTING.md) to get started.
