@@ -135,12 +135,12 @@ global:
       service:
         # For help configuring the service block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#service
-        httpEnabled: true
+        httpEnabled: false
         port: 80
         targetPort: 8080
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
-          enabled: false
+          enabled: true
           # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
           # values in the External Secrets Manager, and enter the external secret name below
           # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
@@ -421,7 +421,8 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
-    # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
+    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+    pegaRESTServerURL: ""
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
@@ -463,8 +464,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Enabled by default. When enabled deployment will use external Kafka as per configuration and doesn't use the "Stream" node type. Disable this setting to use the "Stream" node type.
-  enabled: true
+  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
+  enabled: false
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.

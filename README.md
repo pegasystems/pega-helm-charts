@@ -21,7 +21,7 @@ Pega provides multiple runbooks that are Kubernetes-environment specific for cli
 
 Because open-source Kubernetes depends on your specific configuration, Pega does not provide a single open-source Kubernetes runbook. Use the Pega helm charts documentation to configure your deployment, with [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md), [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md), and the Getting started section below as your starting points.
 
-The helm charts currently only support running on Kubernetes nodes with x86-64 CPUs.  ARM CPUs are currently unsupported.
+The helm charts support running on Kubernetes releases that are in Maintenance and Active Support at the time of the helm chart’s release. To review the date of a Pega helm chart release, see [Releases](https://github.com/pegasystems/pega-helm-charts/releases); to review the latest matrix of Kubernetes release support,  see [Kubernetes EOL policy](https://endoflife.date/kubernetes).
 
 # Getting started
 
