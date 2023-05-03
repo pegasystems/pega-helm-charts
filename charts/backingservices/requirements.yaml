@@ -9,4 +9,6 @@ dependencies:
   repository: https://helm.elastic.co/
   condition: srs.srsStorage.provisionInternalESCluster
 - name: constellation
+  version: "1.0.0"
 - name: srs
+  version: "0.1.0"
