@@ -442,13 +442,14 @@ hazelcast:
 
   # No. of initial members to join
   replicas: 3
-  # UserName to be used in client-server Hazelcast model for authentication
+  # UserName in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   username: ""
-  # Password to be used in client-server Hazelcast model for authentication
+  # Password in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   password: ""
-  # To avoid exposing username,password parameters, configure the
-  # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
-  # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
+  # To avoid exposing username and password parameters, leave these parameters empty and configure
+  # these cluster settings using an External Secrets Manager using the following keys in the secret
+  # for username: HZ_CS_AUTH_USERNAME and for password: HZ_CS_AUTH_PASSWORD.
+  # Enter the external secret for these credentials below.
   external_secret_name: ""
 
 # Stream (externalized Kafka service) settings.
