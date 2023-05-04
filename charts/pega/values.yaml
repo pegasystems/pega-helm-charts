@@ -457,8 +457,8 @@ hazelcast:
   # Password in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   password: ""
   # To avoid exposing username and password parameters, leave these parameters empty and configure
-  # these cluster settings using an External Secrets Manager using the following keys in the secret
-  # for username: HZ_CS_AUTH_USERNAME and for password: HZ_CS_AUTH_PASSWORD.
+  # these cluster settings using an External Secrets Manager. Use the following keys in the secret:
+  # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
   # Enter the external secret for these credentials below.
   external_secret_name: ""
 
