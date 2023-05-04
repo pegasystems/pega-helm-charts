@@ -35,8 +35,7 @@ spec:
     ports:
     - protocol: TCP
       port: 9200
-  - to:
-{{ include "srs.netpol.kube-dns" . | indent 4 }}
+{{ include "srs.dns" . | indent 2 }}
   {{ if and (.Values.srsStorage.requireInternetAccess) (not .Values.srsStorage.provisionInternalESCluster) -}}
   - to:
     - podSelector:

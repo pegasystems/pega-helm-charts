@@ -12,6 +12,7 @@ func TestSRSServiceNetworkPolicy(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
@@ -31,6 +32,7 @@ func TestSRSServiceNetworkPolicyWithProvisionInternalESCluster(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.requireInternetAccess": "true",
 			"srs.srsStorage.provisionInternalESCluster": "true",
@@ -52,6 +54,7 @@ func TestSRSServiceNetworkPolicyWithProvisionInternalESClusterFalse(t *testing.T
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.requireInternetAccess": "true",
 			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.srsStorage.tls.enabled": "false",

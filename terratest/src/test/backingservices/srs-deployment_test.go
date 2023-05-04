@@ -15,6 +15,7 @@ func TestSRSDeployment(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "1",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:latest",
@@ -55,6 +56,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs-dev",
+			"srs.isOpenShiftDeployment": "false",
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
@@ -106,6 +108,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs-dev",
+			"srs.isOpenShiftDeployment": "false",
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",

@@ -69,6 +69,10 @@ srs:
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
+  # This parameter should be set to `true` only incase of a deployment of srs on an openshift cluster.
+  # This helps in configuring the SRS network policy for DNS resolver.
+  isOpenShiftDeployment: false
+
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster

@@ -13,6 +13,7 @@ func TestSRSService(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_service.yaml"}),
@@ -32,6 +33,7 @@ func TestSRSServiceWithInternetEgress(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.requireInternetAccess": "true",
 			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.srsStorage.domain": "es.acme.io",

@@ -10,6 +10,7 @@ func TestSRSRegistrySecretDefaultName(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/registrysecret.yaml"}),
@@ -30,6 +31,7 @@ func TestSRSRegistrySecretCustomName(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "custom-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"global.imageCredentials.registry": "docker-repo.acme.io",
 			"global.imageCredentials.username": "acmeuser",
 			"global.imageCredentials.password": "thisisapwd",

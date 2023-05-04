@@ -12,6 +12,7 @@ func TestSRSServicePDB(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_poddisruptionbudget.yaml"}),
@@ -31,6 +32,7 @@ func TestSRSServicePDBWithESInternetAccess(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.requireInternetAccess": "true",
 		},
@@ -51,6 +53,7 @@ func TestSRSServicePDBWithESInternetAccessWithExternalES(t *testing.T){
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "true",
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.requireInternetAccess": "true",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.srsStorage.provisionInternalESCluster": "false",

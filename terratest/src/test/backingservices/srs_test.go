@@ -9,6 +9,7 @@ func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "false",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.deploymentName": "test-srs",
@@ -35,6 +36,7 @@ func Test_shouldContainSRSResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.provisionInternalESCluster": "true",
 			"srs.srsStorage.tls.enabled": "true",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
@@ -60,6 +62,7 @@ func Test_shouldContainSRSandESResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.provisionInternalESCluster": "true",
 			"srs.srsStorage.tls.enabled": "false",
 		}),
@@ -84,6 +87,7 @@ func Test_shouldContainSRSWhenEnabledandNotESResourcesWhenDisabled(t *testing.T)
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.deploymentName": "test-srs",
+			"srs.isOpenShiftDeployment": "false",
 			"srs.srsStorage.provisionInternalESCluster": "false",
 			"srs.srsStorage.domain": "es.managed.io",
 			"srs.srsStorage.port": "9200",
