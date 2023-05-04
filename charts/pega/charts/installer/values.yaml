@@ -93,3 +93,7 @@ shareProcessNamespace: false
 # If a nodeSelector is required for the installer pod, it may be specified here:
 # nodeSelector:
 #   label: value
+
+# Apply securityContext to installer pod. For example to set `runAsNonRoot: true`:
+# securityContext:
+#   runAsNonRoot: true
