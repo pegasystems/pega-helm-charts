@@ -104,7 +104,7 @@ To support this option,
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
 4) Update your values.yaml file to refer to the external secret manager for DB password.
 
-•  Pass secrets directly to your deployment using your organization's recommend practices.
+•  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
 ##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
@@ -1081,8 +1081,8 @@ The default and recommended deployment strategy for Hazelcast is client-server, 
 Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later upto 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version of clustering service. 
-\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version of clustering service. 
+\>= 8.6 && < 8.8         | \= 1.0.5                     | Pega Infinity 8.6.x and 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.0.3 or later. 
+\>= 8.8                 | \= 1.3.3                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. 
 
 
 #### Configuration Settings
