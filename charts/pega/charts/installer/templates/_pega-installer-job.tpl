@@ -80,6 +80,10 @@ spec:
 {{- end }}
         ports:
         - containerPort: 8080
+{{- if .root.Values.securityContext }}
+        securityContext:
+{{ toYaml .root.Values.securityContext | indent 10 }}
+{{- end }}
         resources:
           # CPU and Memory that the containers for {{ .name }} request
           requests:

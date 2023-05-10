@@ -104,7 +104,7 @@ To support this option,
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
 4) Update your values.yaml file to refer to the external secret manager for DB password.
 
-•  Pass secrets directly to your deployment using your organization's recommend practices.
+•  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
 ##### Things to note in case of providing keystore, certificates for Enabling encryption of traffic between Ingress/LoadBalancer and Pod
 1. Configure the CA certificate and keystore as a base64 encrypted string inside your preferred secret manager (AWS Secret Manager, Azure Key Vault etc). For details, see [this section.](#enabling-encryption-of-traffic-between-ingressloadbalancer-and-pod)
@@ -131,7 +131,7 @@ The simplest way to provide database authorization is via the `jdbc.username` an
 
 ### Connection Properties
 
-You may optionally set your connection properties that will be sent to our JDBC driver when establishing new connections.  The format of the string is `[propertyName=property;]`.
+You may optionally set your connection properties that will be sent to our JDBC driver when establishing new connections.  The format of the string is `[propertyName=property;]`. Otherwise, refer to the `URL and Driver Class` section above to determine the adequate connection properties.
 
 ### Schemas
 
@@ -801,6 +801,32 @@ pegasearch:
   externalURL: "http://srs-service.namespace.svc.cluster.local"
 ```
 
+To configure authorization for the connection between Pega Infinity and the Search and Reporting Service (SRS) use the OAuth authorization service. For more information, see ['backingservices'](../backingservices). To configure the connection to the authorization service in SRS you must configure the following authorization parameters in the Pega values.yaml as shown in the following table and example:
+
+| Parameter             | Description                                                                                                                                                                                           | Default value      |
+|-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`             | Set the `pegasearch.srsAuth.enabled` to 'true' to use OAuth between Infinity and SRS.                                                                                                                 | false              |
+| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth service endpoint to get the token for SRS.                                                                                             | `""`               |
+| `clientId`            | Set the `pegasearch.srsAuth.clientId` value to the client id used in OAuth service.                                                                                                                   | `""`               |
+| `scopes`              | Set the `pegasearch.srsAuth.scopes` value to "pega.search:full", the scope set in the OAuth service required to grant access to SRS.                                                                  | "pega.search:full" |
+| `privateKey`          | Set the `pegasearch.srsAuth,privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
+| `privateKeyAlgorithm` | Set the `pegasearch.srsAuth.privateKeyAlgorithm` value to the algorithm used to generate a private key used by the OAuth client. Allowed values: RS256 (default), RS384, RS512, ES256, ES384, ES512.  | "RS256"            |
+
+Example:
+
+```yaml
+pegasearch:
+  externalSearchService: true
+  externalURL: "http://srs-service.srs-namespace.svc.cluster.local"
+  srsAuth:
+    enabled: true
+    url: "https:/your-authorization-service-host/oauth2/v1/token"
+    clientId: "your-client-id"
+    scopes: "pega.search:full"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
+    privateKeyAlgorithm: "RS256"
+```
+
 Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
 
 Parameter   | Description   | Default value
@@ -1055,8 +1081,8 @@ The default and recommended deployment strategy for Hazelcast is client-server, 
 Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
-\>= 8.6 && < 8.8         | \= 1.0.4                     | Pega Infinity 8.6 and later upto 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.0.3 or later patch version of clustering service. 
-\>= 8.8                 | \= 1.3.2                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that is tagged with version 1.3.0 or later patch version of clustering service. 
+\>= 8.6 && < 8.8         | \= 1.0.5                     | Pega Infinity 8.6.x and 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.0.3 or later. 
+\>= 8.8                 | \= 1.3.3                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. 
 
 
 #### Configuration Settings

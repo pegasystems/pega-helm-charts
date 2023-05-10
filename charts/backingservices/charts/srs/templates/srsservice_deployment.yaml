@@ -26,9 +26,11 @@ spec:
             - name: srs-port
               containerPort: 8080
               protocol: TCP
+          {{- if .Values.srsStorage.tls.enabled }}
           volumeMounts:
             - name: srs-certificates
               mountPath: /usr/share/
+          {{ end }}
           readinessProbe:
             httpGet:
               path: /health
@@ -75,8 +77,6 @@ spec:
                   key: password
             - name: PATH_TO_TRUSTSTORE
               value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
-            - name: ELASTICSEARCH_AUTH_PROVIDER
-              value: tls
             {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
@@ -84,14 +84,19 @@ spec:
               value: "8080"
             - name: AUTH_ENABLED
               value: "{{ .Values.srsRuntime.env.AuthEnabled | default "false" }}"
+            - name: OAUTH_PUBLIC_KEY_URL
+              value: {{ template "oAuthPublicKeyUrl" .}}
             - name: PUBLIC_KEY_URL
-              value: "{{ .Values.srsRuntime.env.PublicKeyURL }}"
+              value: ""
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
+      {{- if .Values.srsStorage.tls.enabled }}
       volumes:
       - name: srs-certificates
         secret:
           secretName: srs-certificates
+      {{ end }}
+      {{- if .Values.srsStorage.provisionInternalESCluster }}
       initContainers:
       - name: wait-for-internal-es-cluster
         image: {{ .Values.busybox.image }}
@@ -126,4 +131,5 @@ spec:
               secretKeyRef:
                 name: srs-elastic-credentials
                 key: password
+      {{ end }}
   {{ end }}
