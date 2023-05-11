@@ -51,7 +51,7 @@ jobs:
           helm dependency update charts/backingservices
           helm dependency update charts/pega
 
-      - name: update helm dependencies
+      - name: run helm lint
         run: |
           helm lint --with-subcharts --values lint/values.yml --strict charts/addons
           # FIXME there's a warning in an external dependency, so no --strict for now
