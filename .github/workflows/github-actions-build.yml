@@ -32,10 +32,31 @@ jobs:
         run: |
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
 
+
+      - name: Install Helm
+        run: |
+          sudo rm /usr/local/bin/helm
+          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
+          tar xzf ${{ env.HELM_TGZ }}
+          mv linux-amd64/helm /usr/local/bin/helm
+
       - name: run yamllint
         run: |
           yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
           yamllint -c .yamllint.yml -s $(find . -type f -name "values*.yaml")
+
+      - name: update helm dependencies
+        run: |
+          helm dependency update charts/addons
+          helm dependency update charts/backingservices
+          helm dependency update charts/pega
+
+      - name: update helm dependencies
+        run: |
+          helm lint --with-subcharts --values lint/values.yml --strict charts/addons
+          # FIXME there's a warning in an external dependency, so no --strict for now
+          helm lint --with-subcharts --values lint/values.yml charts/backingservices
+          helm lint --with-subcharts --values lint/values.yml --strict charts/pega
 
   run-remark-job:
     runs-on: ubuntu-20.04
