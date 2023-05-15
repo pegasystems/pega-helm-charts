@@ -76,3 +76,12 @@
 # Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent annotations)
 {{- define "generatedClusteringServicePodLabels" }}
 {{- end }}
+
+
+{{- define "performDeployment" }}
+  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
