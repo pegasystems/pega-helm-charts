@@ -35,3 +35,12 @@
     false
   {{- end -}}
 {{- end -}}
+
+
+{{- define "performDeployment" }}
+  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
