@@ -185,24 +185,35 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Network policy: kube-dns
+Network policy: `openshift-dns` for openshift cluster, `kube-dns | core-dns` for other supported providers.
 */}}
-{{- define "srs.netpol.kube-dns" -}}
-- namespaceSelector:
-    matchLabels:
-      name: kube-system
-- podSelector:
-    matchExpressions:
-      - key: k8s-app
-        operator: In
-        values: ["kube-dns", "coredns"]
-ports:
-- protocol: TCP
-  port: 53
-- protocol: TCP
-  port: 1053
-- protocol: TCP
-  port: 80
-- protocol: TCP
-  port: 8080
+{{- define "srs.dns" -}}
+{{ if eq .Values.global.provider "openshift" }}
+- ports:
+    - protocol: UDP
+      port: 5353
+  to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: openshift-dns
+{{ else }}
+- to:
+    - namespaceSelector:
+        matchLabels:
+          name: kube-system
+    - podSelector:
+        matchExpressions:
+          - key: k8s-app
+            operator: In
+            values: ["kube-dns", "coredns"]
+  ports:
+    - protocol: TCP
+      port: 53
+    - protocol: TCP
+      port: 1053
+    - protocol: TCP
+      port: 80
+    - protocol: TCP
+      port: 8080
+{{- end -}}
 {{- end -}}
