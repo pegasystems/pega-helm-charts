@@ -134,6 +134,7 @@ data:
 {{- end }}
 
 {{ if (eq (include "hazelcastCSConfigRequired" .) "true") }}
+  HZ_VERSION: {{ template "hazelcastVersion" . }}
   HZ_DISCOVERY_K8S: "true"
   HZ_CLIENT_MODE: "true"
 {{ if .Values.hazelcast.client.clusterName }}

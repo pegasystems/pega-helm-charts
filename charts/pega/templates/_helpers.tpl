@@ -534,7 +534,7 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzServiceName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{- if and (.Values.hazelcast.enabled) (not (.Values.hazelcast.migration.clusteringServiceEnabled)) -}}
 {{ template "hazelcastName" }}
 {{- else -}}
 {{ template "clusteringServiceName" }}
@@ -542,7 +542,7 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzClusterName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
+{{- if and (.Values.hazelcast.enabled) (not (.Values.hazelcast.migration.clusteringServiceEnabled)) -}}
 {{ .Values.hazelcast.client.clusterName }}
 {{- else -}}
 {{ .Values.hazelcast.server.clustering_service_group_name }}
@@ -554,6 +554,14 @@ servicePort: use-annotation
     true
   {{- else -}}
     false
+  {{- end -}}
+{{- end -}}
+
+{{- define "hazelcastVersion" }}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    v5
+  {{- else -}}
+    v4
   {{- end -}}
 {{- end -}}
 
