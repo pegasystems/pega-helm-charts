@@ -32,7 +32,7 @@ func TestPegaProviderValidate_WithValidProvider(t *testing.T){
 
 }
 
-func TestPegaActonValidate_WithInValidAction(t *testing.T){
+func TestPegaProviderValidate_WithInvalidProvider(t *testing.T){
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
