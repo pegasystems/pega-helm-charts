@@ -183,6 +183,10 @@ global:
           # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
           # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
           ssl_annotation:
+          # for enabling TLS in Openshift Route as Reencrypt, add certificate, key and CaCertificate PEM or crt format.
+          certificate:
+          key:
+          cacertificate:
 
 
       replicas: 1
