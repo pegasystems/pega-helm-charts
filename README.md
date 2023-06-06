@@ -21,7 +21,7 @@ Pega provides multiple runbooks that are Kubernetes-environment specific for cli
 
 Because open-source Kubernetes depends on your specific configuration, Pega does not provide a single open-source Kubernetes runbook. Use the Pega helm charts documentation to configure your deployment, with [Preparing your local Linux system](docs/prepping-local-system-runbook-linux.md), [Preparing your local Windows 10 system](docs/prepping-local-system-runbook-windows.md), and the Getting started section below as your starting points.
 
-The helm charts currently only support running on Kubernetes nodes with x86-64 CPUs.  ARM CPUs are currently unsupported.
+The helm charts support running on Kubernetes releases that are in Maintenance and Active Support at the time of the helm chart’s release. To review the date of a Pega helm chart release, see [Releases](https://github.com/pegasystems/pega-helm-charts/releases); to review the latest matrix of Kubernetes release support,  see [Kubernetes EOL policy](https://endoflife.date/kubernetes).
 
 # Getting started
 
@@ -149,6 +149,30 @@ Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
+
+# Debugging failed upgrades using helm commands
+
+Upgrades using helm charts may fail due to a variety issues, including an invalid configuration, a networking issue, or a platform issue. 
+To diagnose the issue or issues, review failure events in the logs and check for a detailed error; after understanding its cause, you can begin troubleshooting the issue or issues.
+
+To help diagnose an issue, you can find the best information by retrieving relevant logs by trying different contexts such as the following 'kubectl log' options.
+```kubectl logs <pega-zdt-upgrade-podname> -n <namespace>```
+
+You can use the following option to improve the usefulness of the log output
+-f, --follow=false: Specify if the logs should be streamed.
+
+```kubectl logs -f <pod-id> -n <namespace>```
+
+--tail:
+Print the last number of lines that you specify in the log file, for example, that last 100 lines in the specified pod. 
+By default this option (with no selector specified so tail=-1) displays all lines of the log file
+
+```kubectl logs --tail=100 <pod-id>  -n <namespace>```
+
+
+If a container is running, you can log in and run the kubectl log command in the container to review the results, or
+you can copy the log file in /tmp/foo from a pod to a local temporary directory, /tmp/bar to access the files.
+```kubectl cp <some-namespace>/<some-pod>:/tmp/foo /tmp/bar```
 
 # Contributing
 

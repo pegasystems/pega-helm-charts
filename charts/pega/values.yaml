@@ -428,8 +428,7 @@ installer:
     # For postgres databases that you are upgrading from Pega Infinity version 8.4.0 and later
     # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
     targetDataSchema: ""
-    # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
-    pegaRESTServerURL: ""
+    # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
@@ -460,13 +459,14 @@ hazelcast:
 
   # No. of initial members to join
   replicas: 3
-  # UserName to be used in client-server Hazelcast model for authentication
+  # UserName in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   username: ""
-  # Password to be used in client-server Hazelcast model for authentication
+  # Password in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   password: ""
-  # To avoid exposing username,password parameters, configure the
-  # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
-  # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
+  # To avoid exposing username and password parameters, leave these parameters empty and configure
+  # these cluster settings using an External Secrets Manager. Use the following keys in the secret:
+  # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
+  # Enter the external secret for these credentials below.
   external_secret_name: ""
 
 # Stream (externalized Kafka service) settings.

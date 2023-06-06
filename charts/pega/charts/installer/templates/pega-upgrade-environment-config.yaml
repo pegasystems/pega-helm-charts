@@ -36,9 +36,7 @@ data:
 {{- if .Values.upgrade.upgradeSteps }}
   UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
 {{- end }}
-{{- if .Values.upgrade.pegaRESTServerURL }}
-  PEGA_REST_SERVER_URL: {{ .Values.upgrade.pegaRESTServerURL }}
-{{- end }}
+  PEGA_REST_SERVER_URL: {{ include "pegaRestURL" $ | quote }}
 {{- if .Values.upgrade.pegaRESTUsername }}
   PEGA_REST_USERNAME: {{ .Values.upgrade.pegaRESTUsername }}
 {{- end }}

@@ -69,6 +69,22 @@
   {{- end -}}
 {{- end }}
 
+{{- define "performInstallAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performUpgradeAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
@@ -166,6 +182,54 @@
   {{- end -}}
 {{- end -}}
 
-#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+# Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
 {{- define "generatedInstallerPodLabels" }}
+{{- end }}
+
+
+# Compose REST Service URL for pre- and post- upgrade ZDT tasks
+{{- define "pegaRestURL" }}
+{{- $depName := "pega" }}
+{{- if (.Values.global.deployment) }}
+{{- if (.Values.global.deployment.name) }}
+{{- $depName = .Values.global.deployment.name }}
+{{- end }}
+{{- end }}
+{{- $webTier := "web" }}
+{{- $webTierServiceName := "" }}
+{{- $port := "80" }}
+{{- $protocol := "http" }}
+{{- $webAppContextPath := "prweb" }}
+{{- range $index, $tier := .Values.global.tier }}
+  {{- if hasKey $tier "nodeType" }}
+    {{- if and (contains $tier.nodeType "WebUser") (hasKey $tier "service") }}
+    {{- $webTier = $tier.name }}
+    {{- if eq "" $webTierServiceName }}
+      {{- $webTierServiceName = printf "%s-%s" $depName $webTier }}
+      {{- if $tier.service }}
+        {{- if hasKey $tier.service "httpEnabled" }}
+          {{- if eq false $tier.service.httpEnabled }}
+            {{- $protocol = "https" }}
+            {{- $port = "443" }}
+            {{- if $tier.service.tls }}{{- if $tier.service.tls.port }}
+              {{- $port = $tier.service.tls.port }}
+            {{- end }}{{- end }}
+          {{- else }}
+            {{- if and $tier.service $tier.service.port }}
+              {{- $port = $tier.service.port }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if $tier.ingress }}{{- if hasKey $tier.ingress "appContextPath" }}
+        {{- $webAppContextPath = trimAll "/" $tier.ingress.appContextPath }}
+      {{- end }}{{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- if eq "" $webTierServiceName }}
+  {{- $webTierServiceName = printf "%s-web" $depName }}
+{{- end }}
+{{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/{{- $webAppContextPath -}}/PRRestService
 {{- end }}
