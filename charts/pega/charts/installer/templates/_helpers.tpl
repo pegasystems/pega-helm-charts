@@ -69,6 +69,22 @@
   {{- end -}}
 {{- end }}
 
+{{- define "performInstallAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performUpgradeAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}

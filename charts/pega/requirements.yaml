@@ -6,3 +6,11 @@ dependencies:
   version: "0.13.3"
   repository: https://charts.helm.sh/incubator
   condition: cassandra.enabled
+- name: constellation
+  version: "0.0.1"
+- name: hazelcast
+  version: "1.0.0"
+- name: installer
+  version: "1.2.0"
+- name: pegasearch
+  version: "1.2.0"

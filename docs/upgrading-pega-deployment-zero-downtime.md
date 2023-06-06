@@ -61,7 +61,7 @@ The process to upgrade your deployment with zero-downtime assumes:
 
 - Your deployment is running Pega Platform 8.4.2 or later.
 
-- You use the Pega-provided Helm charts that support ZDT upgrades (version 1.6.0 and later).
+- You use the Pega-provided Helm charts that support ZDT upgrades (version 1.6.0 and later). As a best practice, use the latest Helm version and the latest available release of the Pega-provided Helm charts.
 
 - To update your software to version 8.8 or later, please review the infrastructure requirements to use an externalized Kafka streaming service managed using Pega-provided Helm charts. Before you complete a software update, Pega recommends that you migrate the deployment infrastructure from using embedded stream nodes to one that uses an externalized Kafka configuration. For details, see [Kafka cluster requirements](../charts/pega/KafkaClusterRequirement.md) and [Switch from embedded Stream to externalized Kafka service](../charts/pega/MigrationToExternalStream.md).
 
