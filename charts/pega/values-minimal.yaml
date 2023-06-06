@@ -151,7 +151,10 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
-        # For Openshift, to enable TLS, the termination policy would be reencrypt rather than edge, and we can add our certificate, the corresponding key using the appropriate .pem or .crt format and specify a CA certificate to validate the endpoint certificate, securing the connection from the browser to the router.
+        # For Openshift, to enable TLS, the termination policy would be reencrypt rather than edge, 
+        # and we can add our certificate, the corresponding key using the appropriate .pem or .crt format
+        # and specify a CA certificate to validate the endpoint certificate, securing the connection
+        # from the browser to the router.
         certificate:
         key:
         cacertificate:

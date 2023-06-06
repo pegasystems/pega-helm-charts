@@ -183,7 +183,10 @@ global:
           # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
           # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
           ssl_annotation:
-          # For Openshift, to enable TLS, the termination policy would be reencrypt rather than edge, and we can add our certificate, the corresponding key using the appropriate .pem or .crt format and specify a CA certificate to validate the endpoint certificate, securing the connection from the browser to the router.
+          # For Openshift, to enable TLS, the termination policy would be reencrypt rather than edge,
+          # and we can add our certificate, the corresponding key using the appropriate .pem or .crt format 
+          # and specify a CA certificate to validate the endpoint certificate, securing the connection 
+          # from the browser to the router.
           certificate:
           key:
           cacertificate:
