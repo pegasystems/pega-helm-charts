@@ -68,5 +68,5 @@ spec:
       # Volume used to mount secret files.
       {{- include "hazelcastVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" $ }}
+{{- include "imagePullSecrets" . | indent 6 }}
 {{ end }}
