@@ -56,7 +56,7 @@ jobs:
           helm lint --with-subcharts --values lint/values.yml --strict charts/addons
           helm lint --with-subcharts --values lint/values.yml --strict charts/backingservices
           helm lint --with-subcharts --values lint/values.yml --strict charts/pega
-
+      
       - name: Install xml lint
         run: |  
           sudo apt -y install libxml2-utils
