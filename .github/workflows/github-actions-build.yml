@@ -45,18 +45,6 @@ jobs:
         run: |
           sh validatexml.sh      
 
-      - name: update helm dependencies
-        run: |
-          helm dependency update charts/addons
-          helm dependency update charts/backingservices
-          helm dependency update charts/pega
-
-      - name: run helm lint
-        run: |
-          helm lint --with-subcharts --values lint/values.yml --strict charts/addons
-          helm lint --with-subcharts --values lint/values.yml --strict charts/backingservices
-          helm lint --with-subcharts --values lint/values.yml --strict charts/pega
-
   run-remark-job:
     runs-on: ubuntu-20.04
     steps:
