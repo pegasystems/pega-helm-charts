@@ -32,14 +32,6 @@ jobs:
         run: |
           sudo pip install yamllint=="${{ env.YAMLLINT_VERSION }}"
 
-
-      - name: Install Helm
-        run: |
-          sudo rm /usr/local/bin/helm
-          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
-          tar xzf ${{ env.HELM_TGZ }}
-          mv linux-amd64/helm /usr/local/bin/helm
-
       - name: run yamllint
         run: |
           yamllint -c .yamllint.yml -s $(find . -type f -name "Chart.yaml")
