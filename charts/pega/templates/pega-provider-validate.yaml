@@ -1,0 +1,4 @@
+{{- $validProviders := list "k8s" "openshift" "eks" "gke" "pks" "aks" -}}
+{{- if not (has .Values.global.provider $validProviders) -}}
+{{- fail (print "global.provider must be one of " $validProviders) -}}
+{{- end -}}
