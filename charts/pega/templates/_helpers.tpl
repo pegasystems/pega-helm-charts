@@ -534,19 +534,19 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzServiceName" -}}
-{{- if and (.Values.hazelcast.enabled) (not (.Values.hazelcast.migration.clusteringServiceEnabled)) -}}
-{{ template "hazelcastName" }}
-{{- else -}}
-{{ template "clusteringServiceName" }}
-{{- end -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ template "clusteringServiceName" }}
+  {{- else -}}
+    {{ template "hazelcastName" }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "hzClusterName" -}}
-{{- if and (.Values.hazelcast.enabled) (not (.Values.hazelcast.migration.clusteringServiceEnabled)) -}}
-{{ .Values.hazelcast.client.clusterName }}
-{{- else -}}
-{{ .Values.hazelcast.server.clustering_service_group_name }}
-{{- end -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ .Values.hazelcast.server.clustering_service_group_name }}
+  {{- else -}}
+    {{ .Values.hazelcast.client.clusterName }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "hazelcastCSConfigRequired" }}
