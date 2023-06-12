@@ -188,14 +188,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 Network policy: `openshift-dns` for openshift cluster, `kube-dns | core-dns` for other supported providers.
 */}}
 {{- define "srs.dns" -}}
-{{ if eq .Values.global.provider "openshift" }}
-- ports:
-    - protocol: UDP
-      port: 5353
-  to:
+{{ if eq .Values.global.k8sProvider "openshift" }}
+- to:
     - namespaceSelector:
         matchLabels:
           kubernetes.io/metadata.name: openshift-dns
+  ports:
+    - protocol: UDP
+      port: 5353
 {{ else }}
 - to:
     - namespaceSelector:
