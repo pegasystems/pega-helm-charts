@@ -19,8 +19,6 @@ migration:
   migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   # Set to `true` when migrating from embedded Hazelcast.
   embeddedToCSMigration: false
-  # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-  skipRestart: false
 
 # username to be used in client-server Hazelcast model for authentication.
 username: ""
