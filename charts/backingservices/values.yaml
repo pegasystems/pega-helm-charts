@@ -4,6 +4,8 @@ global:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  # Specify the value of your Kubernetes provider
+  k8sProvider: "YOUR_KUBERNETES_PROVIDER"
 
 # Search and Reporting Service (SRS) Configuration
 srs:
