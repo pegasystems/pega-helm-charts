@@ -63,7 +63,6 @@ migration:
   enabled: false
   migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   embeddedToCSMigration: false
-  skipRestart: false
 username: ""
 password: ""
 

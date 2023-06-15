@@ -71,6 +71,8 @@ srs:
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
+constellation:
+  enabled: false
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster

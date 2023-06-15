@@ -7,7 +7,7 @@ env:
   GO_VERSION: 1.18.3
 
 
-on: 
+on:
   push:
     tags:
       - '*'
@@ -56,6 +56,14 @@ jobs:
           helm lint --with-subcharts --values lint/values.yml --strict charts/addons
           helm lint --with-subcharts --values lint/values.yml --strict charts/backingservices
           helm lint --with-subcharts --values lint/values.yml --strict charts/pega
+      
+      - name: Install xml lint
+        run: |  
+          sudo apt -y install libxml2-utils
+          
+      - name: run xml lint for deploy and installer xml files
+        run: |
+          sh validatexml.sh      
 
   run-remark-job:
     runs-on: ubuntu-20.04
@@ -100,14 +108,14 @@ jobs:
       - name: Now load the helm dependencies
         run: |
           make dependencies
-          
+
       - name: Prepare for GO helm unit tests
         run: |
           mkdir $GITHUB_WORKSPACE/terratest/bin
           export GOPATH=$GITHUB_WORKSPACE/terratest
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
-      
+
       - name: run go tests on pega
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
@@ -140,7 +148,7 @@ jobs:
           tar xzf ${{ env.HELM_TGZ }}
           ls -l
           mv linux-amd64/helm /usr/local/bin/helm
-          
+
       - name: Checkout code
         uses: actions/checkout@v3
 

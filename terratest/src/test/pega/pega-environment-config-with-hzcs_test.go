@@ -50,7 +50,6 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
                     "global.provider":        vendor,
                     "global.actions.execute": operation,
                     "hazelcast.enabled": "false",
-                    "hazelcast.migration.skipRestart": "false",
                     "hazelcast.clusteringServiceEnabled": "true",
                     "hazelcast.migration.embeddedToCSMigration": "false",
                 },
@@ -73,14 +72,13 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
                     "global.provider":        vendor,
                     "global.actions.execute": operation,
                     "hazelcast.enabled": "false",
-                    "hazelcast.migration.skipRestart": "true",
                     "hazelcast.clusteringServiceEnabled": "true",
                     "hazelcast.migration.embeddedToCSMigration": "false",
                 },
             }
 
             yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-            VerifyPegaHazelcastEnvironmentConfigForClient(t,yamlContent, options)
+            VerifyClusteringServiceEnvironmentConfigForClient(t,yamlContent, options)
 
         }
     }
