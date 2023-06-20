@@ -232,7 +232,7 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | For Pega Platform release 8.9 and later, pega defaulted to Externalized kafka configuration under external services. for all the new deployments pega won't be using node classification as 'Stream'; for existing deployments, nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” nodetype.
+stream (Deprecated)        | From Pega Platform release 8.9 onwards, the use of the 'Stream' node classification is deprecated due to the shift towards an externalized Kafka configuration; for existing deployments where nodes that run an embedded deployment of Kafka and are not exposed to the load balancer, these nodes should continue using the node classification “Stream” nodetype.
 
 #### Small deployment with a single tier
 
@@ -240,7 +240,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | One tier handles all foreground and background processing using the `nodeType` classification "WebUser,BackgroundProcessing,search,Stream". For Pega Platform release 8.9 and later, Pega defaulted tp Externalized kafka configuration. for all new deployments with 8.9 no longer use the "Stream" node type.
+pega        | One tier handles all foreground and background processing using the `nodeType` classification "WebUser,BackgroundProcessing,search,Stream". Starting from Pega Platform release 8.9, the system defaults to an externalized Kafka configuration. As a result, for all new deployments, the 'Stream' node type is no longer in use.
 
 #### Large deployment for production isolation of processing
 
@@ -250,7 +250,7 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | For Pega Platform release 8.9 and later, pega defaulted to Externalized kafka configuration under external services. for all the new deployments pega won't be using node classification as 'Stream'; for existing deployments, nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” nodetype.
+stream (Deprecated)     | From Pega Platform release 8.9 onwards, the use of the 'Stream' node classification is deprecated due to the shift towards an externalized Kafka configuration; for existing deployments where nodes that run an embedded deployment of Kafka and are not exposed to the load balancer, these nodes should continue using the node classification “Stream” nodetype.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
