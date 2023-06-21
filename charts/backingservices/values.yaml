@@ -4,6 +4,8 @@ global:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  # Specify the value of your Kubernetes provider
+  k8sProvider: "YOUR_KUBERNETES_PROVIDER"
 
 # Search and Reporting Service (SRS) Configuration
 srs:
@@ -69,6 +71,8 @@ srs:
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
+constellation:
+  enabled: false
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
