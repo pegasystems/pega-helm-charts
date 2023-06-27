@@ -217,6 +217,7 @@ To configure the parameters in the backingservices.yaml file, download the file 
 | Chart parameter name    | Purpose                                   | Your setting |
 |-------------------------|-------------------------------------------|--------------|
 |global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul>|
+| global.k8sProvider:  | Specify the value of your Kubernetes provider. | k8sProvider: "pks" |
 |srs.enabled:      | Enable the SRS to provision an internal ElasticSearch service within the SRS cluster that is defined at [ElasticSearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch).    | enabled: "true"|
 |srs.deploymentName:      | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"|
 |srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix). |

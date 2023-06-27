@@ -151,6 +151,16 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+        tls:
+          # Enable TLS encryption
+          enabled: false
+          # For Openshift, Pega deployments enable TLS to secure the connection
+          # from the browser to the router by creating the route using reencrypt termination policy.
+          # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
+          # specify a CA certificate to validate the endpoint certificate.
+          certificate:
+          key:
+          cacertificate:
 
       # Set resource consumption to minimal levels
       replicas: 1
@@ -226,18 +236,17 @@ hazelcast:
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-    skipRestart: false
 
   # No. of initial members to join
   replicas: 3
-  # UserName to be used in client-server Hazelcast model for authentication
+  # UserName in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   username: ""
-  # Password to be used in client-server Hazelcast model for authentication
+  # Password in the client-server Hazelcast model authentication. This setting is exposed and not secure.
   password: ""
-  # To avoid exposing username,password parameters, configure the
-  # username,password parameters in External Secrets Manager, and enter the external secret for the credentials
-  # make sure the keys in the secret should be HZ_CS_AUTH_USERNAME , HZ_CS_AUTH_PASSWORD
+  # To avoid exposing username and password parameters, leave these parameters empty and configure
+  # these cluster settings using an External Secrets Manager. Use the following keys in the secret:
+  # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
+  # Enter the external secret for these credentials below.
   external_secret_name: ""
 
 # Stream (externalized Kafka service) settings.
