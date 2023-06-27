@@ -7,7 +7,7 @@ Pega supports Client-managed cloud clients to configure an externalized Kafka co
 Pega Platform deployments using Pega-provided Helm charts starting at version 2.2 or later provide Pega Helm chart settings that allow you to configure the connection and authentication details required by your organization's Kafka service infrastructure. These latest, Kafka-specific Pega Helm chart enhancements provide a scalable Kafka configuration for your Pega applications running in your preferred Kubernetes environment while offering great flexibility in connecting to a Kafka service infrastructure using your company's preferred streaming policy and security profiles. To manage your externalized Kafka configuration in your deployment see [Kafka Helm charts](https://github.com/bitnami/charts/tree/master/bitnami/kafka).
 
 #### Version
-Pega recommends Apache Kafka versions 2.3.1 or later (Verified version 3.2.1)
+Pega Platform supports Apache Kafka versions 1.0.0 through 3.4.0.
 
 ### Configuration
 
