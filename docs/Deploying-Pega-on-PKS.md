@@ -51,7 +51,7 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-- PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
+- TKGI CLI - the TKGI command-line tool that you use to manage and communicate with your TKGI cluster.
 
 ## Prepare your resources – 45 minutes
 
@@ -212,11 +212,12 @@ To configure the parameters in the backingservices.yaml file, download the file 
   
   `$ helm inspect values pega/backingservices > <local filepath>/TKGI-demo/backingservices.yaml`
   
-2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your PKS requirements:
+2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your TKGI requirements:
   
 | Chart parameter name    | Purpose                                   | Your setting |
 |-------------------------|-------------------------------------------|--------------|
 |global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul>|
+| global.k8sProvider:  | Specify the value of your Kubernetes provider. | k8sProvider: "pks" |
 |srs.enabled:      | Enable the SRS to provision an internal ElasticSearch service within the SRS cluster that is defined at [ElasticSearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch).    | enabled: "true"|
 |srs.deploymentName:      | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"|
 |srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix). |
@@ -319,22 +320,22 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
     `$ cd /home/<local filepath>/TKGI-demo`
 
-2. To use the pks CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
+2. To use the TKGI CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
 
-    `$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
+    `$ tkgi login -a <API> -u <USERNAME> -p <PASSWORD> -k`
 
 If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
 
 3. To view the status of all of your TKGI clusters and verify the name of the cluster for the Pega Platform deployment, enter:
 
-    `$ pks clusters`
+    `$ tkgi clusters`
 
 Your cluster name is displayed in the **Name** field.
 
-4. To use the pks CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
+4. To use the TKGI CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-    $ pks get-credentials <cluster-name>
+    $ tkgi get-credentials <cluster-name>
     Fetching credentials for cluster pega-platform.
     Context set for cluster pega-platform.
 ```
@@ -364,7 +365,7 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
 - To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
 
-    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your PKS cluster name or your resource name, which is expected behavior.
+    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your TKGI cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 

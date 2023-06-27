@@ -151,6 +151,16 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+        tls:
+          # Enable TLS encryption
+          enabled: false
+          # For Openshift, Pega deployments enable TLS to secure the connection
+          # from the browser to the router by creating the route using reencrypt termination policy.
+          # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
+          # specify a CA certificate to validate the endpoint certificate.
+          certificate:
+          key:
+          cacertificate:
 
       # Set resource consumption to minimal levels
       replicas: 1
