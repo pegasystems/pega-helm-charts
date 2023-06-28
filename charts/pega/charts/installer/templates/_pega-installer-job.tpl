@@ -117,6 +117,23 @@ spec:
         env:
         -  name: ACTION
            value: {{ .action }}
+{{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
+        -  name: HZ_VERSION
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_VERSION
+        -  name: HZ_CLUSTER_NAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_CLUSTER_NAME
+        -  name: HZ_SERVER_HOSTNAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_SERVER_HOSTNAME
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
