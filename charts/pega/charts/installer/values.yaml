@@ -69,6 +69,9 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
+  # This flag has to be set for CMC use cases if hazelcast is running in client server mode. Default is false.Set it to true for HZ c/s mode.
+  # This is needed to ensure Installer connect to HZ C/S while data upgrade.
+  isHazelcastClientServer: "false"
   # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
   pegaRESTServerURL: ""
   pegaRESTUsername: ""
