@@ -53,9 +53,7 @@ jobs:
 
       - name: run helm lint
         run: |
-          helm lint --with-subcharts --values lint/values.yml --strict charts/addons
-          helm lint --with-subcharts --values lint/values.yml --strict charts/backingservices
-          helm lint --with-subcharts --values lint/values.yml --strict charts/pega
+          sh helmlint.sh
       
       - name: Install xml lint
         run: |  

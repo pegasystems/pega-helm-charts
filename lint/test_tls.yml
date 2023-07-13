@@ -1,0 +1,39 @@
+global:
+  actions:
+    execute: 'upgrade-deploy'
+  provider: 'eks'
+  tier:
+    - name: "stream"
+      service:
+      ingress:
+        tls:
+          enabled: true
+    - name: "web"
+      service:
+        tls:
+          enabled: true
+      ingress:
+        tls:
+          enabled: true
+    - name: "batch"
+      service:
+        tls:
+          enabled: true
+      ingress:
+        tls:
+          enabled: true
+
+
+
+srsStorage:
+  requireInternetAccess: false
+  tls:
+    enabled: true
+  basicAuthentication:
+    enabled: true
+  esCredentials:
+    username: user
+    password: pass
+installer:
+  upgrade:
+    upgradeType: 'zero-downtime'
