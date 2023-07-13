@@ -8,6 +8,7 @@ do
     do
         for provider in "k8s" "openshift" "eks" "gke" "pks" "aks"
         do
+            echo "Running helm lint --with-subcharts --values lint/$values_file --set-string global.provider=$provider --strict charts/$chart_name"
             helm lint --with-subcharts --values "lint/$values_file" --set-string "global.provider=$provider" --strict "charts/$chart_name" || exitCode=1
         done
     done
