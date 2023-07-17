@@ -1,5 +1,5 @@
 {{- /*
-deploymentName, pegaVolumeCredentials, pegaCredentialsSecret, pegaCredentialVolumeTemplate, and customArtifactorySSLVerification are copied from pega/templates/_helpers.tpl because helm lint requires
+deploymentName, pegaVolumeCredentials, imagePullSecrets, pegaCredentialsSecret, pegaCredentialVolumeTemplate, and customArtifactorySSLVerification are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
 
@@ -53,6 +53,22 @@ false
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "pegaRegistrySecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-registry-secret
+{{- end }}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
 
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
 {{- define "pegaInstallConfig" }}pega-install-config{{- end }}
