@@ -1,3 +1,25 @@
+{{- /*
+deploymentName, pegaRegistrySecret, and imagePullSecrets are copied from pega/templates/_helpers.tpl because helm lint requires
+charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
+*/}}
+
+{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
+{{- define "pegaRegistrySecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-registry-secret
+{{- end }}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
+{{- end -}}
+
 {{- define "searchDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "searchName" -}}{{ $depName := printf "%s" (include "searchDeploymentName" $) }}{{- printf "%s" $depName -}}-search{{- end -}}
