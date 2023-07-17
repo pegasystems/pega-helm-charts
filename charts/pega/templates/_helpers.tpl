@@ -1,4 +1,3 @@
-{{- define "pegaCredentialsSecret" }}pega-credentials-secret{{- end }}
 {{- define "pegaEnvironmentConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-environment-config
