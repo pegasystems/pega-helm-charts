@@ -1,5 +1,5 @@
 {{- /*
-deploymentName, pegaVolumeCredentials, pegaCredentialsSecret, and pegaCredentialVolumeTemplate are copied from pega/templates/_helpers.tpl because helm lint requires
+deploymentName, pegaVolumeCredentials, pegaCredentialsSecret, pegaCredentialVolumeTemplate, and customArtifactorySSLVerification are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
 
@@ -41,6 +41,18 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
         name: {{ .Values.stream.external_secret_name }}
   {{- end }}
 {{- end}}
+
+{{- define "customArtifactorySSLVerificationEnabled" }}
+{{- if (.Values.global.customArtifactory) }}
+{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
+{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
+true
+{{- else -}}
+false
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 {{- define "pegaVolumeInstall" }}pega-volume-installer{{- end }}
 {{- define "pegaInstallConfig" }}pega-install-config{{- end }}

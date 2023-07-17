@@ -10,6 +10,22 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- $depName -}}-credentials-secret
 {{- end }}
 
+{{- define "pegaRegistrySecret" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-registry-secret
+{{- end }}
+
+{{- define "imagePullSecrets" }}
+{{- if .Values.global.docker.registry }}
+- name: {{ template "pegaRegistrySecret" $ }}
+{{- end }}
+{{- if (.Values.global.docker.imagePullSecretNames) }}
+{{- range .Values.global.docker.imagePullSecretNames }}
+- name: {{ . }}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
 
 {{- define "hazelcastName" -}} pega-hazelcast {{- end -}}
 {{- define "hazelcastEnvironmentConfig" -}} pega-hz-env-config {{- end -}}

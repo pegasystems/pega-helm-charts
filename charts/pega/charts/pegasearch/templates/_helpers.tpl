@@ -19,6 +19,8 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 - name: {{ . }}
 {{- end -}}
 {{- end -}}
+{{- end -}}
+
 
 {{- define "searchDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
