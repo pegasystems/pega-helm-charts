@@ -101,6 +101,12 @@
   {{- end }}
 {{- end }}
 
+{{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
+{{- end }}
+
 {{- define "useApiKeyForCustomArtifactory" }}
   {{- if (.Values.global.customArtifactory) }}
     {{- if (.Values.global.customArtifactory.authentication) }}
@@ -478,15 +484,4 @@ servicePort: use-annotation
   {{- else -}}
     v4
   {{- end -}}
-{{- end -}}
-
-{{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
-- name: {{ template "pegaRegistrySecret" $ }}
-{{- end }}
-{{- if (.Values.global.docker.imagePullSecretNames) }}
-{{- range .Values.global.docker.imagePullSecretNames }}
-- name: {{ . }}
-{{- end -}}
-{{- end -}}
 {{- end -}}
