@@ -1,32 +1,3 @@
-{{- /*
-deploymentName and pegaCredentialsSecret are copied from pega/templates/_helpers.tpl because helm lint requires
-charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
-*/}}
-
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
-
-{{- define "pegaCredentialsSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-credentials-secret
-{{- end }}
-
-{{- define "pegaRegistrySecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-registry-secret
-{{- end }}
-
-{{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
-- name: {{ template "pegaRegistrySecret" $ }}
-{{- end }}
-{{- if (.Values.global.docker.imagePullSecretNames) }}
-{{- range .Values.global.docker.imagePullSecretNames }}
-- name: {{ . }}
-{{- end -}}
-{{- end -}}
-{{- end -}}
-
-
 {{- define "hazelcastName" -}} pega-hazelcast {{- end -}}
 {{- define "hazelcastEnvironmentConfig" -}} pega-hz-env-config {{- end -}}
 
