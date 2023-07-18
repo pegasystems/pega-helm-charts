@@ -51,6 +51,10 @@ jobs:
           helm dependency update charts/backingservices
           helm dependency update charts/pega
 
+      - name: run sync supplementals
+        run: |
+          sh sync_supplementals.sh
+
       - name: run helm lint
         run: |
           sh helmlint.sh

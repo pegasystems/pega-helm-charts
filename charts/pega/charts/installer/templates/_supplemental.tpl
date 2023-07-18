@@ -1,5 +1,14 @@
 {{- /*
-deploymentName, pegaVolumeCredentials, imagePullSecrets, pegaCredentialsSecret, pegaCredentialVolumeTemplate, and customArtifactorySSLVerification are copied from pega/templates/_helpers.tpl because helm lint requires
+deploymentName
+pegaCredentialsSecret
+pegaRegistrySecret
+imagePullSecrets
+pegaCredentialVolumeTemplate
+pegaVolumeCredentials
+customArtifactorySSLVerificationEnabled
+performDeployment
+performInstallAndDeployment
+performUpgradeAndDeployment are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
 
@@ -69,3 +78,28 @@ false
 {{- end -}}
 {{- end -}}
 {{- end -}}
+
+
+{{- define "performDeployment" }}
+  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performInstallAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performUpgradeAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
