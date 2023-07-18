@@ -1,11 +1,13 @@
 #!/bin/bash
 
 master_file="charts/pega/templates/_supplemental.tpl"
-tpl_files=(
-  "charts/pega/charts/installer/templates/_supplemental.tpl"
-  "charts/pega/charts/hazelcast/templates/_supplemental.tpl"
-  "charts/pega/charts/pegasearch/templates/_supplemental.tpl"
-)
+tpl_files="charts/pega/charts/installer/templates/_supplemental.tpl"
+"charts/pega/charts/hazelcast/templates/_supplemental.tpl"
+"charts/pega/charts/pegasearch/templates/_supplemental.tpl"
+
+IFS='
+'
+
 
 # Loop through each TPL file
 for tpl_file in "${tpl_files[@]}"; do
