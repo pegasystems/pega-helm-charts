@@ -22,6 +22,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  run-supplemental-validation-job:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Run validate supplementals script
+        run : |
+          sh validate_supplementals.sh
   run-lint-job:
     runs-on: ubuntu-20.04
     steps:
@@ -50,10 +56,6 @@ jobs:
           helm dependency update charts/addons
           helm dependency update charts/backingservices
           helm dependency update charts/pega
-
-      - name: run sync supplementals
-        run: |
-          sh sync_supplementals.sh
 
       - name: run helm lint
         run: |
