@@ -25,6 +25,8 @@ jobs:
   run-supplemental-validation-job:
     runs-on: ubuntu-20.04
     steps:
+      - name: Check out repository code
+        uses: actions/checkout@v3
       - name: Run validate supplementals script
         run : |
           sh validate_supplementals.sh

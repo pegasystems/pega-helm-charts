@@ -15,8 +15,10 @@ done
 
 #Check validation status
 if [ $validation_failed -eq 1 ]; then
-  echo -e "Validatoin failed for the following files:"
+  echo -e "Validation failed for the following files:"
   echo -e "$failed_files"
+  echo -e "This indicates that the following files are out of sync with the definitions in the main charts/pega supplemental file."
+  echo -e "Since all subcharts should mirror the definitions of the superchart, consider running sync_supplementals.sh to fix this issue."
   exit 1
 else
   echo "Validation passed: All files match the master file."
