@@ -1,4 +1,3 @@
-
 {{- define "pegaEnvironmentConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-environment-config
@@ -49,17 +48,6 @@
     defaultMode: 420
 {{- end}}
 
-{{- define "customArtifactorySSLVerificationEnabled" }}
-{{- if (.Values.global.customArtifactory) }}
-{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
-{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
-true
-{{- else -}}
-false
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
 
 {{- define "pegaTomcatKeystoreSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" .root) -}}
@@ -85,46 +73,14 @@ false
 
 {{- define "pegaKerberosConfig" }}pega-import-kerberos{{- end }}
 
-{{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
-
-{{- define "pegaCredentialsSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-credentials-secret
-{{- end }}
-
-{{- define "pegaRegistrySecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-registry-secret
-{{- end }}
 
 
 {{- define "deployConfig" -}}deploy-config{{- end -}}
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
-{{- define "imagePullSecret" }}
-{{- if .Values.global.docker.registry }}
-{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
-{{- end }}
-{{- end }}
 
 {{- define "performOnlyDeployment" }}
   {{- if (eq .Values.global.actions.execute "deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performDeployment" }}
-  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performInstallAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
     true
   {{- else -}}
     false
@@ -143,6 +99,12 @@ false
       {{- end -}}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "useApiKeyForCustomArtifactory" }}
@@ -181,14 +143,6 @@ false
   {{- end }}
   backend:
     {{ include "ingressBackend" $ }}
-{{- end }}
-
-{{- define "performUpgradeAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
 {{- end }}
 
 {{- define "customerDeploymentID" -}}
@@ -385,36 +339,6 @@ true
 {{- define "generatedPodLabels" }}
 {{- end }}
 
-#Override this template in a subchart if your secret values are provided by seperate secrets
-{{- define "pegaCredentialVolumeTemplate" }}
-- name: {{ template "pegaVolumeCredentials" }}
-  projected:
-    defaultMode: 420
-    sources:
-    - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if ((.Values.global.jdbc).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.jdbc.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.hazelcast).external_secret_name)}}
-    - secret:
-        name: {{ .Values.hazelcast.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.dds).external_secret_name)}}
-    - secret:
-        name: {{ .Values.dds.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.stream).external_secret_name)}}
-    - secret:
-        name: {{ .Values.stream.external_secret_name }}
-  {{- end }}
-{{- end}}
-
 #Kerberos config map
 {{- define "pegaKerberosVolumeTemplate" }}
 # Volume used to mount config files.
@@ -433,9 +357,6 @@ dnsConfig:
   - {{ .Values.global.privateHostedZoneDomainName }}
 {{- end }}
 {{- end }}
-
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
-
 
 {{- define "pegaSearchURL" -}}
 {{- $d1 := dict "overrideURL" $.Values.pegasearch.externalURL }}
@@ -563,15 +484,4 @@ servicePort: use-annotation
   {{- else -}}
     v4
   {{- end -}}
-{{- end -}}
-
-{{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
-- name: {{ template "pegaRegistrySecret" $ }}
-{{- end }}
-{{- if (.Values.global.docker.imagePullSecretNames) }}
-{{- range .Values.global.docker.imagePullSecretNames }}
-- name: {{ . }}
-{{- end -}}
-{{- end -}}
 {{- end -}}
