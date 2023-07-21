@@ -86,6 +86,7 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 }
 
 func VerifyK8sWaitForArgs(t *testing.T, container k8score.Container) {
+    BOTH_PARAMS_HAPPEN_ONCE := 6
     require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
 
     envvars := container.Env
@@ -95,11 +96,11 @@ func VerifyK8sWaitForArgs(t *testing.T, container k8score.Container) {
         if envvar.Name == "WAIT_TIME" {
             k8sWaitForParamsProduct *= 2
         }
-        if envvar.Name == "WAIT_TIME" {
+        if envvar.Name == "MAX_RETRIES" {
             k8sWaitForParamsProduct *= 3
         }
     }
-    require.Equal(t, 6, k8sWaitForParamsProduct)
+    require.Equal(t, BOTH_PARAMS_HAPPEN_ONCE, k8sWaitForParamsProduct)
 }
 
 func getDeploymentName(options *helm.Options) string {
