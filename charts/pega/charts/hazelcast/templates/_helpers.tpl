@@ -37,19 +37,7 @@
     defaultMode: 420
     sources:
     - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if ((.Values.global.jdbc).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.jdbc.external_secret_name }}
-  {{- end }}
-  {{ if (.Values.external_secret_name)}}
-    - secret:
-        name: {{ .Values.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
-  {{- end }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
 {{- end}}
 
 

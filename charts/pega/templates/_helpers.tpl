@@ -485,3 +485,30 @@ servicePort: use-annotation
     v4
   {{- end -}}
 {{- end -}}
+
+{{- define "pegaCredentialVolumeTemplate" }}
+- name: {{ template "pegaVolumeCredentials" }}
+  projected:
+    defaultMode: 420
+    sources:
+    - secret:
+        name: {{ template "pegaCredentialsSecret" $ }}
+    - secret:
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" }}
+
+    {{ if (eq (include "performDeployment" .) "true") }}
+    - secret:
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.hazelcast.external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
+    - secret:
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.dds.external_secret_name "valuesSecretName" "pega-cassandra-secret-name" }}
+    - secret:
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.stream.external_secret_name "valuesSecretName" "pega-stream-secret-name" }}
+    - secret:
+        name: {{ include "pega-diagnostic-secret-name" $}}
+    {{- end}}
+
+    {{ if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") }}
+    - secret:
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" }}
+    {{- end}}
+{{- end}}
