@@ -54,8 +54,10 @@ spec:
           sources:
           - secret:
               name: {{ template "genericSecretResolver" dict "externalSecretName" .root.Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" }}
+          {{ if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
               name: {{ template "genericSecretResolver" dict "externalSecretName" (.root.Values.hazelcast).external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
+          {{- end }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
