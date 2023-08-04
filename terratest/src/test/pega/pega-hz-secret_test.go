@@ -14,6 +14,7 @@ func TestPegaHazelcastSecretWhenHazelcastIsEnabled(t *testing.T) {
 	const HzCsAuthUsername = "HZClusterUser"
 	const HzCsAuthPassword = "HZclusterPassword"
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -22,22 +23,25 @@ func TestPegaHazelcastSecretWhenHazelcastIsEnabled(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-			fmt.Println(vendor + "-" + operation)
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation)
 
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":                           vendor,
-					"global.actions.execute":                    operation,
-					"installer.upgrade.upgradeType":             "zero-downtime",
-					"hazelcast.enabled":                         "true",
-					"hazelcast.migration.embeddedToCSMigration": "false",
-					"hazelcast.username":                        HzCsAuthUsername,
-					"hazelcast.password":                        HzCsAuthPassword,
-				},
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":                    depName,
+						"global.provider":                           vendor,
+						"global.actions.execute":                    operation,
+						"installer.upgrade.upgradeType":             "zero-downtime",
+						"hazelcast.enabled":                         "true",
+						"hazelcast.migration.embeddedToCSMigration": "false",
+						"hazelcast.username":                        HzCsAuthUsername,
+						"hazelcast.password":                        HzCsAuthPassword,
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-hz-secret.yaml"})
+				VerifyHazelcastSecretWhenHazelcastIsEnabled(t, yamlContent, HzCsAuthUsername, HzCsAuthPassword)
 			}
-
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-hz-secret.yaml"})
-			VerifyHazelcastSecretWhenHazelcastIsEnabled(t, yamlContent, HzCsAuthUsername, HzCsAuthPassword)
 		}
 	}
 

@@ -13,9 +13,10 @@ import (
 const trustStorePassword = "trustStore"
 const keyStorePassword = "keyStore"
 
-func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
+func TestPegaCassandrasSecretWithEncryptionPresent(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install-deploy", "deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -24,26 +25,29 @@ func TestPegaCredentialsSecretWithCassandraEncryptionPresent(t *testing.T) {
 
 		for _, operation := range supportedOperations {
 
-			fmt.Println(vendor + "-" + operation)
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation)
 
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":               vendor,
-					"global.actions.execute":        operation,
-					"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
-					"dds.trustStorePassword":        trustStorePassword,
-					"dds.keyStorePassword":          keyStorePassword,
-				},
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
+						"dds.trustStorePassword":        trustStorePassword,
+						"dds.keyStorePassword":          keyStorePassword,
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-cassandra-secret.yaml"})
+				verifyCassandraSecret(t, yamlContent)
 			}
-
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-cassandra-secret.yaml"})
-			verifyCredentialsSecret(t, yamlContent, operation)
 		}
 	}
 
 }
 
-func verifyCredentialsSecret(t *testing.T, yamlContent string, operation string) {
+func verifyCassandraSecret(t *testing.T, yamlContent string) {
 
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)

@@ -10,14 +10,13 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
-const streamTrustStorePassword = "trustStore"
-const streamKeyStorePassword = "keyStore"
-const jaasConfig = "jaasConfig"
+const apiKeyHeaderName = "apiKeyHeaderName"
+const apiKeyHeaderValue = "apiKeyHeaderValue"
 
-func TestPegaCredentialsSecretWithExternalStreamArePresent(t *testing.T) {
+func TestPegaCustomArtifactorySecretWithApiKey(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install-deploy", "deploy", "upgrade-deploy"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
+	var supportedOperations = []string{"install", "upgrade", "install-deploy", "deploy", "upgrade-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -35,26 +34,23 @@ func TestPegaCredentialsSecretWithExternalStreamArePresent(t *testing.T) {
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
-						"stream.trustStorePassword":     streamTrustStorePassword,
-						"stream.keyStorePassword":       streamKeyStorePassword,
-						"stream.jaasConfig":             jaasConfig,
+						"global.customArtifactory.authentication.apiKey.headerName": apiKeyHeaderName,
+						"global.customArtifactory.authentication.apiKey.value":      apiKeyHeaderValue,
 					},
 				}
-
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-stream-secret.yaml"})
-				verifyStreamCredentialsSecret(t, yamlContent, operation)
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-custom-artifactory-secret.yaml"})
+				verifyCustomArtifactorySecretApiKey(t, yamlContent)
 			}
 		}
 	}
 
 }
 
-func verifyStreamCredentialsSecret(t *testing.T, yamlContent string, operation string) {
+func verifyCustomArtifactorySecretApiKey(t *testing.T, yamlContent string) {
 
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)
 	secretData := secretobj.Data
-	require.Equal(t, streamTrustStorePassword, string(secretData["STREAM_TRUSTSTORE_PASSWORD"]))
-	require.Equal(t, streamKeyStorePassword, string(secretData["STREAM_KEYSTORE_PASSWORD"]))
-	require.Equal(t, jaasConfig, string(secretData["STREAM_JAAS_CONFIG"]))
+	require.Equal(t, apiKeyHeaderName, string(secretData["CUSTOM_ARTIFACTORY_APIKEY_HEADER"]))
+	require.Equal(t, apiKeyHeaderValue, string(secretData["CUSTOM_ARTIFACTORY_APIKEY"]))
 }
