@@ -53,10 +53,10 @@ spec:
           defaultMode: 420
           sources:
           - secret:
-              name: {{ template "genericSecretResolver" dict "externalSecretName" .root.Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" }}
+              name: {{ template "genericSecretResolver" dict "externalSecretName" .root.Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" "context" .root }}
           {{ if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
-              name: {{ template "genericSecretResolver" dict "externalSecretName" (.root.Values.hazelcast).external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
+              name: {{ template "genericSecretResolver" dict "externalSecretName" (.root.Values.hazelcast).external_secret_name "valuesSecretName" "pega-hz-secret-name" "context" .root }}
           {{- end }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:

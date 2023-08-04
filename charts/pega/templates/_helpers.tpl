@@ -494,21 +494,21 @@ servicePort: use-annotation
     - secret:
         name: {{ template "pegaCredentialsSecret" $ }}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" "context" $ }}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.dds.external_secret_name "valuesSecretName" "pega-cassandra-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.dds.external_secret_name "valuesSecretName" "pega-cassandra-secret-name" "context" $ }}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.stream.external_secret_name "valuesSecretName" "pega-stream-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.stream.external_secret_name "valuesSecretName" "pega-stream-secret-name" "context" $ }}
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
 
-    {{ if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") }}
+    {{ if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") (.Values.global.customArtifactory.authentication.external_secret_name)}}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" "context" $ }}
     {{- end}}
 
    {{ if (eq (include "hazelcastCSConfigRequired" .) "true") }}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.hazelcast.external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.hazelcast.external_secret_name "valuesSecretName" "pega-hz-secret-name" "context" $ }}
    {{- end}}
 {{- end}}

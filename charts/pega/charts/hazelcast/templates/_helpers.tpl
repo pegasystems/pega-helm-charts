@@ -37,7 +37,7 @@
     defaultMode: 420
     sources:
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.external_secret_name "valuesSecretName" "pega-hz-secret-name" }}
+        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.external_secret_name "valuesSecretName" "pega-hz-secret-name" "context" $ }}
 {{- end}}
 
 

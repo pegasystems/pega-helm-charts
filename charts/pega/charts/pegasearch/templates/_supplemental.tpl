@@ -77,10 +77,16 @@ false
   {{- end -}}
 {{- end }}
 
-{{- define "pega-db-secret-name" }}pega-db-secret{{- end -}}
+{{- define "pega-db-secret-name" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-db-secret
+{{- end -}}
 
-{{- define "pega-hz-secret-name" }}pega-hz-secret{{- end -}}
+{{- define "pega-hz-secret-name" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-hz-secret
+{{- end -}}
 
 {{- define "genericSecretResolver" }}
-    {{- if (.externalSecretName) }}{{ .externalSecretName }}{{- else }}{{ include .valuesSecretName $}}{{- end }}
+    {{- if (.externalSecretName) -}}{{ .externalSecretName }}{{- else -}}{{ (include .valuesSecretName .context) }}{{- end -}}
 {{- end  -}}
