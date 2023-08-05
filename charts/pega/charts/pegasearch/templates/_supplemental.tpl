@@ -1,6 +1,5 @@
 {{- /*
 deploymentName
-pegaCredentialsSecret
 pegaRegistrySecret
 imagePullSecrets
 pegaVolumeCredentials
@@ -18,11 +17,6 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
-
-{{- define "pegaCredentialsSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-credentials-secret
-{{- end }}
 
 {{- define "customArtifactorySSLVerificationEnabled" }}
 {{- if (.Values.global.customArtifactory) }}

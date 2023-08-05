@@ -492,8 +492,6 @@ servicePort: use-annotation
     defaultMode: 420
     sources:
     - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-    - secret:
         name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" "context" $ }}
     - secret:
         name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.dds.external_secret_name "valuesSecretName" "pega-cassandra-secret-name" "context" $ }}
