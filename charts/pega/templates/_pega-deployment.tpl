@@ -48,8 +48,9 @@ spec:
     metadata:
       labels:
         app: {{ .name }}
-        {{- if .root.Values.global.jdbc.podbinding-}}
+        {{- if .root.Values.global.jdbc.podbinding }}
         aadpodidbinding: {{ .root.Values.global.jdbc.podbinding }}
+        {{- end  }}
 {{- if .node.podLabels }}
 {{ toYaml .node.podLabels | indent 8 }}
 {{- include "generatedPodLabels" .root | indent 8 }}
