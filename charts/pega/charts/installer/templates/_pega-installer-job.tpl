@@ -29,6 +29,8 @@ spec:
     metadata:
       labels:
         installer-job: {{ .name }}
+        {{- if .root.Values.global.jdbc.podbinding-}}
+        aadpodidbinding: {{ .root.Values.global.jdbc.podbinding }}
 {{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}

@@ -63,6 +63,7 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
+    podbinding: ""
 
   customArtifactory:
     # If you use a secured custom artifactory to manager your JDBC driver,
