@@ -81,7 +81,7 @@ upgrade:
   pegaRESTServerURL: ""
   pegaRESTUsername: ""
   pegaRESTPassword: ""
-  #Automatic resume flag to support resuming rules_upgrade from point of failure , for custom upgradeType
+  # Automatic resume flag to support resuming rules_upgrade from point of failure , for custom upgradeType
   automaticResumeEnabled: "false"
 
 # Memory and CPU settings for installer

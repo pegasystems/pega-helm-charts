@@ -1,19 +1,13 @@
 ---
 global:
-  # This values.yaml file is an example.  For more information about
-  # each configuration option, see the project readme.
-
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
-
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
     name: "pega"
-
   # Deploy Pega nodes
   actions:
     execute: "upgrade"
-
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
