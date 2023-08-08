@@ -59,10 +59,15 @@ global:
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
+    # custom Authentication using Managed Identity for `action=INSTALL` should be passed here:
+    # For example: Authentication=ActiveDirectoryMSI;msiClientId=1234;
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
+    # As an authentication alternative, you can configure an AAD Pod Identity to manage 
+    # authentication access for VMSS of your cluster to Azure SQL database. 
+    # PodBinding adds `aadpodidbinding` label to pod for AAD Pod Identity discovery.
     podbinding: ""
 
   customArtifactory:
