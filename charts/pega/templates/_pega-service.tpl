@@ -45,7 +45,9 @@ spec:
   {{- end }}
   {{- if and (eq .node.service.serviceType "LoadBalancer") (.node.service.loadBalancerSourceRanges) }}
   loadBalancerSourceRanges:
-  - {{ .node.service.loadBalancerSourceRanges }}
+  {{- range .node.service.loadBalancerSourceRanges }}
+    - "{{ . }}"
+  {{- end }}
   {{- end }}
   # Specification of on which port the service is enabled
   ports:
