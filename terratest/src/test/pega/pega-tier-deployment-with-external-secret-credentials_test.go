@@ -49,11 +49,11 @@ func assertCredentialVolumeAndMount(t *testing.T, tierYaml string, options *helm
 			fmt.Println(sources[0].Secret.LocalObjectReference.Name)
 			require.Equal(t, len(sources), 6)
 			require.Equal(t, sources[0].Secret.LocalObjectReference.Name, "db-secret")
-			require.Equal(t, sources[1].Secret.LocalObjectReference.Name, "dds-secret")
+			require.Equal(t, sources[1].Secret.LocalObjectReference.Name, "hazelcast-secret")
 			require.Equal(t, sources[2].Secret.LocalObjectReference.Name, "kafka-secret")
-			require.Equal(t, sources[3].Secret.LocalObjectReference.Name, "pega-diagnostic-secret")
+			require.Equal(t, sources[3].Secret.LocalObjectReference.Name, "dds-secret")
 			require.Equal(t, sources[4].Secret.LocalObjectReference.Name, "customArtifactory-secret")
-			require.Equal(t, sources[5].Secret.LocalObjectReference.Name, "hazelcast-secret")
+			require.Equal(t, sources[5].Secret.LocalObjectReference.Name, "pega-diagnostic-secret")
 			foundVol = true
 			break
 		}
