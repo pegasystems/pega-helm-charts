@@ -7,9 +7,11 @@ customArtifactorySSLVerificationEnabled
 performDeployment
 performInstallAndDeployment
 performUpgradeAndDeployment
-genericSecretResolver
-pegaDBSecretName
-pegaHZSecretName are copied from pega/templates/_helpers.tpl because helm lint requires
+pega-db-secret-name
+pega-hz-secret-name
+deployDBSecret
+deployNonExtDBSecret
+secretResolver are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
 

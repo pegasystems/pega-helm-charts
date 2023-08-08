@@ -491,25 +491,24 @@ servicePort: use-annotation
   projected:
     defaultMode: 420
     sources:
-    {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" $  -}}
-    {{ include "secretResolver" $d | indent 4}}
+    {{- $dbDict := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" $  -}}
+    {{ include "secretResolver" $dbDict | indent 4}}
 
-    {{- $d := dict "deploySecret" "deployHzSecret" "deployNonExtsecret" "deployNonExtHzSecret" "extSecretName" .Values.hazelcast.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
-    {{ include "secretResolver" $d | indent 4}}
+    {{- $hzDict := dict "deploySecret" "deployHzSecret" "deployNonExtsecret" "deployNonExtHzSecret" "extSecretName" .Values.hazelcast.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $hzDict | indent 4}}
 
-    {{- $d := dict "deploySecret" "deployStreamSecret" "deployNonExtsecret" "deployNonExtStreamSecret" "extSecretName" .Values.stream.external_secret_name "nonExtSecretName" "pega-stream-secret-name" "context" $ -}}
-    {{ include "secretResolver" $d | indent 4}}
+    {{- $streamDict := dict "deploySecret" "deployStreamSecret" "deployNonExtsecret" "deployNonExtStreamSecret" "extSecretName" .Values.stream.external_secret_name "nonExtSecretName" "pega-stream-secret-name" "context" $ -}}
+    {{ include "secretResolver" $streamDict | indent 4}}
 
-    {{- $d := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
-    {{ include "secretResolver" $d | indent 4}}
+    {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
+    {{ include "secretResolver" $ddsDict | indent 4}}
     
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
 
     {{ if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") (.Values.global.customArtifactory.authentication.external_secret_name)}}
     - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" "context" $ }}
+        name: {{ template "artifactorySecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" "context" $ }}
     {{- end}}
 
-    
 {{- end}}

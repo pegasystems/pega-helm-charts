@@ -18,13 +18,12 @@
 {{- $depName -}}-diagnostic-secret
 {{- end -}}
 
-
 {{- define "deployStreamSecret" }}
-  {{- if and (eq (include "performDeployment" .) "true") ((.Values.stream).enabled) -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
+{{- if and (eq (include "performDeployment" .) "true") ((.Values.stream).enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
 {{- end }}
 
 {{- define "deployNonExtStreamSecret" }}
@@ -36,11 +35,11 @@ false
 {{- end -}}
 
 {{- define "deployHzSecret" }}
-  {{- if (eq (include "hazelcastCSConfigRequired" .) "true") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
+{{- if (eq (include "hazelcastCSConfigRequired" .) "true") -}}
+true
+{{- else -}}
+false
+{{- end -}}
 {{- end }}
 
 {{- define "deployNonExtHzSecret" }}
@@ -52,11 +51,11 @@ false
 {{- end -}}
 
 {{- define "deployDDSSecret" }}
-  {{- if  and (eq (include "cassandraEnabled" .) "true") (eq (include "internalCassandraEnabled" .) "false") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
+{{- if  and (eq (include "performDeployment" .) "true") (eq (include "cassandraEnabled" .) "true") (eq (include "internalCassandraEnabled" .) "false") -}}
+true
+{{- else -}}
+false
+{{- end -}}
 {{- end }}
 
 {{- define "deployNonExtDDSSecret" }}
@@ -66,3 +65,7 @@ true
 false
 {{- end -}}
 {{- end -}}
+
+{{- define "artifactorySecretResolver" }}
+    {{- if (.externalSecretName) }}{{ .externalSecretName }}{{- else }}{{ include .valuesSecretName $}}{{- end }}
+{{- end  -}}
