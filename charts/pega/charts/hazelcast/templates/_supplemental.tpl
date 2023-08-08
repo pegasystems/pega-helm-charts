@@ -81,6 +81,25 @@ false
 {{- $depName -}}-hz-secret
 {{- end -}}
 
-{{- define "genericSecretResolver" }}
-    {{- if (.externalSecretName) -}}{{ .externalSecretName }}{{- else -}}{{ (include .valuesSecretName .context) }}{{- end -}}
+{{- define "deployDBSecret" -}} 
+true
+{{- end }}
+
+{{- define "deployNonExtDBSecret" }}
+{{- if and (eq (include "deployDBSecret" .) "true") (not (.Values.global.jdbc).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "secretResolver" }}
+{{- if (eq (include .deploySecret .context) "true") }}
+- secret:
+{{- if (eq (include .deployNonExtsecret .context) "true") }}
+    name: {{ include .nonExtSecretName .context}}
+{{- else }}
+    name: {{ .extSecretName }}
+{{- end -}}
+{{- end -}}
 {{- end  -}}
