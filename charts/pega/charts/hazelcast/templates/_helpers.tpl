@@ -36,9 +36,21 @@
   projected:
     defaultMode: 420
     sources:
-    - secret:
-        name: {{ template "genericSecretResolver" dict "externalSecretName" .Values.external_secret_name "valuesSecretName" "pega-hz-secret-name" "context" $ }}
+    {{- $d := dict "deploySecret" "deployHzServerSecret" "deployNonExtsecret" "deployNonExtHzServerSecret" "extSecretName" .Values.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $d | indent 4}}
 {{- end}}
+
+{{- define "deployHzServerSecret" -}}
+true
+{{- end }}
+
+{{- define "deployNonExtHzServerSecret" }}
+{{- if and (eq (include "deployHzServerSecret" .) "true") (not (.Values).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
 
 
 # Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)

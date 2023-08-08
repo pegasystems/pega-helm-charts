@@ -52,11 +52,13 @@ spec:
         projected:
           defaultMode: 420
           sources:
+          {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
+          {{ include "secretResolver" $d | indent 10}}
+
+          # Fix me, External hz secret cant be resolved for installer. Fix it once hazelcast is created as seperate chart
+          {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
-              name: {{ template "genericSecretResolver" dict "externalSecretName" .root.Values.global.jdbc.external_secret_name "valuesSecretName" "pega-db-secret-name" "context" .root }}
-          {{ if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
-          - secret:
-              name: {{ template "genericSecretResolver" dict "externalSecretName" (.root.Values.hazelcast).external_secret_name "valuesSecretName" "pega-hz-secret-name" "context" .root }}
+              name: {{ include  "pega-hz-secret-name" .root}}
           {{- end }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
