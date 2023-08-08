@@ -43,7 +43,7 @@ spec:
   {{- else -}}
   {{ indent 1 "LoadBalancer" }}
   {{- end }}
-{{- if and (eq .node.service.serviceType "LoadBalancer") (.node.service.loadBalancerSourceRanges) }}
+{{- if and (eq .node.service.serviceType "LoadBalancer") (.node.service.loadBalancerSourceRanges) -}}
   loadBalancerSourceRanges:
   - "{{ .node.service.loadBalancerSourceRanges }}"
 {{- end }}
