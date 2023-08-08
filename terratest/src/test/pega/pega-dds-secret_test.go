@@ -13,7 +13,7 @@ import (
 const trustStorePassword = "trustStore"
 const keyStorePassword = "keyStore"
 
-func TestPegaCassandrasSecretWithEncryptionPresent(t *testing.T) {
+func TestPegaDDSSecretWithEncryptionPresent(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install-deploy", "deploy", "upgrade-deploy"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
@@ -34,20 +34,21 @@ func TestPegaCassandrasSecretWithEncryptionPresent(t *testing.T) {
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(operation),
+						"dds.externalNodes":             "123.45.60.00",
 						"dds.trustStorePassword":        trustStorePassword,
 						"dds.keyStorePassword":          keyStorePassword,
 					},
 				}
 
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-cassandra-secret.yaml"})
-				verifyCassandraSecret(t, yamlContent)
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-dds-secret.yaml"})
+				verifyDDSSecret(t, yamlContent)
 			}
 		}
 	}
 
 }
 
-func verifyCassandraSecret(t *testing.T, yamlContent string) {
+func verifyDDSSecret(t *testing.T, yamlContent string) {
 
 	var secretobj k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &secretobj)

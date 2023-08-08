@@ -502,13 +502,11 @@ servicePort: use-annotation
 
     {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
     {{ include "secretResolver" $ddsDict | indent 4}}
-    
+
+    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
+    {{ include "secretResolver" $artifactoryDict | indent 4}}
+
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
-
-    {{ if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") (.Values.global.customArtifactory.authentication.external_secret_name)}}
-    - secret:
-        name: {{ template "artifactorySecretResolver" dict "externalSecretName" .Values.global.customArtifactory.authentication.external_secret_name "valuesSecretName" "pega-custom-artifactory-secret-name" "context" $ }}
-    {{- end}}
 
 {{- end}}

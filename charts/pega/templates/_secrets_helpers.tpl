@@ -66,6 +66,19 @@ false
 {{- end -}}
 {{- end -}}
 
-{{- define "artifactorySecretResolver" }}
-    {{- if (.externalSecretName) }}{{ .externalSecretName }}{{- else }}{{ include .valuesSecretName $}}{{- end }}
-{{- end  -}}
+
+{{- define "deployArtifactorySecret" }}
+{{- if or (eq (include "useBasicAuthForCustomArtifactory" .) "true") (eq (include "useApiKeyForCustomArtifactory" .) "true") (.Values.global.customArtifactory.authentication.external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end }}
+
+{{- define "deployNonExtArtifactorySecret" }}
+{{- if and (eq (include "deployArtifactorySecret" .) "true") (not (.Values.global.customArtifactory.authentication).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}

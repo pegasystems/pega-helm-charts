@@ -55,7 +55,7 @@ spec:
           {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
           {{ include "secretResolver" $d | indent 10}}
 
-          # Fix me, External hz secret cant be resolved for installer. Fix it once hazelcast is created as seperate chart
+          # Fix me, External hz secret cannot be resolved for installer. Fix it once hazelcast is created as seperate chart
           {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
               name: {{ include  "pega-hz-secret-name" .root}}
