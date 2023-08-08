@@ -36,11 +36,17 @@ metadata:
 {{- end }}
 spec:
   type:
-  {{- if or (eq .root.Values.global.provider "gke") (eq .root.Values.global.provider "eks") -}}
+  {{- if (.node.service.serviceType) -}}
+  {{ indent 1 (.node.service.serviceType) }}
+  {{- else if or (eq .root.Values.global.provider "gke") (eq .root.Values.global.provider "eks") -}}
   {{ indent 1 "NodePort" }}
   {{- else -}}
-  {{ indent 1 (.node.service.serviceType | default "LoadBalancer") }}
+  {{ indent 1 "LoadBalancer" }}
   {{- end }}
+{{- if and (eq .node.service.serviceType "LoadBalancer") (.node.service.loadBalancerSourceRanges) }}
+  loadBalancerSourceRanges:
+  - "{{ .node.service.loadBalancerSourceRanges }}"
+{{- end }}
   # Specification of on which port the service is enabled
   ports:
 {{- if or (not (hasKey .node.service "httpEnabled")) (.node.service.httpEnabled) }}
