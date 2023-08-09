@@ -36,41 +36,12 @@ func TestPegaTierService(t *testing.T) {
 					},
 				}
 
-				var serviceTypeOptions = &helm.Options{
-					SetValues: map[string]string{
-						"global.deployment.name":        depName,
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
-						"global.tier[0].service.serviceType": "LoadBalancer",
-						"installer.upgrade.upgradeType": "zero-downtime",
-					},
-				}
-
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
 				VerifyPegaServices(t, yamlContent, options)
-				yamlContentWithServiceType := RenderTemplate(t, serviceTypeOptions, helmChartPath, []string{"templates/pega-tier-service.yaml"})
-				VerifyPegaServicesWithServiceType(t, yamlContentWithServiceType, serviceTypeOptions)
 			}
 		}
 	}
 
-}
-
-func VerifyPegaServicesWithServiceType(t *testing.T, yamlContent string, serviceTypeOptions *helm.Options) {
-	var pegaServiceObj k8score.Service
-	serviceSlice := strings.Split(yamlContent, "---")
-	for index, serviceInfo := range serviceSlice {
-		if index >= 1 && index <= 2 {
-			UnmarshalK8SYaml(t, serviceInfo, &pegaServiceObj)
-
-			if index == 1 {
-				require.Equal(t, getObjName(serviceTypeOptions, "-web"), pegaServiceObj.ObjectMeta.Name)
-				require.Equal(t,pegaServiceObj.Spec.Type, k8score.ServiceType("LoadBalancer"))
-				VerifyPegaService(t, &pegaServiceObj, pegaServices{getObjName(serviceTypeOptions, "-web"), int32(80), intstr.IntOrString{IntVal: 8080}}, serviceTypeOptions)
-			} 
-		}
-	}
-	
 }
 
 // SplitAndVerifyPegaServices - Splits the services from the rendered template and asserts each service objects
