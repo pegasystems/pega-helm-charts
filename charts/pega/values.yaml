@@ -162,12 +162,16 @@ global:
             serverName: ""
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
-        serviceType: "LoadBalancer"
-        # Specify the CIDR range inside the qoutations to restrict the service access to the given CIDR range
-        # e.g "123.123.123.0/24"
-        loadBalancerSourceRanges:
-          - "103.38.88.0/24"
-          - "49.43.219.90/32"
+        # Use this parameter to deploy service of a specifictype. This is an optional value and should be used based on the usecase.
+        # serviceType: ""
+        # Should be used only when serviceType is set to LoadBalancer.
+        # Specify the CIDR ranges to restrict the service access to the given CIDR range.
+        # Each new CIDR block should be added in a separate line.
+        # e.g 
+        # loadBalancerSourceRanges:
+        # - "123.123.123.0/24"
+        # - "128.128.128.64/32"
+        # loadBalancerSourceRanges:
 
       ingress:
         # For help configuring the ingress block including TLS, see the Helm chart documentation
