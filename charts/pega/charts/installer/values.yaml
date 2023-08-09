@@ -24,9 +24,9 @@ distributionKitURL: ""
 # This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence.
 # Only distriubtion kit zip file is expected inside the volume.
 distributionKitVolumeClaimName: ""
-# A manually managed Persistent Volume Claim for mounting upgrade artifacts. Given PVC must be created manually before volume will be bound.
-# installer job persists upgrade artifacts to this pv , to support automatic resume of rules_upgrade in custom upgradeType from point of failure.
-# set automaticResumeEnabled flag to true , to leverage this.
+# A manually managed Persistent Volume Claim for mounting upgrade artifacts. You must create this PVC manually before you bind the volume.
+# The installer job persists upgrade artifacts to this Persistent Volume to support automatically resuming rules_upgrade from point of failure when you use custom upgradeType.
+# To use this function, set the automaticResumeEnabled parameter to true.
 installerMountVolumeClaimName: ""
 
 # Bypass loading engine classes into database.
@@ -81,7 +81,7 @@ upgrade:
   pegaRESTServerURL: ""
   pegaRESTUsername: ""
   pegaRESTPassword: ""
-  # Automatic resume flag to support resuming rules_upgrade from point of failure , for custom upgradeType
+  # Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.
   automaticResumeEnabled: "false"
 
 # Memory and CPU settings for installer
