@@ -174,7 +174,6 @@ global:
         # loadBalancerSourceRanges:
         #     - "123.123.123.0/24"
         #     - "128.128.128.64/32"
-        # loadBalancerSourceRanges:
 
       ingress:
         # For help configuring the ingress block including TLS, see the Helm chart documentation
