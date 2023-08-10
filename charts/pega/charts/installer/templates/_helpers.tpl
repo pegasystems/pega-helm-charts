@@ -183,8 +183,8 @@
 {{- end -}}
 
 {{- define "commonDb2Defaults" -}}
-currentSchema={{ include "resolvedDataSchema" | upper }}
-currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" | upper }}
+currentSchema={{ include "resolvedDataSchema" . | upper }}
+currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end -}}
 
 {{- define "createJobsReaderRole" -}}
