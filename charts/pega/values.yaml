@@ -174,7 +174,6 @@ global:
             serverName: ""
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
-        
 
       ingress:
         # For help configuring the ingress block including TLS, see the Helm chart documentation
