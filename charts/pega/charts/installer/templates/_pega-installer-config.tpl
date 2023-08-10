@@ -75,8 +75,8 @@ data:
 
 {{ if and (eq $dbType "postgres") ( $postgresConf := .root.Files.Glob $postgresConfPath ) }}
   postgres.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
 {{ .root.Files.Get $postgresConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
 
 {{ if and (eq $dbType "oracledate") ( $oracledateConf := .root.Files.Glob $oracledateConfPath ) }}
