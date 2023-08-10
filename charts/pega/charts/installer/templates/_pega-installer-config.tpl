@@ -93,7 +93,7 @@ data:
 
 {{ if and (eq $dbType "db2zos") ( $db2zosConf := .root.Files.Glob $db2zosConfPath ) ( $db2zosProperties := .root.Files.Glob $zosPropertiesPath ) }}
   db2zos.conf: |-
-{{ include "commonDb2Defaults" | indent 6}}
+{{ include "commonDb2Defaults" .root | indent 6}}
       currentSQLID={{ .Values.global.jdbc.username | upper }}
 {{ .root.Files.Get $db2zosConfPath | indent 6 }}
 {{ include "customJdbcProps" .root | indent 6 }}
@@ -103,7 +103,7 @@ data:
 
 {{ if and (eq $dbType "udb") ( $udbConf := .root.Files.Glob $udbConfPath ) }}
   udb.conf: |-
-{{ include "commonDb2Defaults" | indent 6}}
+{{ include "commonDb2Defaults" .root | indent 6 }}
 {{ .root.Files.Get $udbConfPath | indent 6 }}
 {{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
