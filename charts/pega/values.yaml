@@ -168,7 +168,7 @@ global:
         # Specify the CIDR ranges to restrict the service access to the given CIDR range.
         # Each new CIDR block should be added in a separate line.
         # Should be used only when serviceType is set to LoadBalancer.
-        # e.g 
+        # e.g
         # loadBalancerSourceRanges:
         #     - "123.123.123.0/24"
         #     - "128.128.128.64/32"
