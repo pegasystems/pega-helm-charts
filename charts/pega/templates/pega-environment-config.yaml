@@ -113,10 +113,16 @@ data:
   # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
   # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
   # provides lower perceived latencies at the client, but puts greater load on your Cassandra service.
+  CASSANDRA_CUSTOM_RETRY_POLICY_COUNT: "{{ .Values.dds.customRetryPolicyCount }}"
+  # Specify the number of retries when custom retry policy is enabled.
   CASSANDRA_SPECULATIVE_EXECUTION_POLICY: "{{ .Values.dds.speculativeExecutionPolicy }}"
   # Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to
   # monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX
   # interface; disabling also limits the metrics being collected using the DDS landing page.
+  CASSANDRA_SPECULATIVE_EXECUTION_DELAY: "{{ .Values.dds.speculativeExecutionPolicyDelay }}"
+  # Specify the delay in ms before speculative executions are attempted when speculative execution is enabled.
+  CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS: "{{ .Values.dds.speculativeExecutionPolicyMaxExecutions }}"
+  # Specify the maximum number of speculative executions attempted when speculative execution is enabled.
   CASSANDRA_JMX_METRICS_ENABLED: "{{ .Values.dds.jmxMetricsEnabled }}"
   # Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor
   # your Cassandra service. If you enable this property, use the Pega Platform DSS:
