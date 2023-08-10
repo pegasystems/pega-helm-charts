@@ -162,7 +162,7 @@ global:
             serverName: ""
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
-        # Use this parameter to deploy a specific type of service using the serviceType parameter and specify the type of service in double quotes. 
+        # Use this parameter to deploy a specific type of service using the serviceType parameter and specify the type of service in double quotes.
         # This is an optional value and should be used based on the use case.
         # This should be set only in case of eks, gke and other cloud providers. This option is should not be used for k8s and minikube.
         # For example if you want to deploy a service of type LoadBalancer, specify serviceType: "LoadBalancer"
