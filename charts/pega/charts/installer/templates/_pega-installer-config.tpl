@@ -94,7 +94,7 @@ data:
 {{ if and (eq $dbType "db2zos") ( $db2zosConf := .root.Files.Glob $db2zosConfPath ) ( $db2zosProperties := .root.Files.Glob $zosPropertiesPath ) }}
   db2zos.conf: |-
 {{ include "commonDb2Defaults" .root | indent 6}}
-      currentSQLID={{ .Values.global.jdbc.username | upper }}
+      currentSQLID={{ .root.Values.global.jdbc.username | upper }}
 {{ .root.Files.Get $db2zosConfPath | indent 6 }}
 {{ include "customJdbcProps" .root | indent 6 }}
   DB2SiteDependent.properties: |-
