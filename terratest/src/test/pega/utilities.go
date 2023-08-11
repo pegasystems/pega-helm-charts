@@ -21,14 +21,7 @@ func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName 
 	expectedFileData := string(expectedFile)
 	expectedFileData = strings.Replace(expectedFileData, "\r", "", -1)
 
-	equal := false
-	if expectedFileData == actualFileData {
-		equal = true
-	} else {
-		println("Expected yaml contents:\n" + expectedFileData)
-		println("Actual yaml contents:\n" + actualFileData)
-	}
-	require.Equal(t, true, equal)
+	require.Equal(t, expectedFileData, actualFileData)
 }
 
 //aksSpecificUpgraderDeployEnvs - Test aks specific upgrade-deploy environmnet variables in case of upgrade-deploy
