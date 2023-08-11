@@ -36,6 +36,13 @@ func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, containe
 	}
 }
 
+func VerifyInitContainerResources(t *testing.T, container k8score.Container) {
+	require.Equal(t, "50m", container.Resources.Limits.Cpu().String())
+	require.Equal(t, "64Mi", container.Resources.Limits.Memory().String())
+	require.Equal(t, "50m", container.Resources.Requests.Cpu().String())
+	require.Equal(t, "64Mi", container.Resources.Requests.Memory().String())
+}
+
 // VerifyInitContainerData - Verifies any possible initContainer that can occur in pega helm chart deployments
 func VerifyInitContainerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
 	var depName = getDeploymentName(options)
@@ -51,26 +58,32 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"job", "pega-db-install"}, container.Args)
+			VerifyInitContainerResources(t, container)
 		} else if name == "wait-for-pegasearch" {
 			require.Equal(t, "busybox:1.31.0", container.Image)
 			require.Equal(t, []string{"sh", "-c", "until $(wget -q -S --spider --timeout=2 -O /dev/null http://" + depName + "-search); do echo Waiting for search to become live...; sleep 10; done;"}, container.Command)
+			VerifyInitContainerResources(t, container)
 		} else if name == "wait-for-cassandra" {
 			require.Equal(t, "cassandra:3.11.3", container.Image)
 			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
+			VerifyInitContainerResources(t, container)
 		} else if name == "wait-for-pegaupgrade" {
 			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"job", "pega-zdt-upgrade"}, container.Args)
 			aksSpecificUpgraderDeployEnvs(t, options, container)
+			VerifyInitContainerResources(t, container)
 		} else if name == "wait-for-pre-dbupgrade" {
 			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"job", "pega-pre-upgrade"}, container.Args)
+			VerifyInitContainerResources(t, container)
 		} else if name == "wait-for-rolling-updates" {
 			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/" + depName + "-web --namespace default && kubectl rollout status deployment/" + depName + "-batch --namespace default && kubectl rollout status statefulset/" + depName + "-stream --namespace default"}, container.Command)
+			VerifyInitContainerResources(t, container)
 		} else {
 			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()
