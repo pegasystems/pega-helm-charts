@@ -95,6 +95,7 @@
       value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
       value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -108,6 +109,7 @@
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
@@ -120,6 +122,7 @@
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -154,6 +157,7 @@
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "initContainerEnvs" -}}
