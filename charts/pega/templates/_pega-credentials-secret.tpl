@@ -35,9 +35,13 @@ data:
 
  {{ if (eq (include "performDeployment" .) "true") }}
   # Base64 encoded username for connecting to cassandra
+  {{ if .Values.dds.username -}}
   CASSANDRA_USERNAME: {{ .Values.dds.username | b64enc }}
+  {{- end }}
   # Base64 encoded password for connecting to cassandra
+  {{ if .Values.dds.password -}}
   CASSANDRA_PASSWORD: {{ .Values.dds.password | b64enc }}
+  {{- end }}
   {{ if .Values.dds.trustStorePassword -}}
   # Base64 encoded password for the cassandra trust store
   CASSANDRA_TRUSTSTORE_PASSWORD: {{ .Values.dds.trustStorePassword | b64enc }}
