@@ -175,6 +175,19 @@
 {{ end }}
 {{- end -}}
 
+{{- define "resolvedDataSchema" -}}
+  {{- if .Values.global.jdbc.dataSchema -}}
+    {{ .Values.global.jdbc.dataSchema }}
+  {{- else -}}
+    {{ .Values.global.jdbc.rulesSchema }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "commonDb2Defaults" -}}
+currentSchema={{ include "resolvedDataSchema" . | upper }}
+currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
+{{- end -}}
+
 {{- define "createJobsReaderRole" -}}
   {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") -}}
     true
