@@ -251,8 +251,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a"Kafka stream service" configuration.
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.

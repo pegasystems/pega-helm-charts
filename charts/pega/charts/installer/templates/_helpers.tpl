@@ -102,12 +102,12 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
-  env:  
-    - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" $ }}"
-    - name: MAX_RETRIES
-      value: "{{ template "k8sWaitForMaxRetries" $ }}"
+  env:
 {{- include "initContainerEnvs" $ }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
@@ -116,10 +116,10 @@
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
   env:  
-    - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" $ }}"
-    - name: MAX_RETRIES
-      value: "{{ template "k8sWaitForMaxRetries" $ }}"
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -148,23 +148,23 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   command: ['sh', '-c',  '{{ $rolloutCommand }}' ]
+  env:
 {{- include "initContainerEnvs" $ }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 
 {{- define "initContainerEnvs" -}}
 {{- if or (eq .Values.global.provider "aks") (eq .Values.global.provider "pks") -}}
 {{ $apiserver := index .Values.global.upgrade "kube-apiserver" }}
-  env:
   - name: KUBERNETES_SERVICE_HOST
     value: {{ $apiserver.serviceHost | quote }}
   - name: KUBERNETES_SERVICE_PORT_HTTPS
     value: {{ $apiserver.httpsServicePort | quote }}
   - name: KUBERNETES_SERVICE_PORT
     value: {{ $apiserver.httpsServicePort | quote }}
-  - name: WAIT_TIME
-    value: "{{ template "k8sWaitForWaitTime" $ }}"
-  - name: MAX_RETRIES
-    value: "{{ template "k8sWaitForMaxRetries" $ }}"
 {{- end }}
 {{- end }}
 
@@ -172,6 +172,19 @@
 {{ range (splitList ";" .Values.global.jdbc.connectionProperties) }}
 {{ . }}
 {{ end }}
+{{- end -}}
+
+{{- define "resolvedDataSchema" -}}
+  {{- if .Values.global.jdbc.dataSchema -}}
+    {{ .Values.global.jdbc.dataSchema }}
+  {{- else -}}
+    {{ .Values.global.jdbc.rulesSchema }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "commonDb2Defaults" -}}
+currentSchema={{ include "resolvedDataSchema" . | upper }}
+currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end -}}
 
 {{- define "createJobsReaderRole" -}}
