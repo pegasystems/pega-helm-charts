@@ -518,7 +518,7 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
 
 4. Save the file.
 
-   > Note: To connect AKS with Azure SQL using managed Identity, you must include the `Authentication` type as well as `msiClientId` if using `user assigned managed identity` under `jdbc.connectionProperties` for action=`INSTALL`.  
+   > Note: To connect AKS with an Azure SQL database using managed Identity, you must include the `Authentication` type as well as `msiClientId` if using user assigned managed identity under `jdbc.connectionProperties` for `action=INSTALL`.  
 example:
    `connectionProperties: "selectMethod=cursor;Authentication=ActiveDirectoryMSI;msiClientId=<clientId>;"`
 
