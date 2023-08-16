@@ -40,7 +40,7 @@ spec:
       serviceAccountName: {{ .root.Values.serviceAccountName }}
 {{- end }}   
       volumes:
-{{- if and .root.Values.installerMountVolumeClaimName (eq .root.Values.upgrade.automaticResumeEnabled "true") }}
+{{- if .root.Values.installerMountVolumeClaimName }}
       - name: {{ template "pegaInstallerMountVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.installerMountVolumeClaimName }}
@@ -98,9 +98,9 @@ spec:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
         volumeMounts:
-{{- if and .root.Values.installerMountVolumeClaimName (eq .root.Values.upgrade.automaticResumeEnabled "true") }}
+{{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
-          mountPath: "/opt/pega/installer"
+          mountPath: "/opt/pega/mount/installer"
 {{- end }}
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeInstall" }}
