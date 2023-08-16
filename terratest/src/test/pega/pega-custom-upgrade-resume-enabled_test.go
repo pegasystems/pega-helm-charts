@@ -66,7 +66,7 @@ func assertUpgradeJobJobResumeEnabled(t *testing.T, jobYaml string, expectedJob 
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
 	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-installer-mount-volume")
-	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/installer")
+	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/mount/installer")
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
 
 	require.Equal(t, jobSpec.ImagePullSecrets[0].Name, getObjName(options, "-registry-secret"))
