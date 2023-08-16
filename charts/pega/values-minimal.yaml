@@ -61,10 +61,9 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
-    # As an authentication alternative, you can configure an AAD Pod Identity to manage
-    # authentication access for VMSS of your cluster to Azure SQL database.
-    # PodBinding adds `aadpodidbinding` label to pod for AAD Pod Identity discovery.
-    podbinding: ""
+    # As an authentication alternative, you can configure an AAD Pod Identity to manage 
+    # authentication access for VMSS of your cluster to Azure SQL database. 
+    # use node.podLabels to pass `aadpodidbinding` label to pod for AAD Pod Identity discovery.
 
   customArtifactory:
     # If you use a secured custom artifactory to manager your JDBC driver,
