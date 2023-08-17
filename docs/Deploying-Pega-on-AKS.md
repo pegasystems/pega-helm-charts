@@ -521,6 +521,18 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
 example:
    `connectionProperties: "selectMethod=cursor;Authentication=ActiveDirectoryMSI;msiClientId=<clientId>;"`
 
+    As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access for VMSS of your cluster to Azure SQL database. use 
+  "web" tier.podLabels to pass `aadpodidbinding` label to pod for AAD Pod Identity discovery.  
+    example:   
+        
+        
+            tier:  
+            - name: "web"  
+              nodeType: "Stream,BackgroundProcessing,WebUser,Search"  
+              podLabels:   
+                aadpodidbinding: <label>  
+       
+    
 ### Changes in Backend setting if tiers.service.tls.domain is `true`
 
 If you set `tiers.service.tls.enabled` to `true` and the certificate in the keystore is issued by a valid CA authority, no additional steps is required.
