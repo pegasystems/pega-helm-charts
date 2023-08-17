@@ -521,8 +521,7 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
 example:
    `connectionProperties: "selectMethod=cursor;Authentication=ActiveDirectoryMSI;msiClientId=<clientId>;"`
 
-    As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access for VMSS of your cluster to Azure SQL database. use 
-  "web" tier.podLabels to pass `aadpodidbinding` label to pod for AAD Pod Identity discovery.  
+    > As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access for VMSS of your cluster to Azure SQL database. Use the "web" tier.podLabels parameter to pass a aadpodidbinding label to your pod to enable it to discover your AAD Pod Identity. 
     example:   
         
         
