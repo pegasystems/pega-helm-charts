@@ -43,6 +43,17 @@
   {{- end -}}
 {{- end -}}
 
+{{- define "initContainerResources" }}
+  resources:
+    # Resources requests/limits for initContainers
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+{{- end }}
+
 {{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "performInstall" }}
