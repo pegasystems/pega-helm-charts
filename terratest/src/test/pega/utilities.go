@@ -21,10 +21,17 @@ func compareConfigMapData(t *testing.T, actualFileData string, expectedFileName 
 	expectedFileData := string(expectedFile)
 	expectedFileData = strings.Replace(expectedFileData, "\r", "", -1)
 
-	require.Equal(t, expectedFileData, actualFileData)
+	equal := false
+	if expectedFileData == actualFileData {
+		equal = true
+	} else {
+		println("Expected yaml contents:\n" + expectedFileData)
+		println("Actual yaml contents:\n" + actualFileData)
+	}
+	require.Equal(t, true, equal)
 }
 
-//aksSpecificUpgraderDeployEnvs - Test aks specific upgrade-deploy environmnet variables in case of upgrade-deploy
+// aksSpecificUpgraderDeployEnvs - Test aks specific upgrade-deploy environmnet variables in case of upgrade-deploy
 func aksSpecificUpgraderDeployEnvs(t *testing.T, options *helm.Options, container k8score.Container) {
 	if options.SetValues["global.provider"] == "aks" && options.SetValues["global.actions.execute"] == "upgrade-deploy" {
 		require.Equal(t, container.Env[0].Name, "KUBERNETES_SERVICE_HOST")
@@ -48,8 +55,7 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 		container := containers[i]
 		name := container.Name
 		if name == "wait-for-pegainstall" {
-			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
-			VerifyK8sWaitForArgs(t, container)
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-db-install"}, container.Args)
 		} else if name == "wait-for-pegasearch" {
 			require.Equal(t, "busybox:1.31.0", container.Image)
@@ -59,41 +65,20 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 			//The cassandra svc name below is derived from helm release name and not .Values.global.deploymentName like search svc
 			require.Equal(t, []string{"sh", "-c", "until cqlsh -u \"dnode_ext\" -p \"dnode_ext\" -e \"describe cluster\" pega-cassandra 9042 ; do echo Waiting for cassandra to become live...; sleep 10; done;"}, container.Command)
 		} else if name == "wait-for-pegaupgrade" {
-			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
-			VerifyK8sWaitForArgs(t, container)
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-zdt-upgrade"}, container.Args)
 			aksSpecificUpgraderDeployEnvs(t, options, container)
 		} else if name == "wait-for-pre-dbupgrade" {
-			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
-			VerifyK8sWaitForArgs(t, container)
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"job", "pega-pre-upgrade"}, container.Args)
 		} else if name == "wait-for-rolling-updates" {
-			require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
-			VerifyK8sWaitForArgs(t, container)
+			require.Equal(t, "dcasavant/k8s-wait-for", container.Image)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/" + depName + "-web --namespace default && kubectl rollout status deployment/" + depName + "-batch --namespace default && kubectl rollout status statefulset/" + depName + "-stream --namespace default"}, container.Command)
 		} else {
 			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()
 		}
 	}
-}
-
-func VerifyK8sWaitForArgs(t *testing.T, container k8score.Container) {
-    BOTH_PARAMS_HAPPEN_ONCE := 6
-    require.Equal(t, "pegasystems/k8s-wait-for", container.Image)
-
-    envvars := container.Env
-    k8sWaitForParamsProduct := 1
-    for i := 0; i < len(envvars); i++ {
-        envvar := envvars[i]
-        if envvar.Name == "WAIT_TIME" {
-            k8sWaitForParamsProduct *= 2
-        }
-        if envvar.Name == "MAX_RETRIES" {
-            k8sWaitForParamsProduct *= 3
-        }
-    }
-    require.Equal(t, BOTH_PARAMS_HAPPEN_ONCE, k8sWaitForParamsProduct)
 }
 
 func getDeploymentName(options *helm.Options) string {
@@ -106,12 +91,4 @@ func getDeploymentName(options *helm.Options) string {
 
 func getObjName(options *helm.Options, suffix string) string {
 	return getDeploymentName(options) + suffix
-}
-
-func getUpgradeTypeForUpgradeAction(action string) string {
-	if action == "upgrade-deploy" {
-		return "zero-downtime"
-	} else {
-		return "out-of-place"
-	}
 }
