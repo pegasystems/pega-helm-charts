@@ -75,34 +75,37 @@ data:
 
 {{ if and (eq $dbType "postgres") ( $postgresConf := .root.Files.Glob $postgresConfPath ) }}
   postgres.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
 {{ .root.Files.Get $postgresConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
 
 {{ if and (eq $dbType "oracledate") ( $oracledateConf := .root.Files.Glob $oracledateConfPath ) }}
   oracledate.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
 {{ .root.Files.Get $oracledateConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
 
 {{ if and (eq $dbType "mssql") ( $mssqlConf := .root.Files.Glob $mssqlConfPath ) }}
   mssql.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
 {{ .root.Files.Get $mssqlConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
 
 {{ if and (eq $dbType "db2zos") ( $db2zosConf := .root.Files.Glob $db2zosConfPath ) ( $db2zosProperties := .root.Files.Glob $zosPropertiesPath ) }}
   db2zos.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
+{{ include "commonDb2Defaults" .root | indent 6}}
+      currentSQLID={{ .root.Values.global.jdbc.username | upper }}
 {{ .root.Files.Get $db2zosConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
   DB2SiteDependent.properties: |-
 {{ .root.Files.Get $zosPropertiesPath | indent 6 }}
 {{- end }}
 
 {{ if and (eq $dbType "udb") ( $udbConf := .root.Files.Glob $udbConfPath ) }}
   udb.conf: |-
-{{ include "customJdbcProps" .root | indent 6 }}
+{{ include "commonDb2Defaults" .root | indent 6 }}
 {{ .root.Files.Get $udbConfPath | indent 6 }}
+{{ include "customJdbcProps" .root | indent 6 }}
 {{- end }}
 
 {{- end }}

@@ -191,3 +191,10 @@ New versions of this Helm Chart may be released at any time. Versions are define
 * Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
   * Bug fixes or known issue resolutions.
   * Security vulnerability enhancements.
+
+## Helm charts and Docker images compatibility
+
+Both Helm charts and Docker images undergo frequent updates; new Helm chart releases may appear at any time, and the latest patch versions of the Docker images are rebuilt nightly as part of software maintenance (for more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html)). This might result in incompatibility issues during the install and upgrade process. To ensure that Helm charts and Docker images are compatible, do one of the following actions:
+
+* If you update your Helm charts to the latest version to take advantage of new features, update your Docker images to the latest version as well (latest build of the latest patch).
+* If you upgrade your Pega Platform to a later version, use the latest Docker image build and latest Helm chart version.

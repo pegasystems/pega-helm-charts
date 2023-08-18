@@ -133,27 +133,22 @@ The prompt returns when the installation is completed.
 
 For details about installing the Azure CLI on a Windows system, see [Install Azure CLI on Windows](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli-windows?view=azure-cli-latest).
 
-### For TKGI only: installing pks cli
+### For TKGI only: installing the TKGI CLI
 
 Install the PKS CLI binary executable file from the VMware Enterprise PKS support site that you run with Windows administrator permissions during the TKGI deployment steps:
 
-1. Use the browser of your choice to navigate to [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html) and log in.
+1. Navigate to [VMware Tanzu Network](https://network.pivotal.io/) and log in.  
 
-2. Open the latest version and navigate to the Windows section.
+2. Click **Tanzu Kubernetes Grid Integrated Edition.**  
+3. Select your desired release version from the **Releases dropdown.**  
+4. Click **TKGI CLI.**  
+5. Click TKGI CLI - Windows to download the Windows executable file.  
+6. Rename the downloaded binary file to `tkgi.exe`.  
+7. Move the binary file into your `PATH`.  
+8. Run `tkgi –version` to verify the version of your TKGI CLI installed locally.  
 
-3. Click **PKS CLI – <version>**.
 
-4. Click **PKS CLI - Windows**.
-
-5. In the EULA tab, click **AGREE**.
-
-6. In the Windows explorer window, choose the `TKGI-demo` folder to save the `pks-windows-amd64-1.5.1-build.xx.exe` file, change the filename to `pks.exe`, and then click **Save**.
-
-7. Add this executable file to the PATH on your local computer so you can run `pks` from the command-line by entering:
-
-    `$env:path += ";C:\Users\<Windows-username>\<platform>-demo"`
-
-    Advanced users can add the binary file to their path using their preferred method. These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html).
+These instructions were mostly sourced from the [Installing the TKGI CLI](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid-Integrated-Edition/1.14/tkgi/GUID-installing-cli.html).
 
 ### Installing Docker Desktop on Windows 10
 
