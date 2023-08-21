@@ -43,17 +43,6 @@
   {{- end -}}
 {{- end -}}
 
-{{- define "initContainerResources" }}
-  resources:
-    # Resources requests/limits for initContainers
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-{{- end }}
-
 {{- define "installerDeploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "performInstall" }}
@@ -62,7 +51,6 @@
   {{- else -}}
     false
   {{- end -}}
-{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "performUpgrade" }}
@@ -97,12 +85,23 @@
   {{- end -}}
 {{- end }}
 
+{{- define "initContainerResources" }}
+  resources:
+    # Resources requests/limits for initContainers
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+{{- end }}
+
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
-  env:  
+  env:
     - name: WAIT_TIME
       value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
@@ -129,7 +128,7 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
-  env:  
+  env:
   - name: WAIT_TIME
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
