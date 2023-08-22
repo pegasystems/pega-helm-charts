@@ -100,3 +100,7 @@ shareProcessNamespace: false
 # Apply securityContext to installer pod. For example to set `runAsNonRoot: true`:
 # securityContext:
 #   runAsNonRoot: true
+
+# Add extra pod labels
+# podLabels:
+#   label: value
