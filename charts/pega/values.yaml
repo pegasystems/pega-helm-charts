@@ -59,6 +59,7 @@ global:
     # CUSTOM CONNECTION PROPERTIES
     # Add a list of ; delimited connections properties. The list must end with ;
     # For example: connectionProperties=user=usr;password=pwd;
+    # Set `Authentication=ActiveDirectoryMSI;msiClientId=1234;` for custom authentication using Azure Managed Identity.
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
