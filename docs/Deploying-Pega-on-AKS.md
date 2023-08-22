@@ -517,19 +517,24 @@ helm inspect values pega/pega > <local filepath>/aks-demo/pega.yaml
 
 4. Save the file.
 
-   > Note: To connect AKS with an Azure SQL database using managed Identity, you must include the `Authentication` type as well as `msiClientId` if using user assigned managed identity under `jdbc.connectionProperties` for `action=INSTALL`.  
+   > Note: To connect AKS with an Azure SQL database using managed Identity, you must include the `Authentication` type as well as `msiClientId` if using user assigned managed identity under `jdbc.connectionProperties`.  
 example:
    `connectionProperties: "selectMethod=cursor;Authentication=ActiveDirectoryMSI;msiClientId=<clientId>;"`
 
-    > As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access for VMSS of your cluster to Azure SQL database. Use the "web" tier.podLabels parameter to pass a aadpodidbinding label to your pod to enable it to discover your AAD Pod Identity. 
+    > As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access for VMSS of your cluster to Azure SQL database. Use the `tier[*].podLabels` parameter to pass a `aadpodidbinding` label to your Pega pod to enable it to discover your AAD Pod Identity. For Installer pod use `"installer".podLabels`
     example:   
         
         
-            tier:  
+           tier:  
             - name: "web"  
               nodeType: "Stream,BackgroundProcessing,WebUser,Search"  
               podLabels:   
-                aadpodidbinding: <label>  
+                aadpodidbinding: <label>
+           ...
+           installer:
+              image: <installer_image>
+              podLabels:
+                aadpodidbinding: <label>
        
     
 ### Changes in Backend setting if tiers.service.tls.domain is `true`
