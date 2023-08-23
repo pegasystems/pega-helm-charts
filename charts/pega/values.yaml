@@ -57,8 +57,11 @@ global:
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
-    # Add a list of ; delimited connections properties. The list must end with ;
-    # For example: connectionProperties=user=usr;password=pwd;
+    # Use the connectionProperties parameter to pass connection settings to your deployment
+    # by adding a list of semi-colon-delimited required connection setting. The list string must end with ";".
+    # For example, you can set a custom authentication using Azure Managed Identity and avoid using a password.
+    # To pass an Authentication method and a managed identity, MSI Client ID,
+    # set: connectionProperties: "Authentication=ActiveDirectoryMSI;msiClientId=<your Azure Managed Identity>;"
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
