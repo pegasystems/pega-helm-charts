@@ -207,7 +207,7 @@
   # final 2 args for cqlsh are cassandra host and port respectively
   command: ['sh', '-c', '{{- template "waitForCassandraScript" dict "nodes" (include "getCassandraSubchartService" .) "node" .Values.dds -}}']
 {{- include "initContainerResources" $ }}
-  {{- end -}}
+ {{- end -}}
 {{- end }}
 
 {{- define "getCassandraSubchartService" -}}
