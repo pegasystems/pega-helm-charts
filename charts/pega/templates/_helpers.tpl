@@ -188,7 +188,6 @@
   {{- end -}}
 {{- end }}
 
-
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch
   image: {{ .Values.global.utilityImages.busybox.image }}

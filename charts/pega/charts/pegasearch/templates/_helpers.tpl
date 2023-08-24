@@ -23,7 +23,6 @@
 {{- end -}}
 {{- end -}}
 
-
 {{- /* From the perspective of the Pega Infinity nodes, Pega deployments always assume that the search instances are external to the deployment when you use these charts; 
        however this check determines if search is deployed externally as defined in the backing search service configuration or if it is defined in the Pega-provided 
        Docker search image.*/ -}}
