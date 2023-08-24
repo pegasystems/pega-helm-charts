@@ -103,7 +103,6 @@ false
   {{- if (eq .Values.global.actions.execute "install-deploy") -}}
     true
   {{- else -}}
-
     false
   {{- end -}}
 {{- end }}
