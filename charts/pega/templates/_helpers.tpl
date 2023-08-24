@@ -188,16 +188,6 @@
   {{- end -}}
 {{- end }}
 
-{{- define "initContainerResources" }}
-  resources:
-    # Resources requests/limits for initContainers
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-{{- end }}
 
 {{- define "waitForPegaSearch" -}}
 - name: wait-for-pegasearch

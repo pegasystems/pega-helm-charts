@@ -85,17 +85,6 @@
   {{- end -}}
 {{- end }}
 
-{{- define "initContainerResources" }}
-  resources:
-    # Resources requests/limits for initContainers
-    requests:
-      cpu: 50m
-      memory: 64Mi
-    limits:
-      cpu: 50m
-      memory: 64Mi
-{{- end }}
-
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}

@@ -22,6 +22,17 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- $depName -}}-credentials-secret
 {{- end }}
 
+{{- define "initContainerResources" }}
+  resources:
+    # Resources requests/limits for initContainers
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+{{- end }}
+
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
   projected:
@@ -92,6 +103,7 @@ false
   {{- if (eq .Values.global.actions.execute "install-deploy") -}}
     true
   {{- else -}}
+
     false
   {{- end -}}
 {{- end }}
