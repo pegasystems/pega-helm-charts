@@ -90,11 +90,12 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
-  env:  
+  env:
     - name: WAIT_TIME
       value: "{{ template "k8sWaitForWaitTime" $ }}"
     - name: MAX_RETRIES
       value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -108,6 +109,7 @@
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
@@ -115,11 +117,12 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
-  env:  
+  env:
   - name: WAIT_TIME
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -154,6 +157,7 @@
     value: "{{ template "k8sWaitForWaitTime" $ }}"
   - name: MAX_RETRIES
     value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "initContainerEnvs" -}}
