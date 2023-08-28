@@ -57,8 +57,11 @@ global:
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
-    # Add a list of ; delimited connections properties. The list must end with ;
-    # For example: connectionProperties=user=usr;password=pwd;
+    # Use the connectionProperties parameter to pass connection settings to your deployment
+    # by adding a list of semi-colon-delimited required connection setting. The list string must end with ";".
+    # For example, you can set a custom authentication using Azure Managed Identity and avoid using a password.
+    # To pass an Authentication method and a managed identity, MSI Client ID,
+    # set: connectionProperties: "Authentication=ActiveDirectoryMSI;msiClientId=<your Azure Managed Identity>;"
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
@@ -138,6 +141,18 @@ global:
         httpEnabled: true
         port: 80
         targetPort: 8080
+        # Use this parameter to deploy a specific type of service using the serviceType parameter and specify the type of service in double quotes.
+        # This is an optional value and should be used based on the use case.
+        # This should be set only in case of eks, gke and other cloud providers. This option should not be used for k8s and minikube.
+        # For example if you want to deploy a service of type LoadBalancer, uncomment the following line and specify serviceType: "LoadBalancer"
+        # serviceType: ""
+        # Specify the CIDR ranges to restrict the service access to the given CIDR range.
+        # Each new CIDR block should be added in a separate line.
+        # Should be used only when serviceType is set to LoadBalancer.
+        # Uncomment the following lines and replace the CIDR blocks with your configuration requirements.
+        # loadBalancerSourceRanges:
+        #     - "123.123.123.0/24"
+        #     - "128.128.128.64/32"
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false

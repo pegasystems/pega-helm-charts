@@ -40,6 +40,7 @@ spec:
         image: {{ .Values.global.utilityImages.busybox.image }}
         imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
         command: ['sh', '-c', 'chown -R {{ .Values.podSecurityContext.runAsUser | default 1000 }}:{{ .Values.podSecurityContext.runAsUser | default 1000 }} /usr/share/elasticsearch/data']
+      {{- include "initContainerResources" . | indent 6 }}
         volumeMounts:
         - name: esstorage
           mountPath: /usr/share/elasticsearch/data
@@ -49,6 +50,7 @@ spec:
         image: {{ .Values.global.utilityImages.busybox.image }}
         imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
         command: ['sysctl', '-w', 'vm.max_map_count=262144']
+      {{- include "initContainerResources" . | indent 6 }}
         securityContext:
           privileged: true
       {{ end }}

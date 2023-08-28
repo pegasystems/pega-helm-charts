@@ -29,6 +29,9 @@ spec:
     metadata:
       labels:
         installer-job: {{ .name }}
+        {{- if .root.Values.podLabels }}
+{{ toYaml .root.Values.podLabels | indent 8 }}
+        {{- end -}}
 {{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}

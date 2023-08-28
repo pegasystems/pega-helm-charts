@@ -20,6 +20,17 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 
+{{- define "initContainerResources" }}
+  resources:
+    # Resources requests/limits for initContainers
+    requests:
+      cpu: 50m
+      memory: 64Mi
+    limits:
+      cpu: 50m
+      memory: 64Mi
+{{- end }}
+
 {{- define "customArtifactorySSLVerificationEnabled" }}
 {{- if (.Values.global.customArtifactory) }}
 {{- if (.Values.global.customArtifactory.enableSSLVerification) }}
