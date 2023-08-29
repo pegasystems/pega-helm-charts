@@ -835,7 +835,7 @@ Use the following configuration to provision the legacy client-server Elasticsea
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
-`image`   | Set the `pegasearch.image` parameter to a registry that can access the Pega-provided `platform/search` Docker image. Download the image from the Pega repository, tag it, and push it to your local registry. For more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html). | `platform/search:latest`
+`image`   | Set the `pegasearch.image` parameter to a registry that can access the Pega-provided `platform/search` Docker image. Download the image from the Pega repository, tag it, and push it to your local registry. As a best practice, use the latest available image for your Pega Platform version, based on the build date specified in the tag. For example, the image tagged "8.5.6-20230829" was built on August 29, 2023. For more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).| `platform/search:8.5.x-XXXXXXXX`
 `imagePullPolicy` | Optionally specify an imagePullPolicy for the search container. | `""`
 `replicas` | Specify the desired replica count. | `1`
 `minimumMasterNodes` | To prevent data loss, you must configure the minimumMasterNodes setting so that each master-eligible node is set to the minimum number of master-eligible nodes that must be visible in order to form a cluster. Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.  For more information, see the Elasticsearch [important setting documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html) for more information. | `1`
@@ -850,7 +850,7 @@ Example:
 
 ```yaml
 pegasearch:
-  image: "platform/search:8.3"
+  image: "platform/search:8.5.6-20230829"
   memLimit: "3Gi"
   replicas: 1
   minimumMasterNodes: 2
