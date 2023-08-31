@@ -401,15 +401,29 @@ dds:
   # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. If not configured, queries
   # will be retried once.
   customRetryPolicy: false
-  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
-  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
-  # provides lower perceived latencies at the client, but puts greater load on your Cassandra service.
+  # Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your
+  # deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries
+  # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you
+  # do not specify a retry count, timed out queries are retried once.
+  # This property is for use with Pega Infinity '23 and lower.
+  customRetryPolicyEnabled: false
+  # Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your
+  # deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries
+  # using the customRetryPolicyCount property. The default is 1, so if you do not specify a retry count, timed out queries
+  # are retried once.
+  # This property is for use with Pega Infinity '24 and greater.
   customRetryPolicyCount: 1
   # Specify the number of retries when custom retry policy is enabled.
   speculativeExecutionPolicy: false
-  # Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to
-  # monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX
-  # interface; disabling also limits the metrics being collected using the DDS landing page.
+  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
+  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
+  # provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service.
+  # This property is for use with Pega Infinity '23 and lower.
+  speculativeExecutionPolicyEnabled: false
+  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
+  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
+  # provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service.
+  # This property is for use with Pega Infinity '24 and greater.
   speculativeExecutionPolicyDelay: 100
   # Specify the delay in ms before speculative executions are attempted when speculative execution is enabled.
   speculativeExecutionPolicyMaxExecutions: 2
