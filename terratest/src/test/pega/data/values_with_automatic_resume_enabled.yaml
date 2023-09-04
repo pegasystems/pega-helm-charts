@@ -1,0 +1,31 @@
+---
+global:
+  # Enter your Kubernetes provider.
+  provider: "YOUR_KUBERNETES_PROVIDER"
+  deployment:
+    # Specify the prefix for all Pega nodes (for example, you can replace "pega" with "app1-dev").
+    name: "pega"
+  # Deploy Pega nodes
+  actions:
+    execute: "upgrade"
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  # Set the initial administrator@pega.com password for your installation. Change the password at first login.
+  # The adminPassword value cannot start with "@".
+  adminPassword: "ADMIN_PASSWORD"
+  # Upgrade specific properties
+  installerMountVolumeClaimName: "test-claim"
+  upgrade:
+    # Type of upgrade
+    # Valid upgradeType values are “in-place”, “zero-downtime”, “custom”, “out-of-place-rules”, “out-of-place-data”.
+    upgradeType: "custom"
+    # Specify a name for a target rules schema that the upgrade process creates for patches and upgrades.
+    targetRulesSchema: ""
+    # Specify a name for a target data schema that the upgrade process creates for patches and upgrades.
+    # For PostgreSQL databases that you are upgrading from Pega Platform version 8.4.0 and later
+    # And for Oracle databases that you are upgrading from Pega Infinity version 8.4.3 and later.
+    targetDataSchema: ""
+    # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
+    pegaRESTUsername: ""
+    pegaRESTPassword: ""
+    automaticResumeEnabled: "true"
