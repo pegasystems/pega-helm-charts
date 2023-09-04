@@ -13,7 +13,7 @@ import (
 func TestPegaCustomUpgradeJobResumeEnabled(t *testing.T) {
 
 	var supportedVendors = []string{"eks"}
-	var supportedOperations = []string{"upgrade"}
+	var supportedOperations = []string{"upgrade", "upgrade-deploy"}
 	var deploymentNames = []string{"pega"}
 	var upgradeType = []string{"custom"}
 	var upgradeSteps = []string{"rules_upgrade"}
