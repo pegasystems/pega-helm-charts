@@ -123,8 +123,8 @@ data:
   # releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount.
   CASSANDRA_SPECULATIVE_EXECUTION_POLICY: "{{ .Values.dds.speculativeExecutionPolicy }}"
   # Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and
-  # earlier releases. When enabled, the Pega Platform will send a query to multiple nodes in your Cassandra service and
-  # process the first response. This provides lower perceived latencies for your deployment, but puts greater load
+  # earlier releases. When enabled, Pega Platform sends a query to multiple nodes in your Cassandra service and
+  # processes the first response. This provides lower perceived latencies for your deployment, but puts greater load
   # on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic
   # system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and
   # dnode/cassandra_speculative_execution_policy/max_executions.
