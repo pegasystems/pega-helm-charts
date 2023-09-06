@@ -110,33 +110,36 @@ data:
   # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. If not configured, queries
   # will be retried once.
   CASSANDRA_CUSTOM_RETRY_POLICY: "{{ .Values.dds.customRetryPolicy }}"
-  # Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your
-  # deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries
-  # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you
-  # do not specify a retry count, timed out queries are retried once.
-  # This property is for use with Pega Infinity '23 and lower.
+  # Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier
+  # releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries
+  # that time out. Configure the number of retries using the dynamic system setting (DSS):
+  # dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out
+  # queries are retried once.
   CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED: "{{ .Values.dds.customRetryPolicyEnabled }}"
-  # Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your
-  # deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries
-  # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you
-  # do not specify a retry count, timed out queries are retried once.
-  # This property is for use with Pega Infinity '24 and greater.
+  # Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries
+  # using the `customRetryPolicyCount` property.
   CASSANDRA_CUSTOM_RETRY_POLICY_COUNT: "{{ .Values.dds.customRetryPolicyCount }}"
-  # Specify the number of retries when custom retry policy is enabled.
+  # Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier
+  # releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount.
   CASSANDRA_SPECULATIVE_EXECUTION_POLICY: "{{ .Values.dds.speculativeExecutionPolicy }}"
-  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
-  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
-  # provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service.
-  # This property is for use with Pega Infinity '23 and lower.
+  # Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and
+  # earlier releases. When enabled, the Pega Platform will send a query to multiple nodes in your Cassandra service and
+  # process the first query response. This provides lower perceived latencies for your deployment, but puts greater load
+  # on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic
+  # system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and
+  # dnode/cassandra_speculative_execution_policy/max_executions.
   CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED: "{{ .Values.dds.speculativeExecutionPolicyEnabled }}"
-  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
-  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
-  # provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service.
-  # This property is for use with Pega Infinity '24 and greater.
+  # Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the
+  # speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and
+  # `speculativeExecutionPolicyMaxExecutions` properties.
   CASSANDRA_SPECULATIVE_EXECUTION_DELAY: "{{ .Values.dds.speculativeExecutionPolicyDelay }}"
-  # Specify the delay in ms before speculative executions are attempted when speculative execution is enabled.
+  # Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is
+  # true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS):
+  # dnode/cassandra_speculative_execution_policy/delay.
   CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS: "{{ .Values.dds.speculativeExecutionPolicyMaxExecutions }}"
-  # Specify the maximum number of speculative executions attempted when speculative execution is enabled.
+  # Specify the maximum number of speculative execution attempts when `speculativeExecutionPolicyEnabled` is true. For
+  # Pega Platform '23 and earlier releases use the dynamic system setting (DSS):
+  # dnode/cassandra_speculative_execution_policy/max_executions.
   CASSANDRA_JMX_METRICS_ENABLED: "{{ .Values.dds.jmxMetricsEnabled }}"
   # Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor
   # your Cassandra service. If you enable this property, use the Pega Platform DSS:
