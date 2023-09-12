@@ -26,6 +26,13 @@ else
   exit 1
 fi
 
+if xmllint --noout charts/pega/config/deploy/tomcat-web.xml >/dev/null 2>&1; then
+  echo "deploy tomcat-web.xml  validation passed"
+else
+  echo "deploy tomcat-web.xml formatting is incorrect"
+  exit 1
+fi
+
 if xmllint --noout charts/pega/charts/installer/config/prlog4j2.xml >/dev/null 2>&1; then
   echo "installer prlog4j2.xml validation passed"
 else
