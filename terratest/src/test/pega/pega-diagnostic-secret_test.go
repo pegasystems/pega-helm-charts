@@ -10,8 +10,8 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
-const diagnosticWebUser = "ZGlhZ25vc3RpY1dlYlVzZXI="
-const diagnosticWebPassword = "ZGlhZ25vc3RpY1dlYlVzZXI="
+const diagnosticWebUser = "diagnosticWebUser"
+const diagnosticWebPassword = "diagnosticWebPassword"
 
 func TestPegaDiagnosticSecret(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
