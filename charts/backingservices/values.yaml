@@ -4,6 +4,8 @@ global:
     registry: "YOUR_DOCKER_REGISTRY"
     username: "YOUR_DOCKER_REGISTRY_USERNAME"
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
+  # Specify the value of your Kubernetes provider
+  k8sProvider: "YOUR_KUBERNETES_PROVIDER"
 
 # Search and Reporting Service (SRS) Configuration
 srs:
@@ -29,8 +31,8 @@ srs:
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
-      # Set the value for parameter 'PublicKeyURL' when AuthEnabled is true.
-      PublicKeyURL: ""
+      # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
+      OAuthPublicKeyURL: ""
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
@@ -69,13 +71,16 @@ srs:
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
+constellation:
+  enabled: false
 
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 if required
+  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
+  # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
   imageTag: 7.10.2
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"

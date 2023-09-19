@@ -51,7 +51,7 @@ The following account, resources, and application versions are required for use 
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
-- PKS CLI - the PKS command-line tool that you use to manage and communicate with your PKS cluster.
+- TKGI CLI - the TKGI command-line tool that you use to manage and communicate with your TKGI cluster.
 
 ## Prepare your resources – 45 minutes
 
@@ -212,11 +212,12 @@ To configure the parameters in the backingservices.yaml file, download the file 
   
   `$ helm inspect values pega/backingservices > <local filepath>/TKGI-demo/backingservices.yaml`
   
-2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your PKS requirements:
+2. Use a text editor to open the backingservices.yaml file and update the following parameters in the chart based on your TKGI requirements:
   
 | Chart parameter name    | Purpose                                   | Your setting |
 |-------------------------|-------------------------------------------|--------------|
 |global.imageCredentials.registry: username: password:  | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul>|
+| global.k8sProvider:  | Specify the value of your Kubernetes provider. | k8sProvider: "pks" |
 |srs.enabled:      | Enable the SRS to provision an internal ElasticSearch service within the SRS cluster that is defined at [ElasticSearch Helm Chart](https://github.com/elastic/helm-charts/tree/master/elasticsearch).    | enabled: "true"|
 |srs.deploymentName:      | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"|
 |srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix). |
@@ -288,6 +289,7 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
     | customArtifactory.certificate: | Custom artifactory SSL certificate verification is enabled by default. If your custom artifactory domain has a self-signed SSL certificate, provide the certificate. You can disable SSL certificate verification by setting `customArtifactory.enableSSLVerification` to `false`;however, this setting establishes an insecure connection. | <ul><li> certificate: "\<custom artifactory SSL certificate to be verified\>"</li></ul> |
     | docker.registry.url: username: password: | Map the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). | <ul><li>url: “https://index.docker.io/v1/” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul> |
     | docker.registry.url: username: password: | Include the URL of your Docker registry along with the registry “username” and “password” credentials. | <ul><li>url: “\<URL of your registry>” </li><li>username: "\<Registry account username\>"</li><li> password: "\<Registry account password\>"</li></ul> |
+    | docker.imagePullSecretNames | Specify the Docker registry secrets to pull an image from a private Docker repository. Refer to [Kubernetes Secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create Docker registry secrets. | imagePullSecretNames: ["secret1", "secret2"] |
     | docker.pega.image:       | Specify the Pega-provided `Pega` image you downloaded and pushed to your Docker registry.  | Image: "<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
     | tier.name: ”web” tier.ingress.domain:| Set a host name for the pega-web service of the DNS zone. | <ul><li>domain: "\<the host name for your web service tier\>" </li><li>Assign this host name with an external IP address and log into Pega Platform with this host name in the URL. Your web tier host name must comply with your networking standards and be available as an external IP address.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li></ul> |
     | tier.name: ”stream” (Deprecated) tier.ingress.domain: | The "Stream tier" is deprecated, please enable externalized Kafka service configuration under External Services.Set the host name for the pega-stream service of the DNS zone.   | <ul><li>domain: "\<the host name for your stream service tier\>" </li><li>Your stream tier host name should comply with your networking standards.</li><li>tier.ingress.tls: set to `true` to support HTTPS in the ingress and pass the SSL certificate in the cluster using a secret. For details, see step 12 in the section, **Deploying Pega Platform using the command line**.</li><li>To remove the exposure of a stream from external network traffic, delete the `service` and `ingress` blocks in the tier.</li></ul> |
@@ -295,8 +297,8 @@ Configure the following parameters so the pega.yaml Helm chart matches your depl
     | installer.image:  | Specify the Docker `installer` image for installing Pega Platform that you pushed to your Docker registry. |Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
     | installer. adminPassword:                | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@". | adminPassword: "\<initial password\>"  |
     | hazelcast: | For Pega Platform 8.6 and later, Pega recommends using Hazelcast in client-server model. Embedded deployment would not be supported in future platform releases. | |
-    | hazelcast.image:        | Specify the Pega-provided `clustering-service` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
-    | hazelcast.enabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Either to enable Hazelcast in client-server model and configure the number of replicas and username & passowrd for authentication | <ul><li>enabled: true/false <br/> Set to true if you want to deploy pega platform in client-server Hazelcast model, otherwise false. *Note: Set this value as false for Pega platform versions below 8.6, if not set the installation will fail.* </li><li>replicas: <No. of initial server members to join(3 or more based on deployment)> </li><li>username: "\<UserName for authentication\>" </li><li> password: "\<Password for authentication\>" </li></ul> |
+   | hazelcast.image: hazelcast.clusteringServiceImage:       | Specify the Pega-provided clustering-service Docker image that you downloaded and pushed to your Docker registry. | Image: "/my-pega-installer:" |
+   | hazelcast.enabled: hazelcast.clusteringServiceEnabled: hazelcast.replicas: hazelcast.username: hazelcast.password: | Enable the use of Hazelcast in client-server model for the version of Pega Platform, configure the number of replicas and set a username and password for authentication. | <ul><li>enabled: true/false <br/> Setting above to true will deploy Pega Platform using a client-server Hazelcast model for version 8.6 through 8.7.x. Note: Make sure to set this value as "false" if your Pega Platform version is earlier than "8.6"; if not set, the installation will fail. </li><li>clusteringServiceEnabled: true/false <br/> Setting above to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later. </li><li>replicas: <Enter a number of members to join the Hazelcast cluster (use 3 or more based on the size of the deployment).> </li><li>username: "<UserName for authentication>" </li><li> password: "<Password for authentication>" </li></ul> |
     | stream.enabled: stream.bootstrapServer: stream.securityProtocol: stream.trustStore: stream.trustStorePassword: stream.keyStore: stream.keyStorePassword: stream.saslMechanism: stream.jaasConfig: stream.streamNamePattern: stream.replicationFactor: stream.external_secret_name:| Enable an externalized kafka configuration to connect to your existing stream service, by configuring these required settings | <ul><li>enabled: true/false <br/> Set to true if you want to deploy Pega Platform to use an externalized Kafka configuration, otherwise leave set to false. Note: Pega recommends enabling an externalized Kafka configuration and has deprecated using a stream tier configuration starting at version 8.7.</li><li>bootstrapServer: Provide your existing Kafka broker URLs separated by commas.</li><li>securityProtocol: Provide the required security protocol that your deployment will use to communicate with your existing brokers. Valid values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.</li><li> trustStore: When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate, in the global.certificatesSecrets parameter. Pega deployments only support trustStores using the Java Key Store (.jks) format.</li><li> trustStorePassword: If required, provide keyStore value in plain text.</li><li> keyStore: When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate, in the global.certificatesSecrets parameter. Pega deployments only support keyStores using the Java Key Store (.jks) format.<li> keyStorePassword: If required, provide keyStore value in plain text.</li><li> jaasConfig: If required, provide jaasConfig value in plain text.</li><li> saslMechanism: If required, provide SASL Mechanism. Supported values are: PLAIN, SCRAM-SHA-256, SCRAM-SHA-512.</li> <li> streamNamePattern: By default, topics originating from Pega Platform have the "pega-" prefix, so that it is easy to distinguish them from topics created by other applications. Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.</li> <li> replicationFactor: Your replicationFactor value cannot be more than the number of Kafka brokers and 3.</li> <li> external_secret_name: To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and configure them using an External Secrets Manager, making sure that you configure the keys in the secret in the order:STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG. Enter the external secret name.</li></ul> |
 
 3. Save the file.
@@ -318,22 +320,22 @@ automatically followed by a deploy. In subsequent Helm deployments, you should n
 
     `$ cd /home/<local filepath>/TKGI-demo`
 
-2. To use the pks CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
+2. To use the TKGI CLI to log into your account using the Cloud Foundry API and login credentials and skip SSL validation, enter:
 
-    `$ pks login -a <API> -u <USERNAME> -p <PASSWORD> -k`
+    `$ tkgi login -a <API> -u <USERNAME> -p <PASSWORD> -k`
 
 If you need to validate with SSL, replace the -k with --ca-cert \<PATH TO CERT\>.
 
 3. To view the status of all of your TKGI clusters and verify the name of the cluster for the Pega Platform deployment, enter:
 
-    `$ pks clusters`
+    `$ tkgi clusters`
 
 Your cluster name is displayed in the **Name** field.
 
-4. To use the pks CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
+4. To use the TKGI CLI to download the cluster Kubeconfig access credential file, which is specific to your cluster, into your \<local filepath\>/.kube directory, enter:
 
 ```yaml
-    $ pks get-credentials <cluster-name>
+    $ tkgi get-credentials <cluster-name>
     Fetching credentials for cluster pega-platform.
     Context set for cluster pega-platform.
 ```
@@ -363,7 +365,7 @@ If you need to use a Bearer Token Access Credentials instead of this credential 
 
 - To use a cluster a Kubeconfig token: select **Token** and paste your Kubeconfig token into the **Enter token** area. Click **SIGN IN**.
 
-    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your PKS cluster name or your resource name, which is expected behavior.
+    You can now view your deployment details using the Kubernetes dashboard. After you install Pega software, you can use this dashboard to review the status of all of the related Kubernetes objects used in your deployment; without a deployment, only Kubernetes cluster objects display. The dashboard does not display your TKGI cluster name or your resource name, which is expected behavior.
 
     To continue using the Kubernetes dashboard to see the progress of your deployment, keep this PowerShell or Linux shell open.
 

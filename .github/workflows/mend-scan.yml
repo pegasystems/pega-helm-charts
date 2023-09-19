@@ -1,0 +1,54 @@
+# Reference: https://github.com/mend-toolkit/mend-examples/blob/main/Unified%20Agent/CI-CD/GitHub.yml
+
+name: Mend Unified Agent Release Scan
+on: 
+  workflow_dispatch:
+  push:
+   branches:
+   - 'master'
+jobs:
+  mendscan:
+    env:
+      WS_APIKEY: ${{secrets.MEND_APIKEY}}
+      WS_USERKEY: ${{secrets.MEND_USERKEY}}
+      WS_WSS_URL: ${{secrets.MEND_WS_WSS_URL}}
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v2
+      with:
+        java-version: '11'
+        distribution: 'adopt'
+    # - name: Build with Gradle
+    #   run: ./gradlew -Prelease.useLastTag=false clean build
+    - name: Mend Unified Agent Scan
+      env:
+        WS_PRODUCTNAME: ${{vars.MEND_PRODUCT_NAME}}
+        WS_PROJECTNAME: ${{github.event.repository.name}}_${{github.ref_name}}
+        WS_GENERATEPROJECTDETAILSJSON: true
+        WS_GRADLE_ADDITIONALARGUMENTS: -Prelease.useLastTag=false
+      run: |
+        echo Downloading Mend Unified Agent
+        curl -LJO https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar
+        if [[ "$(curl -sL https://unified-agent.s3.amazonaws.com/wss-unified-agent.jar.sha256)" != "$(sha256sum wss-unified-agent.jar)" ]] ; then
+          echo "Integrity Check Failed"
+        else
+          echo "Integrity Check Passed"
+          echo Starting Unified Agent Scan
+          java -jar wss-unified-agent.jar
+        fi
+    - name: 'Upload WhiteSource folder'
+      uses: actions/upload-artifact@v2
+      with:
+        name: Mend
+        path: whitesource
+        retention-days: 14
+    - name: 'Upload Mend folder if failure'
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: Mend
+        path: whitesource
+        retention-days: 14

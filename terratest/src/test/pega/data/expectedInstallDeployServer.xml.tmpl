@@ -72,7 +72,8 @@
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
                connectionTimeout="20000"
-               maxHeaderCount="100" />
+               maxHeaderCount="100"
+               maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_MAXTHREADS 200 }}" />
 
     <!-- facilitates liveness check via separate port -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
@@ -85,12 +86,13 @@
 
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                        scheme="https" secure="true" SSLEnabled="true"
-                        relaxedQueryChars="[ ]"
+                       relaxedQueryChars="[ ]"
                        relaxedPathChars="[ ]"
                        maxHttpHeaderSize="16384"
                        maxSavePostSize="65536"
                        connectionTimeout="20000"
-                       maxHeaderCount="100" >
+                       maxHeaderCount="100"
+                       maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8443_MAXTHREADS 200 }}" >
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
                            {{ if ( and (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
@@ -212,9 +214,12 @@
                resolveHosts="false" />
 
         <Valve className="org.apache.catalina.valves.ErrorReportValve"
-               showReport="false"
+               errorCode.404="webapps/ROOT/error404.html"
+               errorCode.405="webapps/ROOT/error405.html"
+               errorCode.400="webapps/ROOT/error400.html"
+               errorCode.403="webapps/ROOT/error403.html"
+               showReport="true"
                showServerInfo="false" />
-
       </Host>
     </Engine>
   </Service>

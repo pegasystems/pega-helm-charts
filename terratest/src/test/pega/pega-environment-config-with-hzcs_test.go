@@ -29,6 +29,7 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"hazelcast.enabled": "true",
+					"hazelcast.migration.embeddedToCSMigration": "false",
 				},
 			}
 
@@ -38,6 +39,49 @@ func TestPegaHazelcastEnvironmentConfigForClient(t *testing.T){
 		}
 	}
 
+    for _,vendor := range supportedVendors{
+
+        for _,operation := range supportedOperations{
+
+            fmt.Println(vendor + "-" + operation)
+
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.provider":        vendor,
+                    "global.actions.execute": operation,
+                    "hazelcast.enabled": "false",
+                    "hazelcast.clusteringServiceEnabled": "true",
+                    "hazelcast.migration.embeddedToCSMigration": "false",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+            VerifyClusteringServiceEnvironmentConfigForClient(t,yamlContent, options)
+
+        }
+    }
+
+    for _,vendor := range supportedVendors{
+
+        for _,operation := range supportedOperations{
+
+            fmt.Println(vendor + "-" + operation)
+
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.provider":        vendor,
+                    "global.actions.execute": operation,
+                    "hazelcast.enabled": "false",
+                    "hazelcast.clusteringServiceEnabled": "true",
+                    "hazelcast.migration.embeddedToCSMigration": "false",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+            VerifyClusteringServiceEnvironmentConfigForClient(t,yamlContent, options)
+
+        }
+    }
 
 }
 
@@ -53,6 +97,22 @@ func VerifyPegaHazelcastEnvironmentConfigForClient(t *testing.T, yamlContent str
 			require.Equal(t, envConfigData["HZ_CLIENT_MODE"], "true")
 			require.Equal(t, envConfigData["HZ_CLUSTER_NAME"], "PRPC")
 			require.Equal(t, envConfigData["HZ_SERVER_HOSTNAME"], "pega-hazelcast-service.default.svc.cluster.local")
+		}
+	}
+}
+
+func VerifyClusteringServiceEnvironmentConfigForClient(t *testing.T, yamlContent string, options *helm.Options) {
+
+	var envConfigMap k8score.ConfigMap
+	statefulSlice := strings.Split(yamlContent, "---")
+	for index, statefulInfo := range statefulSlice {
+		if index >= 1 {
+			UnmarshalK8SYaml(t, statefulInfo, &envConfigMap)
+			envConfigData := envConfigMap.Data
+			require.Equal(t, envConfigData["HZ_DISCOVERY_K8S"], "true")
+			require.Equal(t, envConfigData["HZ_CLIENT_MODE"], "true")
+			require.Equal(t, envConfigData["HZ_CLUSTER_NAME"], "prpchz")
+			require.Equal(t, envConfigData["HZ_SERVER_HOSTNAME"], "clusteringservice-service.default.svc.cluster.local")
 		}
 	}
 }

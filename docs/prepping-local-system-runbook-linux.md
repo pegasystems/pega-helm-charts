@@ -122,29 +122,30 @@ This command downloads and parses the \`stable.txt\` in the repository, navigate
 
 For details about installing on Linux and other supported installation methods, see [Install kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-on-linux).
 
-### For TKGI only: installing the PKS CLI
+### For TKGI only: installing the TKGI CLI
 
-Install the PKS CLI binary file from the VMware Enterprise PKS support site as an executable that you will run as a super user with a single command with the command curl piped into your bash:
+Install the TKGI CLI binary file from the VMware Enterprise PKS support site as an executable that you will run as a super user with a single command with the command curl piped into your bash:
 
-1. Use the browser of your choice to navigate to [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html) and log in.
+1. Navigate to [VMware Tanzu Network](https://network.pivotal.io/) and log in. 
 
-2. Select release version 1.7 or later from the Releases dropdown.
+2. Click **Tanzu Kubernetes Grid Integrated Edition.**  
 
-3. Click **PKS CLI - Linux** to display the **Release Download Files**.
+3. Select your desired release version from the **Releases dropdown.**  
 
-4. Click **PKS CLI - Linux** and in the **Save as** window, choose the `<local filepath>/TKGI-demo` folder to which you save the downloaded Linux binary file.
+4. Click **TKGI CLI.**  
 
-5. Rename the downloaded binary file to "pks".
+5. Click **TKGI CLI - Linux** to download the Linux binary.  
 
-6. On the command line, to make the PKS CLI binary executable, enter:
+6. Rename the downloaded binary file to `tkgi`.  
 
-    `$ chmod +x pks`
+7. On the command line, run the following command to make the TKGI CLI binary executable: `$ chmod +x tkgi`  
 
-7. To move the binary file into your $PATH directory, enter:
+8. Move the binary file into your `PATH`.  
 
-    `$ sudo mv ./pks /bin`
+9. Run `tkgi –version` to verify the version of your TKGI CLI installed locally.  
 
-These instructions were mostly sourced from the [Installing the PKS CLI](https://docs.pivotal.io/pks/1-7/installing-pks-cli.html).
+
+These instructions were mostly sourced from the [Installing the TKGI CLI](https://docs.vmware.com/en/VMware-Tanzu-Kubernetes-Grid-Integrated-Edition/1.14/tkgi/GUID-installing-cli.html).
 
 ### For AKS only: installing the Azure CLI
 
@@ -253,7 +254,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 5.  To verify the AWS IAM Authenticator is working, enter:
 
    ```bash
-   $ ws-iam-authenticator help
+   $ aws-iam-authenticator help
    A tool to authenticate to Kubernetes using AWS IAM credentials
 
    Usage:

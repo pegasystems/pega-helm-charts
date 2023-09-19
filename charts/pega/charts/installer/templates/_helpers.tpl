@@ -14,6 +14,7 @@
 {{- define "pegaDBOOPRulesUpgrade" -}}pega-db-ooprules-upgrade{{- end -}}
 {{- define "pegaDBOOPDataUpgrade" -}}pega-db-oopdata-upgrade{{- end -}}
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
+{{- define "pegaDBOOPUpgrade" -}}pega-db-oop-upgrade{{- end -}}
 {{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
@@ -28,6 +29,16 @@
       {{ .Values.global.utilityImages.k8s_wait_for.waitTimeSeconds }}
     {{- else -}}
       2
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- define "k8sWaitForMaxRetries" -}}
+  {{- if (.Values.global.utilityImages.k8s_wait_for) -}}
+    {{- if (.Values.global.utilityImages.k8s_wait_for.maxRetries) -}}
+      {{ .Values.global.utilityImages.k8s_wait_for.maxRetries }}
+    {{- else -}}
+      1
     {{- end -}}
   {{- end -}}
 {{- end -}}
@@ -58,14 +69,33 @@
   {{- end -}}
 {{- end }}
 
+{{- define "performInstallAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+{{- define "performUpgradeAndDeployment" }}
+  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
 {{- define "waitForPegaDBInstall" -}}
 - name: wait-for-pegainstall
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBInstall" }}']
-  env:  
+  env:
     - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+      value: "{{ template "k8sWaitForWaitTime" $ }}"
+    - name: MAX_RETRIES
+      value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPegaDBZDTUpgrade" -}}
@@ -73,10 +103,13 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaDBZDTUpgrade" }}']
-  env:  
-    - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+  env:
 {{- include "initContainerEnvs" $ }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForPreDBUpgrade" -}}
@@ -84,9 +117,12 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   args: [ 'job', '{{ template "pegaPreDBUpgrade" }}']
-  env:  
-    - name: WAIT_TIME
-      value: "{{ template "k8sWaitForWaitTime" }}"
+  env:
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForRollingUpdates" -}}
@@ -115,13 +151,18 @@
   image: {{ .Values.global.utilityImages.k8s_wait_for.image }}
   imagePullPolicy: {{ .Values.global.utilityImages.k8s_wait_for.imagePullPolicy }}
   command: ['sh', '-c',  '{{ $rolloutCommand }}' ]
+  env:
 {{- include "initContainerEnvs" $ }}
+  - name: WAIT_TIME
+    value: "{{ template "k8sWaitForWaitTime" $ }}"
+  - name: MAX_RETRIES
+    value: "{{ template "k8sWaitForMaxRetries" $ }}"
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "initContainerEnvs" -}}
 {{- if or (eq .Values.global.provider "aks") (eq .Values.global.provider "pks") -}}
 {{ $apiserver := index .Values.global.upgrade "kube-apiserver" }}
-  env:
   - name: KUBERNETES_SERVICE_HOST
     value: {{ $apiserver.serviceHost | quote }}
   - name: KUBERNETES_SERVICE_PORT_HTTPS
@@ -137,6 +178,19 @@
 {{ end }}
 {{- end -}}
 
+{{- define "resolvedDataSchema" -}}
+  {{- if .Values.global.jdbc.dataSchema -}}
+    {{ .Values.global.jdbc.dataSchema }}
+  {{- else -}}
+    {{ .Values.global.jdbc.rulesSchema }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "commonDb2Defaults" -}}
+currentSchema={{ include "resolvedDataSchema" . | upper }}
+currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
+{{- end -}}
+
 {{- define "createJobsReaderRole" -}}
   {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") -}}
     true
@@ -144,3 +198,55 @@
     false
   {{- end -}}
 {{- end -}}
+
+# Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedInstallerPodLabels" }}
+{{- end }}
+
+
+# Compose REST Service URL for pre- and post- upgrade ZDT tasks
+{{- define "pegaRestURL" }}
+{{- $depName := "pega" }}
+{{- if (.Values.global.deployment) }}
+{{- if (.Values.global.deployment.name) }}
+{{- $depName = .Values.global.deployment.name }}
+{{- end }}
+{{- end }}
+{{- $webTier := "web" }}
+{{- $webTierServiceName := "" }}
+{{- $port := "80" }}
+{{- $protocol := "http" }}
+{{- $webAppContextPath := "prweb" }}
+{{- range $index, $tier := .Values.global.tier }}
+  {{- if hasKey $tier "nodeType" }}
+    {{- if and (contains $tier.nodeType "WebUser") (hasKey $tier "service") }}
+    {{- $webTier = $tier.name }}
+    {{- if eq "" $webTierServiceName }}
+      {{- $webTierServiceName = printf "%s-%s" $depName $webTier }}
+      {{- if $tier.service }}
+        {{- if hasKey $tier.service "httpEnabled" }}
+          {{- if eq false $tier.service.httpEnabled }}
+            {{- $protocol = "https" }}
+            {{- $port = "443" }}
+            {{- if $tier.service.tls }}{{- if $tier.service.tls.port }}
+              {{- $port = $tier.service.tls.port }}
+            {{- end }}{{- end }}
+          {{- else }}
+            {{- if and $tier.service $tier.service.port }}
+              {{- $port = $tier.service.port }}
+            {{- end }}
+          {{- end }}
+        {{- end }}
+      {{- end }}
+      {{- if $tier.ingress }}{{- if hasKey $tier.ingress "appContextPath" }}
+        {{- $webAppContextPath = trimAll "/" $tier.ingress.appContextPath }}
+      {{- end }}{{- end }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+{{- end }}
+{{- if eq "" $webTierServiceName }}
+  {{- $webTierServiceName = printf "%s-web" $depName }}
+{{- end }}
+{{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/{{- $webAppContextPath -}}/PRRestService
+{{- end }}

@@ -16,7 +16,8 @@ spec:
       labels:
         app: {{ template "hazelcastName" . }}
         component: "Hazelcast"
-        ops.identifier: "hazelcast" 
+        ops.identifier: "hazelcast"
+{{- include "generatedHazelcastServicePodLabels" . | indent 8 }}
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
@@ -30,7 +31,7 @@ spec:
         volumeMounts:
         - name: logs
           mountPath: "/opt/hazelcast/logs"
-        - name: {{ template "pegaVolumeCredentials" }}
+        - name: {{ template "hazelcastVolumeCredentials" }}
           mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
@@ -64,8 +65,8 @@ spec:
       # Volume used to mount logs folder
       - name: logs
         emptyDir: {}
-      # Volume used to mount secret files.
-      {{- include "pegaCredentialVolumeTemplate" . | indent 6 }}
+      # Volume used to mount  secrets
+      {{- include "hazelcastVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" $ }}
+{{- include "imagePullSecrets" . | indent 6 }}
 {{ end }}

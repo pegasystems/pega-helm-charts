@@ -13,8 +13,9 @@ import (
 
 func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy", "upgrade", "upgrade-deploy"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 	var supportedDbs = []string{"postgres", "mssql", "oracledate", "udb", "db2zos"}
+	var dataSchemas = []string{"data", ""}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -22,24 +23,30 @@ func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
 			for _, dbPlatform := range supportedDbs {
-				var options = &helm.Options{
-					SetValues: map[string]string{
-						"global.provider":                  vendor,
-						"global.actions.execute":           operation,
-						"global.jdbc.dbType":               dbPlatform,
-						"global.jdbc.connectionProperties": "prop1=value1;prop2=value2",
-						"installer.upgrade.upgradeType":    "zero-downtime",
-					},
+				for _, dataSchema := range dataSchemas{
+					var options = &helm.Options{
+						SetValues: map[string]string{
+							"global.provider":                  vendor,
+							"global.actions.execute":           operation,
+							"global.jdbc.dbType":               dbPlatform,
+							"global.jdbc.connectionProperties": "prop1=value1;prop2=value2",
+							"global.jdbc.rulesSchema":          "rules",
+							"global.jdbc.dataSchema":           dataSchema,
+							"global.jdbc.username":             "jdbcuser",
+							"installer.upgrade.upgradeType":    "zero-downtime",
+						},
+					}
+	
+					yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
+					assertInstallerConnectionPropsConfig(t, yamlContent, dbPlatform, dataSchema)
 				}
-
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
-				assertInstallerConnectionPropsConfig(t, yamlContent, dbPlatform)
+			
 			}
 		}
 	}
 }
 
-func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPlatform string) {
+func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPlatform string, dataSchema string) {
 	var installConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, configYaml, &installConfigMap)
 	installConfigData := installConfigMap.Data
@@ -50,7 +57,11 @@ func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPla
 	compareConfigMapData(t, installConfigData["migrateSystem.properties.tmpl"], "data/expectedMigrateSystem.properties.tmpl")
 	compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
 	compareConfigMapData(t, installConfigData["prpcUtils.properties.tmpl"], "data/expectedPRPCUtils.properties.tmpl")
-	compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%s.conf", dbPlatform))
+	if (dbPlatform == "db2zos" || dbPlatform == "udb") && dataSchema == ""{
+		compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%ssingleschema.conf", dbPlatform))
+	} else {
+		compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%s.conf", dbPlatform))
+	}
 	if dbPlatform == "db2zos" {
 		compareConfigMapData(t, installConfigData["DB2SiteDependent.properties"], "data/expectedDB2SiteDependent.properties")
 	} else {

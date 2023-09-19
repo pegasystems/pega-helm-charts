@@ -173,6 +173,8 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "pegasystems/pega", pod.Containers[0].Image)
 	require.Equal(t, "pega-web-port", pod.Containers[0].Ports[0].Name)
 	require.Equal(t, int32(8080), pod.Containers[0].Ports[0].ContainerPort)
+	require.Equal(t, "pega-tls-port", pod.Containers[0].Ports[1].Name)
+	require.Equal(t, int32(8443), pod.Containers[0].Ports[1].ContainerPort)
 	var envIndex int32 = 0
 	require.Equal(t, "NODE_TYPE", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)

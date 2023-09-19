@@ -1,4 +1,3 @@
-
 {{- define "pegaEnvironmentConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-environment-config
@@ -7,6 +6,11 @@
 {{- define "pegaImportCertificatesSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-import-certificates-secret
+{{- end }}
+
+{{- define "pegaImportKerberosConfigMap" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-import-kerberos-configmap
 {{- end }}
 
 {{- define "pegaVolumeImportCertificates" }}pega-volume-import-certificates{{- end }}
@@ -44,17 +48,6 @@
     defaultMode: 420
 {{- end}}
 
-{{- define "customArtifactorySSLVerificationEnabled" }}
-{{- if (.Values.global.customArtifactory) }}
-{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
-{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
-true
-{{- else -}}
-false
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
 
 {{- define "pegaTomcatKeystoreSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" .root) -}}
@@ -78,44 +71,16 @@ false
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
 
-{{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
+{{- define "pegaKerberosConfig" }}pega-import-kerberos{{- end }}
 
-{{- define "pegaCredentialsSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-credentials-secret
-{{- end }}
-
-{{- define "pegaRegistrySecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-registry-secret
-{{- end }}
 
 
 {{- define "deployConfig" -}}deploy-config{{- end -}}
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
-{{- define "imagePullSecret" }}
-{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
-{{- end }}
 
 {{- define "performOnlyDeployment" }}
   {{- if (eq .Values.global.actions.execute "deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performDeployment" }}
-  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performInstallAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
     true
   {{- else -}}
     false
@@ -134,6 +99,12 @@ false
       {{- end -}}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "useApiKeyForCustomArtifactory" }}
@@ -157,12 +128,21 @@ false
      secretName: {{ .node.ingress.tls.secretName }}
 {{- end }}
 
-{{- define "performUpgradeAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
+{{- define "hostPathType" }}
+ {{- if .node.ingress.pathType -}}
+   {{ .node.ingress.pathType }}
+ {{- else -}}
+   ImplementationSpecific
+ {{- end }}
+{{- end }}
+
+{{- define "defaultIngressRule" }}
+- pathType: {{ include "hostPathType" $ }}
+  {{- if .node.ingress.path }}
+  path: {{ .node.ingress.path }}
+  {{- end }}
+  backend:
+    {{ include "ingressBackend" $ }}
 {{- end }}
 
 {{- define "customerDeploymentID" -}}
@@ -214,6 +194,7 @@ false
   imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -225,6 +206,7 @@ false
   # -p is password
   # final 2 args for cqlsh are cassandra host and port respectively
   command: ['sh', '-c', '{{- template "waitForCassandraScript" dict "nodes" (include "getCassandraSubchartService" .) "node" .Values.dds -}}']
+{{- include "initContainerResources" $ }}
  {{- end -}}
 {{- end }}
 
@@ -355,34 +337,19 @@ true
 {{- define "generatedPodAnnotations" }}
 {{- end }}
 
-#Override this template in a subchart if your secret values are provided by seperate secrets
-{{- define "pegaCredentialVolumeTemplate" }}
-- name: {{ template "pegaVolumeCredentials" }}
-  projected:
+#Override this template to generate additional pod labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedPodLabels" }}
+{{- end }}
+
+#Kerberos config map
+{{- define "pegaKerberosVolumeTemplate" }}
+# Volume used to mount config files.
+- name: {{ template "pegaKerberosConfig" }}-config
+  configMap:
+    # This name will be referred in the volume mounts kind.
+    name: {{ template "pegaImportKerberosConfigMap" $ }}
+    # Used to specify permissions on files within the volume.
     defaultMode: 420
-    sources:
-    - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if ((.Values.global.jdbc).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.jdbc.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.hazelcast).external_secret_name)}}
-    - secret:
-        name: {{ .Values.hazelcast.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.dds).external_secret_name)}}
-    - secret:
-        name: {{ .Values.dds.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.stream).external_secret_name)}}
-    - secret:
-        name: {{ .Values.stream.external_secret_name }}
-  {{- end }}
 {{- end}}
 
 {{- define "generatedDNSConfigAnnotations" }}
@@ -393,14 +360,21 @@ dnsConfig:
 {{- end }}
 {{- end }}
 
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
-
-
 {{- define "pegaSearchURL" -}}
 {{- $d1 := dict "overrideURL" $.Values.pegasearch.externalURL }}
 {{- $d2 := merge $ $d1 }}
 {{- template "searchURL" $d2 }}
 {{- end -}}
+
+{{- define "srsAuthPrivateKey" -}}
+{{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
+    {{- if (.Values.pegasearch.srsAuth).privateKey }}
+        {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
+    {{- else }}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
+    {{- end }}
+{{- end }}
+{{- end }}
 
 {{- define "ingressApiVersion" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
@@ -480,4 +454,36 @@ servicePort: use-annotation
 {{- else -}}
 {{- add .failureThreshold 1 -}}
 {{- end -}}
+{{- end -}}
+
+{{- define "hzServiceName" -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ template "clusteringServiceName" }}
+  {{- else -}}
+    {{ template "hazelcastName" }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "hzClusterName" -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ .Values.hazelcast.server.clustering_service_group_name }}
+  {{- else -}}
+    {{ .Values.hazelcast.client.clusterName }}
+  {{- end -}}
+{{- end -}}
+
+{{- define "hazelcastCSConfigRequired" }}
+  {{- if and (or (.Values.hazelcast.enabled) (.Values.hazelcast.clusteringServiceEnabled)) (not (.Values.hazelcast.migration.embeddedToCSMigration)) -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "hazelcastVersion" }}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    v5
+  {{- else -}}
+    v4
+  {{- end -}}
 {{- end -}}

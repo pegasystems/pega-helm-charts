@@ -1,0 +1,13 @@
+global:
+  actions:
+    execute: 'upgrade-deploy'
+
+srsStorage:
+  requireInternetAccess: false
+  tls:
+    enabled: false
+  basicAuthentication:
+    enabled: true
+  esCredentials:
+    username: user
+    password: pass

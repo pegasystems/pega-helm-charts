@@ -36,6 +36,13 @@ data:
 {{- if .Values.upgrade.upgradeSteps }}
   UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
 {{- end }}
+  PEGA_REST_SERVER_URL: {{ include "pegaRestURL" $ | quote }}
+{{- if .Values.upgrade.pegaRESTUsername }}
+  PEGA_REST_USERNAME: {{ .Values.upgrade.pegaRESTUsername }}
+{{- end }}
+{{- if .Values.upgrade.pegaRESTPassword }}
+  PEGA_REST_PASSWORD: {{ .Values.upgrade.pegaRESTPassword }}
+{{- end }}
   # Whether this is a Multitenant System ('true' if yes, 'false' if no)
 {{- if .Values.multitenant_system }}
   MT_SYSTEM: {{ .Values.multitenant_system | quote}}

@@ -27,6 +27,12 @@ spec:
   backoffLimit: 0
   template:
     metadata:
+      labels:
+        installer-job: {{ .name }}
+        {{- if .root.Values.podLabels }}
+{{ toYaml .root.Values.podLabels | indent 8 }}
+        {{- end -}}
+{{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
@@ -77,6 +83,10 @@ spec:
 {{- end }}
         ports:
         - containerPort: 8080
+{{- if .root.Values.securityContext }}
+        securityContext:
+{{ toYaml .root.Values.securityContext | indent 10 }}
+{{- end }}
         resources:
           # CPU and Memory that the containers for {{ .name }} request
           requests:
@@ -110,6 +120,23 @@ spec:
         env:
         -  name: ACTION
            value: {{ .action }}
+{{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
+        -  name: HZ_VERSION
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_VERSION
+        -  name: HZ_CLUSTER_NAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_CLUSTER_NAME
+        -  name: HZ_SERVER_HOSTNAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_SERVER_HOSTNAME
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
@@ -124,6 +151,6 @@ spec:
 {{- end }}                
       restartPolicy: Never
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" .root }}
+{{- include "imagePullSecrets" .root | indent 6 }}
 ---
 {{- end -}}
