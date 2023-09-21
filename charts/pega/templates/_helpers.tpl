@@ -194,6 +194,7 @@
   imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -205,6 +206,7 @@
   # -p is password
   # final 2 args for cqlsh are cassandra host and port respectively
   command: ['sh', '-c', '{{- template "waitForCassandraScript" dict "nodes" (include "getCassandraSubchartService" .) "node" .Values.dds -}}']
+{{- include "initContainerResources" $ }}
  {{- end -}}
 {{- end }}
 
