@@ -26,9 +26,9 @@ spec:
     # Edge-terminated routes can specify an insecureEdgeTerminationPolicy that enables traffic on insecure schemes (HTTP) to be disabled, allowed or redirected.  (None/Allow/Redirect/EMPTY_VALUE)
     insecureEdgeTerminationPolicy: Redirect
 {{- if ((.node.ingress).tls).enabled }}
-    certificate: {{ .node.ingress.tls.certificate }}
-    key: {{ .node.ingress.tls.key }}
-    caCertificate: {{ .node.ingress.tls.cacertificate }}
+    certificate: {{ .node.ingress.tls.certificate | toYaml | indent 4 }}
+    key: {{ .node.ingress.tls.key | toYaml | indent 4 }}
+    caCertificate: {{ .node.ingress.tls.cacertificate | toYaml | indent 4 }}
 {{- end }} 
 {{- if ((.node.service).tls).enabled }}
     termination: reencrypt

@@ -57,8 +57,8 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 
 	var containerPort int32 = 8080
 
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-volume-credentials")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-credentials-secret"))
+	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
+	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
 	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
 
@@ -74,7 +74,7 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
 	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-volume-installer")
 	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-volume-credentials")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-credentials-volume")
 	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
 

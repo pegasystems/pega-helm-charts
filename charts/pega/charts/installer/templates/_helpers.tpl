@@ -251,3 +251,5 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end }}
 {{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/{{- $webAppContextPath -}}/PRRestService
 {{- end }}
+
+{{- define "pegaInstallerCredentialsVolume" }}pega-installer-credentials-volume{{- end }}

@@ -29,6 +29,9 @@ spec:
     metadata:
       labels:
         installer-job: {{ .name }}
+        {{- if .root.Values.podLabels }}
+{{ toYaml .root.Values.podLabels | indent 8 }}
+        {{- end -}}
 {{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}
@@ -53,7 +56,18 @@ spec:
 {{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
 {{ toYaml .root.Values.custom.volumes | indent 6 }}
 {{- end }}{{- end }}
-{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+      - name: {{ template "pegaInstallerCredentialsVolume" }}
+        projected:
+          defaultMode: 420
+          sources:
+          {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
+          {{ include "secretResolver" $d | indent 10}}
+
+          # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
+          {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
+          - secret:
+              name: {{ include  "pega-hz-secret-name" .root}}
+          {{- end }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
@@ -105,7 +119,7 @@ spec:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeInstall" }}
           mountPath: "/opt/pega/config"
-        - name: {{ template "pegaVolumeCredentials" }}
+        - name: {{ template "pegaInstallerCredentialsVolume" }}
           mountPath: "/opt/pega/secrets"
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
         - name: {{ template "pegaDistributionKitVolume" }}

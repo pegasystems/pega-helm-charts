@@ -38,63 +38,62 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 	}
 }
 
-
-func TestPegaEnvironmentConfigJDBCTimeouts(t * testing.T) {
+func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-    var options = &helm.Options{
-        SetValues: map[string]string{
-            "global.provider":               "k8s",
-            "global.actions.execute":        "deploy",
-        },
-    }
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":        "k8s",
+			"global.actions.execute": "deploy",
+		},
+	}
 
-    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
-    options.SetValues["global.jdbc.connectionTimeoutProperties"] = "socketTimeout=90;"
-    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	options.SetValues["global.jdbc.connectionTimeoutProperties"] = "socketTimeout=90;"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
-    options.SetValues["global.jdbc.writerConnectionTimeoutProperties"] = "socketTimeout=120;"
-    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	options.SetValues["global.jdbc.writerConnectionTimeoutProperties"] = "socketTimeout=120;"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "")
 
-    options.SetValues["global.jdbc.readerConnectionTimeoutProperties"] = "socketTimeout=150;"
-    yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	options.SetValues["global.jdbc.readerConnectionTimeoutProperties"] = "socketTimeout=150;"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
-    VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
+	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
 }
 
 func VerifyEnvNotPresent(t *testing.T, yamlContent string, entry string) {
-    var envConfigMap k8score.ConfigMap
-    UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
-    envConfigData := envConfigMap.Data
+	var envConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+	envConfigData := envConfigMap.Data
 
-    _, previouslySet := envConfigData[entry]
-    require.Equal(t, false, previouslySet)
+	_, previouslySet := envConfigData[entry]
+	require.Equal(t, false, previouslySet)
 }
 
 func VerifyEnvValue(t *testing.T, yamlContent string, entry string, value string) {
-    var envConfigMap k8score.ConfigMap
-    UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
-    envConfigData := envConfigMap.Data
+	var envConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+	envConfigData := envConfigMap.Data
 
-    val, previouslySet := envConfigData[entry]
-    require.Equal(t, true, previouslySet)
-    require.Equal(t, value, val)
+	val, previouslySet := envConfigData[entry]
+	require.Equal(t, true, previouslySet)
+	require.Equal(t, value, val)
 }
 
 func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
@@ -126,7 +125,12 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY"], "false")
 	require.Equal(t, envConfigData["CASSANDRA_LATENCY_AWARE_POLICY"], "false")
 	require.Equal(t, envConfigData["CASSANDRA_CUSTOM_RETRY_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_CUSTOM_RETRY_POLICY_COUNT"], "1")
 	require.Equal(t, envConfigData["CASSANDRA_SPECULATIVE_EXECUTION_POLICY"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED"], "false")
+	require.Equal(t, envConfigData["CASSANDRA_SPECULATIVE_EXECUTION_DELAY"], "100")
+	require.Equal(t, envConfigData["CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS"], "2")
 	require.Equal(t, envConfigData["CASSANDRA_JMX_METRICS_ENABLED"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_CSV_METRICS_ENABLED"], "false")
 	require.Equal(t, envConfigData["CASSANDRA_LOG_METRICS_ENABLED"], "false")
