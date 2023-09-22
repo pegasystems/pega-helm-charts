@@ -86,6 +86,6 @@ bypass.load.assembled.classes={{ .Env.BYPASS_LOAD_ASSEMBLED_CLASSES }}
 # Enable adminstrator user after upgrade by default.
 upgrade.enable.admin=true
 
-custom.jvm.args={{ .Env.CUSTOM_JVM_ARGS }}
+custom.jvm.args={{ default .Env.CUSTOM_JVM_ARGS "-Xmx4g" }}
 
 {{ .Env.ADVANCED_SETTINGS }}
