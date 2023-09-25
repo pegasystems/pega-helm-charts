@@ -36,22 +36,21 @@
   projected:
     defaultMode: 420
     sources:
-    - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if ((.Values.global.jdbc).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.jdbc.external_secret_name }}
-  {{- end }}
-  {{ if (.Values.external_secret_name)}}
-    - secret:
-        name: {{ .Values.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
-  {{- end }}
+    {{- $d := dict "deploySecret" "deployHzServerSecret" "deployNonExtsecret" "deployNonExtHzServerSecret" "extSecretName" .Values.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $d | indent 4}}
 {{- end}}
 
+{{- define "deployHzServerSecret" -}}
+true
+{{- end }}
+
+{{- define "deployNonExtHzServerSecret" }}
+{{- if and (eq (include "deployHzServerSecret" .) "true") (not (.Values).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
 
 # Override this template to generate additional pod annotations that are dynamically composed during helm deployment (do not indent annotations)
 {{- define "generatedHazelcastServicePodAnnotations" }}
