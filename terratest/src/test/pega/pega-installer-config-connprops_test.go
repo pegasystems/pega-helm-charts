@@ -23,7 +23,7 @@ func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
 			for _, dbPlatform := range supportedDbs {
-				for _, dataSchema := range dataSchemas{
+				for _, dataSchema := range dataSchemas {
 					var options = &helm.Options{
 						SetValues: map[string]string{
 							"global.provider":                  vendor,
@@ -36,11 +36,11 @@ func TestPegaInstallerConnectionPropsConfig(t *testing.T) {
 							"installer.upgrade.upgradeType":    "zero-downtime",
 						},
 					}
-	
+
 					yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-config.yaml"})
 					assertInstallerConnectionPropsConfig(t, yamlContent, dbPlatform, dataSchema)
 				}
-			
+
 			}
 		}
 	}
@@ -57,7 +57,7 @@ func assertInstallerConnectionPropsConfig(t *testing.T, configYaml string, dbPla
 	compareConfigMapData(t, installConfigData["migrateSystem.properties.tmpl"], "data/expectedMigrateSystem.properties.tmpl")
 	compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
 	compareConfigMapData(t, installConfigData["prpcUtils.properties.tmpl"], "data/expectedPRPCUtils.properties.tmpl")
-	if (dbPlatform == "db2zos" || dbPlatform == "udb") && dataSchema == ""{
+	if (dbPlatform == "db2zos" || dbPlatform == "udb") && dataSchema == "" {
 		compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%ssingleschema.conf", dbPlatform))
 	} else {
 		compareConfigMapData(t, installConfigData[fmt.Sprintf("%s.conf", dbPlatform)], fmt.Sprintf("data/expected%s.conf", dbPlatform))

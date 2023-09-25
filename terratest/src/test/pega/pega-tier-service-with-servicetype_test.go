@@ -26,9 +26,9 @@ func TestPegaServiceWithServiceType(t *testing.T) {
 				var options = &helm.Options{
 					ValuesFiles: []string{"data/values_with_servicetype.yaml"},
 					SetValues: map[string]string{
-						"global.deployment.name":        depName,
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
+						"global.deployment.name": depName,
+						"global.provider":        vendor,
+						"global.actions.execute": operation,
 					},
 				}
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
@@ -36,10 +36,8 @@ func TestPegaServiceWithServiceType(t *testing.T) {
 				var pegaServiceObj k8score.Service
 				UnmarshalK8SYaml(t, serviceyamlContent[1], &pegaServiceObj)
 				serviceType := pegaServiceObj.Spec.Type
-				require.Equal(t, k8score.ServiceType("LoadBalancer"), serviceType )
+				require.Equal(t, k8score.ServiceType("LoadBalancer"), serviceType)
 			}
-        }
+		}
 	}
 }
-
-
