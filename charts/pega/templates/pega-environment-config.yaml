@@ -172,6 +172,9 @@ data:
 {{ if .Values.stream.enabled }}
   # Whether to enable connecting to an external stream cluster.  "true" for enabled, "false for disabled"
   EXTERNAL_STREAM: "true"
+  SERVICES_STREAM_PROVIDER: "{{ .Values.stream.provider }}"
+  KAFKA_CLUSTER_NAME: "{{ .Values.stream.clusterName }}"
+  SERVICES_STREAM_VALIDATE: {{ .Values.stream.validate }}
   # Provided bootstrap server
   STREAM_BOOTSTRAP_SERVERS: "{{ .Values.stream.bootstrapServer }}"
   STREAM_SECURITY_PROTOCOL: "{{ .Values.stream.securityProtocol }}"
