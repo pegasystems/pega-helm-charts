@@ -9,7 +9,7 @@ global:
 
 # Search and Reporting Service (SRS) Configuration
 srs:
-  # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
+  # Set srs.enabled=true to enable SRS
   enabled: true
 
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
@@ -38,6 +38,7 @@ srs:
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
     # specified in the `elasticsearch` section
+    # If you do not enable SRS and the srs.enabled parameter is set to false, always set srs.srsStorage.provisionInternalESCluster=false
     provisionInternalESCluster: true
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
