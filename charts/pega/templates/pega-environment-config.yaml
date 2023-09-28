@@ -174,7 +174,7 @@ data:
   EXTERNAL_STREAM: "true"
   SERVICES_STREAM_PROVIDER: "{{ .Values.stream.provider }}"
   KAFKA_CLUSTER_NAME: "{{ .Values.stream.clusterName }}"
-  SERVICES_STREAM_VALIDATE: {{ .Values.stream.validate }}
+  SERVICES_STREAM_VALIDATE: "{{ .Values.stream.validate }}"
   # Provided bootstrap server
   STREAM_BOOTSTRAP_SERVERS: "{{ .Values.stream.bootstrapServer }}"
   STREAM_SECURITY_PROTOCOL: "{{ .Values.stream.securityProtocol }}"
