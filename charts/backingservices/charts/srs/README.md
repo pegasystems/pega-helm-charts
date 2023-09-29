@@ -44,7 +44,7 @@ You may enable the component of [Elasticsearch](https://github.com/helm/charts/t
 Note: Pega does **not** actively update the elasticsearch dependency in `requirements.yaml`. To leverage SRS, you must do one of the following:
 
 * To use the internally-provided Elasticsearch service in the SRS cluster, use the default `srs.enabled.true` parameter and set the Elasticsearch version by updating the `elasticsearch.imageTag` parameter in the [values.yaml](./values.yaml) to match the `dependencies.version` parameter in the [requirements.yaml](../../requirements.yaml).
-* To use an externally-provided Elasticsearch service from the SRS cluster, update the `srs.srsStorage.provisionInternalESCluster` parameter in the [values.yaml](./values.yaml) to `false` and then provide connection details as documented below.
+* To use an externally-provided Elasticsearch service with SRS, use the default `srs.enabled.true` parameter, update the `srs.srsStorage.provisionInternalESCluster` parameter in the [values.yaml](./values.yaml) to `false` and then provide connection details as documented below.
 
 ### Deploying SRS with Pega-provided busybox images
 To deploy Pega Platform with the SRS backing service, the SRS helm chart requires the use of the busybox image.  For clients who want to pull this image from a registry other than Docker Hub, they must tag and push their image to another registry, and then pull it by specifying `busybox.image` and `busybox.imagePullPolicy`.
@@ -53,7 +53,7 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `enabled`                               | Enable the Search and Reporting Service deployment as a backing service.                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| `enabled`                               | Enable the Search and Reporting Service deployment as a backing service. Set this parameter to `true` to use SRS.                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `deploymentName`                        | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.                                                                                                                                                                                                                                                                                                                                                          |
 | `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS.                                                                                                                                                                                                                                                                                                                                                             |
 | `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                                                                                      |
@@ -99,7 +99,7 @@ Example:
 
 ```yaml
 srs:
-  # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
+  # Set srs.enabled=true to enable SRS
   enabled: true
 
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
@@ -128,6 +128,7 @@ srs:
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
     # specified in the `elasticsearch` section
+    # IF you do not enable SRS and the srs.enabled parameter is set to false, always set srs.srsStorage.provisionInternalESCluster=false
     provisionInternalESCluster: true
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
