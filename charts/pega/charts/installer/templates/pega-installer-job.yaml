@@ -4,6 +4,7 @@
 {{ if (and  (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "in-place"))  }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBInPlaceUpgrade" .) "action" "upgrade" }}
 {{ end }}
+# allowing ZDT to trigger only incase of action upgrade-deploy and upgradeType as zero-downtime
 {{ if ( and (eq (include "performUpgradeAndDeployment" .) "true") (eq .Values.upgrade.upgradeType "zero-downtime")) }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaPreDBUpgrade" .) "action" "pre-upgrade" }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBZDTUpgrade" .) "action" "upgrade" "initContainers" (list "waitForPreDBUpgrade") }}
@@ -12,6 +13,7 @@
 {{ if ( and (eq (include "performOnlyUpgrade" .) "true") (eq .Values.upgrade.upgradeType "out-of-place")) }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBOOPUpgrade" .) "action" "upgrade" }}
 {{ end }}
+# enabled custom upgrade in case of upgrade-deploy , this allows ZDT to recover from failure and can switch over to custom and perfrom rest of steps in upgrade process
 {{ if ( and  ( or (eq (include "performUpgradeAndDeployment" .) "true") (eq (include "performOnlyUpgrade" .) "true") ) (eq .Values.upgrade.upgradeType "custom")) }}
 {{ template "pega.installer" dict "root" $ "name" (include "pegaDBCustomUpgrade" .) "action" "upgrade" }}
 {{ end }}

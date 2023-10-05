@@ -32,6 +32,7 @@
 {{ end }}
 {{ end }}
 
+# Allowing ZDT wait containers to trigger only in case of upgradeType as zero-downtime, so that custom upgrade moves forward in case of failure in ZDT
 {{ if ( and  (eq (include "performUpgradeAndDeployment" $) "true") (eq $.Values.installer.upgrade.upgradeType "zero-downtime")) }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaDBZDTUpgrade" }}
 {{ end }}
