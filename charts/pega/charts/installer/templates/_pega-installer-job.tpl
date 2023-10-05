@@ -36,20 +36,25 @@ spec:
       annotations:
 {{- if .root.Values.podAnnotations}}
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
-{{- end }}     
+{{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
 {{- if .root.Values.serviceAccountName }}
       serviceAccountName: {{ .root.Values.serviceAccountName }}
-{{- end }}   
+{{- end }}
       volumes:
+{{- if .root.Values.installerMountVolumeClaimName }}
+      - name: {{ template "pegaInstallerMountVolume" }}
+        persistentVolumeClaim:
+          claimName: {{ .root.Values.installerMountVolumeClaimName }}
+{{- end }}
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}
 {{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
-{{ toYaml .root.Values.custom.volumes | indent 6 }}          
+{{ toYaml .root.Values.custom.volumes | indent 6 }}
 {{- end }}{{- end }}
       - name: {{ template "pegaInstallerCredentialsVolume" }}
         projected:
@@ -107,14 +112,18 @@ spec:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
         volumeMounts:
+{{- if .root.Values.installerMountVolumeClaimName }}
+        - name: {{ template "pegaInstallerMountVolume" }}
+          mountPath: "/opt/pega/mount/installer"
+{{- end }}
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeInstall" }}
           mountPath: "/opt/pega/config"
         - name: {{ template "pegaInstallerCredentialsVolume" }}
           mountPath: "/opt/pega/secrets"
-{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
+{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
         - name: {{ template "pegaDistributionKitVolume" }}
-          mountPath: "/opt/pega/mount/kit"                           
+          mountPath: "/opt/pega/mount/kit"
 {{- end }}
 {{- if .root.Values.custom }}
 {{- if .root.Values.custom.volumeMounts }}
@@ -159,7 +168,7 @@ spec:
 {{- end }}
 {{- if .root.Values.sidecarContainers }}
 {{ toYaml .root.Values.sidecarContainers | indent 6 }}
-{{- end }}                
+{{- end }}
       restartPolicy: Never
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
