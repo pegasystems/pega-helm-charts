@@ -5,7 +5,7 @@
 # To disable deploying Elasticsearch in SRS, set the 'srs.srsStorage.provisionInternalESCluster' parameter in backingservices values.yaml to false.
 dependencies:
 - name: elasticsearch
-  version: "7.10.2"
+  version: "7.17.3"
   repository: https://helm.elastic.co/
   condition: srs.srsStorage.provisionInternalESCluster
 - name: constellation

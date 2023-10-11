@@ -80,9 +80,9 @@ constellation:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
-  # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
-  imageTag: 7.10.2
+  # for internally provisioned elasticsearch version is set to 7.17.9. Use this imageTag configuration to update it to 7.10.2 or
+  # 7.16.3 if required. However, we strongly recommend to use version 7.17.9.
+  imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.
