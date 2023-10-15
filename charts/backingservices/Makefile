@@ -26,3 +26,9 @@ purge-es-secrets:
 
 external-es-secrets:
 	kubectl create secret generic srs-certificates --from-file=$(PATH_TO_CERTIFICATE) --namespace=$(NAMESPACE)
+
+purge-secrets: purge-es-secrets
+	kubectl delete secrets srs-certificates --namespace=$(NAMESPACE) || true
+
+upgrade-secrets: purge-secrets
+	make es-prerequisite NAMESPACE=$(NAMESPACE) ELASTICSEARCH_VERSION=$(ELASTICSEARCH_VERSION)
