@@ -157,3 +157,37 @@ srs:
     requireInternetAccess: false
 
 ```
+### Upgrading SRS to Kubernetes Cluster Version >=1.25
+
+- **Internally Provisioned Elasticsearch**
+  - Get the latest backingservices chart which supports `k8s version >=1.25`
+  - Update the srs and elasticsearch certificates by running the below Make command
+    ```bash
+    make update-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> ELASTICSEARCH_VERSION=7.17.9
+    ```
+  - Upgrade the helm deployment by using the latest backingservices helm chart supporting `k8s >= 1.25` and update the `elasticsearch imageTag to 7.17.9`
+    ```bash
+    helm upgrade backingservices pega/backingservices --version <CHART_VERSION> --namespace <NAMESPACE_OF EXISTING_DEPLOYMENT> --values <YAML_FILE_WITH_ES_IMAGE_TAG_CHANGES>
+    ```
+    Sample YAML file with imageTag changes
+    ```yaml
+    elasticsearch:
+      # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
+      # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
+      imageTag: 7.17.9
+    ```
+  - Monitor the Elasticsearch pod health to be in healthy and running status
+  - Delete the old SRS pods and let the new pods spin up.
+
+* **External Elasticsearch**
+  - Get the latest backingservices chart which supports `k8s version >=1.25`
+  - Update the srs and elasticsearch certificates by running the below Make command
+    ```bash
+    make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>
+    ```
+  - Upgrade the helm deployment by using the latest backingservices helm chart supporting `k8s >= 1.25` and update the `elasticsearch imageTag to 7.17.9`. (Optional, execute this step if there are any changes to ES certificate name of auth credentials).
+  ```bash
+    helm upgrade backingservices pega/backingservices --version <CHART_VERSION> --namespace <NAMESPACE_OF EXISTING_DEPLOYMENT> --values <YAML_FILE_WITH_ES_IMAGE_TAG_CHANGES>
+    ```
+  - If upgrade command is executed helm will automatically update SRS pods.
+  - Verify if everthing works fine.
