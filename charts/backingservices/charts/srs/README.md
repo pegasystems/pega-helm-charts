@@ -159,6 +159,7 @@ srs:
 ```
 ### Upgrading SRS to Kubernetes Cluster Version >=1.25
 
+We need to use Elasticsearch server version 7.17.9 to support SRS on Kubernetes version >=1.25.
 - **Internally Provisioned Elasticsearch**
   - Get the latest backingservices chart which supports `k8s version >=1.25`
   - Update the srs and elasticsearch certificates by running the below Make command
@@ -178,8 +179,9 @@ srs:
     ```
   - Monitor the Elasticsearch pod health to be in healthy and running status
   - Delete the old SRS pods and let the new pods spin up.
+  - Verify if everthing works fine.
 
-* **External Elasticsearch**
+- **External Elasticsearch**
   - Get the latest backingservices chart which supports `k8s version >=1.25`
   - Update the srs and elasticsearch certificates by running the below Make command
     ```bash
