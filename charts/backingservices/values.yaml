@@ -20,6 +20,9 @@ srs:
   busybox:
     image: "alpine:3.16.1"
     imagePullPolicy: "IfNotPresent"
+    # To avoid exposing Docker credentials, optionally create a separate Docker config secret.
+    # Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+    imagePullSecretNames: []
 
   srsRuntime:
     # Number of pods to provision
