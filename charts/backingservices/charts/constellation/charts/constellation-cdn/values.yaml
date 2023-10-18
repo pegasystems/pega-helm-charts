@@ -22,9 +22,9 @@ ingress:
 
 # List one deployment for each patch release of Pega Infinity that needs to be supported.
 # The path accessed by the user's browser will include the Pega build nnumber (e.g. /8.8.1-161),
-#   so the load balancer should support a wildcard at the end of  the path name.
+#   so the load balancer should be configured to allow a wildcard at the end of the path name.
 deployments:
-#  - name: "881"
-#    image: pega-docker.downloads.pega.com/constellationui/cdn-onprem:8.8.1-ga-52
-#    path: "/8.8.1(.*)"
-#    replicas: 1
+  - name: "881"
+    image: pega-docker.downloads.pega.com/constellationui/cdn-onprem:8.8.1-ga-52
+    path: "/8.8.1(.*)"
+    replicas: 1
