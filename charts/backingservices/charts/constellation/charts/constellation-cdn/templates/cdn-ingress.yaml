@@ -1,0 +1,28 @@
+{{ if and .Values.enabled .Values.ingress.domain }}
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Values.name }}
+{{- if (.Values.ingress.annotations) }}
+  annotations:
+{{ toYaml .Values.ingress.annotations | indent 4 }}
+{{- end }}
+spec:
+{{- if (.Values.ingress.ingressClassName) }}
+  ingressClassName: {{ .Values.ingressClassName }}
+{{ end }}
+  rules:
+    - host: {{ .Values.ingress.domain }}
+      http:
+        paths:
+        {{- range .Values.deployments }}
+          - path: {{ .path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ printf "%s-%s" $.Values.name .name }}
+                port:
+                  number: {{ $.Values.pegaStaticPort }}
+        {{- end }}
+{{ end }}

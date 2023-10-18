@@ -1,0 +1,7 @@
+{{ if .Values.enabled }}
+{{ $depName := printf "%s" (.Values.name) }}
+
+{{ range $index, $dep := .Values.deployments }}
+{{ template "cdn.service" dict "root" $ "node" $dep "name" (printf "%s-%s" $depName $dep.name) }}
+{{ end }}
+{{ end }}

@@ -1,0 +1,30 @@
+---
+enabled: false
+name: YOUR_CDN_SERVICE_DEPLOYMENT_NAME
+
+# To avoid exposing Docker credentials, create a separate Docker config secret.
+# Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+imagePullSecretNames: []
+imagePullPolicy: Always
+
+pegaStaticPort: 1080
+pegaStaticTargetPort: 1080
+
+serviceType: NodePort
+
+# An ingress will be provisioned if a hostname is defined, or omitted if the hostname is empty.
+# ingressClassName and annotations are optional and will be included if defined.
+# Due to the diverse requirements for ingresses and TLS configuration, it may be necessary to define the ingress separately from this chart.
+ingress:
+  domain:
+  ingressClassName: 
+  annotations:
+
+# List one deployment for each patch release of Pega Infinity that needs to be supported.
+# The path accessed by the user's browser will include the Pega build nnumber (e.g. /8.8.1-161),
+#   so the load balancer should support a wildcard at the end of  the path name.
+deployments:
+#  - name: "881"
+#    image: pega-docker.downloads.pega.com/constellationui/cdn-onprem:8.8.1-ga-52
+#    path: "/8.8.1(.*)"
+#    replicas: 1
