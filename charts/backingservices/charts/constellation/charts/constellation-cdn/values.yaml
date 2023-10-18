@@ -17,7 +17,7 @@ serviceType: NodePort
 # Due to the diverse requirements for ingresses and TLS configuration, it may be necessary to define the ingress separately from this chart.
 ingress:
   domain:
-  ingressClassName: 
+  ingressClassName:
   annotations:
 
 # List one deployment for each patch release of Pega Infinity that needs to be supported.
