@@ -125,9 +125,19 @@ spec:
 {{- else }}
         fsGroup: 0
 {{- end }}
+{{- if .node.securityContext.supplementalGroups }}
+        supplementalGroups: [{{ .node.securityContext.supplementalGroups }}]
+{{- end }}
 {{- else }}
         runAsUser: 9001
         fsGroup: 0
+{{- end }}
+{{- else }}
+{{- if .node.securityContext }}
+{{- if .node.securityContext.supplementalGroups }}
+      securityContext:
+        supplementalGroups: [{{ .node.securityContext.supplementalGroups }}]
+{{- end }}
 {{- end }}
 {{- end }}
       containers:
