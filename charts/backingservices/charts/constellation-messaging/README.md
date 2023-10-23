@@ -1,4 +1,4 @@
-#Constellation Messaging Service
+# Constellation Messaging Service
 
 The optional Messaging service acts as a middle man between information publishers and information subscribers; accepting simple http publish of information to forward to 1000's of websocket subscribers. The publishers are typically the Infinity case engine or 3rd party integration services, and the subscribers are UI components in browsers running Constellation UI.
 
