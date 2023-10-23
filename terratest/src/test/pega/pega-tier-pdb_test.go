@@ -65,6 +65,64 @@ func TestPegaTierPDBEnabled(t *testing.T) {
 	}
 }
 
+func TestPegaTierPDBWithCustomLabels(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	webPDBLabels := map[string]string{"weblabel": "somevalue", "anotherlabel": "anothervalue"}
+	batchPDBLabels := map[string]string{"batchlabel": "batchvalue", "anotherbatchlabel": "batchvalue2"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	testsPath, err := filepath.Abs(PegaHelmChartTestsPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name": depName,
+						"global.provider":        vendor,
+						"global.actions.execute": operation,
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-pdb.yaml"}, "--values", testsPath+"/data/values_pdb_custom_labels.yaml")
+				verifyPegaPDBs(t, yamlContent, options, []pdb{
+					{
+						name:         getObjName(options, "-web-pdb"),
+						kind:         "PodDisruptionBudget",
+						apiversion:   "policy/v1beta1",
+						labels:       webPDBLabels,
+						minAvailable: 1,
+					},
+					{
+						name:         getObjName(options, "-batch-pdb"),
+						kind:         "PodDisruptionBudget",
+						apiversion:   "policy/v1beta1",
+						labels:       batchPDBLabels,
+						minAvailable: 1,
+					},
+					{
+						name:         getObjName(options, "-stream-pdb"),
+						kind:         "PodDisruptionBudget",
+						apiversion:   "policy/v1beta1",
+						minAvailable: 1,
+					},
+				})
+			}
+		}
+	}
+}
+
 // TestPegaTierPDBDisabled - verify that a PodDisruptionBudget is not created when global.tier.pdb.enabled=false
 func TestPegaTierPDBDisabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
@@ -121,11 +179,18 @@ func verifyPegaPdb(t *testing.T, pegaPdbObj *v1beta1.PodDisruptionBudget, expect
 	//kubernetes 1.21 or higher, and we should adjust this test to use the policy/v1 API version
 	require.Equal(t, pegaPdbObj.TypeMeta.APIVersion, expectedPdb.apiversion)
 	require.Equal(t, expectedPdb.minAvailable, pegaPdbObj.Spec.MinAvailable.IntVal)
+
+	for key, expectedValue := range expectedPdb.labels {
+		actual := pegaPdbObj.Labels[key]
+		require.NotNil(t, actual)
+		require.Equal(t, expectedValue, actual)
+	}
 }
 
 type pdb struct {
 	name         string
 	kind         string
 	apiversion   string
+	labels       map[string]string
 	minAvailable int32
 }
