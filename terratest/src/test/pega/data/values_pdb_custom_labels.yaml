@@ -136,7 +136,6 @@ global:
         labels:
           weblabel: "somevalue"
           anotherlabel: "anothervalue"
-        # maxUnavailable: "50%"
 
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
@@ -174,7 +173,6 @@ global:
         labels:
           batchlabel: "batchvalue"
           anotherbatchlabel: "batchvalue2"
-        # maxUnavailable: "50%"
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
