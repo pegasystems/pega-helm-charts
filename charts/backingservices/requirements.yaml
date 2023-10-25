@@ -3,6 +3,7 @@
 # NOTE: For kubernetes version >=1.25 or Elasticsearch version 7.17.9, 
 # use 7.17.3 for the elasticsearch 'version' parameter below (for Elasticsearch version 7.17.9, you will still use 7.17.9 in the backingservices values.yaml).
 # To disable deploying Elasticsearch in SRS, set the 'srs.srsStorage.provisionInternalESCluster' parameter in backingservices values.yaml to false.
+# The dependencies.version parameter refers to the Elastcisearch Helm chart version, not Elasticsearch server version.
 dependencies:
 - name: elasticsearch
   version: "7.17.3"
