@@ -77,6 +77,8 @@ data:
   RUN_RULESET_CLEANUP: {{ .Values.upgrade.runRulesetCleanup | quote }}
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   REBUILD_INDEXES:  {{ .Values.upgrade.rebuildIndexes | quote }}
+  # Automatic resume parameter to support resuming rules_upgrade from point of failure
+  AUTOMATIC_RESUME_ENABLED: {{ .Values.upgrade.automaticResumeEnabled | quote }}
 {{- if .Values.distributionKitURL }}
   # Distribution kit URL
   DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
