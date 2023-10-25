@@ -78,7 +78,7 @@ make external-es-secrets NAMESPACE=pegabackingservices ELASTICSEARCH_VERSION=7.1
 | `tls`                                   | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `esCredentials.username`                | Enter the username for your available Elasticsearch service. This username value must match the values you set in the connection info section of esCredentials.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | `esCredentials.password`                | Enter the required password for your available Elasticsearch service. This password value must match the values you set in the connection info section of esCredentials.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `srsStorage.provisionInternalESCluster` | <ul><li>Set to false to disable this parameter and connect to your available Elasticsearch service from the SRS cluster. Disabling this setting requires you to provide connectivity details to your organization's external Elasticsearch service along with an appropriate TLS certificate with which you authenticate with the service. To pass the required certificate to the cluster using a secrets file, run the command, `$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`. </li><li>where NAMESPACE references your deployment namespace of the SRS cluster, `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use, and `PATH_TO_CERTIFICATE` points to the location where you copied the required certificates on your location machine.</li></ul> |
+| `srsStorage.provisionInternalESCluster` | <ul><li>Set to false to disable this parameter and connect to your available Elasticsearch service from the SRS cluster. Disabling this setting requires you to provide connectivity details to your organization's external Elasticsearch service along with an appropriate TLS certificate with which you authenticate with the service. To pass the required certificate to the cluster using a secrets file, run the command, `$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`. </li><li>where NAMESPACE references your deployment namespace of the SRS cluster, `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use, and `PATH_TO_CERTIFICATE` points to the location where you copied the required certificates on your location machine.</li><li>Use the following Make command to update the SRS and External Elasticsearch certificates: `$ make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>`.</li></ul> |
 | `domain`                                | Enter the DNS entry associated with your external Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 Note: Only .p12 and .jks certificates are supported.
@@ -157,39 +157,23 @@ srs:
     requireInternetAccess: false
 
 ```
-### Upgrading SRS to Kubernetes Cluster Version >=1.25
+### Steps to upgrade SRS (with Internal Elasticsearch) to Kubernetes Cluster Version >=1.25
 
-We need to use Elasticsearch server version 7.17.9 to support SRS on Kubernetes version >=1.25.
-- **Internally Provisioned Elasticsearch**
-  - Get the latest backingservices chart which supports `k8s version >=1.25`
-  - Update the srs and elasticsearch certificates by running the below Make command
-    ```bash
-    make update-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> ELASTICSEARCH_VERSION=7.17.9
-    ```
-  - Upgrade the helm deployment by using the latest backingservices helm chart supporting `k8s >= 1.25` and update the `elasticsearch imageTag to 7.17.9`
-    ```bash
-    helm upgrade backingservices pega/backingservices --version <CHART_VERSION> --namespace <NAMESPACE_OF EXISTING_DEPLOYMENT> --values <YAML_FILE_WITH_ES_IMAGE_TAG_CHANGES>
-    ```
-    Sample YAML file with imageTag changes
-    ```yaml
-    elasticsearch:
-      # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
-      # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
-      imageTag: 7.17.9
-    ```
-  - Monitor the Elasticsearch pod health to be in healthy and running status
-  - Delete the old SRS pods and let the new pods spin up.
-  - Verify if everthing works fine.
-
-- **External Elasticsearch**
-  - Get the latest backingservices chart which supports `k8s version >=1.25`
-  - Update the srs and elasticsearch certificates by running the below Make command
-    ```bash
-    make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>
-    ```
-  - Upgrade the helm deployment by using the latest backingservices helm chart supporting `k8s >= 1.25` and update the `elasticsearch imageTag to 7.17.9`. (Optional, execute this step if there are any changes to ES certificate name of auth credentials).
+To support SRS on Kubernetes version >=1.25 you need to use Elasticsearch server version 7.17.9. If you are using an earlier version of Elasticsearch in your deployment, to upgrade to 7.17.9, you need to perform the following steps:
+1. Get the latest backingservices Helm chart which supports `k8s version >=1.25`.
+2. Update the SRS and Elasticsearch certificates by running the following Make command:
   ```bash
-    helm upgrade backingservices pega/backingservices --version <CHART_VERSION> --namespace <NAMESPACE_OF EXISTING_DEPLOYMENT> --values <YAML_FILE_WITH_ES_IMAGE_TAG_CHANGES>
-    ```
-  - If upgrade command is executed helm will automatically update SRS pods.
-  - Verify if everthing works fine.
+  make update-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> ELASTICSEARCH_VERSION=7.17.9
+  ```
+3.   To use Elasticsearch version 7.17.9, inspect the values.yaml file from the latest backingservices helm chart and confirm if the imageTag parameter in the values.yaml file is same as in the example below:
+  ```yaml
+  elasticsearch:
+    imageTag: 7.17.9
+  ```
+4. Upgrade your deployment using the following Helm command:
+  ```bash
+  helm upgrade backingservices pega/backingservices --version <CHART_VERSION> --namespace <NAMESPACE_OF EXISTING_DEPLOYMENT> --values <YAML_FILE_WITH_ES_IMAGE_TAG_CHANGES>
+  ```
+5. Verify that the Elasticsearch pods status is Running.
+6. Restart the old SRS pods and verify that the status of the new pods is Running.
+7. Verify all pods are running and working as expected.
