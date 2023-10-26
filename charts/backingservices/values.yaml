@@ -81,7 +81,7 @@ constellation:
 # as per runtime and storage requirements.
 elasticsearch:
   # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended version.
-  # Use this parameter to change it to 7.10.2 or 7.16.3 if required. 
+  # Use this parameter to change it to 7.10.2 or 7.16.3 if required.
   imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
