@@ -159,7 +159,7 @@ srs:
 ```
 ### Steps to upgrade SRS (with Internal Elasticsearch) to Kubernetes Cluster Version >=1.25
 
-To support SRS on Kubernetes version >=1.25 you need to use Elasticsearch server version 7.17.9. If you are using an earlier version of Elasticsearch in your deployment, to upgrade to 7.17.9, you need to perform the following steps:
+To support SRS on Kubernetes version >=1.25 you need to use Elasticsearch server version 7.17.9. If you are using an earlier version (7.10.2 or 7.16.3) of Elasticsearch in your deployment, to upgrade to 7.17.9, you need to perform the following steps:
 1. Get the latest backingservices Helm chart which supports `k8s version >=1.25`.
 2. Update the SRS and Elasticsearch certificates by running the following Make command:
   ```bash

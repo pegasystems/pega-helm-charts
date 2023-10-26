@@ -30,8 +30,8 @@ external-es-secrets:
 purge-srs-secrets:
 	kubectl delete secrets srs-certificates --namespace=$(NAMESPACE) || true
 
-purge-secrets: 
-	make purge-es-secrets && make purge-srs-secrets
+purge-secrets: purge-es-secrets
+	make purge-srs-secrets
 
 update-secrets: purge-secrets
 	make es-prerequisite
