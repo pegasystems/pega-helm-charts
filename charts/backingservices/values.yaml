@@ -80,7 +80,7 @@ constellation:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version 
+  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version
   # for k8s version >= 1.25.
   # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
   imageTag: 7.17.9
