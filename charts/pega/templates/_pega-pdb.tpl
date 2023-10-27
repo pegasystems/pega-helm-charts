@@ -10,6 +10,10 @@ kind: PodDisruptionBudget
 metadata:
   name: {{ .name }}-pdb
   namespace: {{ .root.Release.Namespace }}
+{{- if .pdb.labels }}
+  labels:
+{{ toYaml .pdb.labels | indent 4 }}
+{{- end }}
 spec:
   {{- if .pdb.minAvailable }}
   minAvailable: {{ .pdb.minAvailable }}
