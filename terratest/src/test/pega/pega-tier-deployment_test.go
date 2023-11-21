@@ -198,7 +198,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	require.Equal(t, "INITIAL_HEAP", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, "4096m", pod.Containers[0].Env[envIndex].Value)
+	require.Equal(t, "8192m", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	require.Equal(t, "MAX_HEAP", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8192m", pod.Containers[0].Env[envIndex].Value)

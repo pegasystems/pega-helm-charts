@@ -270,7 +270,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
+[Node types for VM-based and containerized deployments](https://docs.pega.com/bundle/platform-88/page/platform/system-administration/node-types-on-premises.html)
 
 Example:
 
@@ -451,7 +451,7 @@ Parameter       | Description                                            | Defau
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
 ### JVM Arguments
