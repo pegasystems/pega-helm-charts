@@ -1,0 +1,15 @@
+---
+global:
+  tier:
+    - name: "web"
+      hpa:
+        enabled: true
+        labels:
+          web-label: "somevalue"
+          web-other-label: "someothervalue"
+    - name: "batch"
+      hpa:
+        enabled: true
+        labels:
+          batch-label: "batchlabel"
+          batch-other-label: "anothervalue"

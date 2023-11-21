@@ -451,7 +451,7 @@ Parameter       | Description                                            | Defau
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
 ### JVM Arguments
