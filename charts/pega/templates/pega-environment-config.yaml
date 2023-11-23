@@ -46,7 +46,7 @@ data:
 {{- end }}
   # compression flag to decompress the config files of Pega Installation.
 {{- if .Values.configurations.isCompressed }}
-  IS_COMPRESSED: {{ .Values.configurations.isCompressed }}
+  IS_COMPRESSED: "{{ .Values.configurations.isCompressed }}"
 {{- else }}
   IS_COMPRESSED: "false"
 {{- end }}
