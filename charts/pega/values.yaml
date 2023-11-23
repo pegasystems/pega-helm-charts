@@ -338,6 +338,8 @@ global:
         minAvailable: 1
         # maxUnavailable: "50%"
 
+configurations:
+  isCompressed: false
 # External services
 
 # Cassandra automatic deployment settings.
