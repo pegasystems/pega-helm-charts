@@ -121,6 +121,12 @@ global:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
 
+  configurations:
+    # Set isCompressed=true when configuration files under charts/pega/config/deploy are in compressed format.
+    # For help adding the compressed configurations, see the Helm chart documentation
+    # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-compressed-configuration-files
+    isCompressed: false
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
