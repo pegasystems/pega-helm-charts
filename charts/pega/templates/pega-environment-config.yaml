@@ -45,8 +45,8 @@ data:
   JDBC_TIMEOUT_PROPERTIES_RO: ""
 {{- end }}
   # compression flag to decompress the config files of Pega Installation.
-{{- if .Values.global.configurations.isCompressed }}
-  IS_PEGA_CONFIG_COMPRESSED: "{{ .Values.global.configurations.isCompressed }}"
+{{- if .Values.global.compressedConfigurations }}
+  IS_PEGA_CONFIG_COMPRESSED: "{{ .Values.global.compressedConfigurations }}"
 {{- else }}
   IS_PEGA_CONFIG_COMPRESSED: "false"
 {{- end }}
