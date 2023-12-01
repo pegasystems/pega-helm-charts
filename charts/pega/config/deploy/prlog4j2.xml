@@ -160,7 +160,7 @@
         <AppenderRef ref="DATAFLOW"/>
     </Logger>
     <!-- Added for Usage Metrics -->
-    <AsyncLogger name="com.pega.pegarules.session.internal.usagemetrics" additivity="true" level="USAGE">
+    <AsyncLogger name="com.pega.pegarules.session.internal.usagemetrics" additivity="true" level="info">
         <AppenderRef ref="USAGEMETRICS"/>
     </AsyncLogger>
 </Loggers>
