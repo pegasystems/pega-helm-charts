@@ -652,6 +652,23 @@ tier:
       webXML: |-
         ...
 ```
+### Pega compressed configuration files
+
+To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
+
+1) Compress each configuration file using the following command in your local terminal:
+```
+- cat "<path_to_actual_uncompressed_file_in_local>" | gzip -c | base64 
+```
+Example for a prconfig.xml file:
+```
+cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
+```
+2) Provide the file content with the output of the command for each file executed.
+3) Set the `compressedConfigurations` in values.yaml to `true`, as in the following example:
+```yaml
+  compressedConfigurations: true
+```
 
 ### Pega diagnostic user
 
