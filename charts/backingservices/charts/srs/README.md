@@ -18,19 +18,19 @@ The service deployment provisions runtime service pods along with a dependency o
 | Pega Infinity version | SRS version | Elasticsearch version | Description                                                                                                                                                                                                                                                                                                           |
 |-----------------------|-------------|-----------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | < 8.6                 | NA          | NA                    | SRS can be used with Pega Infinity 8.6 and later                                                                                                                                                                                                                                                                      |
-| \>= 8.6              | 1.25.3  | 7.10.2, 7.16.3, and 7.17.9      | While SRS Docker images are certified against Elasticsearch versions 7.10.2, 7.16.3 and 7.17.9, Pega recommends using Elasticsearch version 7.17.9. To stay current with Pega releases, use the latest available SRS image 1.25.3.
+| \>= 8.6              | 1.28.0      | 7.10.2, 7.16.3, and 7.17.9      | While SRS Docker images are certified against Elasticsearch versions 7.10.2, 7.16.3 and 7.17.9, Pega recommends using Elasticsearch version 7.17.9. To stay current with Pega releases, use the latest available SRS image 1.28.0.
 
 **Note**: 
 
 **If your deployment uses the internally-provisioned Elasticsearch:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
 
-* Update the SRS Docker image version to use v1.25.3, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Update the SRS Docker image version to use v1.28.0, which supports both Elasticsearch versions 7.10.x and 7.16.x.
 * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
 * Update Elasticsearch to 7.17.9.
 
 **If your deployment connects to an externally-managed Elasticsearch service:** To migrate to Elasticsearch version 7.17.9 from the Elasticsearch version 7.10.2 or 7.16.3 use the process that applies to your deployment:
 
-* Update the SRS Docker image version to use v1.25.3, which supports both Elasticsearch versions 7.10.x and 7.16.x.
+* Update the SRS Docker image version to use v1.28.0, which supports both Elasticsearch versions 7.10.x and 7.16.x.
 * Complete the version upgrade to 7.17.9. Refer to Elasticsearch version 7.17 documentation. For example, see [Upgrade Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/setup-upgrade.html).
 
 ### SRS runtime configuration
