@@ -18,7 +18,7 @@ srs:
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
-    image: "alpine:3.16.1"
+    image: "alpine:3.18.3"
     imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
@@ -86,8 +86,8 @@ constellation:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version
-  # for k8s version >= 1.25.
+  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the
+  # recommended Elasticsearch server version for k8s version >= 1.25.
   # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
   imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
@@ -99,6 +99,12 @@ elasticsearch:
   # If you previously set srs.srsStorage.tls.enabled: true, you must uncomment the line to use protocol: https parameter.
   # protocol: https
 
+  # Uncomment the below lines if you want to deploy/upgrade Elasticsearch server version >= 8.x
+  # createCert: false
+  # secret:
+  #   enabled: false
+  # protocol: http
+
   # For deployments that use TLS-based authentication to an internal Elasticsearch service in the SRS cluster,
   # uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
   # xpack.security.http.ssl.enabled: true
@@ -107,11 +113,14 @@ elasticsearch:
 
   esConfig:
     elasticsearch.yml: |
-     xpack.security.enabled: true
-     xpack.security.transport.ssl.enabled: true
-     xpack.security.transport.ssl.verification_mode: certificate
-     xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
-     xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.enabled: true
+      xpack.security.transport.ssl.enabled: true
+      xpack.security.transport.ssl.verification_mode: certificate
+      xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    # Uncomment the below lines if you want to deploy/upgrade Elasticsearch server version >= 8.x by adding below lines under esConfig.elasticsearch.yml.
+    # action.destructive_requires_name: false
+    # ingest.geoip.downloader.enabled: false
 
   # Use this section to include additional, supported environmental variables for Elasticsearch basic authentication.
   # The parameter values can be read from a specified secrets file.
