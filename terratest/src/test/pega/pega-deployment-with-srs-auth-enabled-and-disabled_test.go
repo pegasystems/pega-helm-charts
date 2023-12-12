@@ -93,8 +93,8 @@ func assertNoSRSAuthSettings(t *testing.T, pegaTierDeployment string) {
 	UnmarshalK8SYaml(t, pegaTierDeployment, &deployment)
 	for _, container := range deployment.Spec.Template.Spec.Containers {
 		for _, envVar := range container.Env {
-			if "SERV_AUTH_PRIVATE_KEY" == envVar.Name {
-				require.Fail(t, "container '"+container.Name+"' should not have 'SERV_AUTH_PRIVATE_KEY' environment variable")
+			if "SERV_AUTH_CLIENT_SECRET" == envVar.Name {
+				require.Fail(t, "container '"+container.Name+"' should not have 'SERV_AUTH_CLIENT_SECRET' environment variable")
 			}
 		}
 	}
@@ -106,12 +106,12 @@ func assertHasSRSAuthSettings(t *testing.T, pegaTierDeployment string) {
 	for _, container := range deployment.Spec.Template.Spec.Containers {
 		hasPrivateKey := false
 		for _, envVar := range container.Env {
-			if "SERV_AUTH_PRIVATE_KEY" == envVar.Name {
+			if "SERV_AUTH_CLIENT_SECRET" == envVar.Name {
 				require.Equal(t, "pega-srs-auth-secret", envVar.ValueFrom.SecretKeyRef.Name)
 				require.Equal(t, "privateKey", envVar.ValueFrom.SecretKeyRef.Key)
 				hasPrivateKey = true
 			}
 		}
-		require.True(t, hasPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_PRIVATE_KEY' environment variable")
+		require.True(t, hasPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_CLIENT_SECRET' environment variable")
 	}
 }
