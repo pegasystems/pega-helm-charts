@@ -61,7 +61,7 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 | `k8sProvider`                               | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].. 
 
 ### Enabling security between SRS and Elasticsearch
-Enabling a secure connection between SRS and your Elasticsearch cluster depends on the method you chose to deploy the Elasticsearch cluster.
+Enabling a secure connection between SRS and your Elasticsearch service depends on the method you chose to deploy the Elasticsearch cluster.
 To configure a secure connection between the SRS cluster and internally provisioned Elasticsearch, configure the following parameters.
 
 | Configuration                            | Usage                                                                                                                                                                                                                                            |
