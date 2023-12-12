@@ -270,7 +270,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
+[Node types for VM-based and containerized deployments](https://docs.pega.com/bundle/platform-88/page/platform/system-administration/node-types-on-premises.html)
 
 Example:
 
@@ -451,7 +451,7 @@ Parameter       | Description                                            | Defau
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
 ### JVM Arguments
@@ -651,6 +651,23 @@ tier:
 
       webXML: |-
         ...
+```
+### Pega compressed configuration files
+
+To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
+
+1) Compress each configuration file using the following command in your local terminal:
+```
+- cat "<path_to_actual_uncompressed_file_in_local>" | gzip -c | base64 
+```
+Example for a prconfig.xml file:
+```
+cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
+```
+2) Provide the file content with the output of the command for each file executed.
+3) Set the `compressedConfigurations` in values.yaml to `true`, as in the following example:
+```yaml
+  compressedConfigurations: true
 ```
 
 ### Pega diagnostic user
