@@ -8,7 +8,7 @@ global:
   provider: "k8s"
 
   # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
-  customerDeploymentId: 
+  customerDeploymentId:
 
   # Deploy Pega nodes
   actions:
