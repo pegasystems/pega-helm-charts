@@ -146,6 +146,8 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
+All Docker images for Pega Platform releases that are in Standard Support undergo a nightly rebuild that applies the latest available updates and patches to all third-party components. To take advantage of these updates, you must redeploy your Pega Platform with the latest available images. Pega does not guarantee nightly rebuilds for Pega Platform releases in Extended Support and stops rebuilding images for Pega Platform releases that are out of Extended Support.
+
 For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
