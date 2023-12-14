@@ -188,6 +188,11 @@ spec:
         - name: MAX_RETRIES
           value: {{ include "tierClassloaderMaxRetries" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
 {{- if and (.root.Values.pegasearch.externalSearchService) ((.root.Values.pegasearch.srsAuth).enabled) }}
+        - name: SERV_AUTH_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+              name: pega-srs-auth-secret
+              key: privateKey
         - name: SERV_AUTH_CLIENT_SECRET
           valueFrom:
             secretKeyRef:
