@@ -102,7 +102,7 @@ To support this option,
 2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
 3) Update your local Helm repository to the latest version using the command: 
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
-4) Update your values.yaml file to refer to the external secret manager for DB password.
+4) Update the `external_secret_name` parameter in the values.yaml file to refer to the `spec.target.name` defined in the External Secret file you created in step 1. Update the parameter for each section where you want to use the External Secrets Operator.
 
 •  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
@@ -651,6 +651,23 @@ tier:
 
       webXML: |-
         ...
+```
+### Pega compressed configuration files
+
+To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
+
+1) Compress each configuration file using the following command in your local terminal:
+```
+- cat "<path_to_actual_uncompressed_file_in_local>" | gzip -c | base64 
+```
+Example for a prconfig.xml file:
+```
+cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
+```
+2) Provide the file content with the output of the command for each file executed.
+3) Set the `compressedConfigurations` in values.yaml to `true`, as in the following example:
+```yaml
+  compressedConfigurations: true
 ```
 
 ### Pega diagnostic user

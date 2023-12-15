@@ -44,6 +44,12 @@ data:
 {{- else }}
   JDBC_TIMEOUT_PROPERTIES_RO: ""
 {{- end }}
+  # compression flag to decompress the config files of Pega Installation.
+{{- if .Values.global.compressedConfigurations }}
+  IS_PEGA_CONFIG_COMPRESSED: "{{ .Values.global.compressedConfigurations }}"
+{{- else }}
+  IS_PEGA_CONFIG_COMPRESSED: "false"
+{{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
   RULES_SCHEMA: {{ .Values.installer.upgrade.targetRulesSchema }}
