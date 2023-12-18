@@ -63,8 +63,8 @@ spec:
           {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
           {{ include "secretResolver" $d | indent 10}}
 
-          {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
-          {{ include "secretResolver" $artifactoryDict | indent 4}}
+          {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
+          {{ include "secretResolver" $artifactoryDict | indent 10}}
 
           # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
           {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
