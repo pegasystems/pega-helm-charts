@@ -63,26 +63,28 @@ func TestPegaDeploymentWithSRSAuthDisabled(t *testing.T) {
 func TestPegaDeploymentWithSRSAuthEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "eks", "gke", "aks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
+	var supportedSrsAuthenticationKeys = []string{"privateKey", "clientSecret"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
-
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":                  vendor,
-					"global.actions.execute":           operation,
-					"pegasearch.externalSearchService": "true",
-					"pegasearch.srsAuth.enabled":       "true",
-					"pegasearch.srsAuth.privateKey":    SRSAuthPrivateKeyExample,
-				},
-			}
-			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-			deployments := strings.Split(deploymentYaml, "---")
-			for _, deployment := range deployments {
-				assertHasSRSAuthSettings(t, deployment)
+			for _, key := range supportedSrsAuthenticationKeys {
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":                  vendor,
+						"global.actions.execute":           operation,
+						"pegasearch.externalSearchService": "true",
+						"pegasearch.srsAuth.enabled":       "true",
+						"pegasearch.srsAuth." + key:        SRSAuthPrivateKeyExample,
+					},
+				}
+				deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				deployments := strings.Split(deploymentYaml, "---")
+				for _, deployment := range deployments {
+					assertHasSRSAuthSettings(t, deployment, key)
+				}
 			}
 		}
 	}
@@ -103,7 +105,7 @@ func assertNoSRSAuthSettings(t *testing.T, pegaTierDeployment string) {
 	}
 }
 
-func assertHasSRSAuthSettings(t *testing.T, pegaTierDeployment string) {
+func assertHasSRSAuthSettings(t *testing.T, pegaTierDeployment string, authKey string) {
 	var deployment appsv1.Deployment
 	UnmarshalK8SYaml(t, pegaTierDeployment, &deployment)
 	for _, container := range deployment.Spec.Template.Spec.Containers {
@@ -121,7 +123,14 @@ func assertHasSRSAuthSettings(t *testing.T, pegaTierDeployment string) {
 				hasClientPrivateKey = true
 			}
 		}
-		require.True(t, hasPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_PRIVATE_KEY' environment variable")
-		require.True(t, hasClientPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_CLIENT_SECRET' environment variable")
+		if authKey == "privateKey" {
+			require.True(t, hasPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_PRIVATE_KEY' environment variable")
+			require.False(t, hasClientPrivateKey, "container '"+container.Name+"' should not have 'SERV_AUTH_CLIENT_SECRET' environment variable")
+		}
+		
+		if authKey == "clientSecret" {
+			require.True(t, hasClientPrivateKey, "container '"+container.Name+"' should have 'SERV_AUTH_CLIENT_SECRET' environment variable")
+			require.False(t, hasPrivateKey, "container '"+container.Name+"' should not have 'SERV_AUTH_PRIVATE_KEY' environment variable")
+		}
 	}
 }
