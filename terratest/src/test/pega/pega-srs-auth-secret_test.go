@@ -89,8 +89,8 @@ func TestPegaSRSAuthSecretNotCreatedForMissingPrivateKey(t *testing.T) {
 				}
 
 				yamlContent, err := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-srs-auth-secret.yaml"})
-				require.Contains(t, yamlContent, "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true")
-				require.Contains(t, err.Error(), "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true")
+				require.Contains(t, yamlContent, "A valid entry is required for pegasearch.srsAuth.clientSecret or pegasearch.srsAuth.privateKey, when request authentication mechanism (IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true.")
+				require.Contains(t, err.Error(), "A valid entry is required for pegasearch.srsAuth.clientSecret or pegasearch.srsAuth.privateKey, when request authentication mechanism (IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true.")
 			}
 		}
 	}
