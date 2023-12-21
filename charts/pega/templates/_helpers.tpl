@@ -194,6 +194,7 @@
   imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -205,6 +206,7 @@
   # -p is password
   # final 2 args for cqlsh are cassandra host and port respectively
   command: ['sh', '-c', '{{- template "waitForCassandraScript" dict "nodes" (include "getCassandraSubchartService" .) "node" .Values.dds -}}']
+{{- include "initContainerResources" $ }}
  {{- end -}}
 {{- end }}
 
@@ -239,7 +241,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- if .node.initialHeap }}
   value: "{{ .node.initialHeap }}"
 {{- else }}
-  value: "4096m"
+  value: "8192m"
 {{- end }}
 # Maximum JVM heap size, equivalent to -Xmx
 - name: MAX_HEAP
@@ -485,3 +487,28 @@ servicePort: use-annotation
     v4
   {{- end -}}
 {{- end -}}
+
+{{- define "pegaCredentialVolumeTemplate" }}
+- name: {{ template "pegaVolumeCredentials" }}
+  projected:
+    defaultMode: 420
+    sources:
+    {{- $dbDict := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" $  -}}
+    {{ include "secretResolver" $dbDict | indent 4}}
+
+    {{- $hzDict := dict "deploySecret" "deployHzSecret" "deployNonExtsecret" "deployNonExtHzSecret" "extSecretName" .Values.hazelcast.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $hzDict | indent 4}}
+
+    {{- $streamDict := dict "deploySecret" "deployStreamSecret" "deployNonExtsecret" "deployNonExtStreamSecret" "extSecretName" .Values.stream.external_secret_name "nonExtSecretName" "pega-stream-secret-name" "context" $ -}}
+    {{ include "secretResolver" $streamDict | indent 4}}
+
+    {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
+    {{ include "secretResolver" $ddsDict | indent 4}}
+
+    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
+    {{ include "secretResolver" $artifactoryDict | indent 4}}
+
+    - secret:
+        name: {{ include "pega-diagnostic-secret-name" $}}
+
+{{- end}}

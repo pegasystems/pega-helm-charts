@@ -158,7 +158,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
 	require.Equal(t, volumeDefaultModePtr, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode)
 	require.Equal(t, "pega-volume-credentials", pod.Volumes[1].Name)
-	require.Equal(t, getObjName(options, "-credentials-secret"), pod.Volumes[1].VolumeSource.Projected.Sources[0].Secret.Name)
 	require.Equal(t, volumeDefaultModePtr, pod.Volumes[1].VolumeSource.Projected.DefaultMode)
 
 	actualInitContainers := pod.InitContainers
@@ -208,7 +207,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	require.Equal(t, "INITIAL_HEAP", pod.Containers[0].Env[envIndex].Name)
-	require.Equal(t, "4096m", pod.Containers[0].Env[envIndex].Value)
+	require.Equal(t, "8192m", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
 	require.Equal(t, "MAX_HEAP", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "8192m", pod.Containers[0].Env[envIndex].Value)
@@ -257,7 +256,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "/opt/pega/config", pod.Containers[0].VolumeMounts[0].MountPath)
 	require.Equal(t, "pega-volume-config", pod.Volumes[0].Name)
 	require.Equal(t, "pega-volume-credentials", pod.Volumes[1].Name)
-	require.Equal(t, getObjName(options, "-credentials-secret"), pod.Volumes[1].Projected.Sources[0].Secret.Name)
 
 }
 
