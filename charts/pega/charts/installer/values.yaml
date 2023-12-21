@@ -20,6 +20,10 @@ assembler: ""
 bypassTruncateUpdatescache: "false"
 # Distribution kit URL
 distributionKitURL: ""
+# A manually managed Persistent Volume Claim for mounting upgrade artifacts. You must create this PVC manually before you bind the volume.
+# The installer job persists upgrade artifacts to this Persistent Volume to support automatically resuming rules_upgrade from point of failure when you use custom upgradeType.
+# To use this function, set the automaticResumeEnabled parameter to true.
+installerMountVolumeClaimName: ""
 # A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
 # This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence.
 # Only distriubtion kit zip file is expected inside the volume.
@@ -69,10 +73,15 @@ upgrade:
   runRulesetCleanup: "false"
   # Rebuild Database Rules Indexes after Rules Load to improve Database Access Performance
   rebuildIndexes: "false"
+  # This flag has to be set for CMC use cases if hazelcast is running in client server mode. Default is false.Set it to true for HZ c/s mode.
+  # This is needed to ensure Installer connect to HZ C/S while data upgrade.
+  isHazelcastClientServer: "false"
   # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
   pegaRESTServerURL: ""
   pegaRESTUsername: ""
   pegaRESTPassword: ""
+  # Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.
+  automaticResumeEnabled: "false"
 
 # Memory and CPU settings for installer
 resources:
@@ -97,3 +106,7 @@ shareProcessNamespace: false
 # Apply securityContext to installer pod. For example to set `runAsNonRoot: true`:
 # securityContext:
 #   runAsNonRoot: true
+
+# Add extra pod labels
+# podLabels:
+#   label: value

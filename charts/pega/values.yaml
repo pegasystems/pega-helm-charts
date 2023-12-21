@@ -57,8 +57,11 @@ global:
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
-    # Add a list of ; delimited connections properties. The list must end with ;
-    # For example: connectionProperties=user=usr;password=pwd;
+    # Use the connectionProperties parameter to pass connection settings to your deployment
+    # by adding a list of semi-colon-delimited required connection setting. The list string must end with ";".
+    # For example, you can set a custom authentication using Azure Managed Identity and avoid using a password.
+    # To pass an Authentication method and a managed identity, MSI Client ID,
+    # set: connectionProperties: "Authentication=ActiveDirectoryMSI;msiClientId=<your Azure Managed Identity>;"
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
@@ -118,6 +121,10 @@ global:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
 
+  # Set the `compressedConfigurations` parameter to `true` when the configuration files under charts/pega/config/deploy are in compressed format.
+  # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
+  compressedConfigurations: false
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
@@ -138,6 +145,18 @@ global:
         httpEnabled: true
         port: 80
         targetPort: 8080
+        # Use this parameter to deploy a specific type of service using the serviceType parameter and specify the type of service in double quotes.
+        # This is an optional value and should be used based on the use case.
+        # This should be set only in case of eks, gke and other cloud providers. This option should not be used for k8s and minikube.
+        # For example if you want to deploy a service of type LoadBalancer, uncomment the following line and specify serviceType: "LoadBalancer"
+        # serviceType: ""
+        # Specify the CIDR ranges to restrict the service access to the given CIDR range.
+        # Each new CIDR block should be added in a separate line.
+        # Should be used only when serviceType is set to LoadBalancer.
+        # Uncomment the following lines and replace the CIDR blocks with your configuration requirements.
+        # loadBalancerSourceRanges:
+        #     - "123.123.123.0/24"
+        #     - "128.128.128.64/32"
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
@@ -179,6 +198,13 @@ global:
           # secretName:
           # useManagedCertificate: false
           # ssl_annotation:
+          # For Openshift, Pega deployments enable TLS to secure the connection
+          # from the browser to the router by creating the route using reencrypt termination policy.
+          # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
+          # specify a CA certificate to validate the endpoint certificate.
+          certificate:
+          key:
+          cacertificate:
 
       replicas: 1
       javaOpts: ""
@@ -379,13 +405,36 @@ dds:
   # using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. If not configured, queries
   # will be retried once.
   customRetryPolicy: false
-  # Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega
-  # Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This
-  # provides lower perceived latencies at the client, but puts greater load on your Cassandra service.
+  # Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier
+  # releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries
+  # that time out. Configure the number of retries using the dynamic system setting (DSS):
+  # dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out
+  # queries are retried once.
+  customRetryPolicyEnabled: false
+  # Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries
+  # using the `customRetryPolicyCount` property.
+  customRetryPolicyCount: 1
+  # Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier
+  # releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount.
   speculativeExecutionPolicy: false
-  # Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to
-  # monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX
-  # interface; disabling also limits the metrics being collected using the DDS landing page.
+  # Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and
+  # earlier releases. When enabled, Pega Platform sends a query to multiple nodes in your Cassandra service and
+  # processes the first response. This provides lower perceived latencies for your deployment, but puts greater load
+  # on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic
+  # system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and
+  # dnode/cassandra_speculative_execution_policy/max_executions.
+  speculativeExecutionPolicyEnabled: false
+  # Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the
+  # speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and
+  # `speculativeExecutionPolicyMaxExecutions` properties.
+  speculativeExecutionPolicyDelay: 100
+  # Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is
+  # true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS):
+  # dnode/cassandra_speculative_execution_policy/delay.
+  speculativeExecutionPolicyMaxExecutions: 2
+  # Specify the maximum number of speculative execution attempts when `speculativeExecutionPolicyEnabled` is true. For
+  # Pega Platform '23 and earlier releases use the dynamic system setting (DSS):
+  # dnode/cassandra_speculative_execution_policy/max_executions.
   jmxMetricsEnabled: true
   # Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor
   # your Cassandra service. If you enable this property, use the Pega Platform DSS:
@@ -447,8 +496,6 @@ hazelcast:
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-    skipRestart: false
 
   # No. of initial members to join
   replicas: 3
@@ -464,8 +511,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a"Kafka stream service" configuration.
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.

@@ -29,26 +29,48 @@ spec:
     metadata:
       labels:
         installer-job: {{ .name }}
+        {{- if .root.Values.podLabels }}
+{{ toYaml .root.Values.podLabels | indent 8 }}
+        {{- end -}}
 {{ include "generatedInstallerPodLabels" .root | indent 8 }}
       annotations:
 {{- if .root.Values.podAnnotations}}
 {{ toYaml .root.Values.podAnnotations | indent 8 }}
-{{- end }}     
+{{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
 {{- if .root.Values.serviceAccountName }}
       serviceAccountName: {{ .root.Values.serviceAccountName }}
-{{- end }}   
+{{- end }}
       volumes:
+{{- if .root.Values.installerMountVolumeClaimName }}
+      - name: {{ template "pegaInstallerMountVolume" }}
+        persistentVolumeClaim:
+          claimName: {{ .root.Values.installerMountVolumeClaimName }}
+{{- end }}
 {{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
       - name: {{ template "pegaDistributionKitVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}
 {{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
-{{ toYaml .root.Values.custom.volumes | indent 6 }}          
-{{- end }}{{- end }}  
-{{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{ toYaml .root.Values.custom.volumes | indent 6 }}
+{{- end }}{{- end }}
+      - name: {{ template "pegaInstallerCredentialsVolume" }}
+        projected:
+          defaultMode: 420
+          sources:
+          {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
+          {{ include "secretResolver" $d | indent 10}}
+
+          {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
+          {{ include "secretResolver" $artifactoryDict | indent 10}}
+
+          # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
+          {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
+          - secret:
+              name: {{ include  "pega-hz-secret-name" .root}}
+          {{- end }}
       - name: {{ template "pegaVolumeInstall" }}
         configMap:
           # This name will be referred in the volume mounts kind.
@@ -93,14 +115,18 @@ spec:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
         volumeMounts:
+{{- if .root.Values.installerMountVolumeClaimName }}
+        - name: {{ template "pegaInstallerMountVolume" }}
+          mountPath: "/opt/pega/mount/installer"
+{{- end }}
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeInstall" }}
           mountPath: "/opt/pega/config"
-        - name: {{ template "pegaVolumeCredentials" }}
+        - name: {{ template "pegaInstallerCredentialsVolume" }}
           mountPath: "/opt/pega/secrets"
-{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}          
+{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
         - name: {{ template "pegaDistributionKitVolume" }}
-          mountPath: "/opt/pega/mount/kit"                           
+          mountPath: "/opt/pega/mount/kit"
 {{- end }}
 {{- if .root.Values.custom }}
 {{- if .root.Values.custom.volumeMounts }}
@@ -117,6 +143,23 @@ spec:
         env:
         -  name: ACTION
            value: {{ .action }}
+{{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
+        -  name: HZ_VERSION
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_VERSION
+        -  name: HZ_CLUSTER_NAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_CLUSTER_NAME
+        -  name: HZ_SERVER_HOSTNAME
+           valueFrom:
+            configMapKeyRef:
+              name: {{ template "pegaEnvironmentConfig" }}
+              key: HZ_SERVER_HOSTNAME
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
@@ -128,7 +171,7 @@ spec:
 {{- end }}
 {{- if .root.Values.sidecarContainers }}
 {{ toYaml .root.Values.sidecarContainers | indent 6 }}
-{{- end }}                
+{{- end }}
       restartPolicy: Never
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}

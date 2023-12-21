@@ -1,4 +1,3 @@
-
 {{- define "pegaEnvironmentConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-environment-config
@@ -49,17 +48,6 @@
     defaultMode: 420
 {{- end}}
 
-{{- define "customArtifactorySSLVerificationEnabled" }}
-{{- if (.Values.global.customArtifactory) }}
-{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
-{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
-true
-{{- else -}}
-false
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
 
 {{- define "pegaTomcatKeystoreSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" .root) -}}
@@ -85,46 +73,14 @@ false
 
 {{- define "pegaKerberosConfig" }}pega-import-kerberos{{- end }}
 
-{{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
-
-{{- define "pegaCredentialsSecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-credentials-secret
-{{- end }}
-
-{{- define "pegaRegistrySecret" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-registry-secret
-{{- end }}
 
 
 {{- define "deployConfig" -}}deploy-config{{- end -}}
 {{- define "pegaBackendConfig" -}}pega-backend-config{{- end -}}
 
-{{- define "imagePullSecret" }}
-{{- if .Values.global.docker.registry }}
-{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
-{{- end }}
-{{- end }}
 
 {{- define "performOnlyDeployment" }}
   {{- if (eq .Values.global.actions.execute "deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performDeployment" }}
-  {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
-{{- define "performInstallAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "install-deploy") -}}
     true
   {{- else -}}
     false
@@ -143,6 +99,12 @@ false
       {{- end -}}
     {{- end }}
   {{- end }}
+{{- end }}
+
+{{- define "imagePullSecret" }}
+{{- if .Values.global.docker.registry }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
 {{- end }}
 
 {{- define "useApiKeyForCustomArtifactory" }}
@@ -181,14 +143,6 @@ false
   {{- end }}
   backend:
     {{ include "ingressBackend" $ }}
-{{- end }}
-
-{{- define "performUpgradeAndDeployment" }}
-  {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
 {{- end }}
 
 {{- define "customerDeploymentID" -}}
@@ -240,6 +194,7 @@ false
   imagePullPolicy: {{ .Values.global.utilityImages.busybox.imagePullPolicy }}
   # Init container for waiting for Elastic Search to initialize.  The URL should point at your Elastic Search instance.
   command: ['sh', '-c', 'until $(wget -q -S --spider --timeout=2 -O /dev/null {{ include "pegaSearchURL" $ }}); do echo Waiting for search to become live...; sleep 10; done;']
+{{- include "initContainerResources" $ }}
 {{- end }}
 
 {{- define "waitForCassandra" -}}
@@ -251,6 +206,7 @@ false
   # -p is password
   # final 2 args for cqlsh are cassandra host and port respectively
   command: ['sh', '-c', '{{- template "waitForCassandraScript" dict "nodes" (include "getCassandraSubchartService" .) "node" .Values.dds -}}']
+{{- include "initContainerResources" $ }}
  {{- end -}}
 {{- end }}
 
@@ -285,7 +241,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- if .node.initialHeap }}
   value: "{{ .node.initialHeap }}"
 {{- else }}
-  value: "4096m"
+  value: "8192m"
 {{- end }}
 # Maximum JVM heap size, equivalent to -Xmx
 - name: MAX_HEAP
@@ -385,36 +341,6 @@ true
 {{- define "generatedPodLabels" }}
 {{- end }}
 
-#Override this template in a subchart if your secret values are provided by seperate secrets
-{{- define "pegaCredentialVolumeTemplate" }}
-- name: {{ template "pegaVolumeCredentials" }}
-  projected:
-    defaultMode: 420
-    sources:
-    - secret:
-        name: {{ template "pegaCredentialsSecret" $ }}
-  {{ if ((.Values.global.jdbc).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.jdbc.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.hazelcast).external_secret_name)}}
-    - secret:
-        name: {{ .Values.hazelcast.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.global.customArtifactory.authentication).external_secret_name) }}
-    - secret:
-        name: {{ .Values.global.customArtifactory.authentication.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.dds).external_secret_name)}}
-    - secret:
-        name: {{ .Values.dds.external_secret_name }}
-  {{- end }}
-  {{ if ((.Values.stream).external_secret_name)}}
-    - secret:
-        name: {{ .Values.stream.external_secret_name }}
-  {{- end }}
-{{- end}}
-
 #Kerberos config map
 {{- define "pegaKerberosVolumeTemplate" }}
 # Volume used to mount config files.
@@ -433,9 +359,6 @@ dnsConfig:
   - {{ .Values.global.privateHostedZoneDomainName }}
 {{- end }}
 {{- end }}
-
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
-
 
 {{- define "pegaSearchURL" -}}
 {{- $d1 := dict "overrideURL" $.Values.pegasearch.externalURL }}
@@ -534,19 +457,19 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzServiceName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
-{{ template "hazelcastName" }}
-{{- else -}}
-{{ template "clusteringServiceName" }}
-{{- end -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ template "clusteringServiceName" }}
+  {{- else -}}
+    {{ template "hazelcastName" }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "hzClusterName" -}}
-{{- if or (.Values.hazelcast.enabled) (.Values.hazelcast.migration.skipRestart) -}}
-{{ .Values.hazelcast.client.clusterName }}
-{{- else -}}
-{{ .Values.hazelcast.server.clustering_service_group_name }}
-{{- end -}}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    {{ .Values.hazelcast.server.clustering_service_group_name }}
+  {{- else -}}
+    {{ .Values.hazelcast.client.clusterName }}
+  {{- end -}}
 {{- end -}}
 
 {{- define "hazelcastCSConfigRequired" }}
@@ -557,13 +480,35 @@ servicePort: use-annotation
   {{- end -}}
 {{- end -}}
 
-{{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
-- name: {{ template "pegaRegistrySecret" $ }}
-{{- end }}
-{{- if (.Values.global.docker.imagePullSecretNames) }}
-{{- range .Values.global.docker.imagePullSecretNames }}
-- name: {{ . }}
+{{- define "hazelcastVersion" }}
+  {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
+    v5
+  {{- else -}}
+    v4
+  {{- end -}}
 {{- end -}}
-{{- end -}}
-{{- end -}}
+
+{{- define "pegaCredentialVolumeTemplate" }}
+- name: {{ template "pegaVolumeCredentials" }}
+  projected:
+    defaultMode: 420
+    sources:
+    {{- $dbDict := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" $  -}}
+    {{ include "secretResolver" $dbDict | indent 4}}
+
+    {{- $hzDict := dict "deploySecret" "deployHzSecret" "deployNonExtsecret" "deployNonExtHzSecret" "extSecretName" .Values.hazelcast.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $hzDict | indent 4}}
+
+    {{- $streamDict := dict "deploySecret" "deployStreamSecret" "deployNonExtsecret" "deployNonExtStreamSecret" "extSecretName" .Values.stream.external_secret_name "nonExtSecretName" "pega-stream-secret-name" "context" $ -}}
+    {{ include "secretResolver" $streamDict | indent 4}}
+
+    {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
+    {{ include "secretResolver" $ddsDict | indent 4}}
+
+    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
+    {{ include "secretResolver" $artifactoryDict | indent 4}}
+
+    - secret:
+        name: {{ include "pega-diagnostic-secret-name" $}}
+
+{{- end}}

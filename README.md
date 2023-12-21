@@ -146,6 +146,8 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/platform/pega:<version>
 ```
 
+All Docker images for Pega Platform releases that are in Standard Support undergo a nightly rebuild that applies the latest available updates and patches to all third-party components. To take advantage of these updates, you must redeploy your Pega Platform with the latest available images. Pega does not guarantee nightly rebuilds for Pega Platform releases in Extended Support and stops rebuilding images for Pega Platform releases that are out of Extended Support.
+
 For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
@@ -191,3 +193,10 @@ New versions of this Helm Chart may be released at any time. Versions are define
 * Patch: Pega fixes bugs and maintains backwards compatibility between minor releases. Examples:
   * Bug fixes or known issue resolutions.
   * Security vulnerability enhancements.
+
+## Helm charts and Docker images compatibility
+
+Both Helm charts and Docker images undergo frequent updates; new Helm chart releases may appear at any time, and the latest patch versions of the Docker images are rebuilt nightly as part of software maintenance (for more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html)). This might result in incompatibility issues during the install and upgrade process. To ensure that Helm charts and Docker images are compatible, do one of the following actions:
+
+* If you update your Helm charts to the latest version to take advantage of new features, update your Docker images to the latest version as well (latest build of the latest patch).
+* If you upgrade your Pega Platform to a later version, use the latest Docker image build and latest Helm chart version.

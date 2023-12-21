@@ -86,4 +86,9 @@ bypass.load.assembled.classes={{ .Env.BYPASS_LOAD_ASSEMBLED_CLASSES }}
 # Enable adminstrator user after upgrade by default.
 upgrade.enable.admin=true
 
+custom.jvm.args=-Xmx4g {{ .Env.CUSTOM_JVM_ARGS }}
+
+# Enable the automatic resume parameter to support resuming rules_upgrade from point of failure.
+automatic.resume={{ .Env.AUTOMATIC_RESUME_ENABLED }}
+
 {{ .Env.ADVANCED_SETTINGS }}

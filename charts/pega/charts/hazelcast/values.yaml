@@ -19,8 +19,6 @@ migration:
   migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
   # Set to `true` when migrating from embedded Hazelcast.
   embeddedToCSMigration: false
-  # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-  skipRestart: false
 
 # username to be used in client-server Hazelcast model for authentication.
 username: ""
@@ -40,8 +38,9 @@ client:
   clusterName: "PRPC"
 # Server side settings for Hazelcast
 server:
-  java_opts: "-Xms820m -Xmx820m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof
-  -XX:+UseParallelGC -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m"
+  java_opts: "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof
+   -XX:+UseG1GC -XX:NewRatio=3 -XshowSettings:vm -XX:InitiatingHeapOccupancyPercent=45
+   -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m"
   jmx_enabled: "true"
   health_monitoring_level: "OFF"
   operation_generic_thread_count: ""

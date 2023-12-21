@@ -102,7 +102,7 @@ To support this option,
 2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
 3) Update your local Helm repository to the latest version using the command: 
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
-4) Update your values.yaml file to refer to the external secret manager for DB password.
+4) Update the `external_secret_name` parameter in the values.yaml file to refer to the `spec.target.name` defined in the External Secret file you created in step 1. Update the parameter for each section where you want to use the External Secrets Operator.
 
 •  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
@@ -232,7 +232,7 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | For Pega Platform release 8.8 and later, Pega has deprecated the use of embedded "Stream tier" nodes. For new deployments, Pega recommends that you enable an Externalized Kafka configuration under External Services; for existing deployments, nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” nodetype.
+stream (Deprecated)        | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 
 #### Small deployment with a single tier
 
@@ -240,7 +240,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | One tier handles all foreground and background processing using the `nodeType` classification "WebUser,BackgroundProcessing,search,Stream". When your Pega Platform deployment uses an externalize Kafka configuration, your deployment no longer uses the "Stream" node type.
+pega        | With embedded Kafka, which is currently deprecated, one tier handles all foreground and background processing using the nodeType classification "WebUser,BackgroundProcessing,search,Stream". For newer Pega Platform deployments using a configuration that connects to a Kafka service managed in your organization, "Stream" nodetype not supported.
 
 #### Large deployment for production isolation of processing
 
@@ -250,7 +250,7 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | For Pega Platform release 8.8 and later, Pega has deprecated the use of embedded "Stream tier" nodes. For new deployments, Pega recommends that you enable an Externalized Kafka configuration under External Services; for existing deployments, nodes that run an embedded deployment of Kafka and are not exposed to the load balancer. Pega requires that these nodes use the node classification “Stream” nodetype.
+stream (Deprecated)     | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -270,7 +270,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
+[Node types for VM-based and containerized deployments](https://docs.pega.com/bundle/platform-88/page/platform/system-administration/node-types-on-premises.html)
 
 Example:
 
@@ -343,7 +343,7 @@ Parameter | Description
 `tls.secretName` | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment. For compatibility, see [provider support for SSL certificate injection](#provider-support-for-ssl-certificate-management).
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
-`annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes and EKS deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
+`annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes, EKS, and OpenShift deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
   - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
@@ -451,7 +451,7 @@ Parameter       | Description                                            | Defau
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
 ### JVM Arguments
@@ -652,6 +652,23 @@ tier:
       webXML: |-
         ...
 ```
+### Pega compressed configuration files
+
+To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
+
+1) Compress each configuration file using the following command in your local terminal:
+```
+- cat "<path_to_actual_uncompressed_file_in_local>" | gzip -c | base64 
+```
+Example for a prconfig.xml file:
+```
+cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
+```
+2) Provide the file content with the output of the command for each file executed.
+3) Set the `compressedConfigurations` in values.yaml to `true`, as in the following example:
+```yaml
+  compressedConfigurations: true
+```
 
 ### Pega diagnostic user
 
@@ -682,8 +699,13 @@ Parameter     | Tier Level Environment Variable | Description | Default value
 `keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra. | Empty
 `extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner. | false
 `latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average). | false
-`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that timeout. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once. | false
-`speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service. When enabled, the Pega Platform will send a query to multiple nodes in your Cassandra service and process the first query response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. | false
+`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that time out. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once.| false
+`customRetryPolicyEnabled` | CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries using the `customRetryPolicyCount` property.| false
+`customRetryPolicyCount` | CASSANDRA_CUSTOM_RETRY_POLICY_COUNT | Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. | 1
+`speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and earlier releases. When enabled, Pega Platform sends a query to multiple nodes in your Cassandra service and processes the first response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and dnode/cassandra_speculative_execution_policy/max_executions. | false
+`speculativeExecutionPolicyEnabled` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and `speculativeExecutionPolicyMaxExecutions` properties. | false
+`speculativeExecutionPolicyDelay` | CASSANDRA_SPECULATIVE_EXECUTION_DELAY | Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/delay. | 100
+`speculativeExecutionPolicyMaxExecutions` | CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS | Specify the maximum number of speculative execution attempts when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/max_executions. | 2
 `jmxMetricsEnabled` | CASSANDRA_JMX_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX interface; disabling also limits the metrics being collected using the DDS landing page. | true
 `csvMetricsEnabled` | CASSANDRA_CSV_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor your Cassandra service. If you enable this property, use the Pega Platform DSS: dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By default, after you enable this property, CSV files will be written to the Pega Platform work directory. | true
 `logMetricsEnabled` | CASSANDRA_LOG_METRICS_ENABLED | Enable reporting of DDS SDK metrics to your Pega Platform logs. | false
@@ -780,13 +802,15 @@ cassandra:
 
 ## Search deployment
 
-Use the `pegasearch` section to configure the source ElasticSearch service that the Pega Platform deployment uses for searching Rules and Work within Pega. The ElasticSearch service defined here is not related to the ElasticSearch deployment if you also define an EFK stack for logging and monitoring in your Pega Platform deployment.
+Use the `pegasearch` section to configure the source Elasticsearch service that the Pega Platform deployment uses for searching Rules and Work within Pega. The Elasticsearch service defined here is not related to the Elasticsearch deployment if you also define an EFK stack for logging and monitoring in your Pega Platform deployment.
+
 ### For Pega Platform 8.6 and later:
 
-Pega recommends using the chart ['backingservices'](../backingservices) to enable Pega Infinity backing service and to deploy the latest generation of search and reporting capabilities to your Pega applications that run independently on nodes provisioned exclusively to run these services.
-This is an independently manageable search solution that replaces the previous implementation of Elasticsearch. The SRS supports, but does not require you to enable, Elasticsearch for your Pega Infinity deployment searching capability.
+Use the chart ['backingservices'](../backingservices) to deploy the Search and Reporting Service (SRS), a Pega Platform backing service enabling the latest generation of search and reporting capabilities for your Pega applications. SRS is independent from Pega Platform and replaces the previous implementation of Elasticsearch, the legacy client-server Elasticsearch plug-in.
 
-To use this search and reporting service, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy `pega` helm chart. You must configure the SRS URL for your Pega Infinity deployment using the parameter in values.yaml as shown the the following table and exmple:
+To use SRS, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy the Pega Helm chart. For more information, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-88/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).
+
+You must configure the SRS URL for your Pega Platform deployment using the parameter in values.yaml as shown the following table and example:
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
@@ -827,26 +851,28 @@ pegasearch:
     privateKeyAlgorithm: "RS256"
 ```
 
-Use the below configuration to provision an internally deployed instance of elasticsearch for search functionality within the platform:
+### For Pega Platform 8.5 and earlier:
+
+Use the following configuration to provision the legacy client-server Elasticsearch plug-in with a Pega-provided Docker image. This is a deprecated solution; as a best practice, update your deployment to Pega Platform version 8.6 or later and use SRS instead.
 
 Parameter   | Description   | Default value
 ---         | ---           | ---
-`image`   | Set the `pegasearch.image` location to a registry that can access the Pega search Docker image. The image is [available on DockerHub](https://hub.docker.com/r/pegasystems/search), and you may choose to mirror it in a private Docker repository. | `pegasystems/search:latest`
+`image`   | Set the `pegasearch.image` parameter to a registry that can access the Pega-provided `platform/search` Docker image. Download the image from the Pega repository, tag it, and push it to your local registry. As a best practice, use the latest available image for your Pega Platform version, based on the build date specified in the tag. For example, the image tagged "8.5.6-20230829" was built on August 29, 2023. For more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform-88/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).| `platform/search:8.5.x-XXXXXXXX`
 `imagePullPolicy` | Optionally specify an imagePullPolicy for the search container. | `""`
 `replicas` | Specify the desired replica count. | `1`
-`minimumMasterNodes` | To prevent data loss, you must configure the minimumMasterNodes setting so that each master-eligible node is set to the minimum number of master-eligible nodes that must be visible in order to form a cluster. Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.  For more information, see the ElasticSearch [important setting documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html) for more information. | `1`
-`podSecurityContext.runAsUser`   | ElasticSearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
-`set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the ElasticSearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [ElasticSearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
+`minimumMasterNodes` | To prevent data loss, you must configure the minimumMasterNodes setting so that each master-eligible node is set to the minimum number of master-eligible nodes that must be visible in order to form a cluster. Configure this value using the formula (n/2) + 1 where n is replica count or desired capacity.  For more information, see the Elasticsearch [important setting documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/important-settings.html) for more information. | `1`
+`podSecurityContext.runAsUser`   | Elasticsearch defaults to UID 1000.  In some environments where user IDs are restricted, you may configure your own using this parameter. | `1000`
+`set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the Elasticsearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
 `podAnnotations` | Configurable annotations applied to all Elasticsearch pods. | {}
 
-Additional env settings supported by ElasticSearch may be specified in a `custom.env` block as shown in the example below.
+Additional env settings supported by Elasticsearch may be specified in a `custom.env` block as shown in the example below.
 
 Example:
 
 ```yaml
 pegasearch:
-  image: "pegasystems/search:8.3"
+  image: "platform/search:8.5.6-20230829"
   memLimit: "3Gi"
   replicas: 1
   minimumMasterNodes: 2
@@ -857,8 +883,7 @@ pegasearch:
 ```
 ## Deploying Pega with externalized kafka service for stream
 
-Deployment of stream with an externalized Kafka configuration requires Pega Infinity 8.4 or later. Starting in 8.7, Pega deprecated the use of embedded stream (using the Stream tier or “Stream” nodetype).
-For new deployments, Pega recommends deploying Pega Platform using an externalized Kafka configuration as a stream service provider to use your own managed Kafka infrastructure. Pega provides parameters for this configuration in the Pega Helm chart so your stream service starts when your Pega nodes start. For details and requirements about configuring Kafka, see [Kafka Cluster requirements](KafkaClusterRequirement.md).
+Beginning with Pega Platform '23, configure the default Pega Helm chart parameters that are appropriate to connect to a Kafka service that you manage in your organization to use as your stream provider for Pega Platform data integrations
 Pega supports migrating existing deployments to use an externalized Kafka configuration as a stream service provider using Pega-provided Helm charts. To use your own managed Kafka infrastructure without the use of stream nodes, Pega provides instructions to run a migration with downtime and potential data loss or with minimal downtime and no downtime. For migration steps, see [Switch from embedded Stream to externalized Kafka service](MigrationToExternalStream.md).
 
 ### Stream (externalized Kafka service) settings
@@ -867,8 +892,8 @@ Example:
 ```yaml
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a Kafka stream service configuration
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
@@ -1098,7 +1123,6 @@ Parameter   | Description   | Default value
 `hazelcast.migration.initiateMigration` |  Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster. | `false`
 `hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
 `hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
-`hazelcast.migration.skipRestart` |  Set to `true` during a deployment that removes an older Hazelcast cluster to avoid restarting of Pega pods, which can cause the migration to fail. | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
 `hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
@@ -1115,7 +1139,6 @@ hazelcast:
     initiateMigration: false
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     embeddedToCSMigration: false
-    skipRestart: false
   replicas: 3
   username: ""
   password: ""

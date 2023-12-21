@@ -151,6 +151,16 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+        tls:
+          # Enable TLS encryption
+          enabled: false
+          # For Openshift, Pega deployments enable TLS to secure the connection
+          # from the browser to the router by creating the route using reencrypt termination policy.
+          # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
+          # specify a CA certificate to validate the endpoint certificate.
+          certificate:
+          key:
+          cacertificate:
 
       # Set resource consumption to minimal levels
       replicas: 1
@@ -226,8 +236,6 @@ hazelcast:
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-    skipRestart: false
 
   # No. of initial members to join
   replicas: 3
@@ -243,8 +251,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a"Kafka stream service" configuration.
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.

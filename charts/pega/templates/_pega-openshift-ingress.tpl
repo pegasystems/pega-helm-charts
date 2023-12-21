@@ -5,12 +5,17 @@ apiVersion: route.openshift.io/v1
 metadata:
   name: {{ .name }}
   annotations:
+{{- if (.node.ingress).annotations }}
+    # Custom annotations
+{{ toYaml .node.ingress.annotations | indent 4 }}
+{{- else }}
     # When a route has multiple endpoints, HAProxy distributes requests to the route among the endpoints based on the selected load-balancing strategy. (roundrobin/leastconn/source)
     # roundrobin: Each endpoint is used in turn, according to its weight.
     # leastconn: The endpoint with the lowest number of connections receives the request.
     # source: The source IP address is hashed and divided by the total weight of the running servers to designate which server will receive the request.
     haproxy.router.openshift.io/balance: roundrobin
     haproxy.router.openshift.io/timeout: 2m
+{{- end }}
 spec:
   # Host on which you can reach mentioned service.
   host: {{ template "domainName" dict "node" .node }}
@@ -25,6 +30,11 @@ spec:
   tls:
     # Edge-terminated routes can specify an insecureEdgeTerminationPolicy that enables traffic on insecure schemes (HTTP) to be disabled, allowed or redirected.  (None/Allow/Redirect/EMPTY_VALUE)
     insecureEdgeTerminationPolicy: Redirect
+{{- if ((.node.ingress).tls).enabled }}
+    certificate: {{ .node.ingress.tls.certificate | toYaml | indent 4 }}
+    key: {{ .node.ingress.tls.key | toYaml | indent 4 }}
+    caCertificate: {{ .node.ingress.tls.cacertificate | toYaml | indent 4 }}
+{{- end }} 
 {{- if ((.node.service).tls).enabled }}
     termination: reencrypt
   {{- if .node.service.tls.cacertificate }}

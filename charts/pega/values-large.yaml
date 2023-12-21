@@ -57,8 +57,11 @@ global:
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
-    # Add a list of ; delimited connections properties. The list must end with ;
-    # For example: connectionProperties=user=usr;password=pwd;
+    # Use the connectionProperties parameter to pass connection settings to your deployment
+    # by adding a list of semi-colon-delimited required connection setting. The list string must end with ";".
+    # For example, you can set a custom authentication using Azure Managed Identity and avoid using a password.
+    # To pass an Authentication method and a managed identity, MSI Client ID,
+    # set: connectionProperties: "Authentication=ActiveDirectoryMSI;msiClientId=<your Azure Managed Identity>;"
     connectionProperties: ""
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
@@ -183,6 +186,13 @@ global:
           # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
           # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
           ssl_annotation:
+          # For Openshift, Pega deployments enable TLS to secure the connection
+          # from the browser to the router by creating the route using reencrypt termination policy.
+          # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
+          # specify a CA certificate to validate the endpoint certificate.
+          certificate:
+          key:
+          cacertificate:
 
 
       replicas: 1
@@ -437,8 +447,6 @@ hazelcast:
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
     # Set to `true` when migrating from embedded Hazelcast.
     embeddedToCSMigration: false
-    # Set to `true` to prevent Pega pod restart while decommissioning older version of externalized Hazelcast pods.
-    skipRestart: false
 
   # No. of initial members to join
   replicas: 3
@@ -454,8 +462,8 @@ hazelcast:
 
 # Stream (externalized Kafka service) settings.
 stream:
-  # Disabled by default, when enabled, your deployment no longer uses the "Stream" node type.
-  enabled: false
+  # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a"Kafka stream service" configuration.
+  enabled: true
   # Provide externalized Kafka service broker urls.
   bootstrapServer: ""
   # Provide Security Protocol used to communicate with kafka brokers. Supported values are: PLAINTEXT, SSL, SASL_PLAINTEXT, SASL_SSL.
