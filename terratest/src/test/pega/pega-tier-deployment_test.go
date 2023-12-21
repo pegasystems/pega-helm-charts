@@ -38,7 +38,7 @@ func TestPegaTierDeployment(t *testing.T) {
 						"global.actions.execute":        operation,
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
-						"global.storageClassName": "storage-class",
+						"global.storageClassName":       "storage-class",
 					},
 				}
 
@@ -90,6 +90,7 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 					"global.tier[2].securityContext.fsGroup": key, // stream tier
 				},
 			}
+
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 			yamlSplit := strings.Split(yamlContent, "---")
 
@@ -190,6 +191,14 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		envIndex++
 		require.Equal(t, "COSMOS_SETTINGS", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
+	}
+	if expectedSpec.name == getObjName(options, "-web") {
+		envIndex++
+		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "EXTERNAL_CERTIFICATE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, "JAVA_OPTS", pod.Containers[0].Env[envIndex].Name)
