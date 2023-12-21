@@ -368,11 +368,11 @@ dnsConfig:
 
 {{- define "srsAuthPrivateKey" -}}
 {{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsAuth).enabled) }}
-  {{- if (.Values.pegasearch.srsAuth).privateKey }}
-      {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
-  {{- else }}
-      {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
-  {{- end }}
+    {{- if (.Values.pegasearch.srsAuth).privateKey }}
+        {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
+    {{- else }}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote }}
+    {{- end }}
 {{- end }}
 {{- end }}
 
