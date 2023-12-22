@@ -60,7 +60,11 @@
 - name: {{ template "pegaVolumeTomcatKeystore" }}
   secret:
     # This name will be referred in the volume mounts kind.
-  {{ if ((.node.service).tls).external_secret_name }}
+  {{ if ((.node.service).tls).external_secret_names }}
+    {{- range ((.node.service).tls).external_secret_names }}
+    - secret:
+        name: {{ . }}
+    {{- end }}
     secretName: {{ ((.node.service).tls).external_secret_name }}
   {{ else }}
     secretName: {{ template "pegaTomcatKeystoreSecret" $ }}

@@ -173,7 +173,7 @@ spec:
         - name: COSMOS_SETTINGS
           value: "Pega-UIEngine/cosmosservicesURI=/c11n"
 {{- end }}
-{{- if (eq .tierName "web") }}
+{{- if ((.node.service).tls).enabled }}
         - name: EXTERNAL_CERTIFICATE_KEYSTORE
           value: "{{ (((.node.service).tls).external_certificate_keystore) }}"
         - name: EXTERNAL_CERTIFICATE_PASSWORD
