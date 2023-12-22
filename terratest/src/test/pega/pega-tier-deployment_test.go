@@ -34,11 +34,12 @@ func TestPegaTierDeployment(t *testing.T) {
 
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
-						"global.deployment.name":        depName,
-						"installer.upgrade.upgradeType": "zero-downtime",
-						"global.storageClassName":       "storage-class",
+						"global.provider":                    vendor,
+						"global.actions.execute":             operation,
+						"global.deployment.name":             depName,
+						"installer.upgrade.upgradeType":      "zero-downtime",
+						"global.storageClassName":            "storage-class",
+						"global.tier[0].service.tls.enabled": "true",
 					},
 				}
 
