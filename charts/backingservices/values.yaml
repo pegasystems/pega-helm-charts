@@ -9,7 +9,7 @@ global:
 
 # Search and Reporting Service (SRS) Configuration
 srs:
-  # always set srs.srsStorage.provisionInternalESCluster=false when srs.enabled=false
+  # Set srs.enabled=true to enable SRS
   enabled: true
 
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
@@ -38,6 +38,7 @@ srs:
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
     # specified in the `elasticsearch` section
+    # If you do not enable SRS and the srs.enabled parameter is set to false, always set srs.srsStorage.provisionInternalESCluster=false
     provisionInternalESCluster: true
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
     # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
@@ -52,8 +53,10 @@ srs:
     tls:
       enabled: false
     # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false),
-    # uncomment the following line to specify the TLS certificate name for your Elasticsearch service.
+    # uncomment the following lines to specify the TLS certificate name with password for your Elasticsearch service.
+    # Default certificatePassword value will be empty if not used.
     # certificateName: "Certificate_Name"
+    # certificatePassword: "password"
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -79,9 +82,10 @@ constellation:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
-  # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
-  imageTag: 7.10.2
+  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version
+  # for k8s version >= 1.25.
+  # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
+  imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.

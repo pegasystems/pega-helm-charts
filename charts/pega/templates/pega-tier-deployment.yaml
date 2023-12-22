@@ -23,7 +23,7 @@
 {{ end }}
 
 {{ if (eq (include "performInstallAndDeployment" $) "true") }}
-{{ $containerWaitList = append $containerWaitList "waitForPegaDBInstall" }} 
+{{ $containerWaitList = append $containerWaitList "waitForPegaDBInstall" }}
 {{ if not $.Values.pegasearch.externalSearchService }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaSearch" }}
 {{ end }}
@@ -32,7 +32,8 @@
 {{ end }}
 {{ end }}
 
-{{ if (eq (include "performUpgradeAndDeployment" $) "true") }}
+# Allowing ZDT wait containers to trigger only in case of upgradeType as zero-downtime, so that custom upgrade moves forward in case of failure in ZDT
+{{ if ( and  (eq (include "performUpgradeAndDeployment" $) "true") (eq $.Values.installer.upgrade.upgradeType "zero-downtime")) }}
 {{ $containerWaitList = append $containerWaitList "waitForPegaDBZDTUpgrade" }}
 {{ end }}
 
