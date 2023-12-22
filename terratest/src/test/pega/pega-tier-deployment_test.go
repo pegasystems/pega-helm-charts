@@ -39,7 +39,6 @@ func TestPegaTierDeployment(t *testing.T) {
 						"global.deployment.name":             depName,
 						"installer.upgrade.upgradeType":      "zero-downtime",
 						"global.storageClassName":            "storage-class",
-						"global.tier[0].name":                "web",
 						"global.tier[0].service.tls.enabled": "true",
 					},
 				}
