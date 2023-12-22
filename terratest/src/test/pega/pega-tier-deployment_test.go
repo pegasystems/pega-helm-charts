@@ -34,12 +34,11 @@ func TestPegaTierDeployment(t *testing.T) {
 
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.provider":                    vendor,
-						"global.actions.execute":             operation,
-						"global.deployment.name":             depName,
-						"installer.upgrade.upgradeType":      "zero-downtime",
-						"global.storageClassName":            "storage-class",
-						"global.tier[0].service.tls.enabled": "true",
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"global.deployment.name":        depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName":       "storage-class",
 					},
 				}
 
@@ -191,14 +190,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		envIndex++
 		require.Equal(t, "COSMOS_SETTINGS", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
-	}
-	if expectedSpec.name == getObjName(options, "-web") {
-		envIndex++
-		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
-		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
-		envIndex++
-		require.Equal(t, "EXTERNAL_CERTIFICATE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
-		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, "JAVA_OPTS", pod.Containers[0].Env[envIndex].Name)
