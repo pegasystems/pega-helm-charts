@@ -192,11 +192,11 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	}
 	if options.ValuesFiles != nil && expectedSpec.name == getObjName(options, "-web") && options.SetStrValues["service.tls.enabled"] == "true" {
 		envIndex++
-		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
-		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, "EXTERNAL_KEYSTORE_NAME", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "EXTERNAL_KEYSTORE_NAME", pod.Containers[0].Env[envIndex].Value)
 		envIndex++
-		require.Equal(t, "EXTERNAL_CERTIFICATE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
-		require.Equal(t, "EXTERNAL_CERTIFICATE_PASSWORD", pod.Containers[0].Env[envIndex].Value)
+		require.Equal(t, "EXTERNAL_KEYSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "EXTERNAL_KEYSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, "JAVA_OPTS", pod.Containers[0].Env[envIndex].Name)
