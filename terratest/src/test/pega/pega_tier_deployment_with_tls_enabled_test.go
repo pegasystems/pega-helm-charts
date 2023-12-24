@@ -34,6 +34,9 @@ func TestPegaTierDeploymentWithTlsEnabled(t *testing.T) {
 						"global.storageClassName":       "storage-class",
 					},
 					ValuesFiles: []string{"data/pega-tier-service-override_values.yaml"},
+					SetStrValues: map[string]string{
+						"service.tls.enabled": "true",
+					},
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})

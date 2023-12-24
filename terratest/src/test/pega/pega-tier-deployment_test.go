@@ -190,7 +190,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		require.Equal(t, "COSMOS_SETTINGS", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
 	}
-	if options.ValuesFiles != nil && expectedSpec.name == getObjName(options, "-web") {
+	if options.ValuesFiles != nil && expectedSpec.name == getObjName(options, "-web") && options.SetStrValues["service.tls.enabled"] == "true" {
 		envIndex++
 		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "EXTERNAL_CERTIFICATE_KEYSTORE", pod.Containers[0].Env[envIndex].Value)
