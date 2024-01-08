@@ -211,6 +211,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, "PATH_TO_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "/usr/share/elastic-certificates.p12", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
+	require.Equal(t, "PATH_TO_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
 	}
 	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
     require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)

@@ -82,6 +82,8 @@ spec:
                   key: password
             - name: PATH_TO_TRUSTSTORE
               value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
+            - name: PATH_TO_KEYSTORE
+              value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
             {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
