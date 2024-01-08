@@ -2,7 +2,7 @@
 
 The optional Messaging service acts as a middle man between information publishers and information subscribers; accepting simple http publish of information to forward to 1000's of websocket subscribers. The publishers are typically the Infinity case engine or 3rd party integration services, and the subscribers are UI components in browsers running Constellation UI.
 
-Once the service routing (with TLS) is set up, configure the Pega Infinity ConstellationMessageSvcHostPath DSS to your service URL (e.g.  http://yourhostname.com/c11n-messaging).
+Once the service routing (with TLS) is set up, configure the Pega Infinity ConstellationMessageSvcHostPath DSS to your service URL (e.g.  yourhostname.com/c11n-messaging). Do not include a protocol for this setting.
 
 Only a single Messaging Service deployment is necessary to support an entire organization.  Do not install the service in every namespace or for every application or project.
 
