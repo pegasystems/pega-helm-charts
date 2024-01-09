@@ -17,7 +17,12 @@ spec:
 {{- include "srs.srs-service.match-labels" . | indent 8 }}
     spec:
       imagePullSecrets:
-        - name: {{ template "srsRegistrySecretName" . }}
+        - name: {{ template "srsRegistrySecretName" . -}}
+        {{ if .Values.srsRuntime.imagePullSecretNames }}
+        {{- range .Values.srsRuntime.imagePullSecretNames }}
+        - name: {{ . }}
+        {{- end -}}
+        {{ end }}
       containers:
         - name: srs-service
           image: {{ .Values.srsRuntime.srsImage }}
