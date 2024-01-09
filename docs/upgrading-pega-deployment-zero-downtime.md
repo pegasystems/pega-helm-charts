@@ -113,7 +113,7 @@ To complete an upgrade with zero downtime,  configure the following settings in 
 - In the installer section of the Helm chart, update the following:
 
   - Specify `installer.installerMountVolumeClaimName` persistent Volume Claim name. This is a client-managed PVC for mounting upgrade artifacts.
-  - Specify `installer.upgradeType: "Zero-downtime"` to use the zero-downtime upgrade process.
+  - Specify `installer.upgradeType: "zero-downtime"` to use the zero-downtime upgrade process.
   - Specify `installer.targetRulesSchema: "<target-rules-schema-name>"` and `installer.targetDataSchema: "<target-data-schema-name>"` for the new target and data schema name that the process creates in your existing database for the upgrade process.
   - Specify `installer.upgrade.automaticResumeEnabled` to support resuming from point of failure
 

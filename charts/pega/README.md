@@ -102,7 +102,7 @@ To support this option,
 2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
 3) Update your local Helm repository to the latest version using the command: 
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
-4) Update your values.yaml file to refer to the external secret manager for DB password.
+4) Update the `external_secret_name` parameter in the values.yaml file to refer to the `spec.target.name` defined in the External Secret file you created in step 1. Update the parameter for each section where you want to use the External Secrets Operator.
 
 •  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
@@ -270,7 +270,7 @@ Node classification is the process of separating nodes by purpose, predefining t
 
 Specify the list of Pega node types for this deployment.  For more information about valid node types, see the Pega Community article on [Node Classification].
 
-[Node types for client-managed cloud environments](https://community.pega.com/knowledgebase/articles/performance/node-classification)
+[Node types for VM-based and containerized deployments](https://docs.pega.com/bundle/platform-88/page/platform/system-administration/node-types-on-premises.html)
 
 Example:
 
@@ -451,7 +451,7 @@ Parameter       | Description                                            | Defau
 `cpuLimit`      | CPU limit for pods in the current tier.                | `4`
 `memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
 `memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `4096m`
+`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
 
 ### JVM Arguments
@@ -651,6 +651,23 @@ tier:
 
       webXML: |-
         ...
+```
+### Pega compressed configuration files
+
+To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
+
+1) Compress each configuration file using the following command in your local terminal:
+```
+- cat "<path_to_actual_uncompressed_file_in_local>" | gzip -c | base64 
+```
+Example for a prconfig.xml file:
+```
+cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
+```
+2) Provide the file content with the output of the command for each file executed.
+3) Set the `compressedConfigurations` in values.yaml to `true`, as in the following example:
+```yaml
+  compressedConfigurations: true
 ```
 
 ### Pega diagnostic user
@@ -1148,7 +1165,7 @@ Parameter   | Description   | Default value
 `service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
 
 ##### Important Points to note
-- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty. The default keystore and CA certificate expire on 25/12/2025.
 - To enable SSL, you must either provide a keystore with a keystorepassword or certificate, certificatekey and cacertificate files in PEM format. If you do not provide either, the deployment implements SSL by passing a Pega-provided default self-signed keystore and a custom root/CA certificate to the Pega web nodes.
 - The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
 - To avoid exposing your certificates, you can use external secrets to manage your certificates. Pega also supports specifying the certificate files using the certificate parameters in the Pega values.yaml. To pass the files using these parameters, you must encode the certificate files using base64 and then enter the string output into the appropriate certificate parameter.

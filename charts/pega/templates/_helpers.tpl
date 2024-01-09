@@ -241,7 +241,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- if .node.initialHeap }}
   value: "{{ .node.initialHeap }}"
 {{- else }}
-  value: "4096m"
+  value: "8192m"
 {{- end }}
 # Maximum JVM heap size, equivalent to -Xmx
 - name: MAX_HEAP

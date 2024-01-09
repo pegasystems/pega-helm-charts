@@ -28,6 +28,10 @@ srs:
     # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
     srsImage: "YOUR_SRS_IMAGE:TAG"
 
+    # To avoid exposing Docker credentials, optionally create a separate Docker config secret.
+    # Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+    imagePullSecretNames: []
+
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
@@ -53,8 +57,10 @@ srs:
     tls:
       enabled: false
     # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false),
-    # uncomment the following line to specify the TLS certificate name for your Elasticsearch service.
+    # uncomment the following lines to specify the TLS certificate name with password for your Elasticsearch service.
+    # Default certificatePassword value will be empty if not used.
     # certificateName: "Certificate_Name"
+    # certificatePassword: "password"
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -80,9 +86,10 @@ constellation:
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # for internally provisioned elasticsearch version is set to 7.10.2. Use this imageTag configuration to update it to 7.16.3 or
-  # 7.17.9 if required. However, we strongly recommend to use version 7.17.9.
-  imageTag: 7.10.2
+  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version
+  # for k8s version >= 1.25.
+  # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
+  imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"
   # Shrink default JVM heap.
