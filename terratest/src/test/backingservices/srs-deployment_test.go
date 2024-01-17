@@ -46,6 +46,7 @@ func TestSRSDeployment(t *testing.T){
 				port:     "9200",
 				protocol: "https",
 			},
+			false,
 		})
 }
 
@@ -58,6 +59,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
+			"srs.srsRuntime.imagePullSecretNames": "{secret1, secret2}",
 			"srs.srsRuntime.env.AuthEnabled": "true",
 			"srs.srsRuntime.env.OAuthPublicKeyURL": "https://acme.authenticator.com/OAuthPublicKeyURL",
 			"srs.srsRuntime.resources.limits.cpu": "2",
@@ -97,6 +99,7 @@ func TestSRSDeploymentVariables(t *testing.T){
 				protocol: "https",
 				region: "us-east-1",
 			},
+			true,
 		})
 }
 
@@ -109,6 +112,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 			"global.imageCredentials.registry": "docker-registry.io",
 			"srs.srsRuntime.replicaCount": "3",
 			"srs.srsRuntime.srsImage": "platform-services/search-n-reporting-service:1.0.0",
+			"srs.srsRuntime.imagePullSecretNames": "{secret1, secret2}",
 			"srs.srsRuntime.env.AuthEnabled": "true",
 			"srs.srsRuntime.env.OAuthPublicKeyURL": "https://acme.authenticator.com/OAuthPublicKeyURL",
 			"srs.srsRuntime.resources.limits.cpu": "2",
@@ -145,6 +149,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T){
 				port:     "443",
 				protocol: "https",
 			},
+			true,
 		})
 }
 
@@ -236,6 +241,10 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
 
 	require.Equal(t, pod.ImagePullSecrets[0].Name, expectedSpec.name + "-reg-secret")
+	if expectedSpec.imagePullSecretNames {
+		require.Equal(t, pod.ImagePullSecrets[1].Name, "secret1")
+		require.Equal(t, pod.ImagePullSecrets[2].Name, "secret2")
+	}
 }
 
 type srsDeployment struct {
@@ -248,6 +257,7 @@ type srsDeployment struct {
 	internetEgress			bool
 	podLimits				podResources
 	elasticsearchEndPoint	esDomain
+	imagePullSecretNames	bool
 }
 
 type podResources struct {
