@@ -19,7 +19,7 @@ global:
   # to support multiple custom certificates as external secrets, specify each of your external secrets
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
-  certificates:
+  certificates: {}
 
   # Add krb5.conf file content here.
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
