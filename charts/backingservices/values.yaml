@@ -61,6 +61,10 @@ srs:
     # Default certificatePassword value will be empty if not used.
     # certificateName: "Certificate_Name"
     # certificatePassword: "password"
+    # To specify a certificate using secrets uncomment the below line and provide the secret name containing your certificate and certificate password (if any).
+    # Make sure to keep the keyname for certificate with extension (certificate.p12/certificate.jks) and set the certificateName parameter too. Please provide
+    # the password using a keyname password in the secret.
+    # esCertsSecret: srs-certs-secret
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -70,6 +74,9 @@ srs:
     # esCredentials:
     #   username: "username"
     #   password: "password"
+    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch service in your SRS cluster
+    # using secret, uncomment the below line and provide the secret name. Make sure to use "username" and "password" as keys for your secret
+    # esCredentialsSecret: srs-auth-secret
     # To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
