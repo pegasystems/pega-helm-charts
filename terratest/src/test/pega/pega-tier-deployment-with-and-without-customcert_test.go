@@ -40,6 +40,10 @@ func TestPegaDeploymentWithAndWithoutCustomCerts(t *testing.T) {
             assertStream(t, yamlSplit[3], options)
             assertVolumeAndMount(t, yamlSplit[3], options, true)
 
+            secretYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-certificates-secret.yaml"})
+
+            assertSecretContents(t, secretYaml)
+
             options.ValuesFiles = []string{"data/values_without_customcerts.yaml"}
 
             deploymentYaml = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
@@ -54,6 +58,14 @@ func TestPegaDeploymentWithAndWithoutCustomCerts(t *testing.T) {
             assertVolumeAndMount(t, yamlSplit[3], options, false)
         }
 	}
+}
+
+func assertSecretContents(t *testing.T, secretYaml string){
+    var secretObj appsv1.Secret
+    UnmarshalK8SYaml(t, secretObj, &secretObj)
+
+
+    require.Equal(t, "----THIS IS MY CERT----", secretObj.stringData["testcert.cer"])
 }
 
 func assertVolumeAndMount(t *testing.T, tierYaml string, options *helm.Options, shouldHaveVol bool) {
