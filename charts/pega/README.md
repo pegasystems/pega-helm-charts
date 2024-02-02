@@ -973,7 +973,7 @@ Parameter   | Description   | Default value
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
-`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
+`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
 
 Upgrade type    | Description
 ---             | ---
