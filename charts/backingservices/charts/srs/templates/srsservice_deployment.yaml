@@ -60,13 +60,13 @@ spec:
             {{- if eq (include "elasticsearch.authProvider" $) "basic-authentication" }}
             - name: ELASTICSEARCH_USERNAME
               valueFrom:
-                secretKeyRef:
-                  name: srs-elastic-credentials
+               secretKeyRef:
+                  name: "{{ .Values.srsStorage.esCredentialsSecret | default "srs-elastic-credentials"}}"
                   key: username
             - name: ELASTICSEARCH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: srs-elastic-credentials
+                  name: "{{ .Values.srsStorage.esCredentialsSecret | default "srs-elastic-credentials"}}"
                   key: password
             {{- end}}
             {{- if eq (include "elasticsearch.authProvider" $) "tls" }}
