@@ -62,8 +62,8 @@ srs:
     # certificateName: "Certificate_Name"
     # certificatePassword: "password"
     # To specify a certificate using a secret, uncomment the esCertsSecret parameter and provide the secret name containing your certificate and certificate password (if any).
-    # Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or “certificate.jks”) as a key name in the secret. Use this key name to configure the “certificateName” parameter.
-    # Use a key name “password” to provide the certificate password in the secret.
+    # Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or “certificate.jks”) as a key name in the secret. Use this key name
+    # to configure the “certificateName” parameter. Use a key name “password” to provide the certificate password in the secret.
     # esCertsSecret: srs-certificates
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
