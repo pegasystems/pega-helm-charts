@@ -1,6 +1,6 @@
 # Pega deployment on Kubernetes
 
-This project provides Helm charts and basic examples for deploying Pega on Kubernetes. You will also need to download the required [installation kit](https://community.pega.com/knowledgebase/products/platform/deploy) from the Pega Community which includes rules and data to preload into your relational database. Deploying Pega on Kubernetes requires Pega Infinity 8.2 or later.
+This project provides Helm charts and basic examples for deploying Pega on Kubernetes. You will also need to download the required [installation kit](https://community.pega.com/knowledgebase/products/platform/deploy) from the Pega Community which includes rules and data to preload into your relational database. Deploying Pega on Kubernetes requires Pega Infinity 8.3 or later.
 
 [![Build Status](https://github.com/pegasystems/pega-helm-charts/actions/workflows/github-actions-build.yml/badge.svg)](https://github.com/pegasystems/pega-helm-charts/actions/workflows/github-actions-build.yml)
 [![GitHub release](https://img.shields.io/github/release/pegasystems/pega-helm-charts.svg)](https://github.com/pegasystems/pega-helm-charts/releases)

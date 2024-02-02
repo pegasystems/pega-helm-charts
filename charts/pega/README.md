@@ -810,6 +810,8 @@ Use the chart ['backingservices'](../backingservices) to deploy the Search and R
 
 To use SRS, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy the Pega Helm chart. For more information, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-88/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).
 
+Configure the customerDeploymentId parameter in the global section of the values.yaml to provide data isolation in SRS.  The customerDeploymentId is used as a prefix for all indexes created in ElasticSearch, and must be the value of the 'guid' claim if OAuth is used for authorization between Pega and SRS.  This parameter defaults to the name of the namespace when left empty.
+
 You must configure the SRS URL for your Pega Platform deployment using the parameter in values.yaml as shown the following table and example:
 
 Parameter   | Description   | Default value
@@ -971,7 +973,7 @@ Parameter   | Description   | Default value
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
-`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
+`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
 
 Upgrade type    | Description
 ---             | ---
