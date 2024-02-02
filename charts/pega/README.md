@@ -810,6 +810,8 @@ Use the chart ['backingservices'](../backingservices) to deploy the Search and R
 
 To use SRS, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy the Pega Helm chart. For more information, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-88/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).
 
+Configure the customerDeploymentId parameter in the global section of the values.yaml to provide data isolation in SRS.  The customerDeploymentId is used as a prefix for all indexes created in ElasticSearch, and must be the value of the 'guid' claim if OAuth is used for authorization between Pega and SRS.  This parameter defaults to the name of the namespace when left empty.
+
 You must configure the SRS URL for your Pega Platform deployment using the parameter in values.yaml as shown the following table and example:
 
 Parameter   | Description   | Default value
