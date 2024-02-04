@@ -70,7 +70,7 @@ Helm provides a script that you can download and then run to install the latest 
 
 1. To download the Helm installation script from the Helm Git repository, from your home directory, enter:
 
-`$ curl
+    `$ curl
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
 get_helm.sh`
 
@@ -80,22 +80,22 @@ get_helm.sh`
 
 3. To run the script, enter:
 
-```bash
-$ ./get_helm.sh
-Helm v3.0.1 is available.
-Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
-Preparing to install helm into /usr/local/bin
-helm installed into /usr/local/bin/helm
-```
+    ```bash
+    $ ./get_helm.sh
+    Helm v3.0.1 is available.
+    Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
+    Preparing to install helm into /usr/local/bin
+    helm installed into /usr/local/bin/helm
+    ```
 
 4. To review your version, enter:
 
-```bash
-$ helm version
-version.BuildInfo{Version:"v3.0.1",
-GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
-GoVersion:"go1.13.4"}
-```
+    ```bash
+    $ helm version
+    version.BuildInfo{Version:"v3.0.1",
+    GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
+    GoVersion:"go1.13.4"}
+    ```
 
 For additional information, see [Helm documentation](https://helm.sh/docs/); for details about installation methods for previous Helm versions, see <https://v2.helm.sh/docs/using_helm/#installing-helm>.
 
@@ -105,12 +105,12 @@ Kubernetes supports a variety of installation methods for the kubectl command. T
 
 1. To download the latest binary from their git repository, enter:
 
-```bash
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s
-https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-```
+    ```bash
+    $ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s
+    https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    ```
 
-This command downloads and parses the \`stable.txt\` in the repository, navigates to the version listed in the file, and downloads the kubectl binary file in the /bin/linux/amd64/ directory.
+    This command downloads and parses the \`stable.txt\` in the repository, navigates to the version listed in the file, and downloads the kubectl binary file in the /bin/linux/amd64/ directory.
 
 2. Make the kubectl binary executable:
 
@@ -193,28 +193,28 @@ To install the Google Cloud SDK:
 
 10. In your command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
 
-```bash
-Pick cloud project to use:
- [1] [my-project-1]
- [2] [my-project-2]
- ...
- Please enter your numeric choice or text value (must exactly match list item):
-```
+    ```bash
+    Pick cloud project to use:
+     [1] [my-project-1]
+     [2] [my-project-2]
+     ...
+     Please enter your numeric choice or text value (must exactly match list item):
+    ```
 
-If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
+    If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
 
-```bash
-Your current project has been set to: [my-project-name].
-...
-Your Google Cloud SDK is configured and ready to use!
-
-* Commands that require authentication will use [my-account-name] by default
-* Commands will reference project `[my-project-name]` by default
-Run `gcloud help config` to learn how to change individual settings
-
-This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
-Run `gcloud topic configurations` to learn more.
-```
+    ```bash
+    Your current project has been set to: [my-project-name].
+    ...
+    Your Google Cloud SDK is configured and ready to use!
+    
+    * Commands that require authentication will use [my-account-name] by default
+    * Commands will reference project `[my-project-name]` by default
+    Run `gcloud help config` to learn how to change individual settings
+    
+    This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
+    Run `gcloud topic configurations` to learn more.
+    ```
 
 11. To list accounts whose credentials are stored on the local system, enter:
 
@@ -232,12 +232,12 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
 1. To download the latest binary from the AWS site, from your home directory, enter:
 
-```bash
-   $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
-   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                  Dload  Upload   Total   Spent    Left  Speed
-   100 33.6M  100 33.6M    0     0  1996k      0  0:00:17  0:00:17 --:--:-- 4786k
-```
+    ```bash
+       $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
+       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                      Dload  Upload   Total   Spent    Left  Speed
+       100 33.6M  100 33.6M    0     0  1996k      0  0:00:17  0:00:17 --:--:-- 4786k
+    ```
 
 2. To make the AWS IAM Authenticator binary executable, enter:
 
@@ -251,7 +251,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
    `$ echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc`
 
-5.  To verify the AWS IAM Authenticator is working, enter:
+5. To verify the AWS IAM Authenticator is working, enter:
 
    ```bash
    $ aws-iam-authenticator help
@@ -259,7 +259,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
    Usage:
      aws-iam-authenticator [command]
-```
+   ```
 
 These instructions were sourced from the AWS document, [Installing aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
 
@@ -323,17 +323,16 @@ For Linux command line users, you can follow these steps to install Docker Commu
 
     The command should return:
 
-```bash
-pub 4096R/0EBFCD88 2017-02-22
-9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
-uid Docker Release (CE deb) <docker@docker.com>
-sub 4096R/F273FCD8 2017-02-22
-```
+    ```bash
+    pub 4096R/0EBFCD88 2017-02-22
+    9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+    uid Docker Release (CE deb) <docker@docker.com>
+    sub 4096R/F273FCD8 2017-02-22
+    ```
 
 5. Use the following command to set up the stable repository. You always need the stable repository, even if you want to install builds from the edge or test repositories as well. To add the edge or test repository, add the word "edge" or "test" (or both) after the word stable in the commands below.
 
-`$ sudo add-apt-repository "deb [arch=amd64]
-https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
+    `$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
 
 Note: Starting with Docker 17.06, stable releases are also pushed to the edge
 and test repositories.
@@ -388,12 +387,12 @@ Use the generation method best suited to your company standards. The following s
 
 5. Using the DNS lookup management system of your choice, associate the generated name/host record with the verification value. For instance:
 
-```java
-Name          :   _acme-challenge.demotest.dev.pega.io
-Type          :   TXT
-TTL (Seconds) :   1
-Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
-```
+    ```java
+    Name          :   _acme-challenge.demotest.dev.pega.io
+    Type          :   TXT
+    TTL (Seconds) :   1
+    Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
+    ```
 
 With the host name associated with the verification value, wait several minutes to ensure the configuration is established.
 
@@ -465,17 +464,17 @@ Clients with appropriate licenses can log in to the image repository and downloa
 
 4. In the right side of the page, click **Request access key**.
 
-![Select your distribution](media/dockerimage-download.png)
+   ![Select your distribution](media/dockerimage-download.png)
 
 5. Enter your credential details.
 
    After you enter valid credentials, you recieve confirmation that an email is on the way. 
 
-![Select your distribution](media/dockerimage-download-access.png)
+   ![Select your distribution](media/dockerimage-download-access.png)
 
 6. Open the email you received. It will look similar to the image shown.
 
-![Confirmation email with access key details](media/dockerimage-access-email.png)
+   ![Confirmation email with access key details](media/dockerimage-access-email.png)
 
 7. Save your access key to a text file the <local filepath>\<platform>-demo folder so you can pass it into your docker login command to ensure the it will not display in your bash history or logs.
 
@@ -611,4 +610,3 @@ It is a best practice to retag each of your Pega Docker images by including your
 16. To push the retagged `my-pega-srs` image to your registry, enter:
 
     `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
-
