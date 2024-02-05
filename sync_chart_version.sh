@@ -1,5 +1,11 @@
 #!/bin/bash
 set -e
+tagVersion=""
+if [ ${GITHUB_REF_TYPE} == "tag" ]
+then
+    tagVersion=${GITHUB_REF_NAME}
+fi
+export CHART_VERSION=$(expr ${tagVersion:1})
 
 echo "${GITHUB_REF}"
 echo "${GITHUB_REPOSITORY}"
@@ -32,6 +38,8 @@ awk -v new_version="${CHART_VERSION}" '/^version:/ {$2="\"" new_version "\""}1' 
 
 # Commit changes
 git add charts/pega/Chart.yaml charts/addons/Chart.yaml charts/backingservices/Chart.yaml
+
+echo "Updating chart versions to ${CHART_VERSION}"
 git commit -m "Update chart versions to ${CHART_VERSION}"
 
 echo "Pushing to master"
