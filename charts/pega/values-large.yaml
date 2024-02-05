@@ -7,6 +7,9 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
     name: "pega"
