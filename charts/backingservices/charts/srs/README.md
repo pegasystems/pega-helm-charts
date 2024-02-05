@@ -33,30 +33,30 @@ The service deployment provisions runtime service pods along with a dependency o
             <td>NA</td>
             <td>NA</td>
             <td>NA</td>
-            <td>SRS can be used with Pega Infinity 8.6 and later</td>
+            <td>SRS can be used with Pega Infinity 8.6 and later.</td>
         </tr>
         <tr>
             <td rowspan=4> >= 8.6 </td>
             <td rowspan=4>1.29.1</td>
             <td rowspan=2>< 1.25</td>
-            <td>No Authentication</td>
+            <td>Not enabled</td>
             <td>7.10.2, 7.16.3 & 7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9.</td>
+            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
-            <td>Basic Authentication</td>
+            <td>Enabled</td>
             <td>7.10.2, 7.16.3, 7.17.9 & 8.10.3</td>
             <td>As a best practice, use Elasticsearch version 8.10.3.</td>
         </tr>
         <tr>
             <td rowspan=2>>= 1.25</td>
-            <td>No Authentication</td>
-            <td>7.16.3 & 7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9.</td>
+            <td>Not enabled</td>
+            <td>7.17.9</td>
+            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
-            <td>Basic Authentication</td>
-            <td>7.16.3, 7.17.9 & 8.10.3</td>
+            <td>Enabled</td>
+            <td>7.17.9 & 8.10.3</td>
             <td>As a best practice, use Elasticsearch version 8.10.3.</td>
         </tr>
     </tbody>
