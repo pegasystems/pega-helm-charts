@@ -6,6 +6,9 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
     name: "pega"
@@ -19,7 +22,7 @@ global:
   # to support multiple custom certificates as external secrets, specify each of your external secrets
   # as an array of comma-separated strings using the certificatesSecrets parameter.
   certificatesSecrets: []
-  certificates:
+  certificates: {}
 
   # Add krb5.conf file content here.
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
