@@ -41,7 +41,7 @@ The service deployment provisions runtime service pods along with a dependency o
             <td rowspan=2>< 1.25</td>
             <td>Disabled</td>
             <td>7.10.2, 7.16.3 & 7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9. Having Authentication as disabled is NOT recommended for Prod clusters</td>
+            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Having Authentication as disabled is NOT recommended for Prod clusters </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
@@ -52,7 +52,7 @@ The service deployment provisions runtime service pods along with a dependency o
             <td rowspan=2>>= 1.25</td>
             <td>Disabled</td>
             <td>7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9. Having Authentication as disabled is NOT recommended for Prod clusters</td>
+            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Having Authentication as disabled is NOT recommended for Prod clusters </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
