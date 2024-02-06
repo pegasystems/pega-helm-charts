@@ -193,3 +193,11 @@ jobs:
           ./update_gh_pages.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
+
+      - name: sync chart version
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 sync_chart_version.sh
+          ./sync_chart_version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
