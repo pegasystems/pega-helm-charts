@@ -100,21 +100,21 @@ func TestPegaTierPDBWithCustomLabels(t *testing.T) {
 					{
 						name:         getObjName(options, "-web-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						labels:       webPDBLabels,
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-batch-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						labels:       batchPDBLabels,
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-stream-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 				})
@@ -175,8 +175,6 @@ func verifyPegaPDBs(t *testing.T, yamlContent string, options *helm.Options, exp
 // verifyPegaPdb - Performs Pega PDB assertions with the values as provided
 func verifyPegaPdb(t *testing.T, pegaPdbObj *v1beta1.PodDisruptionBudget, expectedPdb pdb) {
 	require.Equal(t, pegaPdbObj.TypeMeta.Kind, expectedPdb.kind)
-	//if the below fails it means that the helm version used in testing is compiled against
-	//kubernetes 1.21 or higher, and we should adjust this test to use the policy/v1 API version
 	require.Equal(t, pegaPdbObj.TypeMeta.APIVersion, expectedPdb.apiversion)
 	require.Equal(t, expectedPdb.minAvailable, pegaPdbObj.Spec.MinAvailable.IntVal)
 
