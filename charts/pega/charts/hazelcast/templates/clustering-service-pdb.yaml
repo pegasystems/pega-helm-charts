@@ -1,0 +1,20 @@
+{{ if and (eq (include "performDeployment" .) "true") (eq (include "isClusteringServiceEnabled" .) "true") }}
+  {{- if (semverCompare ">= 1.21.0-0" (trimPrefix "v" .Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: policy/v1
+  {{- else }}
+apiVersion: policy/v1beta1
+  {{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ template "clusteringServiceName" . }}-pdb
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app: {{ template "clusteringServiceName" . }}
+    component: Hazelcast
+spec:
+  maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {{ template "clusteringServiceName" . }}
+      component: Hazelcast
+{{- end }}
