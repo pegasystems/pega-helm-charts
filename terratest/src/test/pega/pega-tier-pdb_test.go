@@ -11,6 +11,10 @@ import (
 	"k8s.io/api/policy/v1beta1"
 )
 
+// Leaving the k8s.io import at v1beta1 for now because it doesn't impact the test and upgrading seems like it would probably require going
+// through all the Go dependencies.  If this test starts failing in the future due to new features not being supported, we should probably
+// actually go through and do the upgrade
+
 // TestPegaTierPDBEnabled - verify that a PodDisruptionBudget is created when global.tier.pdb.enabled=true
 func TestPegaTierPDBEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
