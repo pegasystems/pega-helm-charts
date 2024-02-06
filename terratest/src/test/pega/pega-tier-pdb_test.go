@@ -44,19 +44,19 @@ func TestPegaTierPDBEnabled(t *testing.T) {
 					{
 						name:         getObjName(options, "-web-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-batch-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-stream-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 				})
