@@ -7,6 +7,12 @@ cloudProvider: "aws"
 # For aws cloud provider enter your acm certificate ARN here.
 awsCertificateArn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
 domainName: YOUR_CUSTOM_DOMAIN_NAME_HERE
+# Additional annotations for the ingress can be specified here
+ingressAnnotations:
+# Customer assets must be stored on a persistent storage volume.  Create a volume claim and provide the name.
+customerAssetVolumeClaimName:
+# Provide pre-defined image pull secret names if desired
+imagePullSecretNames: []
 # Docker repos and tag for image
 docker:
   # If using a custom Docker registry, supply the credentials here to pull Docker images.

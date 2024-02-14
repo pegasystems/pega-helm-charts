@@ -11,6 +11,10 @@ import (
 	"k8s.io/api/policy/v1beta1"
 )
 
+// Leaving the k8s.io import at v1beta1 for now because it doesn't impact the test and upgrading seems like it would probably require going
+// through all the Go dependencies.  If this test starts failing in the future due to new features not being supported, we should probably
+// actually go through and do the upgrade
+
 // TestPegaTierPDBEnabled - verify that a PodDisruptionBudget is created when global.tier.pdb.enabled=true
 func TestPegaTierPDBEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
@@ -44,19 +48,19 @@ func TestPegaTierPDBEnabled(t *testing.T) {
 					{
 						name:         getObjName(options, "-web-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-batch-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-stream-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 				})
@@ -100,21 +104,21 @@ func TestPegaTierPDBWithCustomLabels(t *testing.T) {
 					{
 						name:         getObjName(options, "-web-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						labels:       webPDBLabels,
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-batch-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						labels:       batchPDBLabels,
 						minAvailable: 1,
 					},
 					{
 						name:         getObjName(options, "-stream-pdb"),
 						kind:         "PodDisruptionBudget",
-						apiversion:   "policy/v1beta1",
+						apiversion:   "policy/v1",
 						minAvailable: 1,
 					},
 				})
@@ -175,8 +179,6 @@ func verifyPegaPDBs(t *testing.T, yamlContent string, options *helm.Options, exp
 // verifyPegaPdb - Performs Pega PDB assertions with the values as provided
 func verifyPegaPdb(t *testing.T, pegaPdbObj *v1beta1.PodDisruptionBudget, expectedPdb pdb) {
 	require.Equal(t, pegaPdbObj.TypeMeta.Kind, expectedPdb.kind)
-	//if the below fails it means that the helm version used in testing is compiled against
-	//kubernetes 1.21 or higher, and we should adjust this test to use the policy/v1 API version
 	require.Equal(t, pegaPdbObj.TypeMeta.APIVersion, expectedPdb.apiversion)
 	require.Equal(t, expectedPdb.minAvailable, pegaPdbObj.Spec.MinAvailable.IntVal)
 

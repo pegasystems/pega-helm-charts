@@ -17,7 +17,12 @@ spec:
 {{- include "srs.srs-service.match-labels" . | indent 8 }}
     spec:
       imagePullSecrets:
-        - name: {{ template "srsRegistrySecretName" . }}
+        - name: {{ template "srsRegistrySecretName" . -}}
+        {{ if .Values.srsRuntime.imagePullSecretNames }}
+        {{- range .Values.srsRuntime.imagePullSecretNames }}
+        - name: {{ . }}
+        {{- end -}}
+        {{ end }}
       containers:
         - name: srs-service
           image: {{ .Values.srsRuntime.srsImage }}
@@ -55,30 +60,38 @@ spec:
             {{- if eq (include "elasticsearch.authProvider" $) "basic-authentication" }}
             - name: ELASTICSEARCH_USERNAME
               valueFrom:
-                secretKeyRef:
-                  name: srs-elastic-credentials
+               secretKeyRef:
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
                   key: username
             - name: ELASTICSEARCH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: srs-elastic-credentials
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
                   key: password
             {{- end}}
             {{- if eq (include "elasticsearch.authProvider" $) "tls" }}
             - name: ELASTICSEARCH_USERNAME
               valueFrom:
                 secretKeyRef:
-                  name: srs-elastic-credentials
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
                   key: username
             - name: ELASTICSEARCH_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: srs-elastic-credentials
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
                   key: password
             - name: PATH_TO_TRUSTSTORE
               value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
+            {{ if not .Values.srsStorage.certsSecret }}
             - name: PATH_TO_KEYSTORE
               value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
+            {{ else }}
+            - name: PATH_TO_KEYSTORE
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
+                  key: password
+            {{- end }}
             {{- end}}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
@@ -96,7 +109,7 @@ spec:
       volumes:
       - name: srs-certificates
         secret:
-          secretName: srs-certificates
+          secretName: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
       {{ end }}
       {{- if .Values.srsStorage.provisionInternalESCluster }}
       initContainers:

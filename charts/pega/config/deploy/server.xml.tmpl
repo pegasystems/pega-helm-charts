@@ -82,7 +82,7 @@
 
     <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
 
-    {{ if or (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") (exists "/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_FILE") }}
+    {{ if or (exists .Env.TOMCAT_KEYSTORE_CONTENT) (exists "/opt/pega/tomcatcertsmount/TOMCAT_CERTIFICATE_FILE") }}
 
     <Connector port="8443" protocol="org.apache.coyote.http11.Http11NioProtocol"
                        scheme="https" secure="true" SSLEnabled="true"
@@ -94,9 +94,9 @@
                        maxHeaderCount="100"
                        maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8443_MAXTHREADS 200 }}" >
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
-                           {{ if ( and (exists "/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT") .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
+                           {{ if ( and (exists .Env.TOMCAT_KEYSTORE_CONTENT) .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
-                           <Certificate certificateKeystoreFile="/opt/pega/tomcatcertsmount/TOMCAT_KEYSTORE_CONTENT"
+                           <Certificate certificateKeystoreFile="{{ .Env.TOMCAT_KEYSTORE_CONTENT }}"
                                         certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
 
                            {{ else }}

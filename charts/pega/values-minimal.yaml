@@ -7,6 +7,9 @@ global:
   # Enter your Kubernetes provider.
   provider: "k8s"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
