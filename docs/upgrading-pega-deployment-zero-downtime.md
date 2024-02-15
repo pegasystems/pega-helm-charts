@@ -112,8 +112,10 @@ To complete an upgrade with zero downtime,  configure the following settings in 
 
 - In the installer section of the Helm chart, update the following:
 
-  - Specify `installer.upgradeType: "Zero-downtime"` to use the zero-downtime upgrade process.
+  - Specify `installer.installerMountVolumeClaimName` persistent Volume Claim name. This is a client-managed PVC for mounting upgrade artifacts.
+  - Specify `installer.upgradeType: "zero-downtime"` to use the zero-downtime upgrade process.
   - Specify `installer.targetRulesSchema: "<target-rules-schema-name>"` and `installer.targetDataSchema: "<target-data-schema-name>"` for the new target and data schema name that the process creates in your existing database for the upgrade process.
+  - Specify `installer.upgrade.automaticResumeEnabled` to support resuming from point of failure
 
 You can leave the existing customized parameters as is; the upgrade process will use the remaining existing settings in your deployment.
 
@@ -126,8 +128,8 @@ You can leave the existing customized parameters as is; the upgrade process will
    | Chart parameter name    | Purpose                                   | Your setting |
    |-------------------------|-------------------------------------------|--------------|
    | actions.execute: | To upgrade using the zero-downtime upgrade process, specify an “upgrade-deploy” deployment type. | execute: "upgrade-deploy" |
-   | jdbc.rulesSchema: "YOUR_RULES_SCHEMA"  | Specify the name of the existing rules schema from which the upgrade process migrates the existing rules structure to your new rules schema.  | rulesSchema: "YOUR_RULES_SCHEMA" |
-   | jdbc.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the existing data schema to which the upgrade process migrates the existing data structure from the existing data schema  | dataSchema: "YOUR_DATA_SCHEMA"  |
+   | jdbc.rulesSchema: "YOUR_RULES_SCHEMA"  | Specify the name of the existing rules schema from which the upgrade process migrates the existing rules structure to your new rules schema. | rulesSchema: "YOUR_RULES_SCHEMA" |
+   | jdbc.dataSchema: "YOUR_DATA_SCHEMA"  | Specify the name of the existing data schema to which the upgrade process migrates the existing data structure from the existing data schema | dataSchema: "YOUR_DATA_SCHEMA"  |
    | Optional: jdbc.customerDataSchema: "YOUR_DATA_SCHEMA"  | Optionally specify the name of a data schema separate from case data that is for your business and customer data. The `customerDataSchema` parameter defaults to the value of `dataSchema` if you leave this set to default value. | customerDataSchema : "YOUR_DATA_SCHEMA"  |
    | docker.registry.url: username:  and password: | If using a new registry since you installed Pega Platform, update the host name of a registry to an object that contains the “username” and “password” values for that registry. For more information, search for “index.docker.io/v1” in [Engine API v1.24](https://docs.docker.com/engine/api/v1.24/). You can skip this section if the registry is the same as your initial installation. | <ul><li>url: “<https://index.docker.io/v1/>” </li><li>username: "\<DockerHub account username\>"</li><li> password: "\< DockerHub account password\>"</li></ul>    |
    | docker.pega.image:       | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. This image should match the version of the installer image with which you complete the upgrade. | Image: "\<Registry host name:Port\>/my-pega:\<Pega Platform version>" |
@@ -135,11 +137,13 @@ You can leave the existing customized parameters as is; the upgrade process will
    | pegasearch.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/pega` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-search:\<Pega Platform version>"
    | installer.image: | Update the tagging details, including the version and date of your latest Pega-provided `platform/installer` Docker image that you downloaded and pushed to your Docker registry. | Image: "\<Registry host name:Port>/my-pega-installer:\<Pega Platform version>" |
    | installer.adminPassword: | Specify an initial administrator@pega.com password for your installation.  This will need to be changed at first login. The adminPassword value cannot start with "@".| adminPassword: "\<initial password\>"  |
+   | installer.installerMountVolumeClaimName: | A manually managed Persistent Volume Claim for mounting upgrade artifacts. You must create this PVC manually before you bind the volume.The installer job persists upgrade artifacts to this Persistent Volume to support automatically resuming rules_upgrade from point of failure when you use custom upgradeType.To use this function, set the installer.upgrade.automaticResumeEnabled parameter to true. | installerMountVolumeClaimName: "" |
    | installer.upgrade.upgradeType   | Specify an zero-downtime upgrade to upgrade using the zero-downtime upgrade process. | upgradeType: "zero-downtime"  |
    | installer.upgrade.targetRulesSchema   | For upgrades from 8.4.2 and later, specify a new rules schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process.| targetRulesSchema: ""  |
    | installer.upgrade.targetDataSchema   | For upgrades from 8.4.2 and later, specify the new target data schema name within the quotes that the process uses to create the schema in your existing database to support the upgrade process. You must delete this schema from your database after you complete your upgrade. For upgrades starting at earlier versions, you can leave this value empty, as is (do not leave it blank). | targetDataSchema: "" |
-   | installer.upgrade.pegaRESTUsername | For zero-downtime upgrades, specify username to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                  | pegaRESTUsername: "" |
-   | installer.upgrade.pegaRESTPassword | For zero-downtime upgrades, specify user's password to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                  | pegaRESTPassword: "" |
+   | installer.upgrade.pegaRESTUsername | For zero-downtime upgrades, specify username to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                 | pegaRESTUsername: "" |
+   | installer.upgrade.pegaRESTPassword | For zero-downtime upgrades, specify user's password to access Pega REST server within the quotes that the process uses to perform pre-upgrade/post-upgrade actions required for the upgrade orchestration.                                                                 | pegaRESTPassword: "" |
+   | installer.upgrade.automaticResumeEnabled | For zero-downtime upgrades, Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.                                                                  | automaticResumeEnabled: "" |
 
 2. Save the file.
 
@@ -180,3 +184,22 @@ In this document, you specify that the Helm chart always “deploys” by using 
    A successful deployment does not show errors across the various workloads. The `mypega-<platform>-demo` Namespace **Overview** view shows charts of the percentage of complete tiers and resources configurations. A successful deployment has 100% complete **Workloads**.
 
    It takes a little over an hour for the upgrade process to upgrade the applicable rules and then perform a rolling reboot of your nodes.
+
+
+### Steps to resume failed rules_upgrade
+- To debug upgrade failure, follow the instructions in the README section  - [Debugging failed upgrades using helm commands](https://github.com/pegasystems/pega-helm-charts/blob/master/README.md#debugging-failed-upgrades-using-helm-commands)
+- Identify the root cause and make necessary changes to fix the issue before resuming the upgrade
+- Specify `installer.upgrade.upgradeType: custom` and `installer.upgrade.upgradeSteps: rules_upgrade` to run rules_upgrade
+- Resume the upgrade process by using the `helm upgrade release --namespace mypega` command. For more information, see - [Upgrading your Pega Platform deployment using the command line](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/upgrading-pega-deployment-zero-downtime.md#upgrading-your-pega-platform-deployment-using-the-command-line).
+- The upgrade skips steps that were completed successfully in the previous run.
+- Specify `installer.upgrade.upgradeType: custom` and  `installer.upgrade.upgradeSteps: data_upgrade` to run data_upgrade
+- Resume the upgrade process by using the `helm upgrade release --namespace mypega` command. For more information, see - [Upgrading your Pega Platform deployment using the command line](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/upgrading-pega-deployment-zero-downtime.md#upgrading-your-pega-platform-deployment-using-the-command-line).
+- Specify
+  - `action.execute: deploy` this action performs rolling restart
+  - `jdbc.rulesSchema: "<target-rules-schema-name>"` update `jdbc.rulesSchema` with `installer.targetRulesSchema` which you have used in upgrade process 
+- Resume the upgrade process by using the `helm upgrade release --namespace mypega` command. For more information, see - [Upgrading your Pega Platform deployment using the command line](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/upgrading-pega-deployment-zero-downtime.md#upgrading-your-pega-platform-deployment-using-the-command-line).
+- Specify 
+  - `action.execute: upgrade-deploy`
+  - `installer.upgrade.upgradeType: custom`
+  - `installer.upgrade.upgradeSteps: disable_cluster_upgrade` to run disable_cluster_upgrade
+- Resume the upgrade process by using the `helm upgrade release --namespace mypega` command. For more information, see - [Upgrading your Pega Platform deployment using the command line](https://github.com/pegasystems/pega-helm-charts/blob/master/docs/upgrading-pega-deployment-zero-downtime.md#upgrading-your-pega-platform-deployment-using-the-command-line).

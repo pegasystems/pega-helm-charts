@@ -10,6 +10,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .name | quote}}
   namespace: {{ .root.Release.Namespace }}
+{{- if .hpa.labels }}
+  labels:
+{{ toYaml .hpa.labels | indent 4 }}
+{{- end }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1

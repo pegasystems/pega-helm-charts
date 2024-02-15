@@ -6,7 +6,6 @@
         <env name="database/databases/PegaRULES/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
         <env name="database/databases/PegaDATA/dataSource" value="java:comp/env/jdbc/PegaRULES"/>
         <env name="security/urlaccesslog" value="NORMAL" />
-        <env name="security/urlaccessmode" value="WARN" />
         <!-- Most nodes have a 'default' classification and for these nodes, no additional changes need to be made to this file.  However,
         if this is node has a non-general purpose, for example: 'Agent', then the node classification setting should be added to this file. -->
         <!--env name="initialization/nodeclassification" value="Agent" /  -->
