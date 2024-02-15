@@ -100,6 +100,18 @@
 				<SizeBasedTriggeringPolicy size="50 MB"/>
 			</Policies>
 		</RollingRandomAccessFile>
+
+		<!-- RollingFile Appender for USAGEMETRICS logs -->
+		<RollingRandomAccessFile name="USAGEMETRICS" fileName="@CURR_DIR/logs/PRPC-RuleInstaller-PegaUSAGE-${date:yyyy-MM-dd-HH}.json.log" filePattern="@CURR_DIR/logs/PRPC-RuleInstaller-PegaUSAGE-%d{yyyy-MM-dd-HH}-%i.log.gz">	
+			<PatternLayout>
+				<Pattern>%m%n</Pattern>
+			</PatternLayout>
+			<Policies>
+				<TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+				<SizeBasedTriggeringPolicy size="20 MB"/>
+			</Policies>
+			<DefaultRolloverStrategy max="15"/>
+		</RollingRandomAccessFile>
 		
 	</Appenders>
 	
