@@ -57,10 +57,10 @@ spec:
         securityContext:
           privileged: true
       {{ end }}
-{ { - if .Values.topologySpreadConstraints } }
+{{- if .Values.topologySpreadConstraints }}
       topologySpreadConstraints:
-{ { toYaml .Values.topologySpreadConstraints | indent 8 } }
-{ { - end } }
+{{ toYaml .Values.topologySpreadConstraints | indent 8 }}
+{{- end }}
       containers:
       - name: search
         image: {{ .Values.image }}
