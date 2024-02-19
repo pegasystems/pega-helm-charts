@@ -1309,7 +1309,7 @@ tls:
 ```
 
 ```yaml
-# To enable behavior specifications and configure scaleDown & scaleUp for HorizontalPodAutoscaler, configure the following settings:
+# To enable HorizontalPodAutoscaler behavior specifications, configure the following settings against each tier:
 behavior:
    scaleDown:
       stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
