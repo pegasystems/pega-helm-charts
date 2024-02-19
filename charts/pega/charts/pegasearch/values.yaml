@@ -38,7 +38,7 @@ set_data_owner_on_startup: false
 custom:
   env: []
 
-# key/value pairs that are attached to the pods (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+# Key-Value pairs that are attached to the pods (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
 # podLabels:
 
 # Topology spread constraints to control the placement of your pods across nodes, zones, regions, or other user-defined topology domains.
