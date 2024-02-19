@@ -181,6 +181,18 @@ global:
           requests:
             storage: 5Gi
 
+      # key/value pairs that are attached to the pods (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+      # podLabels:
+
+      # Topology spread constraints to control the placement of your pods across nodes, zones, regions, or other user-defined topology domains.
+      # For more information please refer https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+      # If you want to apply topology spread constraints in other tiers, please use the same configuration as described here.
+      # topologySpreadConstraints:
+      # - maxSkew: <integer>
+      #  topologyKey: <string>
+      #  whenUnsatisfiable: <string>
+      #  labelSelector: <object>
+
 # External services
 
 # Cassandra automatic deployment settings.
