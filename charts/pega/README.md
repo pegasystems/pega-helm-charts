@@ -1307,3 +1307,12 @@ tls:
       insecureSkipVerify: true
 
 ```
+
+```yaml
+# To enable HorizontalPodAutoscaler behavior specifications, configure the following settings against each tier:
+behavior:
+   scaleDown:
+      stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
+   scaleUp:
+      stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
+```
