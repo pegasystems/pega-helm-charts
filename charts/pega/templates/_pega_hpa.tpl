@@ -28,7 +28,7 @@ spec:
   maxReplicas: {{ .hpa.maxReplicas }}
   {{- else }}
   maxReplicas: 5
-  {{- end }} 
+  {{- end }}
   metrics:
   {{- if (hasKey .hpa "enableCpuTarget" | ternary .hpa.enableCpuTarget true) }}
   - type: Resource
@@ -57,6 +57,10 @@ spec:
         {{- else }}
         averageUtilization: 85
         {{- end }}
+  {{- end }}
+  {{- if .hpa.behavior}}
+  behavior:
+{{ toYaml .hpa.behavior | indent 4 }}
   {{- end }}
   
 ---

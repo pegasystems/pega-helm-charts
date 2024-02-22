@@ -216,6 +216,11 @@ global:
 
       hpa:
         enabled: true
+        # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
+        # See, https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#stabilization-window
+        # behavior:
+        #  scaleDown:
+        #    stabilizationWindowSeconds: 600
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable

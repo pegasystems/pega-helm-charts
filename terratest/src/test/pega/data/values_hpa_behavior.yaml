@@ -1,0 +1,17 @@
+---
+global:
+  tier:
+    - name: "web"
+      hpa:
+        enabled: true
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 300
+          scaleUp:
+            stabilizationWindowSeconds: 0
+    - name: "batch"
+      hpa:
+        enabled: true
+        behavior:
+          scaleDown:
+            stabilizationWindowSeconds: 200
