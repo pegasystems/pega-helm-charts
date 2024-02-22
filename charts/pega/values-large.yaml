@@ -216,6 +216,11 @@ global:
 
       hpa:
         enabled: true
+        # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
+        # See, https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#stabilization-window
+        # behavior:
+        #  scaleDown:
+        #    stabilizationWindowSeconds: 600
 
       # key/value pairs that are attached to the pods (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
       # podLabels:
