@@ -105,6 +105,10 @@ spec:
               value: ""
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
+          securityContext:
+            {{- toYaml .Values.srsRuntime.securityContext | nindent 12 }}
+      securityContext:
+        {{- toYaml .Values.securityContext | nindent 8 }}
       {{- if .Values.srsStorage.tls.enabled }}
       volumes:
       - name: srs-certificates

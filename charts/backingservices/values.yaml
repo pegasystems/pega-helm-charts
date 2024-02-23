@@ -38,6 +38,18 @@ srs:
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
 
+    # Container securityContext
+    # securityContext:
+    #   runAsUser: 9999 # app
+    #   allowPrivilegeEscalation: false
+    #   capabilities:
+    #     drop:
+    #     - all
+
+  # Pod securityContext
+  # securityContext:
+  #   runAsUser: 9999 # app
+
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
