@@ -26,3 +26,15 @@ purge-es-secrets:
 
 external-es-secrets:
 	kubectl create secret generic srs-certificates --from-file=$(PATH_TO_CERTIFICATE) --namespace=$(NAMESPACE)
+
+purge-srs-secrets:
+	kubectl delete secrets srs-certificates --namespace=$(NAMESPACE) || true
+
+purge-secrets: purge-es-secrets
+	make purge-srs-secrets
+
+update-secrets: purge-secrets
+	make es-prerequisite
+
+update-external-es-secrets: purge-srs-secrets
+	make external-es-secrets

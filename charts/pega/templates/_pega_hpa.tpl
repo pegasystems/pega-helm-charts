@@ -10,6 +10,10 @@ kind: HorizontalPodAutoscaler
 metadata:
   name: {{ .name | quote}}
   namespace: {{ .root.Release.Namespace }}
+{{- if .hpa.labels }}
+  labels:
+{{ toYaml .hpa.labels | indent 4 }}
+{{- end }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
@@ -24,7 +28,7 @@ spec:
   maxReplicas: {{ .hpa.maxReplicas }}
   {{- else }}
   maxReplicas: 5
-  {{- end }} 
+  {{- end }}
   metrics:
   {{- if (hasKey .hpa "enableCpuTarget" | ternary .hpa.enableCpuTarget true) }}
   - type: Resource
@@ -53,6 +57,10 @@ spec:
         {{- else }}
         averageUtilization: 85
         {{- end }}
+  {{- end }}
+  {{- if .hpa.behavior}}
+  behavior:
+{{ toYaml .hpa.behavior | indent 4 }}
   {{- end }}
   
 ---
