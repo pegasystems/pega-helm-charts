@@ -110,15 +110,15 @@
 
     <!-- RollingFile Appender for USAGEMETRICS logs -->
     <!-- Added for Usage Metrics -->
-    <RollingRandomAccessFile  name="USAGEMETRICS" fileName="${sys:pega.logdir}/PegaUSAGE.json.log" filePattern="${sys:pega.logdir}/PegaUSAGE-%d{MM-dd-yyyy}-%i.log.gz">
+    <RollingRandomAccessFile  name="USAGEMETRICS" fileName="${sys:pega.logdir}/PegaUSAGE.json.log" filePattern="${sys:pega.logdir}/PegaUSAGE-%d{yyyy-MM-dd-HH}-%i.log.gz">
         <PatternLayout>
             <Pattern>%m%n</Pattern>
         </PatternLayout>
         <Policies>
-            <TimeBasedTriggeringPolicy />
-            <SizeBasedTriggeringPolicy size="250 MB"/>
+            <TimeBasedTriggeringPolicy interval="1" modulate="true"/>
+            <SizeBasedTriggeringPolicy size="20 MB"/>
         </Policies>
-        <DefaultRolloverStrategy max="1"/>
+        <DefaultRolloverStrategy max="15"/>
     </RollingRandomAccessFile>
 </Appenders>
 <Loggers>
