@@ -130,6 +130,10 @@ spec:
         fsGroup: 0
 {{- end }}
 {{- end }}
+{{- if .node.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .node.topologySpreadConstraints | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
