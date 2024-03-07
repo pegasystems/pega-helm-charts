@@ -1,0 +1,11 @@
+{{ if (eq (include "pdbEnabled" .) "true")   }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "installer-job-pdb"
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      pdb: "enabled"
+{{ end }}
