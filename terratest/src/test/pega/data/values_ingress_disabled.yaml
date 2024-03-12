@@ -232,19 +232,6 @@ global:
       livenessProbe:
         port: 8081
 
-      custom:
-        env: 
-        - name: CENV_KEY1
-          value: CValue1
-        - name: CENV_KEY2
-          value: CValue2
-
-      # Optionally provide tier specific environment variables
-      env:
-      - ENV_KEY1: Value1
-      - ENV_KEY2: Value2
-
-
       # Optionally overridde default resource specifications
       # cpuRequest: 2
       # memRequest: "12Gi"
