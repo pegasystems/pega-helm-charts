@@ -337,16 +337,13 @@ global:
       #  disktype: ssd
 
       # ingress:
-        # enabled: true
-        # Enter the domain name to access web nodes via a load balancer.
-        #  e.g. web.mypega.example.com
-        # domain: "YOUR_STREAM_NODE_DOMAIN"
-        # tls:
-          # Enable TLS encryption
-          #enabled: true
-          # secretName:
-          # useManagedCertificate: false
-          # ssl_annotation:
+      #  enabled: true
+      #  domain: "YOUR_STREAM_NODE_DOMAIN"
+      #  tls:
+      #    enabled: true
+      #    secretName:
+      #    useManagedCertificate: false
+      #    ssl_annotation:
 
       livenessProbe:
         port: 8081
