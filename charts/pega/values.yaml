@@ -500,8 +500,6 @@ installer:
     # Specify the username and password to access the pre-upgrade Pega Platform to perform pre- and post- actions during zero-downtime upgrades.
     pegaRESTUsername: ""
     pegaRESTPassword: ""
-  # To prevent unexpected interruption of installer job's pod, uncomment below setting
-  # preventInterruption: "true"
 
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:

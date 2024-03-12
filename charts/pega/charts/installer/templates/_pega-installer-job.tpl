@@ -22,15 +22,13 @@ metadata:
 {{ toYaml .root.Values.global.pegaJob.annotations | indent 4 }}
 {{- end }}{{- end }}
   labels:
-  {{- if (eq .root.Values.preventInterruption "true")   }}
-    pdb: "enabled"
-  {{- end }}
     app: {{ .name }}
 spec:
   backoffLimit: 0
   template:
     metadata:
       labels:
+        app: "installer"
         installer-job: {{ .name }}
         {{- if .root.Values.podLabels }}
 {{ toYaml .root.Values.podLabels | indent 8 }}

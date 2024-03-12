@@ -34,9 +34,6 @@ bypassLoadEngineClasses: "false"
 bypassLoadAssembledClasses: "false"
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
-# If 'true', a PodDisruptionBudget will be created for the job's pod, preventing unexpected disruption
-#    ie from Cluster scaledown triggering node drain on node running job's pod
-preventInterruption: "false"
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5

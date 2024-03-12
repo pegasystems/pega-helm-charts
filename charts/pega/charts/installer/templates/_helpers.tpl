@@ -161,14 +161,6 @@
 {{- include "initContainerResources" $ }}
 {{- end }}
 
-{{- define "pdbEnabled" -}}
-  {{- if (eq .Values.preventInterruption "true") -}}
-    true
-  {{- else -}}
-    false
-  {{- end -}}
-{{- end }}
-
 {{- define "initContainerEnvs" -}}
 {{- if or (eq .Values.global.provider "aks") (eq .Values.global.provider "pks") -}}
 {{ $apiserver := index .Values.global.upgrade "kube-apiserver" }}
