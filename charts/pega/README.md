@@ -584,6 +584,25 @@ tier:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
 ```
 
+### Custom volumes
+
+You can optionally specify custom `volumes` and `volumeMounts` for your deployment tier. You need to grant read and/or write permissions to the volume location to the Pega user depending on the purpose of the volume. By default, the Pega user UID is 9001.
+
+For example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      volumeMounts:
+        - name: my-volume
+          mountPath: /path/to/mount
+      volumes:
+        - name: my-volume
+          configMap:
+            name: my-configmap 
+```
+
 ### Sidecar Containers
 
 Pega supports adding sidecar containers to manage requirements for your Pega application services that live outside of the primary tomcat container. This may include company policy requirements, utility images, networking containers, or other examples. For an overview of the versatility sidecar containers present, see [How Pods manage multiple containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers).
