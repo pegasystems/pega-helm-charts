@@ -1,0 +1,11 @@
+{{ if (or (eq (include "performInstall" .) "true") (eq (include "performUpgrade" .) "true")) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "installer-job-pdb"
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: "installer"
+{{ end }}
