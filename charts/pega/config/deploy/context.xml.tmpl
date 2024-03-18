@@ -74,6 +74,7 @@
   {{ else }}
   <Environment name="prconfig/database/databases/CustomerData/defaultSchema" value="{{ .Env.DATA_SCHEMA }}" type="java.lang.String" />
   {{ end }}
+  <Environment name="prconfig/initialization/persistrequestor" value="OnTimeout" type="java.lang.String" />
   {{ if .Env.REQUESTOR_PASSIVATION_TIMEOUT }}
   <Environment name="prconfig/timeout/browser" value="{{ .Env.REQUESTOR_PASSIVATION_TIMEOUT }}" type="java.lang.String" />
   {{ end }}
