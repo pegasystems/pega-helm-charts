@@ -130,6 +130,10 @@ spec:
         fsGroup: 0
 {{- end }}
 {{- end }}
+{{- if .node.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .node.topologySpreadConstraints | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
@@ -172,6 +176,12 @@ spec:
 {{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
           value: "Pega-UIEngine/cosmosservicesURI=/c11n"
+{{- end }}
+{{- if ((.node.service).tls).enabled }}
+        - name: EXTERNAL_KEYSTORE_NAME
+          value: "{{ (((.node.service).tls).external_keystore_name) }}"
+        - name: EXTERNAL_KEYSTORE_PASSWORD
+          value: "{{ (((.node.service).tls).external_keystore_password) }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}

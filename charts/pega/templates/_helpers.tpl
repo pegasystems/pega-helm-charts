@@ -58,15 +58,19 @@
 
 {{- define "pegaVolumeTomcatKeystoreTemplate" }}
 - name: {{ template "pegaVolumeTomcatKeystore" }}
-  secret:
-    # This name will be referred in the volume mounts kind.
-  {{ if ((.node.service).tls).external_secret_name }}
-    secretName: {{ ((.node.service).tls).external_secret_name }}
-  {{ else }}
-    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
-  {{ end }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (((.node.service).tls).external_secret_names) }}
+  {{- range (((.node.service).tls).external_secret_names) }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
@@ -241,7 +245,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- if .node.initialHeap }}
   value: "{{ .node.initialHeap }}"
 {{- else }}
-  value: "4096m"
+  value: "8192m"
 {{- end }}
 # Maximum JVM heap size, equivalent to -Xmx
 - name: MAX_HEAP
@@ -487,3 +491,28 @@ servicePort: use-annotation
     v4
   {{- end -}}
 {{- end -}}
+
+{{- define "pegaCredentialVolumeTemplate" }}
+- name: {{ template "pegaVolumeCredentials" }}
+  projected:
+    defaultMode: 420
+    sources:
+    {{- $dbDict := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" $  -}}
+    {{ include "secretResolver" $dbDict | indent 4}}
+
+    {{- $hzDict := dict "deploySecret" "deployHzSecret" "deployNonExtsecret" "deployNonExtHzSecret" "extSecretName" .Values.hazelcast.external_secret_name "nonExtSecretName" "pega-hz-secret-name" "context" $ -}}
+    {{ include "secretResolver" $hzDict | indent 4}}
+
+    {{- $streamDict := dict "deploySecret" "deployStreamSecret" "deployNonExtsecret" "deployNonExtStreamSecret" "extSecretName" .Values.stream.external_secret_name "nonExtSecretName" "pega-stream-secret-name" "context" $ -}}
+    {{ include "secretResolver" $streamDict | indent 4}}
+
+    {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
+    {{ include "secretResolver" $ddsDict | indent 4}}
+
+    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
+    {{ include "secretResolver" $artifactoryDict | indent 4}}
+
+    - secret:
+        name: {{ include "pega-diagnostic-secret-name" $}}
+
+{{- end}}

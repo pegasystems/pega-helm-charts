@@ -23,6 +23,7 @@
 {{- define "pegaInstallEnvironmentConfig" -}}pega-install-environment-config{{- end -}}
 {{- define "pegaUpgradeEnvironmentConfig" -}}pega-upgrade-environment-config{{- end -}}
 {{- define "pegaDistributionKitVolume" -}}pega-distribution-kit-volume{{- end -}}
+{{- define "pegaInstallerMountVolume" -}}pega-installer-mount-volume{{- end -}}
 {{- define "k8sWaitForWaitTime" -}}
   {{- if (.Values.global.utilityImages.k8s_wait_for) -}}
     {{- if (.Values.global.utilityImages.k8s_wait_for.waitTimeSeconds) -}}
@@ -250,3 +251,5 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end }}
 {{- $protocol }}://{{- $webTierServiceName -}}:{{- $port -}}/{{- $webAppContextPath -}}/PRRestService
 {{- end }}
+
+{{- define "pegaInstallerCredentialsVolume" }}pega-installer-credentials-volume{{- end }}

@@ -19,6 +19,7 @@ type pegaDbJob struct {
 }
 
 var volDefaultMode int32 = 420
+var customArtifactorySecret = "artifactory_secret"
 var volDefaultModePointer = &volDefaultMode
 
 func TestPegaInstallerJob(t *testing.T) {
@@ -36,11 +37,12 @@ func TestPegaInstallerJob(t *testing.T) {
 				for _, pullPolicy := range imagePullPolicy {
 					var options = &helm.Options{
 						SetValues: map[string]string{
-							"global.deployment.name":        depName,
-							"global.provider":               vendor,
-							"global.actions.execute":        operation,
-							"installer.imagePullPolicy":     pullPolicy,
-							"installer.upgrade.upgradeType": "zero-downtime",
+							"global.deployment.name": depName,
+							"global.provider":        vendor,
+							"global.actions.execute": operation,
+							"global.customArtifactory.authentication.external_secret_name": customArtifactorySecret,
+							"installer.imagePullPolicy":                                    pullPolicy,
+							"installer.upgrade.upgradeType":                                "zero-downtime",
 						},
 					}
 					yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
@@ -112,8 +114,9 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 
 	var containerPort int32 = 8080
 
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-volume-credentials")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-credentials-secret"))
+	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
+	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
+	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[1].Secret.Name, customArtifactorySecret)
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
 	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
 	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-install-config" {
@@ -131,7 +134,7 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
 	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-volume-installer")
 	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-volume-credentials")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-credentials-volume")
 	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
 
