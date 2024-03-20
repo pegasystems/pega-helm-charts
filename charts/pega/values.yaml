@@ -193,6 +193,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
 
@@ -334,6 +335,7 @@ global:
       #  disktype: ssd
 
       ingress:
+        enabled: true
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_STREAM_NODE_DOMAIN"
