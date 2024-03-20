@@ -190,7 +190,7 @@ func VerifyPegaWithoutExternalSRSEnvironmentConfig(t *testing.T, yamlContent str
 }
 
 func VerifyEnvConfigDataWithoutAuthVariables(t *testing.T, envConfigData map[string]string) {
-	authEnvironmentVariables := []string{"SERV_AUTH_URL", "SERV_AUTH_CLIENT_ID", "SERV_AUTH_SCOPES", "SERV_AUTH_PRIVATE_KEY_ALGORITHM", "SERV_AUTH_PRIVATE_KEY"}
+	authEnvironmentVariables := []string{"SERV_AUTH_URL", "SERV_AUTH_CLIENT_ID", "SERV_AUTH_SCOPES", "SERV_AUTH_PRIVATE_KEY_ALGORITHM", "SERV_AUTH_PRIVAYE_KEY", "SERV_AUTH_CLIENT_SECRET"}
 	for _, authEnvironmentVariable := range authEnvironmentVariables {
 		require.Emptyf(t, envConfigData[authEnvironmentVariable], "Environment variable '%s' should be empty", authEnvironmentVariable)
 	}
@@ -203,4 +203,6 @@ func VerifyEnvConfigDataWithAuthVariables(t *testing.T, envConfigData map[string
 	require.Equal(t, expectedAlgorithm, envConfigData["SERV_AUTH_PRIVATE_KEY_ALGORITHM"])
 	_, hasPrivateKey := envConfigData["SERV_AUTH_PRIVATE_KEY"]
 	require.False(t, hasPrivateKey)
+	_, hasClientPrivateKey := envConfigData["SERV_AUTH_CLIENT_SECRET"]
+	require.False(t, hasClientPrivateKey)
 }

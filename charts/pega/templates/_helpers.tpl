@@ -375,8 +375,18 @@ dnsConfig:
     {{- if (.Values.pegasearch.srsAuth).privateKey }}
         {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
     {{- else }}
-        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote }}
     {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "srsAuthEnvSecretFrom" }}
+{{- if .Values.pegasearch.srsAuth.external_secret_name }}
+name: {{ .Values.pegasearch.srsAuth.external_secret_name }}
+key: SRS_OAUTH_PRIVATE_KEY
+{{- else }}
+name: pega-srs-auth-secret
+key: privateKey
 {{- end }}
 {{- end }}
 
