@@ -558,9 +558,9 @@ The `deploymentStrategy` can be used to optionally configure the [strategy](http
 
 ### Environment variables
 
-Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` block for your tier as shown in the example below.
+Pega supports a variety of configuration options for cluster-wide and application settings. In cases when you want to pass a specific environment variable into your deployment on a tier-by-tier basis, you specify a custom `env` or 'envFrom' block for your tier as shown in the example below.
 
-Example:
+Example 'env' block:
 
 ```yaml
 tier:
@@ -570,6 +570,18 @@ tier:
         - name: MY_ENV_NAME
           value: MY_ENV_VALUE
 ```
+
+Example 'envFrom' block:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      envFrom:
+        - secretRef:
+            name: MY_SECRET_REF
+```
+
 
 ### Service Account
 

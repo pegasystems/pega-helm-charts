@@ -207,6 +207,12 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
+{{- if .custom }}
+{{- if .custom.envFrom }}
+        # Additional custom envFrom vars
+{{ toYaml .custom.envFrom | indent 8 }}
+{{- end }}
+{{- end }}
         resources:
           # Maximum CPU and Memory that the containers for {{ .name }} can use
           limits:
