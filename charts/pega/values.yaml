@@ -245,6 +245,7 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
+      #   supplementalGroups: "1111,2222"
 
       hpa:
         enabled: true
