@@ -1,0 +1,32 @@
+{{- if .Values.enabled }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ .Values.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.name }}
+    spec:
+      imagePullSecrets:
+      {{- range .Values.imagePullSecretNames }}
+        - name: {{ . }}
+      {{- end }}
+      containers:
+      - name: c11n-messaging
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+        image: {{ .Values.image }}
+        args:
+          - --max-semi-space-size=1024
+          - port={{ .Values.pegaMessagingTargetPort }}
+          - path=/c11n-messaging
+        ports:
+        - containerPort: {{ .Values.pegaMessagingTargetPort }}
+{{ end }}

@@ -1,0 +1,16 @@
+{{- if .Values.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.name }}
+spec:
+  type: NodePort
+  selector:
+    app: {{ .Values.name }}
+  ports:
+    - protocol: TCP
+      port: {{ .Values.pegaMessagingPort }}  
+      targetPort: {{ .Values.pegaMessagingTargetPort }}     
+{{ end }}
