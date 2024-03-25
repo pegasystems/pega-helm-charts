@@ -12,7 +12,7 @@ k8s         | Open-source Kubernetes
 openshift   | Red Hat Openshift
 eks         | Amazon Elastic Kubernetes Service (EKS)
 gke         | Google Kubernetes Engine (GKE)
-pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS)
+pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS) (**Note:** VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) was deprecated for all releases in February 2024. Current deployments on TKGI continue to be supported, but as a best practice, do not use TKGI for new deployments of Pega Platform.)
 aks         | Microsoft Azure Kubernetes Service (AKS)
 
 Example for a kubernetes environment:

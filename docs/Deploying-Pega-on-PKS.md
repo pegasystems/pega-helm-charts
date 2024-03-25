@@ -1,5 +1,7 @@
 # Deploying Pega Platform on a TKGI cluster
 
+**Note:** VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) was deprecated for all releases in February 2024. Current deployments on TKGI continue to be supported, but as a best practice, do not use TKGI for new deployments of Pega Platform.
+
 Deploy Pega Platform™ on a VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) cluster using a PostgreSQL database you configure in Google Cloud Platform (GCP). TKGI was formerly knows Pivotal Container Service (PKS). If your TKGI cluster is deployed on a different cloud, the database steps may be different. The following procedures are written for any level of user, from a system administrator to a development engineer who is interested in learning how to install and deploy Pega Platform onto a TKGI cluster.
 
 Pega helps enterprises and agencies quickly build business apps that deliver the outcomes and end-to-end customer experiences that you need. Use the procedures in this guide, to install and deploy Pega software onto a TKGI cluster without much experience in either TKGI configurations or Pega Platform deployments.
