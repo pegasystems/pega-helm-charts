@@ -14,6 +14,9 @@ spec:
     metadata:
       labels:
         app: constellation
+{{- if .node.podLabels }}
+{{ toYaml .node.podLabels | indent 8 }}
+{{- end }}
     spec:
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
@@ -28,6 +31,10 @@ spec:
       - name: {{ . }}
       {{- end }}
       {{ end }}
+{{- if .node.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .node.topologySpreadConstraints | indent 8 }}
+{{- end }}
       containers:
       - name: constellation
         image: {{ .Values.docker.constellation.image }}
