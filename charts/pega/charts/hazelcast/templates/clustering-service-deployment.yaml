@@ -33,6 +33,10 @@ spec:
           mountPath: "/opt/hazelcast/logs"
         - name: {{ template "hazelcastVolumeCredentials" }}
           mountPath: "/opt/hazelcast/secrets"
+  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
+  {{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "clusteringServiceEnvironmentConfig" }}
@@ -65,6 +69,12 @@ spec:
       # Volume used to mount logs folder
       - name: logs
         emptyDir: {}
+  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+  {{- end }}
       # Volume used to mount secret files.
       {{- include "hazelcastVolumeTemplate" . | indent 6 }}
       imagePullSecrets:

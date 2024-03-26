@@ -517,6 +517,12 @@ hazelcast:
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
 
+  encryption:
+    enabled: true
+    fipsEnabled: false
+    keyStoreName: "cluster-keystore"
+    trustStoreName: "cluster-truststore"
+
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.

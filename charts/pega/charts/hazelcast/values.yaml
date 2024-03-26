@@ -11,6 +11,12 @@ enabled: true
 # Note: Make sure to set this value as "false" in case of Pega platform version before "8.8". If not set this will fail the installation.
 clusteringServiceEnabled: false
 
+encryption:
+  enabled: true
+  fipsEnabled: false
+  keyStoreName: "cluster-keystore"
+  trustStoreName: "cluster-truststore"
+
 # Setting related to Hazelcast migration.
 migration:
   # Set to `true` to initiate the migration job.

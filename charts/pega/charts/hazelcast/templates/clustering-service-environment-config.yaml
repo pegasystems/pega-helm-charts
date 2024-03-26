@@ -10,6 +10,17 @@ data:
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
   SERVICE_NAME: {{ template "clusteringServiceName" . }}-service
   MIN_CLUSTER_SIZE: {{ .Values.replicas | quote }}
+{{- if (eq (include "isHzEncryptionEnabled" .) "true")}}
+  ENCRYPTION_ENABLED: {{ true | quote }}
+{{- if (eq (include "isHzFipsEnabled" .) "true") }}
+  FIPS_ENABLED: {{ true | quote }}
+  ENCRYPTION_KEYSTORE_NAME: {{ .Values.encryption.keyStoreName }}.BCFKS
+  ENCRYPTION_TRUSTSTORE_NAME: {{ .Values.encryption.trustStoreName }}.BCFKS
+{{- else }}
+  ENCRYPTION_KEYSTORE_NAME: {{ .Values.encryption.keyStoreName }}.jks
+  ENCRYPTION_TRUSTSTORE_NAME: {{ .Values.encryption.trustStoreName }}.jks
+{{- end }}
+{{- end }}
 {{- if .Values.server.jmx_enabled }}
   JMX_ENABLED: {{ .Values.server.jmx_enabled | quote }}
 {{- end }}
