@@ -31,7 +31,7 @@ func TestWebTierPegaDiagnosticSecret(t *testing.T) {
 				fmt.Println(vendor + "-" + operation)
 
 				var options = &helm.Options{
-					ValuesFiles: []string{"data/values_with_tier_diagnostic.yaml"},
+					ValuesFiles: []string{"data/values_with_tier_diagnostic_user.yaml"},
 					SetValues: map[string]string{
 						"global.deployment.name":        depName,
 						"global.provider":               vendor,
