@@ -29,7 +29,7 @@
  {{- end -}}
 {{- end }}
 
-{{- define "isHzEncryptionEnabled" }}
+{{- define "isEncryptionEnabled" }}
   {{- if .Values.encryption.enabled  -}}
    true
   {{- else -}}
@@ -37,7 +37,7 @@
   {{- end -}}
 {{- end -}}
 
-{{- define "isHzFipsEnabled" }}
+{{- define "isFipsEnabled" }}
   {{- if and ( .Values.encryption.enabled ) ( .Values.encryption.fipsEnabled) -}}
    true
   {{- else -}}

@@ -69,6 +69,12 @@ spec:
 {{- end }}
 {{- end }}
       volumes:
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+{{- end }}
       # Volume used to mount config files.
       - name: {{ template "pegaVolumeConfig" }}
         configMap:
@@ -233,6 +239,10 @@ spec:
             memory: "12Gi"
           {{- end }}
         volumeMounts:
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
+{{- end }}
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeConfig" }}
           mountPath: "/opt/pega/config"

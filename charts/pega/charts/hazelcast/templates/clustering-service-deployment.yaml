@@ -33,7 +33,7 @@ spec:
           mountPath: "/opt/hazelcast/logs"
         - name: {{ template "hazelcastVolumeCredentials" }}
           mountPath: "/opt/hazelcast/secrets"
-  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  {{- if (eq (include "isEncryptionEnabled" .) "true") }}
         - name: hz-encryption-secrets
           mountPath: "/opt/hazelcast/certs"
   {{- end }}
@@ -57,19 +57,27 @@ spec:
           periodSeconds: 10
           httpGet:
             path: /hazelcast/health/ready
+  {{- if (eq (include "isEncryptionEnabled" .) "true") }}
+            port: 8080
+  {{- else }}
             port: 5701
+  {{- end }}
         livenessProbe:
           initialDelaySeconds: 30
           periodSeconds: 10
           httpGet:
             path: /hazelcast/health/ready
+  {{- if (eq (include "isEncryptionEnabled" .) "true") }}
+            port: 8080
+  {{- else }}
             port: 5701
+  {{- end }}
       restartPolicy: Always
       volumes:
       # Volume used to mount logs folder
       - name: logs
         emptyDir: {}
-  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  {{- if (eq (include "isEncryptionEnabled" .) "true") }}
       - name: hz-encryption-secrets
         secret:
           defaultMode: 444

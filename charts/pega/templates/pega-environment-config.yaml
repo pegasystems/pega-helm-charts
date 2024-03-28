@@ -172,7 +172,22 @@ data:
 {{- end }}
   # Hostname of Hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+
+{{ if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  HZ_SSL_ENABLED: "true"
+  HZ_SSL_PROTOCOL: "TLS"
+  {{ if (eq (include "isHzFipsEnabled" .) "true") }}
+  HZ_FIPS_ENABLED: "true"
+  HZ_SSL_KEY_STORE_NAME: "{{ .Values.hazelcast.encryption.keyStoreName }}.bcfks"
+  HZ_SSL_TRUST_STORE_NAME: "{{ .Values.hazelcast.encryption.trustStoreName }}.bcfks"
+  HZ_SSL_ALGO: "PKIX"
+  {{- else }}
+  HZ_SSL_KEY_STORE_NAME: "{{ .Values.hazelcast.encryption.keyStoreName }}.jks"
+  HZ_SSL_TRUST_STORE_NAME: "{{ .Values.hazelcast.encryption.trustStoreName }}.jks"
+  HZ_SSL_ALGO: "SunX509"
+  {{- end }}
 {{- end }}
+  {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
 {{ if .Values.stream.enabled }}
