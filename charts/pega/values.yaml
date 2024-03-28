@@ -128,6 +128,9 @@ global:
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
@@ -218,8 +221,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -264,9 +265,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
