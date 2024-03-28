@@ -64,8 +64,8 @@ jobs:
           sh helmlint.sh
       
       - name: Install xml lint
-        run: |  
-          sudo apt -y install libxml2-utils
+        run: |
+          sudo apt-get update && sudo apt -y install libxml2-utils
           
       - name: run xml lint for deploy and installer xml files
         run: |

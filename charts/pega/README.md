@@ -331,7 +331,7 @@ service:
 
 ### ingress
 
-Specify the `ingress` yaml block to expose a Pega tier to access from outside Kubernetes. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+Specify the `ingress` yaml block to expose a Pega tier to access from outside Kubernetes. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods. Set `ingress.enabled` to true in order to deploy an ingress for the tier. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
 Parameter | Description
 ---       | ---
@@ -582,6 +582,25 @@ tier:
   - name: my-tier
     custom:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
+### Custom volumes
+
+You can optionally specify custom `volumes` and `volumeMounts` for your deployment tier. You need to grant read and/or write permissions to the volume location to the Pega user depending on the purpose of the volume. By default, the Pega user UID is 9001.
+
+For example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      volumeMounts:
+        - name: my-volume
+          mountPath: /path/to/mount
+      volumes:
+        - name: my-volume
+          configMap:
+            name: my-configmap 
 ```
 
 ### Sidecar Containers
@@ -1306,4 +1325,13 @@ tls:
       # set insecureSkipVerify=true, if the certificate verification has to be skipped
       insecureSkipVerify: true
 
+```
+
+```yaml
+# To enable HorizontalPodAutoscaler behavior specifications, configure the following settings against each tier:
+behavior:
+   scaleDown:
+      stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
+   scaleUp:
+      stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
 ```

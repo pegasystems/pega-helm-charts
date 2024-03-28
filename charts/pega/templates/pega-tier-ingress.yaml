@@ -1,7 +1,7 @@
 {{ $depName := printf "%s" (include "deploymentName" $) }}
 
 {{- range $index, $dep := .Values.global.tier }}
-{{ if and (eq (include "performDeployment" $ ) "true") ($dep.service) }}
+{{ if and (eq (include "performDeployment" $ ) "true") ($dep.ingress) (eq $dep.ingress.enabled true) }}
 {{- if eq $.Values.global.provider "openshift" -}}
 {{ template "pega.openshift.ingress" dict "root" $ "node" $dep "name" (printf "%s-%s" $depName $dep.name) }}
 {{- else if and (eq $.Values.global.provider "eks") -}}

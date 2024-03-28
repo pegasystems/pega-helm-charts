@@ -454,7 +454,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
 - Specify the complete required annotation to the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
-To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
+To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://www.eksworkshop.com/docs/observability/logging/).
 
 #### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
