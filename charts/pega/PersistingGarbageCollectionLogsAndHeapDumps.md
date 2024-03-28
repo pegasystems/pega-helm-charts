@@ -31,7 +31,7 @@ tier:
       volumes:
         - name: <volume name>
           persistentVolumeClaim:
-            climName: <persistent volume claim name>
+            claimName: <persistent volume claim name>
       volumeMounts:
         - mountPath: /heapdumps
           name: <volume name>
