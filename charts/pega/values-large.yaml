@@ -124,6 +124,9 @@ global:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
@@ -203,8 +206,6 @@ global:
       javaOpts: ""
       # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
       catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -251,9 +252,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -336,9 +334,6 @@ global:
       replicas: 1
       javaOpts: ""
 
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-
       deploymentStrategy:
         rollingUpdate:
           maxSurge: 1
@@ -365,9 +360,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
