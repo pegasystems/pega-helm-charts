@@ -22,6 +22,8 @@ Configure a persistent storage using Persistent Volumes (PVs) and Persistent Vol
 
 Include the following configuration snippet for each tier in `values.yaml` file.
 
+Please note that the heap dumps are stored in a predefined location `/heapdumps`. Use the same location as mount path in your `values.yaml`.
+
 ```yaml
 tier:
   - name: my-tier
@@ -31,6 +33,6 @@ tier:
           persistentVolumeClaim:
             climName: <persistent volume claim name>
       volumeMounts:
-        - mountPath: <mount path>
+        - mountPath: /heapdumps
           name: <volume name>
 ```
