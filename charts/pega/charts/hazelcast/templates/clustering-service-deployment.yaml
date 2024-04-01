@@ -77,14 +77,14 @@ spec:
       # Volume used to mount logs folder
       - name: logs
         emptyDir: {}
-  {{- if (eq (include "isEncryptionEnabled" .) "true") }}
+      # Volume used to mount secret files.
+      {{- include "hazelcastVolumeTemplate" . | indent 6 }}
+{{- if (eq (include "isEncryptionEnabled" .) "true") }}
       - name: hz-encryption-secrets
         secret:
           defaultMode: 444
           secretName: hz-encryption-secrets
-  {{- end }}
-      # Volume used to mount secret files.
-      {{- include "hazelcastVolumeTemplate" . | indent 6 }}
+{{- end }}
       imagePullSecrets:
 {{- include "imagePullSecrets" . | indent 6 }}
 {{ end }}

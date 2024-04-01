@@ -6,8 +6,8 @@ NAMESPACE := <YOUR_NAMESPACE>
 FIPS_ENABLED := <FIPS_MODE>
 
 CLUSTERING_SERVICE_IMAGE := cloudservices-docker-dev-local.bin.pega.io/platform/clustering-service:2.0.0-SNAPSHOT
-ENC_KEYSTORE_PASSWORD := myKeystorePwd
-ENC_TRUSTSTORE_PASSWORD := myKeystorePwd
+ENC_KEYSTORE_PASSWORD := mystorePwd
+ENC_TRUSTSTORE_PASSWORD := mystorePwd
 ENCRYPTION_KEYSTORE_NAME := cluster-keystore
 ENCRYPTION_TRUSTSTORE_NAME := cluster-truststore
 ALIAS := myalias

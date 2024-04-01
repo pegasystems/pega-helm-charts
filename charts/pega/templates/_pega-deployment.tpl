@@ -69,12 +69,6 @@ spec:
 {{- end }}
 {{- end }}
       volumes:
-{{- if (.root.Values.hazelcast.encryption.enabled) }}
-      - name: hz-encryption-secrets
-        secret:
-          defaultMode: 444
-          secretName: hz-encryption-secrets
-{{- end }}
       # Volume used to mount config files.
       - name: {{ template "pegaVolumeConfig" }}
         configMap:
@@ -83,6 +77,12 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+{{- end }}
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
@@ -239,10 +239,6 @@ spec:
             memory: "12Gi"
           {{- end }}
         volumeMounts:
-{{- if (.root.Values.hazelcast.encryption.enabled) }}
-        - name: hz-encryption-secrets
-          mountPath: "/opt/hazelcast/certs"
-{{- end }}
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
         - name: {{ template "pegaVolumeConfig" }}
           mountPath: "/opt/pega/config"
@@ -276,6 +272,10 @@ spec:
 {{- if .root.Values.global.kerberos }}
         - name: {{ template "pegaKerberosConfig" }}-config
           mountPath: "/opt/pega/kerberos"
+{{- end }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.

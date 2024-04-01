@@ -9,9 +9,18 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"strconv"
 )
 
 func TestClusteringServiceDeployment(t *testing.T) {
+    SetUp(t, false)
+}
+
+func TestClusteringServiceDeploymentSSL(t *testing.T) {
+    SetUp(t, true)
+}
+
+func SetUp(t *testing.T, sslEnabled bool) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
 
@@ -29,17 +38,18 @@ func TestClusteringServiceDeployment(t *testing.T) {
 					"global.provider":                    vendor,
 					"global.actions.execute":             operation,
 					"hazelcast.clusteringServiceEnabled": "true",
+					"hazelcast.encryption.enabled": strconv.FormatBool(sslEnabled),
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-deployment.yaml"})
-			VerifyClusteringServiceDeployment(t, yamlContent)
+			VerifyClusteringServiceDeployment(t, yamlContent, sslEnabled)
 
 		}
 	}
 }
 
-func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
+func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string, sslEnabled bool) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	statefulSlice := strings.Split(yamlContent, "---")
 	for index, statefulInfo := range statefulSlice {
@@ -49,9 +59,7 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, statefulsetObj.Spec.ServiceName, "clusteringservice-service")
 			statefulsetSpec := statefulsetObj.Spec.Template.Spec
 			require.Equal(t, "/hazelcast/health/ready", statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Path)
-			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Port)
 			require.Equal(t, "/hazelcast/health/ready", statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Path)
-			require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Port)
 			require.Equal(t, "1", statefulsetSpec.Containers[0].Resources.Requests.Cpu().String())
 			require.Equal(t, "1Gi", statefulsetSpec.Containers[0].Resources.Requests.Memory().String())
 			require.Equal(t, statefulsetSpec.Volumes[0].Name, "logs")
@@ -61,6 +69,18 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "hazelcast-volume-credentials")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/secrets")
+
+			if sslEnabled {
+                require.Equal(t, intstr.FromInt(8080), statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Port)
+                require.Equal(t, intstr.FromInt(8080), statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Port)
+                require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].Name, "hz-encryption-secrets")
+                require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[2].MountPath, "/opt/hazelcast/certs")
+
+			} else {
+                require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].LivenessProbe.HTTPGet.Port)
+                require.Equal(t, intstr.FromInt(5701), statefulsetSpec.Containers[0].ReadinessProbe.HTTPGet.Port)
+			}
 		}
 	}
 }
+

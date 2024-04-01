@@ -8,9 +8,19 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"strconv"
 )
 
-func TestClusteringServiceEnvironmentConfig(t *testing.T){
+func TestClusteringServiceEnvironmentConfigNonSSL(t *testing.T){
+    SetUpTestClusteringServiceEnvironmentConfig(t, false , false)
+}
+func TestClusteringServiceEnvironmentConfigFips(t *testing.T){
+    SetUpTestClusteringServiceEnvironmentConfig(t, true, true)
+}
+func TestClusteringServiceEnvironmentConfigSSL(t *testing.T){
+    SetUpTestClusteringServiceEnvironmentConfig(t, true, false)
+}
+func SetUpTestClusteringServiceEnvironmentConfig(t *testing.T, encEnabled bool, fipsEnabled bool){
 	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
 	var supportedOperations =  []string{"deploy","install-deploy"}
 
@@ -28,19 +38,19 @@ func TestClusteringServiceEnvironmentConfig(t *testing.T){
 					"global.provider":        vendor,
 					"global.actions.execute": operation,
 					"hazelcast.clusteringServiceEnabled": "true",
+					"hazelcast.encryption.enabled": strconv.FormatBool(encEnabled),
+                    "hazelcast.encryption.fipsEnabled": strconv.FormatBool(fipsEnabled),
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-environment-config.yaml"})
-			VerifyClusteringServiceEnvironmentConfig(t,yamlContent, options)
+			VerifyClusteringServiceEnvironmentConfig(t,yamlContent, options, encEnabled, fipsEnabled)
 
 		}
 	}
-
-
 }
 
-func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
+func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options, encEnabled bool, fipsEnabled bool) {
 
 	var clusteringServiceEnvConfigMap k8score.ConfigMap
 	statefulSlice := strings.Split(yamlContent, "---")
@@ -62,6 +72,16 @@ func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, 
             require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_FILE_COUNT"], "3")
             require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTIC_LOG_FILE_SIZE_MB"], "50")
 
+            if (fipsEnabled){
+                 require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_ENABLED"], "true")
+                 require.Equal(t, clusteringServiceEnvConfigData["FIPS_ENABLED"], "true")
+                 require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_KEYSTORE_NAME"], "cluster-keystore.bcfks")
+                 require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_TRUSTSTORE_NAME"], "cluster-truststore.bcfks")
+            } else if (encEnabled){
+                require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_ENABLED"], "true")
+                require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_KEYSTORE_NAME"], "cluster-keystore.jks")
+                require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_TRUSTSTORE_NAME"], "cluster-truststore.jks")
+            }
 		}
 	}
 }
