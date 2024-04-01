@@ -12,7 +12,7 @@ enabled: true
 clusteringServiceEnabled: false
 
 encryption:
-  enabled: true
+  enabled: false
   fipsEnabled: false
   keyStoreName: "cluster-keystore"
   trustStoreName: "cluster-truststore"
