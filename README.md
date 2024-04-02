@@ -15,7 +15,7 @@ Pegasystems has validated deployments on the following Kubernetes IaaS and PaaS 
 * Amazon Elastic Kubernetes Service (EKS) - see the [EKS runbook](docs/Deploying-Pega-on-EKS.md)
 * Google Kubernetes Engine (GKE) - see the [GKE runbook](docs/Deploying-Pega-on-GKE.md)
 * Red Hat OpenShift Container Platform (Self-managed) - see the [OpenShift runbook](docs/Deploying-Pega-on-openshift.md)
-* VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) - see the [TKGI runbook](docs/Deploying-Pega-on-PKS.md)
+* VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) - see the [TKGI runbook](docs/Deploying-Pega-on-PKS.md) (**Note:** VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) was deprecated for all releases in February 2024. Current deployments on TKGI continue to be supported, but as a best practice, do not use TKGI for new deployments of Pega Platform.)
 
 Pega provides multiple runbooks that are Kubernetes-environment specific for clients looking for minimum guidance for configuring and deploying Pega Platform in their organization's Kubernetes account. Pega also provides runbooks for patching or updating Pega Platform with near-zero-downtime. To access the runbooks, click on the appropriate link in the list above.
 
