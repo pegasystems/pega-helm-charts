@@ -11,5 +11,7 @@ dependencies:
   condition: srs.srsStorage.provisionInternalESCluster
 - name: constellation
   version: "1.0.0"
+- name: constellation-messaging
+  version: "1.0.0"
 - name: srs
   version: "0.1.0"
