@@ -66,6 +66,9 @@ global:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "ephemeralweb"
@@ -128,8 +131,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
