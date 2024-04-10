@@ -4,7 +4,7 @@ global:
   # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
-  provider: "YOUR_KUBERNETES_PROVIDER"
+  provider: "k8s"
 
   # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
   customerDeploymentId:
@@ -41,20 +41,20 @@ global:
     #                       progressiveStreaming=2;useJDBC4ColumnNameAndLabelSemantics=2;
     #   SQL Server          jdbc:sqlserver://localhost:1433;databaseName=dbName;selectMethod=cursor;sendStringParametersAsUnicode=false
     #   PostgreSQL          jdbc:postgresql://localhost:5432/dbName
-    url: "YOUR_JDBC_URL"
+    url: "jdbc:postgresql://55.55.55.5:38800/postgres"
     #   driverClass 	-- jdbc class.  Valid values are:
     #
     #   Oracle              oracle.jdbc.OracleDriver
     #   IBM DB/2            com.ibm.db2.jcc.DB2Driver
     #   SQL Server          com.microsoft.sqlserver.jdbc.SQLServerDriver
     #   PostgreSQL          org.postgresql.Driver
-    driverClass: "YOUR_JDBC_DRIVER_CLASS"
+    driverClass: "org.postgresql.Driver"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
-    dbType: "YOUR_DATABASE_TYPE"
+    dbType: "postgres"
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "YOUR_JDBC_DRIVER_URI"
-    username: "YOUR_JDBC_USERNAME"
-    password: "YOUR_JDBC_PASSWORD"
+    driverUri: "https://jdbc.postgresql.org/download/postgresql-42.5.0.jar"
+    username: "postgres"
+    password: "postgres"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
     # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
@@ -66,9 +66,9 @@ global:
     # To pass an Authentication method and a managed identity, MSI Client ID,
     # set: connectionProperties: "Authentication=ActiveDirectoryMSI;msiClientId=<your Azure Managed Identity>;"
     connectionProperties: ""
-    rulesSchema: "YOUR_RULES_SCHEMA"
-    dataSchema: "YOUR_DATA_SCHEMA"
-    customerDataSchema: ""
+    rulesSchema: "rules1"
+    dataSchema: "data1"
+    customerDataSchema: "customerdata1"
 
   customArtifactory:
     # If you use a secured custom artifactory to manager your JDBC driver,
@@ -127,9 +127,6 @@ global:
   # Set the `compressedConfigurations` parameter to `true` when the configuration files under charts/pega/config/deploy are in compressed format.
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
-
-  pegaDiagnosticUser: ""
-  pegaDiagnosticPassword: ""
 
   # Specify the Pega tiers to deploy
   tier:
@@ -195,8 +192,9 @@ global:
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
 
+      # Test case: disable ingress creation through ingres.enabled flag
       ingress:
-        enabled: true
+        enabled: false
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
 
@@ -222,6 +220,8 @@ global:
 
       replicas: 1
       javaOpts: ""
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -284,6 +284,9 @@ global:
       replicas: 1
       javaOpts: ""
 
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+
       deploymentStrategy:
         rollingUpdate:
           maxSurge: 1
@@ -328,21 +331,19 @@ global:
         port: 7003
         targetPort: 7003
 
+      # # Test case: disable ingress creation through comment or remove ingress entry from values
       # If a nodeSelector is required for this or any tier, it may be specified here:
       # nodeSelector:
       #  disktype: ssd
 
-      ingress:
-        enabled: true
-        # Enter the domain name to access web nodes via a load balancer.
-        #  e.g. web.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
-        tls:
-          # Enable TLS encryption
-          enabled: true
-          # secretName:
-          # useManagedCertificate: false
-          # ssl_annotation:
+      # ingress:
+      #  enabled: true
+      #  domain: "YOUR_STREAM_NODE_DOMAIN"
+      #  tls:
+      #    enabled: true
+      #    secretName:
+      #    useManagedCertificate: false
+      #    ssl_annotation:
 
       livenessProbe:
         port: 8081
@@ -373,7 +374,7 @@ global:
 
 # Cassandra automatic deployment settings.
 cassandra:
-  enabled: true
+  enabled: false
   persistence:
     enabled: true
   resources:
@@ -482,10 +483,10 @@ pegasearch:
 
 # Pega Installer settings.
 installer:
-  image: "YOUR_INSTALLER_IMAGE:TAG"
+  image: "docker-dev.bin.pega.io/platform/installer:8.7.1"
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
-  adminPassword: "ADMIN_PASSWORD"
+  adminPassword: "install"
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
