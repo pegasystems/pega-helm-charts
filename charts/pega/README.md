@@ -42,6 +42,19 @@ Example:
 ```yaml
 action: "deploy"
 ```
+## Kerberos Configuration
+
+Use the `kerberos` section to configure Kerberos authentication for Decisioning data flows that fetch data from Kafka or HBase streams. For more information on Decisioning data flows that use Kerberos, see [Data Set types](https://docs.pega.com/bundle/platform/page/platform/decision-management/data-set-types.html).
+
+To configure Kerberos authentication, provide the contents of your krb5.conf file n the `krb5.conf` parameter. For more information, see official Kerberos documentation.
+
+For example:
+```yaml
+global:
+  kerberos:
+    krb5.conf: |
+      ----SAMPLE KRB5.CONF----
+```
 
 ## JDBC Configuration
 

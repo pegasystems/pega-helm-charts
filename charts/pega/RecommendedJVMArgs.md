@@ -59,4 +59,9 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **Flag**: `-Duser.timezone=TIMEZONE`<br>
 **Purpose**: Sets the timezone the JVM will use.<br>
 **JVM default**: By default, the JVM obtains time zone from the operating system.  The Pega docker image is configured to Etc/UTC.<br>
-**Pega Recommendation**: Pega requires the JVM timezone to be the same as the timezone used by the database.   Set this if your database is not Etc/UTC.
+**Pega Recommendation**: Set the JVM time zone to match your database time zone. Set this parameter if your database time zone is not Etc/UTC.
+
+**Flag**: `-XX:+HeapDumpOnOutOfMemoryError` <br>
+**Purpose**: Generate a heap dump when an OutOfMemory Occurs.<br>
+**JVM default**: JVM terminates the application when it encounters an OutOfMemoryError without generating heap dump<br>
+**Pega Recommendation**: Set to generate heap dumps in case of OutOfMemoryError <br>

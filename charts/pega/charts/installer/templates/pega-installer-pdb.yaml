@@ -3,6 +3,9 @@ apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
   name: "installer-job-pdb"
+  annotations:
+    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   minAvailable: 1
   selector:
