@@ -85,6 +85,10 @@ srs:
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 
+  # Enable the Network Policy for SRS
+  networkPolicy:
+    enabled: true
+
 constellation:
   enabled: false
 
