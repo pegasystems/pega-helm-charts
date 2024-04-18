@@ -457,15 +457,17 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
-Parameter       | Description                                            | Default value
----             | ---                                                    | ---
-`replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`      | CPU limit for pods in the current tier.                | `4`
-`memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
-`maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
+Parameter                | Description                                            | Default value
+---                      | ---                                                    | ---
+`replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
+`cpuRequest`             | Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Memory limit for pods in the current tier.             | `12Gi`
+`initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
+`maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
+`ephemeralStorageRequest`| Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
