@@ -1,0 +1,24 @@
+---
+enabled: false
+name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+
+image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
+replicas: 1
+
+# To avoid exposing Docker credentials, create a separate Docker config secret.
+# Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+imagePullSecretNames: []
+imagePullPolicy: Always
+
+pegaMessagingPort: 3000
+pegaMessagingTargetPort: 3000
+
+serviceType: NodePort
+
+# An ingress will be provisioned if a hostname is defined, or omitted if the hostname is empty.
+# ingressClassName and annotations are optional and will be included if defined.
+# Due to the diverse requirements for ingresses and TLS configuration, it may be necessary to define the ingress separately from this chart.
+ingress:
+  domain:
+  ingressClassName:
+  annotations:

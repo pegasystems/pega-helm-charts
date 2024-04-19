@@ -58,15 +58,19 @@
 
 {{- define "pegaVolumeTomcatKeystoreTemplate" }}
 - name: {{ template "pegaVolumeTomcatKeystore" }}
-  secret:
-    # This name will be referred in the volume mounts kind.
-  {{ if ((.node.service).tls).external_secret_name }}
-    secretName: {{ ((.node.service).tls).external_secret_name }}
-  {{ else }}
-    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
-  {{ end }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (((.node.service).tls).external_secret_names) }}
+  {{- range (((.node.service).tls).external_secret_names) }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}

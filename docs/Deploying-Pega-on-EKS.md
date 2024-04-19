@@ -8,6 +8,10 @@ Pega helps enterprises and agencies quickly build business apps that deliver the
 
 Create a deployment of Pega Platform on which you can implement a scalable Pega application in a EKS cluster. You can use this deployment for a Pega Platform development environment. By completing these procedures, you deploy Pega Platform on a EKS cluster with a Amazon RDS database instance and two clustered virtual machines (VMs).
 
+*The following diagram shows how Pega Infinity 8.7 can be deployed on AWS with EKS*
+![Overview of EKS Pega Deployment](media/deploying-pega-on-eks.png)
+
+
 ## Deployment process overview
 
 Use Kubernetes tools and the customized orchestration tools and Docker images to orchestrate a deployment in a EKS cluster that you create for the deployment:
@@ -450,7 +454,7 @@ To configure the use of an Amazon AWS ALB ingress controller in the addons.yaml 
 - Uncomment and specify the Amazon EKS Amazon ECR image repository in the `image.repository`: <Amazon EKS Amazon ECR image repository> parameter. This is required for AWS GovCloud deployments
 - Specify the complete required annotation to the role that you associate with the primary IAM user who is responsible for your EKS deployment in the `serviceAccount.annotations.eks.amazonaws.com/role-arn: <YOUR_IAM_ROLE_ARN>` parameter.
 
-To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://eksworkshop.com/logging/).
+To ensure logging for your deployment is properly configured to take advantage of the built-in EFK logging tools in EKS deployments, refer to the [Amazon EKS Workshop](https://www.eksworkshop.com/docs/observability/logging/).
 
 #### Updating the backingservices.yaml Helm chart values for the SRS (Supported when installing or upgrading to Pega Infinity 8.6 and later)
 
@@ -468,6 +472,7 @@ To configure the parameters in the backingservices.yaml file, download the file 
 | global.k8sProvider:  | Specify the value of your Kubernetes provider. | k8sProvider: "eks" |
 | srs.deploymentName:        | Specify unique name for the deployment based on org app and/or SRS applicable environment name.      | deploymentName: "acme-demo-dev-srs"   |
 | srs.srsRuntime.srsImage: | Specify the Pega-provided SRS Docker image that you downloaded and pushed to your Docker registry. | srs.srsRuntime.srsImage: "\<Registry host name:Port>my-pega-srs:\<srs-version>". For `<srs-version>` tag details, see [SRS Version compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix).    |
+| srs.srsRuntime.imagePullSecretNames: | Specify any pre-existing image pull secrets required to pull images from your organization's registry. (Optional) | imagePullSecretNames: [secret1, secret2]    |
 | srs.srsStorage.provisionInternalESCluster: | Enabled by default to provision an Elasticsearch cluster. | <ul><li>Set srs.srsStorage.provisionInternalESCluster:`true` and run `$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION>
 `</li><li>Set srs.srsStorage.provisionInternalESCluster:`false` if you want to use an existing, externally provisioned ElasticSearch cluster. </li></ul> |
 | srs.srsStorage.domain: port: protocol: basicAuthentication: awsIAM: requireInternetAccess: | Disabled by default. Enable only when srs.srsStorage.provisionInternalESCluster is false and you want to configure SRS to use an existing, externally provisioned Elasticsearch cluster. For an Elasticsearch cluster secured with Basic Authentication, use `srs.srsStorage.basicAuthentication` section to provide access credentials. For an AWS Elasticsearch cluster secured with IAM role based authentication, use `srs.srsStorage.awsIAM` section to set the aws region where AWS Elasticsearch cluster is hosted. For unsecured managed ElasticSearch cluster do not configure these options. | <ul><li>srs.srsStorage.domain: "\<external-es domain name\>"</li> <li>srs.srsStorage.port: "\<external es port\>"</li> <li>srs.srsStorage.protocol: "\<external es http protocol, `http` or `https`\>"</li>     <li>srs.srsStorage.basicAuthentication.username: "\<external es `basic Authentication username`\>"</li>     <li>srs.srsStorage.basicAuthentication.password: "\<external es `basic Authentication password`\>"</li>     <li>srs.srsStorage.awsIAM.region: "\<external AWS es cluster hosted `region`\>"</li><li> srs.srsStorage.requireInternetAccess: "\<set to `true` if you host your external Elasticsearch cluster outside of the current network and the deployment must access it over the internet.\>"</li></ul>     |

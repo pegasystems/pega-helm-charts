@@ -7,6 +7,9 @@ global:
   # Enter your Kubernetes provider.
   provider: "k8s"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
@@ -105,6 +108,9 @@ global:
       # waitTimeSeconds: 2
       # maxRetries: 1
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
   # Note: The nodeType Stream is deprecated, please remove it and enable externalized Kafka service
@@ -171,8 +177,6 @@ global:
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
       volumeClaimTemplate:
         resources:
           requests:

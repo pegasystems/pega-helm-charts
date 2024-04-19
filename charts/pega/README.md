@@ -12,7 +12,7 @@ k8s         | Open-source Kubernetes
 openshift   | Red Hat Openshift
 eks         | Amazon Elastic Kubernetes Service (EKS)
 gke         | Google Kubernetes Engine (GKE)
-pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS)
+pks         | VMware Tanzu Kubernetes Grid Integrated Edition (TKGI), which used to be Pivotal Container Service (PKS) (**Note:** VMware Tanzu Kubernetes Grid Integrated Edition (TKGI) was deprecated for all releases in February 2024. Current deployments on TKGI continue to be supported, but as a best practice, do not use TKGI for new deployments of Pega Platform.)
 aks         | Microsoft Azure Kubernetes Service (AKS)
 
 Example for a kubernetes environment:
@@ -41,6 +41,19 @@ Example:
 
 ```yaml
 action: "deploy"
+```
+## Kerberos Configuration
+
+Use the `kerberos` section to configure Kerberos authentication for Decisioning data flows that fetch data from Kafka or HBase streams. For more information on Decisioning data flows that use Kerberos, see [Data Set types](https://docs.pega.com/bundle/platform/page/platform/decision-management/data-set-types.html).
+
+To configure Kerberos authentication, provide the contents of your krb5.conf file n the `krb5.conf` parameter. For more information, see official Kerberos documentation.
+
+For example:
+```yaml
+global:
+  kerberos:
+    krb5.conf: |
+      ----SAMPLE KRB5.CONF----
 ```
 
 ## JDBC Configuration
@@ -102,7 +115,7 @@ To support this option,
 2) Copy both files into the pega-helm-charts/charts/pega/templates directory of your local Helm repository.
 3) Update your local Helm repository to the latest version using the command: 
    - helm repo update pega https://pegasystems.github.io/pega-helm-charts
-4) Update your values.yaml file to refer to the external secret manager for DB password.
+4) Update the `external_secret_name` parameter in the values.yaml file to refer to the `spec.target.name` defined in the External Secret file you created in step 1. Update the parameter for each section where you want to use the External Secrets Operator.
 
 •  Pass secrets directly to your deployment using your organization's recommend practices. Pega supports the providers listed under the [Provider tab]( https://external-secrets.io/v0.8.1) as long as your implementation meets the documented guidelines for a given provider.
 
@@ -331,7 +344,7 @@ service:
 
 ### ingress
 
-Specify the `ingress` yaml block to expose a Pega tier to access from outside Kubernetes. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/).
+Specify the `ingress` yaml block to expose a Pega tier to access from outside Kubernetes. Pega supports the use of managing SSL certificates for HTTPS configuration using a variety of methods. Set `ingress.enabled` to true in order to deploy an ingress for the tier. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/ingress/).
 
 Parameter | Description
 ---       | ---
@@ -444,15 +457,17 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
-Parameter       | Description                                            | Default value
----             | ---                                                    | ---
-`replicas`      | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`    | Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`      | CPU limit for pods in the current tier.                | `4`
-`memRequest`    | Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`      | Memory limit for pods in the current tier.             | `12Gi`
-`initialHeap`   | Specify the initial heap size of the JVM.              | `8192m`
-`maxHeap`       | Specify the maximum heap size of the JVM.              | `8192m`
+Parameter                | Description                                            | Default value
+---                      | ---                                                    | ---
+`replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
+`cpuRequest`             | Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Memory limit for pods in the current tier.             | `12Gi`
+`initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
+`maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
+`ephemeralStorageRequest`| Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
@@ -582,6 +597,25 @@ tier:
   - name: my-tier
     custom:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
+```
+
+### Custom volumes
+
+You can optionally specify custom `volumes` and `volumeMounts` for your deployment tier. You need to grant read and/or write permissions to the volume location to the Pega user depending on the purpose of the volume. By default, the Pega user UID is 9001.
+
+For example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      volumeMounts:
+        - name: my-volume
+          mountPath: /path/to/mount
+      volumes:
+        - name: my-volume
+          configMap:
+            name: my-configmap 
 ```
 
 ### Sidecar Containers
@@ -810,6 +844,8 @@ Use the chart ['backingservices'](../backingservices) to deploy the Search and R
 
 To use SRS, follow the deployment instructions provided at ['backingservices'](../backingservices) before you configure and deploy the Pega Helm chart. For more information, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-88/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).
 
+Configure the customerDeploymentId parameter in the global section of the values.yaml to provide data isolation in SRS.  The customerDeploymentId is used as a prefix for all indexes created in ElasticSearch, and must be the value of the 'guid' claim if OAuth is used for authorization between Pega and SRS.  This parameter defaults to the name of the namespace when left empty.
+
 You must configure the SRS URL for your Pega Platform deployment using the parameter in values.yaml as shown the following table and example:
 
 Parameter   | Description   | Default value
@@ -974,7 +1010,7 @@ Parameter   | Description   | Default value
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
-`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.2 or 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
+`upgrade.targetDataSchema:` | For patches to 8.4 and later or upgrades from 8.4.2 and later, specify the name of the schema the process creates for the temporary data schema. After the patch or upgrade, you must delete this temporary data schema from your database. For 8.3 Pega software patches, you can leave this value empty, as is (do not add blank text). | `""`
 
 Upgrade type    | Description
 ---             | ---
@@ -1168,7 +1204,7 @@ Parameter   | Description   | Default value
 `service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
 
 ##### Important Points to note
-- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty.
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty. The default keystore and CA certificate expire on 25/12/2025.
 - To enable SSL, you must either provide a keystore with a keystorepassword or certificate, certificatekey and cacertificate files in PEM format. If you do not provide either, the deployment implements SSL by passing a Pega-provided default self-signed keystore and a custom root/CA certificate to the Pega web nodes.
 - The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
 - To avoid exposing your certificates, you can use external secrets to manage your certificates. Pega also supports specifying the certificate files using the certificate parameters in the Pega values.yaml. To pass the files using these parameters, you must encode the certificate files using base64 and then enter the string output into the appropriate certificate parameter.
@@ -1307,4 +1343,13 @@ tls:
       # set insecureSkipVerify=true, if the certificate verification has to be skipped
       insecureSkipVerify: true
 
+```
+
+```yaml
+# To enable HorizontalPodAutoscaler behavior specifications, configure the following settings against each tier:
+behavior:
+   scaleDown:
+      stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
+   scaleUp:
+      stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
 ```

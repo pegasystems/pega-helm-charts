@@ -130,6 +130,10 @@ spec:
         fsGroup: 0
 {{- end }}
 {{- end }}
+{{- if .node.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .node.topologySpreadConstraints | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
@@ -172,6 +176,12 @@ spec:
 {{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
           value: "Pega-UIEngine/cosmosservicesURI=/c11n"
+{{- end }}
+{{- if ((.node.service).tls).enabled }}
+        - name: EXTERNAL_KEYSTORE_NAME
+          value: "{{ (((.node.service).tls).external_keystore_name) }}"
+        - name: EXTERNAL_KEYSTORE_PASSWORD
+          value: "{{ (((.node.service).tls).external_keystore_password) }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
@@ -218,6 +228,9 @@ spec:
           {{- else }}
             memory: "12Gi"
           {{- end }}
+          {{- if .node.ephemeralStorageLimit }}
+            ephemeral-storage: "{{ .node.ephemeralStorageLimit }}"
+          {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
           {{- if .node.cpuRequest }}
@@ -229,6 +242,9 @@ spec:
             memory: "{{ .node.memRequest }}"
           {{- else }}
             memory: "12Gi"
+          {{- end }}
+          {{- if .node.ephemeralStorageRequest }}
+            ephemeral-storage: "{{ .node.ephemeralStorageRequest }}"
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.

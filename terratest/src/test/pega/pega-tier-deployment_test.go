@@ -90,6 +90,7 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 					"global.tier[2].securityContext.fsGroup": key, // stream tier
 				},
 			}
+
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 			yamlSplit := strings.Split(yamlContent, "---")
 
@@ -165,7 +166,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	for i := 0; i < count; i++ {
 		actualInitContainerNames[i] = actualInitContainers[i].Name
 	}
-
 	//require.Equal(t, expectedSpec.initContainers, actualInitContainerNames) NEED TO CHANGE FOR "install-deploy"
 	VerifyInitContainerData(t, actualInitContainers, options)
 	require.Equal(t, "pega-web-tomcat", pod.Containers[0].Name)
@@ -189,6 +189,14 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		envIndex++
 		require.Equal(t, "COSMOS_SETTINGS", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "Pega-UIEngine/cosmosservicesURI=/c11n", pod.Containers[0].Env[envIndex].Value)
+	}
+	if options.ValuesFiles != nil && expectedSpec.name == getObjName(options, "-web") && options.SetStrValues["service.tls.enabled"] == "true" {
+		envIndex++
+		require.Equal(t, "EXTERNAL_KEYSTORE_NAME", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "EXTERNAL_KEYSTORE_NAME", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "EXTERNAL_KEYSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "EXTERNAL_KEYSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Value)
 	}
 	envIndex++
 	require.Equal(t, "JAVA_OPTS", pod.Containers[0].Env[envIndex].Name)

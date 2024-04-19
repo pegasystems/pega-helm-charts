@@ -18,7 +18,7 @@ srs:
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
-    image: "alpine:3.16.1"
+    image: "alpine:3.18.3"
     imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
@@ -27,6 +27,10 @@ srs:
 
     # docker image of the srs-service, platform-services/search-n-reporting-service:dockerTag
     srsImage: "YOUR_SRS_IMAGE:TAG"
+
+    # To avoid exposing Docker credentials, optionally create a separate Docker config secret.
+    # Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+    imagePullSecretNames: []
 
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
@@ -57,6 +61,10 @@ srs:
     # Default certificatePassword value will be empty if not used.
     # certificateName: "Certificate_Name"
     # certificatePassword: "password"
+    # To specify a certificate using a secret, uncomment the certsSecret parameter and provide the secret name containing your certificate and certificate password.
+    # Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or “certificate.jks”) as a key name in the secret. Use this key name
+    # to configure the “certificateName” parameter. Use a key name “password” to provide the certificate password in the secret.
+    # certsSecret: srs-certificates
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -66,6 +74,9 @@ srs:
     # esCredentials:
     #   username: "username"
     #   password: "password"
+    # To use a secret to configure basic authentication or TLS-based authentication between your external Elasticsearch service and SRS,
+    # uncomment the authSecret parameter and set it to the secret name. Use "username" and "password" as keys for your secret.
+    # authSecret: srs-elastic-credentials
     # To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
@@ -77,13 +88,19 @@ srs:
 constellation:
   enabled: false
 
+constellation-messaging:
+  enabled: false
+  name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+  image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
+  replicas: 1
+
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
 # as per runtime and storage requirements.
 elasticsearch:
-  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the recommended Elasticsearch server version
-  # for k8s version >= 1.25.
+  # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the
+  # recommended Elasticsearch server version for k8s version >= 1.25.
   # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
   imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
@@ -95,6 +112,12 @@ elasticsearch:
   # If you previously set srs.srsStorage.tls.enabled: true, you must uncomment the line to use protocol: https parameter.
   # protocol: https
 
+  # Uncomment the below lines if you want to deploy/upgrade Elasticsearch server version >= 8.x
+  # createCert: false
+  # secret:
+  #   enabled: false
+  # protocol: http
+
   # For deployments that use TLS-based authentication to an internal Elasticsearch service in the SRS cluster,
   # uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
   # xpack.security.http.ssl.enabled: true
@@ -103,11 +126,14 @@ elasticsearch:
 
   esConfig:
     elasticsearch.yml: |
-     xpack.security.enabled: true
-     xpack.security.transport.ssl.enabled: true
-     xpack.security.transport.ssl.verification_mode: certificate
-     xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
-     xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.enabled: true
+      xpack.security.transport.ssl.enabled: true
+      xpack.security.transport.ssl.verification_mode: certificate
+      xpack.security.transport.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+      xpack.security.transport.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+    # Uncomment the below lines if you want to deploy/upgrade Elasticsearch server version >= 8.x by adding below lines under esConfig.elasticsearch.yml.
+    # action.destructive_requires_name: false
+    # ingest.geoip.downloader.enabled: false
 
   # Use this section to include additional, supported environmental variables for Elasticsearch basic authentication.
   # The parameter values can be read from a specified secrets file.
