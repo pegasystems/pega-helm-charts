@@ -222,6 +222,61 @@ func TestPegaTierOverrideValues(t *testing.T) {
 	}
 }
 
+func TestPegaTierHPAWithBehavior(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	testsPath, err := filepath.Abs(PegaHelmChartTestsPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation + "-" + depName)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-hpa.yaml"}, "--values", testsPath+"/data/values_hpa_behavior.yaml")
+				verifyPegaHPAs(t, yamlContent, options, []hpa{
+					{
+						name:                         getObjName(options, "-web-hpa"),
+						targetRefName:                getObjName(options, "-web"),
+						kind:                         "Deployment",
+						apiversion:                   "apps/v1",
+						cpu:                          true,
+						cpuValue:                     parseResourceValue(t, "2.55"),
+						behavior:                     true,
+						scaleDownStabilizationWindow: 300,
+						scaleUpStabilizationWindow:   0,
+					},
+					{
+						name:                         getObjName(options, "-batch-hpa"),
+						targetRefName:                getObjName(options, "-batch"),
+						kind:                         "Deployment",
+						apiversion:                   "apps/v1",
+						cpu:                          true,
+						cpuValue:                     parseResourceValue(t, "2.55"),
+						behavior:                     true,
+						scaleDownStabilizationWindow: 200,
+					},
+				})
+			}
+		}
+	}
+}
+
 // verifyPegaHPAs - Splits the HPA object from the rendered template and asserts each HPA object
 func verifyPegaHPAs(t *testing.T, yamlContent string, options *helm.Options, expectedHpas []hpa) {
 	var pegaHpaObj autoscaling.HorizontalPodAutoscaler
@@ -270,20 +325,27 @@ func verifyPegaHpa(t *testing.T, hpaObj *autoscaling.HorizontalPodAutoscaler, ex
 		require.Equal(t, expectedValue, actual)
 	}
 
+	if expectedHpa.behavior {
+		require.Equal(t, *hpaObj.Spec.Behavior.ScaleDown.StabilizationWindowSeconds, expectedHpa.scaleDownStabilizationWindow)
+		require.Equal(t, *hpaObj.Spec.Behavior.ScaleUp.StabilizationWindowSeconds, expectedHpa.scaleUpStabilizationWindow)
+	}
 	require.Equal(t, int32(5), hpaObj.Spec.MaxReplicas)
 }
 
 type hpa struct {
-	name          string
-	targetRefName string
-	kind          string
-	apiversion    string
-	labels        map[string]string
-	cpu           bool
-	cpuValue      resource.Quantity
-	cpuPercent    int32
-	mem           bool
-	memPercent    int32
+	name                         string
+	targetRefName                string
+	kind                         string
+	apiversion                   string
+	labels                       map[string]string
+	cpu                          bool
+	cpuValue                     resource.Quantity
+	cpuPercent                   int32
+	mem                          bool
+	memPercent                   int32
+	behavior                     bool
+	scaleDownStabilizationWindow int32
+	scaleUpStabilizationWindow   int32
 }
 
 func (h hpa) expectedMetricCount() int {

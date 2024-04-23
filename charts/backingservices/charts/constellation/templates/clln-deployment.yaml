@@ -15,11 +15,27 @@ spec:
       labels:
         app: constellation
     spec:
+      {{- if .Values.customerAssetVolumeClaimName }}
+      volumes:
+        - name: constellation-appstatic-assets
+          persistentVolumeClaim:
+            claimName: {{ .Values.customerAssetVolumeClaimName }}
+      {{- end }}
       imagePullSecrets:
       - name: {{ template "pegaRegistrySecret" $ }}
+      {{ if .Values.imagePullSecretNames }}
+      {{- range .Values.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
+      {{ end }}
       containers:
       - name: constellation
         image: {{ .Values.docker.constellation.image }}
+        {{ if .Values.customerAssetVolumeClaimName }}
+        volumeMounts:
+         - name: constellation-appstatic-assets
+           mountPath: /usr/src/app/dist/customers
+        {{- end }}
         args:
         - port=3000
         # constellation URL path, if you change it, you need to change ingress template files too

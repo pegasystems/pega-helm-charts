@@ -15,7 +15,7 @@ require (
 	github.com/mailru/easyjson v0.7.1 // indirect
 	github.com/stretchr/testify v1.6.1
 	gopkg.in/yaml.v2 v2.3.0 // indirect
-	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
 	k8s.io/api v0.20.0
 	k8s.io/apimachinery v0.20.0
 	k8s.io/ingress-gce v1.15.2

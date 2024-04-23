@@ -7,6 +7,9 @@ global:
   # Enter your Kubernetes provider.
   provider: "YOUR_KUBERNETES_PROVIDER"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   deployment:
     # The name specified will be used to prefix all of the Pega pods (replacing "pega" with something like "app1-dev").
     name: "pega"
@@ -121,6 +124,9 @@ global:
       serviceHost: "API_SERVICE_ADDRESS"
       httpsServicePort: "SERVICE_PORT_HTTPS"
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
@@ -166,6 +172,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        enabled: true
         # For help configuring the ingress block, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
 
@@ -199,8 +206,6 @@ global:
       javaOpts: ""
       # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
       catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -213,6 +218,23 @@ global:
 
       hpa:
         enabled: true
+        # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
+        # See, https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#stabilization-window
+        # behavior:
+        #  scaleDown:
+        #    stabilizationWindowSeconds: 600
+
+      # key/value pairs that are attached to the pods (https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/)
+      # podLabels:
+
+      # Topology spread constraints to control the placement of your pods across nodes, zones, regions, or other user-defined topology domains.
+      # For more information please refer https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/
+      # If you want to apply topology spread constraints in other tiers, please use the same configuration as described here.
+      # topologySpreadConstraints:
+      # - maxSkew: <integer>
+      #  topologyKey: <string>
+      #  whenUnsatisfiable: <string>
+      #  labelSelector: <object>
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
@@ -230,9 +252,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -272,6 +291,7 @@ global:
         targetPort: 7003
 
       ingress:
+        enabled: true
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_STREAM_NODE_DOMAIN"
@@ -314,9 +334,6 @@ global:
       replicas: 1
       javaOpts: ""
 
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
-
       deploymentStrategy:
         rollingUpdate:
           maxSurge: 1
@@ -343,9 +360,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
