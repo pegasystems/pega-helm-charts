@@ -88,6 +88,12 @@ srs:
 constellation:
   enabled: false
 
+constellation-messaging:
+  enabled: false
+  name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+  image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
+  replicas: 1
+
 # This section specifies the configuration for deploying an internal elasticsearch cluster for use with SRS.
 # The configuration for rest of the values defined under 'elasticsearch' are to define the elasticsearch cluster
 # based on helm charts defined at https://github.com/elastic/helm-charts/tree/master/elasticsearch and may be modified
