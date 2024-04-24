@@ -142,8 +142,14 @@ spec:
 {{- end }}
 {{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
-        -  name: ACTION
-           value: {{ .action }}
+        - name: ACTION
+          value: {{ .action }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
 {{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
         -  name: HZ_VERSION
            valueFrom:
@@ -166,6 +172,13 @@ spec:
             name: {{ template "pegaUpgradeEnvironmentConfig" }}
 {{- end }}
 {{- if (eq $arg "install") }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        env:
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaInstallEnvironmentConfig" }}
