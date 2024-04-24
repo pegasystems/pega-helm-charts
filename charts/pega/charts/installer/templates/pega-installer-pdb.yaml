@@ -1,0 +1,14 @@
+{{ if (or (eq (include "performInstall" .) "true") (eq (include "performUpgrade" .) "true")) }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: "installer-job-pdb"
+  annotations:
+    "helm.sh/hook": pre-install, pre-upgrade
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: "installer"
+{{ end }}

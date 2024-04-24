@@ -28,6 +28,7 @@ spec:
   template:
     metadata:
       labels:
+        app: "installer"
         installer-job: {{ .name }}
         {{- if .root.Values.podLabels }}
 {{ toYaml .root.Values.podLabels | indent 8 }}
