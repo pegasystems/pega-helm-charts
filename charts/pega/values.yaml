@@ -239,6 +239,8 @@ global:
       # memLimit: "12Gi"
       # initialHeap: "4096m"
       # maxHeap: "8192m"
+      # ephemeralStorageRequest:
+      # ephemeralStorageLimit:
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # To configure an alternative group for volume mounts, set value for fsGroup
