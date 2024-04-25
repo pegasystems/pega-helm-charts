@@ -15,7 +15,7 @@ metadata:
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     {{ end }}
     {{- if .Values.ingressAnnotations }}
-    {{ toYaml .Values.ingressAnnotations | indent 4 }}
+    {{- toYaml .Values.ingressAnnotations | nindent 4 }}
     {{ end }}
 spec:
   rules:
