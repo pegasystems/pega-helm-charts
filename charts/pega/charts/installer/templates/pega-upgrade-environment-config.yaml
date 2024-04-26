@@ -5,7 +5,7 @@ apiVersion: v1
 metadata:
   name: {{ template "pegaUpgradeEnvironmentConfig" }}
   namespace: {{ .Release.Namespace }}
-{{ template "pega.installer.environment.config" }}
+{{ include "pega.installer.environment.config" . }}
   # Type of Upgrade
   UPGRADE_TYPE: {{ .Values.upgrade.upgradeType }}
   # custom upgrade steps

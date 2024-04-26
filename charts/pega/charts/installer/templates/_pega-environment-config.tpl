@@ -28,18 +28,8 @@ data:
 {{- if .Values.multitenant_system }}
   MT_SYSTEM: {{ .Values.multitenant_system | quote}}
 {{- end }}
-  # Run the Static Assembler ('true' to run, 'false' to not run)
-  STATIC_ASSEMBLER: {{ .Values.assembler | quote}}
   # UDF generation will be skipped if this property is set to true
   BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
-  # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
-  BYPASS_TRUNCATE_UPDATESCACHE: {{ .Values.bypassTruncateUpdatescache | quote }}
-  # Maximum Idle Thread.Default is 5
-  MAX_IDLE: {{ .Values.threads.maxIdle | quote }}
-  # Maximum Thread Wait.Default is -1
-  MAX_WAIT: {{ .Values.threads.maxWait | quote }}
-  # Maximum Active Thread.Default is 10
-  MAX_ACTIVE: {{ .Values.threads.maxActive | quote }}
   # Z/OS SITE-SPECIFIC PROPERTIES FILE
   ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
 {{- if .Values.zos.db2zosUdfWlm }}

@@ -5,7 +5,7 @@ apiVersion: v1
 metadata:
   name: {{ template "pegaInstallEnvironmentConfig" }}
   namespace: {{ .Release.Namespace }}
-{{ template "pega.installer.environment.config" }}
+{{ include "pega.installer.environment.config" . }}
   # Creates a new System and replaces this with default system
   SYSTEM_NAME: {{ .Values.systemName }}
   # Creates the system with this production level
