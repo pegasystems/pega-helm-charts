@@ -176,5 +176,6 @@ spec:
       restartPolicy: Never
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .root.Values | indent 6 }}
 ---
 {{- end -}}
