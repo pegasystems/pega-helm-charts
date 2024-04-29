@@ -516,3 +516,11 @@ servicePort: use-annotation
         name: {{ include "pega-diagnostic-secret-name" $}}
 
 {{- end}}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+# Pod Affinity
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}

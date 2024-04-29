@@ -325,6 +325,7 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .node | indent 6 }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:
