@@ -16,7 +16,7 @@ type pegaDbJob struct {
 	initContainers []string
 	configMapName  string
 	containerName  string
-	action		   string
+	action         string
 }
 
 var volDefaultMode int32 = 420
@@ -62,15 +62,15 @@ func TestPegaInstallerJob(t *testing.T) {
 									expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config", "pega-installer", "post-upgrade"}
 								}
 
-								assertJob(t, jobInfo, expectedJob, options, pullPolicy, operation)
+								assertJob(t, jobInfo, expectedJob, options, pullPolicy)
 							}
 
 						}
 					} else {
 						if operation == "install" || operation == "install-deploy" {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, operation)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy)
 						} else {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, operation)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy)
 						}
 					}
 
