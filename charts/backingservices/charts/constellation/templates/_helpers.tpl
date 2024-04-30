@@ -8,3 +8,11 @@
 {{- end }}
 
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "constellation" }}{{ if (.Values.deployment) }}{{ if (.Values.deployment.name) }}{{ $deploymentNamePrefix = .Values.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+# Pod Affinity
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}

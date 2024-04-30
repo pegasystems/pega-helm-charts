@@ -61,4 +61,5 @@ spec:
             port: 3000
         ports:
         - containerPort: 3000
+{{- include "podAffinity" .Values | indent 6 }}
 {{ end }}
