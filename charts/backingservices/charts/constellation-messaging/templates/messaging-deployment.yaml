@@ -29,4 +29,5 @@ spec:
           - path=/c11n-messaging
         ports:
         - containerPort: {{ .Values.pegaMessagingTargetPort }}
+{{- include "podAffinity" .Values | indent 6 }}
 {{ end }}
