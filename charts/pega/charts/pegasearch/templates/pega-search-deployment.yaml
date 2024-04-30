@@ -117,6 +117,7 @@ spec:
           mountPath: /usr/share/elasticsearch/data
       imagePullSecrets:
 {{- include "imagePullSecrets" . | indent 6 }}
+{{- include "podAffinity" .Values | indent 6 }}
   volumeClaimTemplates:
   - metadata:
       name: esstorage
