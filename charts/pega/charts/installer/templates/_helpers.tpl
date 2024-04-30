@@ -253,11 +253,3 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end }}
 
 {{- define "pegaInstallerCredentialsVolume" }}pega-installer-credentials-volume{{- end }}
-
-{{- define "podAffinity" }}
-{{- if .affinity }}
-# Pod Affinity
-affinity:
-{{- toYaml .affinity | nindent 2 }}
-{{- end }}
-{{ end }}

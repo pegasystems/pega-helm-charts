@@ -116,3 +116,11 @@ false
 {{- end -}}
 {{- end -}}
 {{- end  -}}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+# Pod Affinity
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}
