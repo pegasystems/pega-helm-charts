@@ -62,6 +62,10 @@ data:
   # CustomerData schema of the Pega installation
   CUSTOMERDATA_SCHEMA: {{ .Values.global.jdbc.customerDataSchema }}
 {{- end }}
+{{- if .Values.global.heapDumpPath }}
+  # Custom value for HeapDumpPath
+  HEAP_DUMP_PATH: {{ .Values.global.heapDumpPath }}
+{{- end }}
 {{- if and (.Values.pegasearch.externalSearchService) (not (.Values.pegasearch.srsAuth).enabled) }}
   # Search deployment type so that the engine knows to connect to the search service
   PEGA_SEARCH_TYPE: "ExternalSearchService" 
