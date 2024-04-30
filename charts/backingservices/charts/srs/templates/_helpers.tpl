@@ -222,3 +222,11 @@ Network policy: `openshift-dns` for openshift cluster, `kube-dns | core-dns` for
       port: 8080
 {{- end -}}
 {{- end -}}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+# Pod Affinity
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}
