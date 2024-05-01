@@ -1,6 +1,6 @@
 {{- define "pega.installer.environment.config" -}}
 data:
-  # Temporary password for administrator@pega.com that is used to install Pega Platform and used to login after upgrading Pega Platform
+  # Temporary password for administrator@pega.com that is used to install Pega Platform
   ADMIN_PASSWORD: {{ .Values.adminPassword }}
   # Database Type for installation
   DB_TYPE: {{ .Values.global.jdbc.dbType }}
@@ -24,8 +24,8 @@ data:
   # JDBC custom connection properties
   JDBC_CUSTOM_CONNECTION: {{ .Values.global.jdbc.connectionProperties }}
 {{- end }}
-  # Whether this is a Multitenant System ('true' if yes, 'false' if no)
 {{- if .Values.multitenant_system }}
+  # Whether this is a Multitenant System ('true' if yes, 'false' if no)
   MT_SYSTEM: {{ .Values.multitenant_system | quote}}
 {{- end }}
   # UDF generation will be skipped if this property is set to true
