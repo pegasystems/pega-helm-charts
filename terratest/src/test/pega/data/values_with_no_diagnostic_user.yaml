@@ -1,0 +1,13 @@
+---
+global:
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+  tier:
+    - name: "web"
+      nodeType: "WebUser"
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+    - name: "batch"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+    - name: "dh"
+      nodeType: "WebUser"

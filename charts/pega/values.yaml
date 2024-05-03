@@ -128,6 +128,9 @@ global:
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
@@ -193,6 +196,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
 
@@ -218,8 +222,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -237,6 +239,8 @@ global:
       # memLimit: "12Gi"
       # initialHeap: "4096m"
       # maxHeap: "8192m"
+      # ephemeralStorageRequest:
+      # ephemeralStorageLimit:
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # To configure an alternative group for volume mounts, set value for fsGroup
@@ -281,9 +285,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
 
       deploymentStrategy:
         rollingUpdate:
@@ -334,6 +335,7 @@ global:
       #  disktype: ssd
 
       ingress:
+        enabled: true
         # Enter the domain name to access web nodes via a load balancer.
         #  e.g. web.mypega.example.com
         domain: "YOUR_STREAM_NODE_DOMAIN"

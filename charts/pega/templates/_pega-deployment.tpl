@@ -169,6 +169,11 @@ spec:
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_PATH
           value: {{ template "pega.applicationContextPath" . }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
@@ -220,6 +225,9 @@ spec:
           {{- else }}
             memory: "12Gi"
           {{- end }}
+          {{- if .node.ephemeralStorageLimit }}
+            ephemeral-storage: "{{ .node.ephemeralStorageLimit }}"
+          {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
           {{- if .node.cpuRequest }}
@@ -231,6 +239,9 @@ spec:
             memory: "{{ .node.memRequest }}"
           {{- else }}
             memory: "12Gi"
+          {{- end }}
+          {{- if .node.ephemeralStorageRequest }}
+            ephemeral-storage: "{{ .node.ephemeralStorageRequest }}"
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.

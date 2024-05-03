@@ -28,6 +28,7 @@ spec:
   template:
     metadata:
       labels:
+        app: "installer"
         installer-job: {{ .name }}
         {{- if .root.Values.podLabels }}
 {{ toYaml .root.Values.podLabels | indent 8 }}
@@ -139,10 +140,16 @@ spec:
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
-{{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
-        -  name: ACTION
-           value: {{ .action }}
+        - name: ACTION
+          value: {{ .action }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
 {{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
         -  name: HZ_VERSION
            valueFrom:
