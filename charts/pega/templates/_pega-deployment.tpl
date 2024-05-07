@@ -169,6 +169,11 @@ spec:
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_PATH
           value: {{ template "pega.applicationContextPath" . }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"

@@ -38,7 +38,7 @@ func TestPegaCustomUpgradeJobResumeEnabled(t *testing.T) {
 						}
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
-						assertUpgradeJobJobResumeEnabled(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer"}, options)
+						assertUpgradeJobJobResumeEnabled(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "upgrade"}, options)
 
 					}
 				}
@@ -67,6 +67,8 @@ func assertUpgradeJobJobResumeEnabled(t *testing.T, jobYaml string, expectedJob 
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
 	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-installer-mount-volume")
 	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/mount/installer")
+	require.Equal(t, jobContainers[0].Env[0].Name, "ACTION")
+	require.Equal(t, jobContainers[0].Env[0].Value, expectedJob.action)
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
 
 	require.Equal(t, jobSpec.ImagePullSecrets[0].Name, getObjName(options, "-registry-secret"))
