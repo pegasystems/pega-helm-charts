@@ -33,7 +33,7 @@ func TestPegaGKECustomBackendConfig(t *testing.T) {
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"}, "--values", testsPath+"/data/values_gke_backend_config.yaml")
-			verifyBackendConfigs(t, yamlContent, options)
+			verifyCustomBackendConfigs(t, yamlContent, options)
 		}
 	}
 }
