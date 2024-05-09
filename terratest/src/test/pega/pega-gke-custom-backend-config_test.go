@@ -16,14 +16,12 @@ func TestPegaGKECustomBackendConfig(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	testsPath, err := filepath.Abs(PegaHelmChartTestsPath)
-	require.NoError(t, err)
-
 	for _, operation := range supportedOperations {
 
 		for _, depName := range deploymentNames {
 
 			var options = &helm.Options{
+				ValuesFiles: []string{"data/values_gke_backend_config.yaml"},
 				SetValues: map[string]string{
 					"global.deployment.name":        depName,
 					"global.provider":               "gke",
@@ -32,7 +30,7 @@ func TestPegaGKECustomBackendConfig(t *testing.T) {
 				},
 			}
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"}, "--values", testsPath+"/data/values_gke_backend_config.yaml")
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-gke-backend-config.yaml"})
 			verifyCustomBackendConfigs(t, yamlContent, options)
 		}
 	}
