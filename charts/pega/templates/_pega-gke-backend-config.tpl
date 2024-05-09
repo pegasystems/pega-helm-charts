@@ -18,5 +18,8 @@ spec:
     timeoutSec: 5
     type: HTTP
     unhealthyThreshold: 2
+{{ if .node.backendConfig }}
+{{ toYaml .node.backendConfig | indent 2 }}
+{{ end }}
 ---
 {{ end }}
