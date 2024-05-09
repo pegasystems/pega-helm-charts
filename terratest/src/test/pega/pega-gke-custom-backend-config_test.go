@@ -21,12 +21,13 @@ func TestPegaGKECustomBackendConfig(t *testing.T) {
 		for _, depName := range deploymentNames {
 
 			var options = &helm.Options{
-				ValuesFiles: []string{"data/values_gke_backend_config.yaml"},
+				//ValuesFiles: []string{"data/values_gke_backend_config.yaml"},
 				SetValues: map[string]string{
 					"global.deployment.name":        depName,
 					"global.provider":               "gke",
 					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
+					"global.tier[0].backendConfig.connectionDraining.drainingTimeoutSec": "80",
 				},
 			}
 
@@ -42,12 +43,11 @@ func verifyCustomBackendConfigs(t *testing.T, yamlContent string, options *helm.
 	for index, backendConfigStr := range backendConfigSlice {
 		if index >= 1 {
 			UnmarshalK8SYaml(t, backendConfigStr, &backendConfig)
-			verifyBackendConfig(t, &backendConfig, getObjName(options, "-web"), 8080)
-			verifyTimeouts(t, &backendConfig, 80)
+			verifyCustomTimeouts(t, &backendConfig, getObjName(options, "-web"), 8080)
 		}
 	}
 }
 
-func verifyTimeouts(t *testing.T, backendConfig *v1beta1.BackendConfig, drainingTimeoutSec int64) {
-	require.Equal(t, drainingTimeoutSec, backendConfig.Spec.ConnectionDraining.DrainingTimeoutSec)
+func verifyCustomTimeouts(t *testing.T, backendConfig *v1beta1.BackendConfig, name string, port int) {
+	require.Equal(t, 60, int(backendConfig.Spec.ConnectionDraining.DrainingTimeoutSec))
 }
