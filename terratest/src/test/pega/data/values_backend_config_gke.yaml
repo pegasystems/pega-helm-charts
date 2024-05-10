@@ -1,0 +1,11 @@
+---
+global:
+  tier:
+    - name: "web"
+      ingress:
+        backendConfig:
+          connectionDraining:
+            drainingTimeoutSec: 100
+      service:
+        port: 80
+        targetPort: 8080

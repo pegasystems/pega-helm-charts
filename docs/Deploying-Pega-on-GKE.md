@@ -523,6 +523,18 @@ tier:
       #  e.g. web.mypega.example.com
       domain: "**gke.web.dev.pega.io**"
 ```
+18. To apply additional configuration for GKE Load balancer, configure BackendConfig with a referenced service port and associate necessary parameters as per need.
+
+```yaml
+tier:
+  - name: "web"
+    ingress:
+      backendConfig:
+        connectionDraining:
+          drainingTimeoutSec: 80
+```
+Note: Parameters provided in backendConfig section of values.yaml will override the parameters part of the existing template if configured already.
+
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
 
