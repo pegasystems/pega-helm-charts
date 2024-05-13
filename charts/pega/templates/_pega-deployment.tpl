@@ -112,23 +112,13 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
+{{- if (ne .root.Values.global.provider "openshift") }}
+        runAsUser: 9001
+        fsGroup: 0
+{{- end }}
 {{- if .node.securityContext }}
-{{- if .node.securityContext.runAsUser }}
-        runAsUser: {{ .node.securityContext.runAsUser }}
-{{- else }}
-        runAsUser: 9001
-{{- end }}
-{{- if .node.securityContext.fsGroup }}
-        fsGroup: {{ .node.securityContext.fsGroup }}
-{{- else }}
-        fsGroup: 0
-{{- end }}
-{{- else }}
-        runAsUser: 9001
-        fsGroup: 0
-{{- end }}
+{{ toYaml .node.securityContext | indent 8 }}
 {{- end }}
 {{- if .node.topologySpreadConstraints }}
       topologySpreadConstraints:
