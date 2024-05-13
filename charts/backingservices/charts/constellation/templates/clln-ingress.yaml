@@ -1,8 +1,9 @@
+{{- $depName := printf "%s" (include "deploymentName" $) }}
 {{- if .Values.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: constellationingress
+  name: {{ $depName }}
   annotations:
     {{ if (eq .Values.cloudProvider "aws") }}
     alb.ingress.kubernetes.io/backend-protocol: HTTP
@@ -11,7 +12,7 @@ metadata:
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/healthcheck-path: /c11n/buildInfo.json
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.urlPath }}/buildInfo.json
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     {{ end }}
     {{- if .Values.ingressAnnotations }}
@@ -26,7 +27,7 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: constellation
+            name: {{ $depName }}
             port:
               number: 3000
 {{ end }}

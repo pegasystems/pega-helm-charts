@@ -1,15 +1,24 @@
+{{ $depName := printf "%s" (include "deploymentName" $) }}
 {{- if .Values.enabled }}
 apiVersion: v1
 kind: Service
 metadata:
-  name: constellation
+  name: {{ $depName }}
   labels:
-    app: constellation
-    # component: constellation
+    app: {{ $depName }}
+{{- if .Values.serviceAnnotations }}
+  annotations: 
+    # Custom annotations
+{{ toYaml .Values.serviceAnnotations | indent 4 }}
+{{- else if (eq .Values.cloudProvider "gke") }}
+  annotations:
+    cloud.google.com/neg: '{"ingress": true}'
+    cloud.google.com/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
+    cloud.google.com/backend-config: '{"ports": {"3000": "{{ $depName }}"}}'
+{{- end }}
 spec:
   selector:
-    app: constellation
-    # component: constellation
+    app: {{ $depName }}
   ports:
   - protocol: TCP
     port: 3000
