@@ -523,7 +523,7 @@ tier:
       #  e.g. web.mypega.example.com
       domain: "**gke.web.dev.pega.io**"
 ```
-18. To apply additional configuration for GKE Load balancer, configure BackendConfig with a referenced service port and associate necessary parameters as per need.
+18. To apply additional configuration for GKE Load balancer, configure BackendConfig with custom timeout or connectionDraining timeout as shown below. Refer [Google documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#configuring_ingress_features_through_backendconfig_parameters) to configure additional parameters in backendConfig.
 
 ```yaml
 tier:
