@@ -371,6 +371,16 @@ ingress:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
 ```
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
+
+The following example shows timeout annotation overrides for an Openshift deployment:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+     haproxy.router.openshift.io/timeout: 2m
+```
 
 #### Provider support for SSL certificate management
 
@@ -866,10 +876,12 @@ To configure authorization for the connection between Pega Infinity and the Sear
 | Parameter             | Description                                                                                                                                                                                           | Default value      |
 |-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
 | `enabled`             | Set the `pegasearch.srsAuth.enabled` to 'true' to use OAuth between Infinity and SRS.                                                                                                                 | false              |
-| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth service endpoint to get the token for SRS.                                                                                             | `""`               |
+| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth token endpoint to get the token for SRS.                                                                                             | `""`               |
 | `clientId`            | Set the `pegasearch.srsAuth.clientId` value to the client id used in OAuth service.                                                                                                                   | `""`               |
 | `scopes`              | Set the `pegasearch.srsAuth.scopes` value to "pega.search:full", the scope set in the OAuth service required to grant access to SRS.                                                                  | "pega.search:full" |
-| `privateKey`          | Set the `pegasearch.srsAuth,privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
+| `authType`            | Set the `pegasearch.srsAuth.authType` value to to authentication type use when connecting to the OAuth token endpoint. Use client_secret_basic for basic authentication or private_key_jwt to use a client assertion JWT.     | `""`               |
+| `external_secret_name`| Set the `pegasearch.srsAuth.external_secret_name` value to the secret that contains the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.  The private key should be contained in the secret key SRS_OAUTH_PRIVATE_KEY.   | `""`               |
+| `privateKey`          | When not using an external secret, set the `pegasearch.srsAuth.privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
 | `privateKeyAlgorithm` | Set the `pegasearch.srsAuth.privateKeyAlgorithm` value to the algorithm used to generate a private key used by the OAuth client. Allowed values: RS256 (default), RS384, RS512, ES256, ES384, ES512.  | "RS256"            |
 
 Example:
@@ -882,6 +894,7 @@ pegasearch:
     enabled: true
     url: "https:/your-authorization-service-host/oauth2/v1/token"
     clientId: "your-client-id"
+    authType: client_secret_basic
     scopes: "pega.search:full"
     privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
     privateKeyAlgorithm: "RS256"
