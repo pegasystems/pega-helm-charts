@@ -371,6 +371,16 @@ ingress:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
 ```
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
+
+The following example shows timeout annotation overrides for an Openshift deployment:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+     haproxy.router.openshift.io/timeout: 2m
+```
 
 #### Provider support for SSL certificate management
 
