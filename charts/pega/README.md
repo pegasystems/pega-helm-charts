@@ -371,9 +371,9 @@ ingress:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
 ```
-Depending on your deployment usage, if there are any long-running operations such as import, append provider specific ingress timeout annotation under each tier.
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
 
-Example for openshift timeout overrides:
+The following example shows timeout annotation overrides for an Openshift deployment:
 
 ```yaml
 ingress:
