@@ -134,7 +134,7 @@ global:
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
-      # Create a an interactive tier for web users.  This tier uses
+      # Create an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
       nodeType: "WebUser"
