@@ -87,7 +87,7 @@ var constellationResources = []SearchResourceOption{
 		Kind: "Service",
 	},
 	{
-		Name: "constellationingress",
+		Name: "constellation",
 		Kind: "Ingress",
 	},
 	{
