@@ -35,6 +35,22 @@ func Test_shouldContainConstellationResourcesWhenEnabled(t *testing.T) {
 	}
 }
 
+func Test_shouldContainConstellationResourcesWithIngressWhenEnabled(t *testing.T) {
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTest(t, helmChartRelativePath, map[string]string{
+			"constellation.enabled": "true",
+			"constellation.ingress.enabled": "true",
+		}),
+	)
+
+	for _, i := range constellationResourcesWithIngress {
+		require.True(t, helmChartParser.Contains(SearchResourceOption{
+			Name: i.Name,
+			Kind: i.Kind,
+		}))
+	}
+}
+
 func Test_shouldContainConstellationMessagingWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
@@ -78,6 +94,21 @@ func Test_shouldNotContainConstellationMessagingWhenDisabled(t *testing.T) {
 }
 
 var constellationResources = []SearchResourceOption{
+	{
+		Name: "constellation",
+		Kind: "Deployment",
+	},
+	{
+		Name: "constellation",
+		Kind: "Service",
+	},
+	{
+		Name: "constellation-registry-secret",
+		Kind: "Secret",
+	},
+}
+
+var constellationResourcesWithIngress = []SearchResourceOption{
 	{
 		Name: "constellation",
 		Kind: "Deployment",
