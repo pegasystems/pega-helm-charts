@@ -11,7 +11,7 @@ spec:
     checkIntervalSec: 5
     healthyThreshold: 1
     port: 3000
-    requestPath: {{ .node.urlPath }}/v860/ping
+    requestPath: {{ .node.urlPath }}/ping
     timeoutSec: 5
     type: HTTP
     unhealthyThreshold: 2
