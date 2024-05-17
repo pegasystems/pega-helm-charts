@@ -23,7 +23,7 @@ spec:
             claimName: {{ .Values.customerAssetVolumeClaimName }}
       {{- end }}
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" $ }}
+      - name: {{ template "backingservicesRegistrySecret" $ }}
       {{ if .Values.imagePullSecretNames }}
       {{- range .Values.imagePullSecretNames }}
       - name: {{ . }}

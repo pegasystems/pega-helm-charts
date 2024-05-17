@@ -1,8 +1,8 @@
-{{- define "pegaRegistryCredentialsSecretTemplate" }}
+{{- define "backingservicesRegistryCredentialsSecretTemplate" }}
 kind: Secret
 apiVersion: v1
 metadata:
-  name: {{ template "pegaRegistrySecret" $ }}
+  name: {{ template "backingservicesRegistrySecret" $ }}
   namespace: {{ .Release.Namespace }}
   annotations:
     "helm.sh/hook": pre-install, pre-upgrade

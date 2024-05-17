@@ -1,4 +1,4 @@
-{{- define  "pega.gke.backendConfig" -}}
+{{- define  "backingservices.gke.backendConfig" -}}
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:

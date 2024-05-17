@@ -2,7 +2,7 @@
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.docker.registry.url (printf "%s:%s" .Values.docker.registry.username .Values.docker.registry.password | b64enc) | b64enc }}
 {{- end }}
 
-{{- define "pegaRegistrySecret" }}
+{{- define "backingservicesRegistrySecret" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-registry-secret
 {{- end }}

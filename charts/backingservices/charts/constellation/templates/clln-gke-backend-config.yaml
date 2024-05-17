@@ -2,6 +2,6 @@
 
 {{- if .Values.enabled }}
 {{- if (eq .Values.cloudProvider "gke") }}
-{{ template "pega.gke.backendConfig" dict "node" .Values "name" $depName }}
+{{ template "backingservices.gke.backendConfig" dict "node" .Values "name" $depName }}
 {{ end }}
 {{ end }}
