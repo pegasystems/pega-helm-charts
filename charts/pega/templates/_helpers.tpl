@@ -364,7 +364,7 @@ dnsConfig:
 {{ if (.Values.global.serviceDNSPolicyNdots) }}
   options:
     - name: ndots
-      value: {{ .Values.global.serviceDNSPolicyNdots }}
+      value: {{ .Values.global.serviceDNSPolicyNdots | quote }}
   {{- end }}
 {{- end }}
 {{- end }}
