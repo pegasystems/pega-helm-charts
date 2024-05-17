@@ -1,5 +1,8 @@
 {{- $depName := printf "%s" (include "deploymentName" $) }}
 
+{{- if .Values.enabled }}
 {{- if (eq .Values.cloudProvider "gke") }}
-{{ template "pega.gke.backendConfig" dict "root" $ "name" $depName }}
+{{ template "pega.gke.backendConfig" dict "node" $ "name" $depName }}
 {{ end }}
+{{ end }}
+

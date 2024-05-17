@@ -6,10 +6,10 @@ metadata:
   name: {{ $depName }}
   labels:
     app: {{ $depName }}
-{{- if .Values.serviceAnnotations }}
+{{- if and (.Values.service) (.Values.service.annotations) }}
   annotations: 
     # Custom annotations
-{{ toYaml .Values.serviceAnnotations | indent 4 }}
+{{ toYaml .Values.service.annotation | indent 4 }}
 {{- else if (eq .Values.cloudProvider "gke") }}
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
@@ -20,7 +20,8 @@ spec:
   selector:
     app: {{ $depName }}
   ports:
-  - protocol: TCP
+  - name: http
+    protocol: TCP
     port: 3000
     targetPort: 3000
   type: NodePort
