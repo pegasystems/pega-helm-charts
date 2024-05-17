@@ -58,3 +58,7 @@ server:
   diagnostics_metric_level: "info"
   diagnostic_log_file_size_mb: "50"
   diagnostics_file_count: "3"
+
+# Apply securityContext to clustering service pods. For example to set `runAsUser: 1000`:
+# securityContext:
+#   runAsUser: 1000
