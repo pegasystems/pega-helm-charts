@@ -308,7 +308,7 @@ requestor:
 ### Security context
 
 By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user and volume mounts uses `root`(0) as the group. To configure an alternative user for your custom image, set value for `runAsUser` and to configure an alternative group for volume mounts, set value for `fsGroup`. Note that pegasystems/pega image works only with pegauser(9001).
-`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, along with these settings other allowed configuration can also be supplied here, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 Example:
 
@@ -370,6 +370,16 @@ ingress:
   annotations:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
+```
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
+
+The following example shows timeout annotation overrides for an Openshift deployment:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+     haproxy.router.openshift.io/timeout: 2m
 ```
 
 #### Provider support for SSL certificate management
