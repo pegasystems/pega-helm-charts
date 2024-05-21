@@ -523,6 +523,18 @@ tier:
       #  e.g. web.mypega.example.com
       domain: "**gke.web.dev.pega.io**"
 ```
+18. To apply additional configuration for GKE Load balancer, configure backendConfig with a custom timeout or a connectionDraining timeout as shown in the following example. For more information on additional parameters in backendConfig, see [Google documentation](https://cloud.google.com/kubernetes-engine/docs/how-to/ingress-configuration#configuring_ingress_features_through_backendconfig_parameters).
+
+```yaml
+tier:
+  - name: "web"
+    ingress:
+      backendConfig:
+        connectionDraining:
+          drainingTimeoutSec: 80
+```
+Note: Parameters provided in the backendConfig section of values.yaml override the parameters section of the existing template if it is already configured.
+
 
 To log in to Pega Platform with this host name, assign the host name with the same IP address that the deployment load balancer assigned to the web tier. This final step ensures that you can log in to Pega Platform with your host name, on which you can independently manage security protocols that match your networking infrastructure standards.
 

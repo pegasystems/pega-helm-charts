@@ -56,7 +56,7 @@ global:
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
-    # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # configure JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
@@ -134,7 +134,7 @@ global:
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
-      # Create a an interactive tier for web users.  This tier uses
+      # Create an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
       nodeType: "WebUser"
@@ -476,11 +476,22 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
-# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
   replicas: 1
+
+  # Set externalSearchService to true to use the Search and Reporting Service.
+  # Refer to the README document to configure SRS as a search functionality provider under this section.
+  externalSearchService: false
+  externalURL:
+  srsAuth:
+    enabled: false
+    url: ""
+    clientId: ""
+    authType: ""
+    privateKey: ""
+    external_secret_name: ""
 
 # Pega Installer settings.
 installer:

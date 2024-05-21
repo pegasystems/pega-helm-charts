@@ -2,13 +2,14 @@ package pega
 
 import (
 	"fmt"
+	"path/filepath"
+	"strings"
+	"testing"
+
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	appsv1beta2 "k8s.io/api/apps/v1beta2"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"path/filepath"
-	"strings"
-	"testing"
 )
 
 func TestClusteringServiceDeployment(t *testing.T) {
@@ -61,6 +62,39 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[0].MountPath, "/opt/hazelcast/logs")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].Name, "hazelcast-volume-credentials")
 			require.Equal(t, statefulsetSpec.Containers[0].VolumeMounts[1].MountPath, "/opt/hazelcast/secrets")
+		}
+	}
+}
+
+func TestClusteringServiceDeploymentSecurityContext(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                     vendor,
+					"global.actions.execute":              operation,
+					"hazelcast.clusteringServiceEnabled":  "true",
+					"hazelcast.securityContext.runAsUser": "1000",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-deployment.yaml"})
+			yamlSplit := strings.Split(yamlContent, "---")
+			var statefulsetObj appsv1beta2.StatefulSet
+			UnmarshalK8SYaml(t, yamlSplit[1], &statefulsetObj)
+
+			require.Equal(t, int64(1000), *statefulsetObj.Spec.Template.Spec.SecurityContext.RunAsUser)
+
 		}
 	}
 }
