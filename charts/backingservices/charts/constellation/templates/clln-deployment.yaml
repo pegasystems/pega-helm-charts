@@ -1,4 +1,4 @@
-{{- $depName := printf "%s" (include "deploymentName" $) }}
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation" )) }}
 {{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
@@ -23,7 +23,7 @@ spec:
             claimName: {{ .Values.customerAssetVolumeClaimName }}
       {{- end }}
       imagePullSecrets:
-      - name: {{ template "backingservicesRegistrySecret" $ }}
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
       {{ if .Values.imagePullSecretNames }}
       {{- range .Values.imagePullSecretNames }}
       - name: {{ . }}

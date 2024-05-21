@@ -1,7 +1,8 @@
-{{- $depName := printf "%s" (include "deploymentName" $) }}
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation" )) }}
+{{- $requestPath := printf "%s/v860/ping" .Values.urlPath }}
 
 {{- if .Values.enabled }}
 {{- if (eq .Values.cloudProvider "gke") }}
-{{ template "backingservices.gke.backendConfig" dict "node" .Values "name" $depName }}
+{{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath }}
 {{ end }}
 {{ end }}

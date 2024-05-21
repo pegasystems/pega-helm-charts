@@ -1,4 +1,4 @@
-{{- $depName := printf "%s" (include "deploymentName" $) }}
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-msg" )) }}
 
 {{- if .Values.enabled }}
 {{- if (eq .Values.cloudProvider "gke") }}

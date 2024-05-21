@@ -1,4 +1,4 @@
-{{- define  "pega.gke.backendConfig" -}}
+{{- define  "backingservices.gke.backendConfig" -}}
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
@@ -11,7 +11,7 @@ spec:
     checkIntervalSec: 5
     healthyThreshold: 1
     port: 3000
-    requestPath: {{ .node.urlPath }}/ping
+    requestPath: {{ .requestPath }}
     timeoutSec: 5
     type: HTTP
     unhealthyThreshold: 2
