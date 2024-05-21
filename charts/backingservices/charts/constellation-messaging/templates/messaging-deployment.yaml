@@ -1,32 +1,54 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
 {{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: {{ .Values.name }}
+  name: {{ $depName }}
   labels:
-    app: {{ .Values.name }}
+    app: {{ $depName }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.name }}
+      app: {{ $depName }}
   template:
     metadata:
       labels:
-        app: {{ .Values.name }}
+        app: {{ $depName }}
     spec:
       imagePullSecrets:
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
+      {{ if .Values.imagePullSecretNames }}
       {{- range .Values.imagePullSecretNames }}
-        - name: {{ . }}
+      - name: {{ . }}
       {{- end }}
+      {{ end }}
       containers:
-      - name: c11n-messaging
+      - name: {{ $depName }}
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.image }}
         args:
-          - --max-semi-space-size=1024
-          - port={{ .Values.pegaMessagingTargetPort }}
-          - path=/c11n-messaging
+        - --max-semi-space-size=1024
+        - port={{ .Values.service.targetPort }}
+        - path={{ .Values.urlPath }}
+        livenessProbe:
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          httpGet:
+            path: {{ .Values.urlPath }}/ping
+            port: {{ .Values.service.targetPort }}
+        readinessProbe:
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          httpGet:
+            path: {{ .Values.urlPath }}/ping
+            port: {{ .Values.service.targetPort }}
         ports:
-        - containerPort: {{ .Values.pegaMessagingTargetPort }}
+        - containerPort: {{ .Values.service.targetPort }}
 {{ end }}

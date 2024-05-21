@@ -38,7 +38,7 @@ spec:
            mountPath: /usr/src/app/dist/customers
         {{- end }}
         args:
-        - port=3000
+        - port={{ .Values.service.targetPort }}
         # constellation URL path, if you change it, you need to change ingress template files too
         - urlPath={{ .Values.urlPath }}
         - logLevel={{ .Values.logLevel }}
@@ -50,7 +50,7 @@ spec:
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
             path: {{ .Values.urlPath }}/buildInfo.json
-            port: 3000
+            port: {{ .Values.service.targetPort }}
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -59,7 +59,7 @@ spec:
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
             path: {{ .Values.urlPath }}/buildInfo.json
-            port: 3000
+            port: {{ .Values.service.targetPort }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.service.targetPort }}
 {{ end }}

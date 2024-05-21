@@ -20,6 +20,9 @@ metadata:
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
     {{ end }}
 spec:
+{{- if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+{{- end }}
   rules:
   - host: {{ .Values.ingress.domain }}
     http:
@@ -30,7 +33,7 @@ spec:
           service:
             name: {{ $depName }}
             port:
-              number: 3000
+              number: {{ .Values.service.port }}
 {{ if (.Values.ingress.tls) }}
 {{- if (eq .Values.ingress.tls.enabled true) }}
 {{- if .Values.ingress.tls.secretName }}

@@ -14,7 +14,7 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
     cloud.google.com/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
-    cloud.google.com/backend-config: '{"ports": {"3000": "{{ $depName }}"}}'
+    cloud.google.com/backend-config: '{"ports": {"{{ .Values.service.port }}": "{{ $depName }}"}}'
 {{- end }}
 spec:
   selector:
@@ -22,7 +22,7 @@ spec:
   ports:
   - name: http
     protocol: TCP
-    port: 3000
-    targetPort: 3000
-  type: NodePort
+    port: {{ .Values.service.port }}
+    targetPort: {{ .Values.service.targetPort }}
+  type: {{ .Values.service.serviceType }}
 {{ end }}

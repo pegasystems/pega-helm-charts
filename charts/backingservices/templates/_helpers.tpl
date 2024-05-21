@@ -7,7 +7,7 @@
 {{- $depName -}}-registry-secret
 {{- end }}
 
-{{- define "deploymentName" }}{{ $deploymentNamePrefix := ".defaultname" }}{{ if (.root.deployment) }}{{ if (.root.deployment.name) }}{{ $deploymentNamePrefix = .root.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+{{- define "deploymentName" }}{{ $deploymentNamePrefix := .defaultname }}{{ if (.root.deployment) }}{{ if (.root.deployment.name) }}{{ $deploymentNamePrefix = .root.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
 
 {{- define "tlssecretsnippet" -}}
 tls:
