@@ -6,6 +6,7 @@ toolchain go1.22.3
 
 require (
 	github.com/GoogleCloudPlatform/gke-managed-certs v0.3.4
+<<<<<<< HEAD
 	github.com/gruntwork-io/terratest v0.46.14
 	github.com/stretchr/testify v1.8.4
 	k8s.io/api v0.28.4
@@ -88,3 +89,21 @@ require (
 	sigs.k8s.io/structured-merge-diff/v4 v4.2.3 // indirect
 	sigs.k8s.io/yaml v1.3.0 // indirect
 )
+=======
+	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
+	github.com/go-errors/errors v1.1.1 // indirect
+	github.com/go-openapi/spec v0.19.8 // indirect
+	github.com/go-openapi/swag v0.19.9 // indirect
+	github.com/go-sql-driver/mysql v1.5.0 // indirect
+	github.com/gruntwork-io/gruntwork-cli v0.6.1 // indirect
+	github.com/gruntwork-io/terratest v0.28.5
+	github.com/imdario/mergo v0.3.9 // indirect
+	github.com/mailru/easyjson v0.7.1 // indirect
+	github.com/stretchr/testify v1.6.1
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
+	k8s.io/api v0.20.0
+	k8s.io/apimachinery v0.20.0
+	k8s.io/ingress-gce v1.15.2
+)
+>>>>>>> upstream/master
