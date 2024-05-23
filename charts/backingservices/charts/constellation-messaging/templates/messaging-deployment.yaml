@@ -18,15 +18,15 @@ spec:
     spec:
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
-      {{ if .Values.imagePullSecretNames }}
-      {{- range .Values.imagePullSecretNames }}
+      {{ if .Values.docker.imagePullSecretNames }}
+      {{- range .Values.docker.imagePullSecretNames }}
       - name: {{ . }}
       {{- end }}
       {{ end }}
       containers:
       - name: {{ $depName }}
-        imagePullPolicy: {{ .Values.imagePullPolicy }}
-        image: {{ .Values.image }}
+        imagePullPolicy: {{ .Values.docker.imagePullPolicy }}
+        image: {{ .Values.docker.messaging.image }}
         args:
         - --max-semi-space-size=1024
         - port={{ .Values.service.targetPort }}

@@ -24,13 +24,14 @@ spec:
       {{- end }}
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
-      {{ if .Values.imagePullSecretNames }}
-      {{- range .Values.imagePullSecretNames }}
+      {{ if .Values.docker.imagePullSecretNames }}
+      {{- range .Values.docker.imagePullSecretNames }}
       - name: {{ . }}
       {{- end }}
       {{ end }}
       containers:
       - name: {{ $depName }}
+        imagePullPolicy: {{ .Values.docker.constellation.imagePullPolicy }}
         image: {{ .Values.docker.constellation.image }}
         {{ if .Values.customerAssetVolumeClaimName }}
         volumeMounts:
