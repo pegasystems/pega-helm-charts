@@ -276,6 +276,15 @@ global:
       #  whenUnsatisfiable: <string>
       #  labelSelector: <object>
 
+      # Tolerations allow the scheduler to schedule pods with matching taints.
+      # For more information please refer https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration
+      # If you want to apply tolerations other tiers, please use the same configuration as described here.
+      # tolerations:
+      #  - key: "key1"
+      #    operator: "Equal"
+      #    value: "value1"
+      #    effect: "NoSchedule"
+
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
       # value and comment out the other parameter.
