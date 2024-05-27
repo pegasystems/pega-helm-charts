@@ -19,7 +19,7 @@ jobs:
           only-labels: 'pending info' # only mark issues/PRs as stale if they have this label
           labels-to-remove-when-unstale: 'pending info' # remove label when unstale -- should be manually added back if information is insufficient
           # automated messages to issue/PR authors
-          stale-issue-message: 'This issue is marked as stale because it has been open 60 days with no activity. Remove pending info & stale labels or comment or this will be closed in 7 days.'
-          stale-pr-message: 'This pull request is marked as stale because it has been open 60 days with no activity. Remove pending info & stale labels or comment or this will be closed in 7 days.'
+          stale-issue-message: 'This issue is marked as stale because it has been open 60 days with no activity. Remove pending info & stale labels or comment if you want to address this issue otherwise this will be closed in 7 days.'
+          stale-pr-message: 'This pull request is marked as stale because it has been open 60 days with no activity. Remove pending info & stale labels or address review comments and update the pull request otherwise this will be closed in 7 days.'
           close-issue-message: 'This issue has been closed due to inactivity and lack of information.If you still encounter this issue, please add the requested information and re-open.'
           close-pr-message: 'This PR has been closed due to inactivity and lack of changes.If you would like to still work on this PR, please address the review comments and re-open.'
