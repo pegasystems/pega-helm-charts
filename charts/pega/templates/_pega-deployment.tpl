@@ -211,7 +211,11 @@ spec:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
         resources:
+{{- if .node.resources }}
+{{ toYaml .node.resources | indent 10 }}
+{{- else }}
           # Maximum CPU and Memory that the containers for {{ .name }} can use
+          # Resources are configured through deprecated settings. Use .tier[].resources instead
           limits:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
@@ -240,6 +244,7 @@ spec:
           {{- end }}
           {{- if .node.ephemeralStorageRequest }}
             ephemeral-storage: "{{ .node.ephemeralStorageRequest }}"
+          {{- end }}
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.

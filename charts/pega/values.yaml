@@ -231,16 +231,17 @@ global:
 
       livenessProbe:
         port: 8081
-
-      # Optionally overridde default resource specifications
-      # cpuRequest: 2
-      # memRequest: "12Gi"
-      # cpuLimit: 4
-      # memLimit: "12Gi"
-      # initialHeap: "4096m"
+     
+      # Optionally overridde the default or add additional resource specifications.
+      # initialHeap: "8192m"
       # maxHeap: "8192m"
-      # ephemeralStorageRequest:
-      # ephemeralStorageLimit:
+      resources: 
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # To configure an alternative group for volume mounts, set value for fsGroup
@@ -312,6 +313,16 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      
+      initialHeap: "8192m"
+      maxHeap: "8192m"
+      resources: 
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -370,6 +381,16 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+
+      initialHeap: "8192m"
+      maxHeap: "8192m"
+      resources: 
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
 # External services
 

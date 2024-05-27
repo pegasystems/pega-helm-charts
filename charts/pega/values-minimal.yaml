@@ -169,14 +169,17 @@ global:
           cacertificate:
 
       # Set resource consumption to minimal levels
-      replicas: 1
-      cpuRequest: 200m
-      memRequest: "6Gi"
-      cpuLimit: 2
-      memLimit: "6Gi"
+      replicas: 1      
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
+      resources: 
+        requests:
+          memory: "6Gi"
+          cpu: 200m
+        limits:
+          memory: "6Gi"
+          cpu: 2
       volumeClaimTemplate:
         resources:
           requests:
