@@ -169,7 +169,7 @@ global:
           cacertificate:
 
       # Set resource consumption to minimal levels
-      replicas: 1     
+      replicas: 1
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
