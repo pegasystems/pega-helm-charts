@@ -231,11 +231,11 @@ global:
 
       livenessProbe:
         port: 8081
-     
+
       # Optionally overridde the default or add additional resource specifications.
       # initialHeap: "8192m"
       # maxHeap: "8192m"
-      resources: 
+      resources:
         requests:
           memory: "12Gi"
           cpu: 3
@@ -313,10 +313,8 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
-      
-      initialHeap: "8192m"
-      maxHeap: "8192m"
-      resources: 
+
+      resources:
         requests:
           memory: "12Gi"
           cpu: 3
@@ -382,9 +380,7 @@ global:
         minAvailable: 1
         # maxUnavailable: "50%"
 
-      initialHeap: "8192m"
-      maxHeap: "8192m"
-      resources: 
+      resources:
         requests:
           memory: "12Gi"
           cpu: 3
