@@ -7,14 +7,16 @@ require (
 	github.com/emicklei/go-restful v2.16.0+incompatible // indirect
 	github.com/go-errors/errors v1.1.1 // indirect
 	github.com/go-openapi/spec v0.19.8 // indirect
+	github.com/go-openapi/swag v0.19.9 // indirect
 	github.com/go-sql-driver/mysql v1.5.0 // indirect
-	github.com/gruntwork-io/terratest v0.46.14
-	github.com/mattn/go-isatty v0.0.19 // indirect
-	github.com/stretchr/testify v1.8.4
-	github.com/virtuald/go-ordered-json v0.0.0-20170621173500-b18e6e673d74 // indirect
-	k8s.io/api v0.28.4
-	k8s.io/apimachinery v0.28.4
-	k8s.io/client-go v0.28.4 // indirect
-	k8s.io/ingress-gce v1.29.1
-	k8s.io/kube-openapi v0.0.0-20230717233707-2695361300d9 // indirect
+	github.com/gruntwork-io/gruntwork-cli v0.6.1 // indirect
+	github.com/gruntwork-io/terratest v0.28.5
+	github.com/imdario/mergo v0.3.9 // indirect
+	github.com/mailru/easyjson v0.7.1 // indirect
+	github.com/stretchr/testify v1.6.1
+	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gopkg.in/yaml.v3 v3.0.0 // indirect
+	k8s.io/api v0.20.0
+	k8s.io/apimachinery v0.20.0
+	k8s.io/ingress-gce v1.15.2
 )
