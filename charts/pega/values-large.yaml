@@ -648,8 +648,8 @@ stream:
   # so that it is easy to distinguish them from topics created by other applications.
   # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
   streamNamePattern: "pega-{stream.name}"
-  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
-  replicationFactor: "1"
+  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3. Pega recommended value is 3.
+  replicationFactor: "3"
   # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
   # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
   # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.
