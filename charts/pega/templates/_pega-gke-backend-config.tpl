@@ -18,5 +18,8 @@ spec:
     timeoutSec: 5
     type: HTTP
     unhealthyThreshold: 2
+{{ if .node.ingress.backendConfig }}
+{{ toYaml .node.ingress.backendConfig | indent 2 }}
+{{ end }}
 ---
 {{ end }}
