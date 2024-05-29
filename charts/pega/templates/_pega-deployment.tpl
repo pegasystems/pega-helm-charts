@@ -124,6 +124,10 @@ spec:
       topologySpreadConstraints:
 {{ toYaml .node.topologySpreadConstraints | indent 8 }}
 {{- end }}
+{{- if .node.tolerations }}
+      tolerations:
+{{ toYaml .node.tolerations | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat

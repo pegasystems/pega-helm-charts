@@ -520,6 +520,25 @@ tier:
     disktype: ssd
 ```
 
+### Tolerations
+
+Pega supports configuring tolerations for workloads. Taints are applied to nodes and tolerations are applied to pods. For more information about taints and tolerations please refer official K8S [documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+
+Example:
+
+```yaml
+tier:
+- name: "my-tier"
+  nodeType: "WebUser"
+  
+  tolerations:
+  - key: "key1"
+    operator: "Equal"
+    value: "value1"
+    effect: "NoSchedule"
+  
+```
+
 ### Liveness, readiness, and startup probes
 
 Pega uses liveness, readiness, and startup probes to determine application health in your deployments. For an overview of these probes, see [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness. You can configure probes independently for each tier. If not explicitly configured, default probes are used during the deployment. Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
