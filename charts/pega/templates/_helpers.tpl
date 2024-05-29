@@ -361,6 +361,11 @@ true
 dnsConfig:
   searches:
   - {{ .Values.global.privateHostedZoneDomainName }}
+{{ if (.Values.global.serviceDNSPolicyNdots) }}
+  options:
+    - name: ndots
+      value: {{ .Values.global.serviceDNSPolicyNdots | quote }}
+  {{- end }}
 {{- end }}
 {{- end }}
 
