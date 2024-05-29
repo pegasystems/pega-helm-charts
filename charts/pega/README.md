@@ -484,14 +484,14 @@ resources:
 Parameter                | Description                                            | Default value
 ---                      | ---                                                    | ---
 `replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`             | Depreated, use `resources.requests.cpu`. Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`               | Depreated, use `resources.limits.cpu`. CPU limit for pods in the current tier.                | `4`
-`memRequest`             | Depreated, use `resources.requests.memory`. Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`               | Depreated, use `resources.limits.memory`. Memory limit for pods in the current tier.             | `12Gi`
+`cpuRequest`             | Deprecated, use `resources.requests.cpu`. Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | Deprecated, use `resources.limits.cpu`. CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Deprecated, use `resources.requests.memory`. Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Deprecated, use `resources.limits.memory`. Memory limit for pods in the current tier.             | `12Gi`
 `initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
-`ephemeralStorageRequest`| Depreated, use `resources.requests.ephemeral-storage`. Ephemeral storage request for the tomcat container.    | -
-`ephemeralStorageLimit`  | Depreated, use `resources.limits.ephemeral-storage`. Ephemeral storage limit for the tomcat container.      | -
+`ephemeralStorageRequest`| Deprecated, use `resources.requests.ephemeral-storage`. Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Deprecated, use `resources.limits.ephemeral-storage`. Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
