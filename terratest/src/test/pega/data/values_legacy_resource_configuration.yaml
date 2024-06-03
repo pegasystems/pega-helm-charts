@@ -1,0 +1,10 @@
+---
+global:
+  tier:
+    - name: "web"
+      cpuRequest: 2
+      memRequest: "6Gi"
+      cpuLimit: 3
+      memLimit: "6Gi"
+      ephemeralStorageRequest: "25Gi"
+      ephemeralStorageLimit: "25Gi"
