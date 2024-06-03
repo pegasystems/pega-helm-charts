@@ -1,8 +1,9 @@
 package backingservices
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_shouldNotContainConstellationResourcesWhenDisabled(t *testing.T) {
@@ -38,7 +39,7 @@ func Test_shouldContainConstellationResourcesWhenEnabled(t *testing.T) {
 func Test_shouldContainConstellationResourcesWithIngressWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"constellation.enabled": "true",
+			"constellation.enabled":         "true",
 			"constellation.ingress.enabled": "true",
 		}),
 	)
@@ -54,13 +55,14 @@ func Test_shouldContainConstellationResourcesWithIngressWhenEnabled(t *testing.T
 func Test_shouldContainConstellationMessagingWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "false",
-			"constellation-messaging.enabled": "true",
-			"constellation-messaging.name": "constellation-messaging",
-			"constellation-messaging.image": "messaging-image:1.0.0",
-			"constellation-messaging.replicas": "3",
-			"constellation-messaging.imagePullSecretNames": "{secret1, secret2}",
-			"constellation-messaging.ingress.domain": "test.com",
+			"srs.enabled":                                         "false",
+			"constellation-messaging.enabled":                     "true",
+			"constellation-messaging.deployment.name":             "constellation-messaging",
+			"constellation-messaging.docker.messaging.image":      "messaging-image:1.0.0",
+			"constellation-messaging.replicas":                    "3",
+			"constellation-messaging.docker.imagePullSecretNames": "{secret1, secret2}",
+			"constellation-messaging.ingress.enabled":             "true",
+			"constellation-messaging.ingress.domain":              "test.com",
 		}),
 	)
 
@@ -75,13 +77,13 @@ func Test_shouldContainConstellationMessagingWhenEnabled(t *testing.T) {
 func Test_shouldNotContainConstellationMessagingWhenDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "false",
-			"constellation-messaging.enabled": "false",
-			"constellation-messaging.name": "constellation-messaging",
-			"constellation-messaging.image": "messaging-image:1.0.0",
-			"constellation-messaging.replicas": "3",
+			"srs.enabled":                                  "false",
+			"constellation-messaging.enabled":              "false",
+			"constellation-messaging.name":                 "constellation-messaging",
+			"constellation-messaging.image":                "messaging-image:1.0.0",
+			"constellation-messaging.replicas":             "3",
 			"constellation-messaging.imagePullSecretNames": "{secret1, secret2}",
-			"constellation-messaging.ingress.domain": "test.com",
+			"constellation-messaging.ingress.domain":       "test.com",
 		}),
 	)
 
