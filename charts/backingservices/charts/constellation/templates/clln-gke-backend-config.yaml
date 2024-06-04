@@ -3,6 +3,6 @@
 
 {{- if .Values.enabled }}
 {{- if or (eq .Values.provider "gke") (eq .Values.cloudProvider "gke") }}
-{{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath }}
+{{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath  "healthCheckPort" .Values.service.port }}
 {{ end }}
 {{ end }}

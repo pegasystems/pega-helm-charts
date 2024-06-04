@@ -1,4 +1,5 @@
 {{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
+{{- $srvPort := .Values.service.port }}{{ if .Values.pegaMessagingPort }}{{ $srvPort = .Values.pegaMessagingPort }}{{ end }}
 {{- if .Values.enabled }}
 {{- if and (.Values.ingress) (eq .Values.ingress.enabled true) }}
 apiVersion: networking.k8s.io/v1
@@ -23,7 +24,7 @@ spec:
           service:
             name: {{ $depName }}
             port:
-              number: {{ .Values.service.port }}
+              number: {{ $srvPort }}
 {{ if (.Values.ingress.tls) }}
 {{- if (eq .Values.ingress.tls.enabled true) }}
 {{- if .Values.ingress.tls.secretName }}

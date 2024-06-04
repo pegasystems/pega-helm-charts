@@ -1,4 +1,6 @@
 {{ $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
+{{- $srvTargetPort := .Values.service.targetPort }}{{ if .Values.pegaMessagingTargetPort }}{{ $srvTargetPort = .Values.pegaMessagingTargetPort }}{{ end }}
+{{- $srvPort := .Values.service.port }}{{ if .Values.pegaMessagingPort }}{{ $srvPort = .Values.pegaMessagingPort }}{{ end }}
 {{- if .Values.enabled }}
 apiVersion: v1
 kind: Service
@@ -14,7 +16,7 @@ metadata:
   annotations:
     cloud.google.com/neg: '{"ingress": true}'
     cloud.google.com/app-protocols: '{"https":"HTTPS","http":"HTTP"}'
-    cloud.google.com/backend-config: '{"ports": {"{{ .Values.service.port }}": "{{ $depName }}"}}'
+    cloud.google.com/backend-config: '{"ports": {"{{ $srvPort }}": "{{ $depName }}"}}'
 {{- end }}
 spec:
   selector:
@@ -22,7 +24,7 @@ spec:
   ports:
   - name: http
     protocol: TCP
-    port: {{ .Values.service.port }}
-    targetPort: {{ .Values.service.targetPort }}
+    port: {{ $srvPort }}
+    targetPort: {{ $srvTargetPort }}
   type: {{ .Values.service.serviceType }}
 {{ end }}

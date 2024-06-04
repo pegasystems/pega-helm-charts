@@ -1,4 +1,5 @@
 {{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
+{{- $srvTargetPort := .Values.service.targetPort }}{{ if .Values.pegaMessagingTargetPort }}{{ $srvTargetPort = .Values.pegaMessagingTargetPort }}{{ end }}
 {{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
@@ -22,14 +23,18 @@ spec:
       {{- range .Values.docker.imagePullSecretNames }}
       - name: {{ . }}
       {{- end }}
+      {{ else if .Values.imagePullSecretNames }}
+      {{- range .Values.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
       {{ end }}
       containers:
       - name: {{ $depName }}
-        imagePullPolicy: {{ .Values.docker.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.docker.messaging.imagePullPolicy }}
         image: {{ .Values.docker.messaging.image }}
         args:
         - --max-semi-space-size=1024
-        - port={{ .Values.service.targetPort }}
+        - port={{ $srvTargetPort }}
         - path={{ .Values.urlPath }}
         livenessProbe:
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
@@ -39,7 +44,7 @@ spec:
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
             path: {{ .Values.urlPath }}/ping
-            port: {{ .Values.service.targetPort }}
+            port: {{ $srvTargetPort }}
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -48,7 +53,7 @@ spec:
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
             path: {{ .Values.urlPath }}/ping
-            port: {{ .Values.service.targetPort }}
+            port: {{ $srvTargetPort }}
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - containerPort: {{ $srvTargetPort }}
 {{ end }}

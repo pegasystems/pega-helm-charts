@@ -10,7 +10,7 @@ spec:
   healthCheck:
     checkIntervalSec: 5
     healthyThreshold: 1
-    port: 3000
+    port: {{ .healthCheckPort }}
     requestPath: {{ .requestPath }}
     timeoutSec: 5
     type: HTTP

@@ -90,7 +90,8 @@ constellation:
 
 constellation-messaging:
   enabled: false
-  name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+  deployment:
+    name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
   image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
   replicas: 1
 
