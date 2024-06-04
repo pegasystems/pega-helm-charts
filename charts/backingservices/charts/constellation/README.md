@@ -60,10 +60,10 @@ The values.yaml file provides configuration options to define the values for the
 | `customerAssetVolumeClaimName`                        | Specify the volume claim name to be used for storing customer assets.                                                                                                                                                                                                                                                                                          |
 | `imagePullSecretNames`                        | Deprected, use `docker.imagePullSecretNames`. Specify a list of existing ImagePullSecrets to be added to the Deployment.                                                                                                                                                                                        |
 | `docker.imagePullSecretNames`                        | Specify a list of existing ImagePullSecrets to be added to the Deployment.                                                                                                                                                                                                                                                                                         |
-| `docker`.`registry`.`url`                        | Specify the image registry url.                                                                                                                                                                                                                                                                                          |
-| `docker`.`registry`.`username`                        | Specify the username for the docker registry.                                                                                                                                                                                                                                                                                          |
-| `docker`.`registry`.`password`                        | Specify the password for the docker registry.                                                                                                                                                                                                                                                                                          |
-| `docker`.`constellation`.`image`                        | Specify the image version.                                                                                                                                                                                                                                                                                          |
+| `docker.registry.url`                        | Specify the image registry url.                                                                                                                                                                                                                                                                                          |
+| `docker.registry.username`                        | Specify the username for the docker registry.                                                                                                                                                                                                                                                                                          |
+| `docker.registry.password`                        | Specify the password for the docker registry.                                                                                                                                                                                                                                                                                          |
+| `docker.constellation.image`                        | Specify the image version.                                                                                                                                                                                                                                                                                          |
 
 Example:
 
@@ -91,6 +91,27 @@ docker:
 logLevel: info
 urlPath: /c11n
 replicas: 1
+
+```
+
+##### Liveness, readiness, and startup probes
+
+Constellation uses liveness, readiness, and startup probes to determine application health in your deployments. For an overview of these probes, see [Configure Liveness, Readiness and Startup Probes](https://kubernetes.io/docs/tasks/configure-pod-container/configure-liveness-readiness-startup-probes/). Configure a probe for *liveness* to determine if a Pod has entered a broken state; configure it for *readiness* to determine if the application is available to be exposed; configure it for *startup* to determine if a pod is ready to be checked for liveness. You can configure probes independently for each tier. If not explicitly configured, default probes are used during the deployment. Set the following parameters as part of a `livenessProbe`, `readinessProbe`, or `startupProbe` configuration.
+
+Notes:
+* `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
+
+Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe`
+---                   | ---            | ---                     | ---
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `5` | `5`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `5` | `5`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `30`
+`successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1`
+`failureThreshold`    | The number consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3`
+
+Example:
+
+```yaml
 livenessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 5
