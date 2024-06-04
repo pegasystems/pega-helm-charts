@@ -6,7 +6,7 @@ kind: Ingress
 metadata:
   name: {{ $depName }}
   annotations:
-    {{ if (eq .Values.cloudProvider "aws") }}
+    {{ if or (eq .Values.provider "aws") (eq .Values.cloudProvider "aws") }}
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.awsCertificateArn }}
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
@@ -18,13 +18,15 @@ metadata:
     {{ end }}
     {{- if .Values.ingress.annotations }}
     {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- else if .Values.ingressAnnotations }}
+    {{- toYaml .Values.ingressAnnotations | nindent 4 }}
     {{ end }}
 spec:
 {{- if .Values.ingress.ingressClassName }}
   ingressClassName: {{ .Values.ingress.ingressClassName }}
 {{- end }}
   rules:
-  - host: {{ .Values.ingress.domain }}
+  - host: {{if (.Values.domainName) }}{{ .Values.domainName }}{{ else }}{{ .Values.ingress.domain }}{{ end }}
     http:
       paths:
       - path: {{ .Values.urlPath }}

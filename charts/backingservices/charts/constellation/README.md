@@ -42,12 +42,24 @@ The values.yaml file provides configuration options to define the values for the
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 |-----------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `enabled`                               | Enables the constellation appstatic service. Set to true to enable constellation appstatic service in the kubernetes environment.                                                                                                                                                                                                               |
-| `cloudProvider`                        | Specify the cloud provider details. Accepted values are aws.                                                                                                                                                                                                                                                                                          |
+| `cloudProvider`                        | Deprecated, use `provider`. Specify the cloud provider details. Accepted values are aws.                                                                                                                                                                                                                                                                                          |
+| `provider`                        | Enter your Kubernetes provider. Accepted values are aws, gke or k8s.   |                                                                                                                                                                     
 | `awsCertificateArn`                        | Specify the arn for the AWS ACM certificate.                                                                                                                                                                                                                                                                                          |
-| `domainName`                        | Specify your custom domain.                                                                                                                                                                                                                                                                                          |
-| `ingressAnnotations`                        | Specify additional annotations to add to the ingress.                                                                                                                                                                                                                                                                                          |
+| `service.port`                        | The port of the tier to be exposed to the cluster. The default value is `3000`.                                                                                                                                                                                                                                               |
+| `service.targetPort`                        | The target port of the container to expose. The constellation container exposes web traffic on port `3000`.                                                                                                                                                                                                                                               |
+| `service.serviceType`                        | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose.                                                                                                                                                                                                                                               |
+| `service.annotations`                        | Optionally add custom annotations for advanced configuration. Specifying a custom set of annotations will result in them being used instead of the default configurations.                                                                                                                                                                                                                                               |
+| `domainName`                        | Deprecated, use `ingress.domain`. Specify your custom domain.                                                                                                                                                                                                               |
+| `ingress.domain`                        | Specify your custom domain.                                                                                                                                                                                                                                                                                         |
+| `ingressAnnotations`                        | Deprecated, use `ingress.annotations`. Specify additional annotations to add to the ingress.                                                                                                                                                                                                      |
+| `ingress.annotations`                        | Specify additional annotations to add to the ingress.                                                                                                                                                                                                           |
+| `ingress.enabled`                        | Set to true in order to deploy an ingress.                                                                                                                                                                                                                                               |
+| `ingress.ingressClassName`                        | Ingress class to be used in place of the annotation.                                                                                                                                                                                                                                               |
+| `ingress.tls.enabled`                        | Specify the use of HTTPS for ingress connectivity. If the tls block is omitted, TLS will not be enabled.                                                                                                                                                                                                                                               |
+| `ingress.tls.secretName`                        | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment.                                                                                                                                                                                                                                               |
 | `customerAssetVolumeClaimName`                        | Specify the volume claim name to be used for storing customer assets.                                                                                                                                                                                                                                                                                          |
-| `imagePullSecretNames`                        | Specify a list of existing ImagePullSecrets to be added to the Deployment.                                                                                                                                                                                                                                                                                          |
+| `imagePullSecretNames`                        | Deprected, use `docker.imagePullSecretNames`. Specify a list of existing ImagePullSecrets to be added to the Deployment.                                                                                                                                                                                        |
+| `docker.imagePullSecretNames`                        | Specify a list of existing ImagePullSecrets to be added to the Deployment.                                                                                                                                                                                                                                                                                         |
 | `docker`.`registry`.`url`                        | Specify the image registry url.                                                                                                                                                                                                                                                                                          |
 | `docker`.`registry`.`username`                        | Specify the username for the docker registry.                                                                                                                                                                                                                                                                                          |
 | `docker`.`registry`.`password`                        | Specify the password for the docker registry.                                                                                                                                                                                                                                                                                          |
@@ -60,20 +72,22 @@ enabled: true
 deployment:
   name: "constellation"
 # Cloud provider details. Accepted values are : aws
-cloudProvider: aws
+provider: aws
 # For aws cloud provider enter your acm certificate ARN here.
 awsCertificateArn : arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
-domainName: YOUR_CUSTOM_DOMAIN_HERE
+
 # Docker repos and tag for image
 docker:
-    # If using a custom Docker registry, supply the credentials here to pull Docker images.
-    registry:
-      url: YOUR_REGISTRY_URL_HERE
-      username: YOUR_REGISTRY_USERNAME_HERE
-      password: YOUR_REGISTRY_PASSWORD_HERE
-    # Docker image information for the Pega docker image, containing the application server.
-    constellation:
-      image: pega-docker.downloads.pega.com/constellation-appstatic-service/docker-image:xxxxxxx
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  registry:
+    url: YOUR_REGISTRY_URL_HERE
+    username: YOUR_REGISTRY_USERNAME_HERE
+    password: YOUR_REGISTRY_PASSWORD_HERE
+  # Docker image information for the Pega docker image, containing the application server.
+  constellation:
+    image: pega-docker.downloads.pega.com/constellation-appstatic-service/docker-image:xxxxxxx
+    imagePullPolicy: Always
+
 logLevel: info
 urlPath: /c11n
 replicas: 1

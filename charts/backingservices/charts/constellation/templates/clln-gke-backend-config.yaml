@@ -2,7 +2,7 @@
 {{- $requestPath := printf "%s/v860/ping" .Values.urlPath }}
 
 {{- if .Values.enabled }}
-{{- if (eq .Values.provider "gke") }}
+{{- if or (eq .Values.provider "gke") (eq .Values.cloudProvider "gke") }}
 {{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath }}
 {{ end }}
 {{ end }}

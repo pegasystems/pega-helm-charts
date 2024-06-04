@@ -28,6 +28,10 @@ spec:
       {{- range .Values.docker.imagePullSecretNames }}
       - name: {{ . }}
       {{- end }}
+      {{ else if .Values.imagePullSecretNames }}
+      {{- range .Values.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
       {{ end }}
       containers:
       - name: {{ $depName }}
