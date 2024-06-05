@@ -4,6 +4,8 @@
 
 {{- if .Values.enabled }}
 {{- if (eq .Values.provider "gke") }}
+{{- if .Values.ingress.enabled }}
 {{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath "healthCheckPort" $srvPort }}
+{{ end }}
 {{ end }}
 {{ end }}
