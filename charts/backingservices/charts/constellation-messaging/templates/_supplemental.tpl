@@ -4,7 +4,7 @@ backingservicesRegistrySecret
 deploymentName
 tlssecretsnippet
 backingservices.gke.backendConfig
-should be kept aligned because helm lint requires
+are copied from backingservices/templates/_supplemental.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
 
