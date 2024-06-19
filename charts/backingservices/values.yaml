@@ -38,7 +38,7 @@ srs:
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
 
-    # Container securityContext
+    ## Container securityContext
     # securityContext:
     #   runAsUser: 9999 # app
     #   allowPrivilegeEscalation: false
