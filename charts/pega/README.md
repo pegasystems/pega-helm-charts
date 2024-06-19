@@ -467,17 +467,31 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
+Example:
+```yaml
+resources: 
+  requests:
+    memory: "12Gi"
+    cpu: 3
+    ephemeral-storage: 
+  limits:
+    memory: "12Gi"
+    cpu: 4
+    ephemeral-storage: 
+```
+
+
 Parameter                | Description                                            | Default value
 ---                      | ---                                                    | ---
 `replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`             | Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`               | CPU limit for pods in the current tier.                | `4`
-`memRequest`             | Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`               | Memory limit for pods in the current tier.             | `12Gi`
+`cpuRequest`             | Deprecated, use `resources.requests.cpu`. Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | Deprecated, use `resources.limits.cpu`. CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Deprecated, use `resources.requests.memory`. Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Deprecated, use `resources.limits.memory`. Memory limit for pods in the current tier.             | `12Gi`
 `initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
-`ephemeralStorageRequest`| Ephemeral storage request for the tomcat container.    | -
-`ephemeralStorageLimit`  | Ephemeral storage limit for the tomcat container.      | -
+`ephemeralStorageRequest`| Deprecated, use `resources.requests.ephemeral-storage`. Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Deprecated, use `resources.limits.ephemeral-storage`. Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
@@ -504,6 +518,25 @@ tier:
 
   nodeSelector:
     disktype: ssd
+```
+
+### Tolerations
+
+Pega supports configuring tolerations for workloads. Taints are applied to nodes and tolerations are applied to pods. For more information about taints and tolerations please refer official K8S [documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+
+Example:
+
+```yaml
+tier:
+- name: "my-tier"
+  nodeType: "WebUser"
+  
+  tolerations:
+  - key: "key1"
+    operator: "Equal"
+    value: "value1"
+    effect: "NoSchedule"
+  
 ```
 
 ### Liveness, readiness, and startup probes

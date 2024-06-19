@@ -124,6 +124,10 @@ spec:
       topologySpreadConstraints:
 {{ toYaml .node.topologySpreadConstraints | indent 8 }}
 {{- end }}
+{{- if .node.tolerations }}
+      tolerations:
+{{ toYaml .node.tolerations | indent 8 }}
+{{- end }}
       containers:
       # Name of the container
       - name: pega-web-tomcat
@@ -211,7 +215,11 @@ spec:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
         resources:
+{{- if .node.resources }}
+{{ toYaml .node.resources | indent 10 }}
+{{- else }}
           # Maximum CPU and Memory that the containers for {{ .name }} can use
+          # Resources are configured through deprecated settings. Use .tier[].resources instead
           limits:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
@@ -240,6 +248,7 @@ spec:
           {{- end }}
           {{- if .node.ephemeralStorageRequest }}
             ephemeral-storage: "{{ .node.ephemeralStorageRequest }}"
+          {{- end }}
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
