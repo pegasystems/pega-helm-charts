@@ -112,11 +112,11 @@ spec:
           requests:
             cpu: "{{ .root.Values.resources.requests.cpu }}"
             memory: "{{ .root.Values.resources.requests.memory }}"
-            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage | default \"\" }}"
+            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage | default '' }}"
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
-            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage | default \"\" }}"
+            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage | default '' }}"
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
