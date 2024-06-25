@@ -22,6 +22,10 @@ spec:
 {{- include "generatedClusteringServicePodAnnotations" . | indent 8 }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.server.graceful_shutdown_max_wait_seconds }}
+{{- if .Values.securityContext }}
+      securityContext:
+{{ toYaml .Values.securityContext | indent 8 }} 
+{{- end }}
       containers:
       - name: hazelcast
         image: {{ .Values.clusteringServiceImage }}

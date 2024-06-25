@@ -308,7 +308,7 @@ requestor:
 ### Security context
 
 By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user and volume mounts uses `root`(0) as the group. To configure an alternative user for your custom image, set value for `runAsUser` and to configure an alternative group for volume mounts, set value for `fsGroup`. Note that pegasystems/pega image works only with pegauser(9001).
-`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, along with these settings other allowed configuration can also be supplied here, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 Example:
 
@@ -370,6 +370,16 @@ ingress:
   annotations:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
+```
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
+
+The following example shows timeout annotation overrides for an Openshift deployment:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+     haproxy.router.openshift.io/timeout: 2m
 ```
 
 #### Provider support for SSL certificate management
@@ -457,17 +467,31 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
+Example:
+```yaml
+resources: 
+  requests:
+    memory: "12Gi"
+    cpu: 3
+    ephemeral-storage: 
+  limits:
+    memory: "12Gi"
+    cpu: 4
+    ephemeral-storage: 
+```
+
+
 Parameter                | Description                                            | Default value
 ---                      | ---                                                    | ---
 `replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`             | Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`               | CPU limit for pods in the current tier.                | `4`
-`memRequest`             | Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`               | Memory limit for pods in the current tier.             | `12Gi`
+`cpuRequest`             | Deprecated, use `resources.requests.cpu`. Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | Deprecated, use `resources.limits.cpu`. CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Deprecated, use `resources.requests.memory`. Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Deprecated, use `resources.limits.memory`. Memory limit for pods in the current tier.             | `12Gi`
 `initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
-`ephemeralStorageRequest`| Ephemeral storage request for the tomcat container.    | -
-`ephemeralStorageLimit`  | Ephemeral storage limit for the tomcat container.      | -
+`ephemeralStorageRequest`| Deprecated, use `resources.requests.ephemeral-storage`. Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Deprecated, use `resources.limits.ephemeral-storage`. Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
@@ -494,6 +518,25 @@ tier:
 
   nodeSelector:
     disktype: ssd
+```
+
+### Tolerations
+
+Pega supports configuring tolerations for workloads. Taints are applied to nodes and tolerations are applied to pods. For more information about taints and tolerations please refer official K8S [documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+
+Example:
+
+```yaml
+tier:
+- name: "my-tier"
+  nodeType: "WebUser"
+  
+  tolerations:
+  - key: "key1"
+    operator: "Equal"
+    value: "value1"
+    effect: "NoSchedule"
+  
 ```
 
 ### Liveness, readiness, and startup probes
