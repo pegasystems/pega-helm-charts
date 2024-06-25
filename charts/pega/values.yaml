@@ -195,6 +195,13 @@ global:
             # set insecureSkipVerify=true, if the certificate verification has to be skipped
             insecureSkipVerify: false
 
+        # Define custom ports for service here. If you want to use the custom ports for other services, please use the same configuration for those services.
+        # customServicePorts:
+        # - name: <name>
+        #   port: <port>
+        #   targetPort: <port>
+
+
       ingress:
         enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation

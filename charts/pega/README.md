@@ -1396,3 +1396,29 @@ behavior:
    scaleUp:
       stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
 ```
+
+### Custom Ports
+
+Pega supports configuring custom ports for deployments and services.
+
+To configure custom ports for deployment, please add the below configuration for applicable tiers
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      ports:
+        - name: portName
+          containerPort: portId
+```
+
+To configure custom ports for service, please add the below configuration for applicable services
+```yaml
+tier:
+   - name: my-tier
+     service:
+       customServicePorts:
+       - name: portName
+         port: portId
+         targetPort: targetPort
+          
+```
