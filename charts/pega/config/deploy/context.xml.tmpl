@@ -21,8 +21,7 @@
     minEvictableIdleTimeMillis="60000"
     />
 
-  {{ if or .Env.SET_RW .Env.JDBC_RW_URL }}
-    <Resource name="jdbc/PegaRULESLongRW"
+  <Resource name="jdbc/PegaRULESLongRW"
     auth="Container"
     type="javax.sql.DataSource"
     driverClassName="{{ .Env.JDBC_CLASS }}"
@@ -38,7 +37,6 @@
     timeBetweenEvictionRunsMillis="30000"
     minEvictableIdleTimeMillis="60000"
     />
-  {{ end }}
 
   {{ if and .Env.JDBC_RO_URL .Env.DB_RO_USERNAME .Env.DB_RO_PASSWORD }}
     <Resource name="jdbc/PegaRULESReadOnly"

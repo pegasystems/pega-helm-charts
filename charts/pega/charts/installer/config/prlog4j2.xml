@@ -130,9 +130,6 @@
 	    <Logger name="com.pega.pegarules.engine.database.ImpExpLog" level="info">
 	    </Logger>
 
-		<Logger name="com.pega.pegarules.deploy.external.maintenance.MaintenanceDownloader" level="info">
-		</Logger>
-
 		<Logger name="com.hazelcast" additivity="false" level="info">
 			<AppenderRef ref="CLUSTER"/>
 		</Logger>
