@@ -160,6 +160,20 @@ jdbc:
   customerDataSchema: ""
 ```
 
+### JDBC Connections
+
+JDBC Connections facilitate the communication between Java applications and relational databases. They enable Java applications to run SQL statements, retrieve results, and propagate changes to the database in a standardized manner. A Connection interface represents a session with a specific database. It provides methods to create statements, commit or rollback transactions, and manage database connections.
+
+Pega provides the following three JDBC Connection types:
+
+JDBC Connection type     | Description
+---           |---
+`PegaRULES`           | The default Pega JDBC Connection.
+`PegaRULESLongRW`         | Provides a longer database connection, which results in less frequent timeouts. Starting in Pega Helm Charts v3.23.0, `PegaRULESLongRW` is enabled for all deployment tiers.
+`PegaRULESReadOnly`        | Provides a read only database connection.
+
+For more information on JDBC Connection configuration, see [charts/pega/config/deploy/context.xml.tmpl](https://github.com/pegasystems/pega-helm-charts/blob/ab0cb220fe3d297a2e8d8be1c278bcdba96bd646/charts/pega/config/deploy/context.xml.tmpl#L4).
+
 ## Docker
 
 Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
