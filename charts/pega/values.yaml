@@ -163,6 +163,13 @@ global:
         # loadBalancerSourceRanges:
         #     - "123.123.123.0/24"
         #     - "128.128.128.64/32"
+
+        # Define custom ports for service here. If you want to use the custom ports for other services, please use the same configuration for those services.
+        # customServicePorts:
+        # - name: <name>
+        #   port: <port>
+        #   targetPort: <port>
+
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false

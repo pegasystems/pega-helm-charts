@@ -1,0 +1,52 @@
+---
+global:
+  tier:
+    - name: "web"
+      nodeType: "WebUser"
+      requestor:
+        passivationTimeSec: 900
+      service:
+        httpEnabled: true
+        port: 80
+        targetPort: 8080
+        tls:
+          enabled: false
+          external_secret_name: ""
+          keystore:
+          keystorepassword:
+          port: 443
+          targetPort: 8443
+          cacertificate:
+          certificateFile:
+          certificateKeyFile:
+          traefik:
+            enabled: false
+            serverName: ""
+            insecureSkipVerify: false
+        customServicePorts:
+          - name: port1
+            port: 5005
+            targetPort: 5005
+      ingress:
+        domain:
+        tls:
+          enabled: true
+          certificate:
+          key:
+          cacertificate:
+      replicas: 1
+      javaOpts: ""
+      pegaDiagnosticUser: ""
+      pegaDiagnosticPassword: ""
+      deploymentStrategy:
+        rollingUpdate:
+          maxSurge: 1
+          maxUnavailable: 0
+        type: RollingUpdate
+      livenessProbe:
+        port: 8081
+      hpa:
+        enabled: true
+      pdb:
+        enabled: false
+        minAvailable: 1

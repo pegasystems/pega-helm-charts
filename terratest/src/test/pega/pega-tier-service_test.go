@@ -88,3 +88,40 @@ type pegaServices struct {
 	Port       int32
 	TargetPort intstr.IntOrString
 }
+
+func TestPegaTierServiceWithCustomPorts(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+	var serviceObj k8score.Service
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			for _, depName := range deploymentNames {
+
+				var options = &helm.Options{
+					ValuesFiles: []string{"data/values_service_custom_ports.yaml"},
+					SetValues: map[string]string{
+						"global.deployment.name":        depName,
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"installer.upgrade.upgradeType": "zero-downtime",
+					},
+				}
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-service.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")
+				UnmarshalK8SYaml(t, yamlSplit[1], &serviceObj)
+				ports := serviceObj.Spec.Ports
+				require.Equal(t, 2, len(ports))
+				require.Equal(t, "http", ports[0].Name)
+				require.Equal(t, int32(80), ports[0].Port)
+				require.Equal(t, int32(8080), ports[0].TargetPort.IntVal)
+				require.Equal(t, "port1", ports[1].Name)
+				require.Equal(t, int32(5005), ports[1].Port)
+				require.Equal(t, int32(5005), ports[1].TargetPort.IntVal)
+			}
+		}
+	}
+}
