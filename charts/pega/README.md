@@ -172,7 +172,7 @@ JDBC Connection type     | Description
 `PegaRULESLongRW`         | Provides a longer database connection, which results in less frequent timeouts. Starting in Pega Helm Charts v3.23.0, `PegaRULESLongRW` is enabled for all deployment tiers.
 `PegaRULESReadOnly`        | Provides a read only database connection.
 
-For more information on JDBC Connection configuration, see [charts/pega/config/deploy/context.xml.tmpl](https://github.com/pegasystems/pega-helm-charts/blob/ab0cb220fe3d297a2e8d8be1c278bcdba96bd646/charts/pega/config/deploy/context.xml.tmpl#L4).
+The JDBC Connection configurations are defined in [charts/pega/config/deploy/context.xml.tmpl](https://github.com/pegasystems/pega-helm-charts/blob/ab0cb220fe3d297a2e8d8be1c278bcdba96bd646/charts/pega/config/deploy/context.xml.tmpl#L4).
 
 ## Docker
 
