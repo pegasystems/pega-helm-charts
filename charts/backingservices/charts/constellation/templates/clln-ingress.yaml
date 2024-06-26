@@ -1,32 +1,47 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation" )) }}
 {{- if .Values.enabled }}
+{{- if and (.Values.ingress) (eq .Values.ingress.enabled true) }}
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: constellationingress
+  name: {{ $depName }}
   annotations:
-    {{ if (eq .Values.cloudProvider "aws") }}
+    {{ if or (eq .Values.provider "aws") (eq .Values.cloudProvider "aws") }}
     alb.ingress.kubernetes.io/backend-protocol: HTTP
     alb.ingress.kubernetes.io/certificate-arn: {{ .Values.awsCertificateArn }}
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTPS":443}]'
     alb.ingress.kubernetes.io/target-type: ip
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/healthcheck-path: /c11n/buildInfo.json
+    alb.ingress.kubernetes.io/healthcheck-path: {{ .Values.urlPath }}/buildInfo.json
     alb.ingress.kubernetes.io/healthcheck-port: traffic-port
     {{ end }}
-    {{- if .Values.ingressAnnotations }}
+    {{- if .Values.ingress.annotations }}
+    {{- toYaml .Values.ingress.annotations | nindent 4 }}
+    {{- else if .Values.ingressAnnotations }}
     {{- toYaml .Values.ingressAnnotations | nindent 4 }}
     {{ end }}
 spec:
+{{- if .Values.ingress.ingressClassName }}
+  ingressClassName: {{ .Values.ingress.ingressClassName }}
+{{- end }}
   rules:
-  - host: {{ .Values.domainName }}
+  - host: {{if (.Values.domainName) }}{{ .Values.domainName }}{{ else }}{{ .Values.ingress.domain }}{{ end }}
     http:
       paths:
       - path: {{ .Values.urlPath }}
         pathType: Prefix
         backend:
           service:
-            name: constellation
+            name: {{ $depName }}
             port:
-              number: 3000
+              number: {{ .Values.service.port }}
+{{ if (.Values.ingress.tls) }}
+{{- if (eq .Values.ingress.tls.enabled true) }}
+{{- if .Values.ingress.tls.secretName }}
+{{- include "tlssecretsnippet" (dict "node" .Values) | indent 2 }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{ end }}
 {{ end }}

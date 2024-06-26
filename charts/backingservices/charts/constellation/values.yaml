@@ -1,18 +1,14 @@
 ---
-enabled: true
+enabled: false
 deployment:
   name: "constellation"
-# Cloud provider details. Accepted values are aws
-cloudProvider: "aws"
+# Cloud provider details. Accepted values are aws, gke and k8s
+provider: "aws"
 # For aws cloud provider enter your acm certificate ARN here.
 awsCertificateArn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
-domainName: YOUR_CUSTOM_DOMAIN_NAME_HERE
-# Additional annotations for the ingress can be specified here
-ingressAnnotations:
 # Customer assets must be stored on a persistent storage volume.  Create a volume claim and provide the name.
 customerAssetVolumeClaimName:
-# Provide pre-defined image pull secret names if desired
-imagePullSecretNames: []
+
 # Docker repos and tag for image
 docker:
   # If using a custom Docker registry, supply the credentials here to pull Docker images.
@@ -20,11 +16,34 @@ docker:
     url: YOUR_DOCKER_REGISTRY_URL
     username: YOUR_DOCKER_REGISTRY_USERNAME
     password: YOUR_DOCKER_REGISTRY_PASSWORD
+  # Provide pre-defined image pull secret names if desired
+  imagePullSecretNames: []
   # Docker image information for the Pega docker image, containing the application server.
   constellation:
-    image: cirrus-docker.jfrog.io/constellation-appstatic-service/docker-image:1.0.8-20221228123724
+    image: YOUR_CONSTELLATION_SERVICE_IMAGE:TAG
+    imagePullPolicy: Always
+
 logLevel: info
 urlPath: /c11n
+
+# Service
+service:
+  port: 3000
+  targetPort: 3000
+  serviceType: NodePort
+
+# Ingress
+ingress:
+  enabled: true
+  domain: YOUR_CUSTOM_DOMAIN_NAME_HERE
+  ingressClassName:
+  # Additional annotations for the ingress can be specified here
+  annotations:
+  tls:
+    enabled: false
+    secretName:
+
+# Deployment Spec
 replicas: 1
 livenessProbe:
   initialDelaySeconds: 5

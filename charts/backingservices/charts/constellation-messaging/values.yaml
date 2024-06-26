@@ -1,24 +1,56 @@
 ---
 enabled: false
-name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+deployment:
+  name: "constellation-messaging"
+# Cloud provider details
+provider: "aws"
 
-image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
-replicas: 1
+# Docker repos and tag for image
+docker:
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  registry:
+    url: YOUR_DOCKER_REGISTRY_URL
+    username: YOUR_DOCKER_REGISTRY_USERNAME
+    password: YOUR_DOCKER_REGISTRY_PASSWORD
+  # To avoid exposing Docker credentials, create a separate Docker config secret.
+  # Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
+  imagePullSecretNames: []
+  # Docker image information for the Pega docker image, containing the application server.
+  messaging:
+    image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
+    imagePullPolicy: Always
 
-# To avoid exposing Docker credentials, create a separate Docker config secret.
-# Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
-imagePullSecretNames: []
-imagePullPolicy: Always
+urlPath: /c11n-messaging
 
-pegaMessagingPort: 3000
-pegaMessagingTargetPort: 3000
-
-serviceType: NodePort
+# Service
+service:
+  port: 3000
+  targetPort: 3000
+  serviceType: NodePort
 
 # An ingress will be provisioned if a hostname is defined, or omitted if the hostname is empty.
 # ingressClassName and annotations are optional and will be included if defined.
 # Due to the diverse requirements for ingresses and TLS configuration, it may be necessary to define the ingress separately from this chart.
 ingress:
-  domain:
+  domain: YOUR_CUSTOM_DOMAIN_NAME_HERE
   ingressClassName:
+  # Additional annotations for the ingress can be specified here
   annotations:
+  tls:
+    enabled: false
+    secretName:
+
+# Deployment Spec
+replicas: 1
+livenessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 5
+  timeoutSeconds: 5
+  periodSeconds: 30
+  successThreshold: 1
+  failureThreshold: 3

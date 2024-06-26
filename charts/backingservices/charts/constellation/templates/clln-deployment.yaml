@@ -1,45 +1,51 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation" )) }}
 {{- if .Values.enabled }}
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: constellation
+  name: {{ $depName }}
   labels:
-    app: constellation
+    app: {{ $depName }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: constellation
+      app: {{ $depName }}
   template:
     metadata:
       labels:
-        app: constellation
+        app: {{ $depName }}
     spec:
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
-        - name: constellation-appstatic-assets
+        - name: {{ $depName }}-appstatic-assets
           persistentVolumeClaim:
             claimName: {{ .Values.customerAssetVolumeClaimName }}
       {{- end }}
       imagePullSecrets:
-      - name: {{ template "pegaRegistrySecret" $ }}
-      {{ if .Values.imagePullSecretNames }}
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
+      {{ if .Values.docker.imagePullSecretNames }}
+      {{- range .Values.docker.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
+      {{ else if .Values.imagePullSecretNames }}
       {{- range .Values.imagePullSecretNames }}
       - name: {{ . }}
       {{- end }}
       {{ end }}
       containers:
-      - name: constellation
+      - name: {{ $depName }}
+        imagePullPolicy: {{ .Values.docker.constellation.imagePullPolicy }}
         image: {{ .Values.docker.constellation.image }}
         {{ if .Values.customerAssetVolumeClaimName }}
         volumeMounts:
-         - name: constellation-appstatic-assets
+         - name: {{ $depName }}-appstatic-assets
            mountPath: /usr/src/app/dist/customers
         {{- end }}
         args:
-        - port=3000
+        - port={{ .Values.service.targetPort }}
         # constellation URL path, if you change it, you need to change ingress template files too
-        - urlPath=/c11n
+        - urlPath={{ .Values.urlPath }}
         - logLevel={{ .Values.logLevel }}
         livenessProbe:
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
@@ -48,8 +54,8 @@ spec:
           successThreshold: {{ .Values.livenessProbe.successThreshold }}
           failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/buildInfo.json
-            port: 3000
+            path: {{ .Values.urlPath }}/buildInfo.json
+            port: {{ .Values.service.targetPort }}
         readinessProbe:
           initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
@@ -57,8 +63,8 @@ spec:
           successThreshold: {{ .Values.readinessProbe.successThreshold }}
           failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
           httpGet:
-            path: /c11n/buildInfo.json
-            port: 3000
+            path: {{ .Values.urlPath }}/buildInfo.json
+            port: {{ .Values.service.targetPort }}
         ports:
-        - containerPort: 3000
+        - containerPort: {{ .Values.service.targetPort }}
 {{ end }}
