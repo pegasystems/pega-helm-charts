@@ -214,6 +214,12 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
+{{- if .custom }}
+{{- if .custom.envFrom }}
+        # Additional custom envFrom vars
+{{ toYaml .custom.envFrom | indent 8 }}
+{{- end }}
+{{- end }}
         resources:
 {{- if .node.resources }}
 {{ toYaml .node.resources | indent 10 }}
