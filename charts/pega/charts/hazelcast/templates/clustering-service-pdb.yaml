@@ -12,7 +12,7 @@ metadata:
     app: {{ template "clusteringServiceName" . }}
     component: Hazelcast
 spec:
-  maxUnavailable: 1
+  minAvailable: 1
   selector:
     matchLabels:
       app: {{ template "clusteringServiceName" . }}
