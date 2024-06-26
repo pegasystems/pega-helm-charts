@@ -1399,26 +1399,25 @@ behavior:
 
 ### Custom Ports
 
-Pega supports configuring custom ports for deployments and services.
+You can optionally specify custom ports for deployment tier. You can specify custom ports for your tiers as shown in the example below:
 
-To configure custom ports for deployment, please add the below configuration for applicable tiers
 ```yaml
 tier:
   - name: my-tier
     custom:
       ports:
-        - name: portName
-          containerPort: portId
+        - name: <name>
+          containerPort: <port>
 ```
 
-To configure custom ports for service, please add the below configuration for applicable services
+You can optionally specify custom ports for tier specific service. You can specify custom ports for your service as shown in the example below:
 ```yaml
 tier:
    - name: my-tier
      service:
        customServicePorts:
-       - name: portName
-         port: portId
-         targetPort: targetPort
+       - name: <name>
+         port: <port>
+         targetPort: <target port>
           
 ```
