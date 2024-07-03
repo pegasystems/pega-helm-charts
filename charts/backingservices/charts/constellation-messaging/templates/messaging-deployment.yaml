@@ -23,6 +23,20 @@ spec:
       - name: c11n-messaging
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.image }}
+        resources:
+          {{ if .Values.memoryRequest }}
+          requests:
+            memory: {{ .Values.memoryRequest }}
+          {{- end }}
+          {{ if .Values.memoryLimit }}
+          limits:
+            memory: {{ .Values.memoryLimit }}
+          {{- end }}
+        securityContext:
+          seccompProfile:
+            type: {{ .Values.seccompProfile }}
+          readOnlyRootFilesystem: {{ .Values.readOnlyRootFilesystem }}
+          allowPrivilegeEscalation: {{ .Values.allowPrivilegeEscalation }}
         args:
           - --max-semi-space-size=1024
           - port={{ .Values.pegaMessagingTargetPort }}

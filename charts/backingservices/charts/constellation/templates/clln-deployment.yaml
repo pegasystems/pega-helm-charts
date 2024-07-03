@@ -31,6 +31,20 @@ spec:
       containers:
       - name: constellation
         image: {{ .Values.docker.constellation.image }}
+        resources:
+          {{ if .Values.memoryRequest }}
+          requests:
+            memory: {{ .Values.memoryRequest }}
+          {{- end }}
+          {{ if .Values.memoryLimit }}
+          limits:
+            memory: {{ .Values.memoryLimit }}
+          {{- end }}
+        securityContext:
+          seccompProfile:
+            type: {{ .Values.seccompProfile }}
+          readOnlyRootFilesystem: {{ .Values.readOnlyRootFilesystem }}
+          allowPrivilegeEscalation: {{ .Values.allowPrivilegeEscalation }}
         {{ if .Values.customerAssetVolumeClaimName }}
         volumeMounts:
          - name: constellation-appstatic-assets
