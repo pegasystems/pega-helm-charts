@@ -24,19 +24,19 @@ spec:
         imagePullPolicy: {{ .Values.imagePullPolicy }}
         image: {{ .Values.image }}
         resources:
-          {{ if .Values.memoryRequest }}
+          {{ if and .Values.resources .Values.resources.requests .Values.resources.requests.memory }}
           requests:
-            memory: {{ .Values.memoryRequest }}
+            memory: {{ .Values.resources.requests.memory }}
           {{- end }}
-          {{ if .Values.memoryLimit }}
+          {{ if and .Values.resources .Values.resources.limits .Values.resources.limits.memory }}
           limits:
-            memory: {{ .Values.memoryLimit }}
+            memory: {{ .Values.resources.limits.memory }}
           {{- end }}
         securityContext:
           seccompProfile:
-            type: {{ .Values.seccompProfile }}
-          readOnlyRootFilesystem: {{ .Values.readOnlyRootFilesystem }}
-          allowPrivilegeEscalation: {{ .Values.allowPrivilegeEscalation }}
+            type: {{ .Values.securityContext.seccompProfile.type }}
+          readOnlyRootFilesystem: {{ .Values.securityContext.readOnlyRootFilesystem }}
+          allowPrivilegeEscalation: {{ .Values.securityContext.allowPrivilegeEscalation }}
         args:
           - --max-semi-space-size=1024
           - port={{ .Values.pegaMessagingTargetPort }}
