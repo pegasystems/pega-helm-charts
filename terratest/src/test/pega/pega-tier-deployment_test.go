@@ -65,7 +65,10 @@ func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.
 func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+<<<<<<< HEAD
 	var affintiyBasePath = "global.tier[0].affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution."
+=======
+>>>>>>> da771c6 (Fixed conflicts with master of pegasystem)
 	require.NoError(t, err)
 
 	var depObjWeb appsv1.Deployment
@@ -75,6 +78,7 @@ func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 	for _, vendor := range supportedVendors {
 		var options = &helm.Options{
 			SetValues: map[string]string{
+<<<<<<< HEAD
 				"global.provider":                        									vendor,
 				"global.actions.execute":                 									"deploy",
 				"global.deployment.name":                 									"pega",
@@ -85,6 +89,18 @@ func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].key": 			"kubernetes.io/os", 
 				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].operator": 	"In", 
 				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].values[0]": 	"linux", 
+=======
+				"global.provider":                        vendor,
+				"global.actions.execute":                 "deploy",
+				"global.deployment.name":                 "pega",
+				"installer.upgrade.upgradeType":          "zero-downtime",
+				"global.tier[0].name":                    "web",
+				"global.tier[1].name":                    "batch",
+				"global.tier[2].name":                    "stream",
+				"global.tier[0].affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].key": 		"kubernetes.io/os", 
+				"global.tier[0].affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].operator": 	"In", 
+				"global.tier[0].affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0].values[0]": 	"linux", 
+>>>>>>> da771c6 (Fixed conflicts with master of pegasystem)
 			},
 		}
 
@@ -92,10 +108,17 @@ func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 		yamlSplit := strings.Split(yamlContent, "---")
 
 		UnmarshalK8SYaml(t, yamlSplit[1], &depObjWeb)
+<<<<<<< HEAD
 		deploymentNodeAffinityWeb := depObjWeb.Spec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution
 		require.Equal(t, "kubernetes.io/os", deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Key)
 		require.Equal(t, "In", string(deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Operator))
 		require.Equal(t, "linux", deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Values[0])
+=======
+		deploymentNodeAffinityWeb := depObjWeb.Spec.Template.Spec.Affinity.NodeAffinity
+		require.Equal(t, "kubernetes.io/os", deploymentNodeAffinityWeb.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0].Key)
+		require.Equal(t, "In", string(deploymentNodeAffinityWeb.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0].Operator))
+		require.Equal(t, "linux", deploymentNodeAffinityWeb.RequiredDuringSchedulingIgnoredDuringExecution.NodeSelectorTerms[0].MatchExpressions[0].Values[0])
+>>>>>>> da771c6 (Fixed conflicts with master of pegasystem)
 		UnmarshalK8SYaml(t, yamlSplit[2], &depObjBatch)
 		deploymentAffinityBatch := depObjBatch.Spec.Template.Spec.Affinity
 		require.Empty(t, deploymentAffinityBatch)
