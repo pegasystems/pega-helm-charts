@@ -106,6 +106,39 @@ func TestPegaInstallerJobWithNodeSelector(t *testing.T) {
 
 }
 
+func TestPegaInstallerJobWithAffinity(t *testing.T) {
+
+	var affintiyBasePath = "installer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0]."
+
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":        "install-ns",
+			"global.provider":               "k8s",
+			"global.actions.execute":        "install",
+			"installer.imagePullPolicy":     "Always",
+			"installer.upgrade.upgradeType": "zero-downtime",
+			affintiyBasePath + "key":        "kubernetes.io/os",
+			affintiyBasePath + "operator":   "In",
+			affintiyBasePath + "values[0]":  "linux",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+	jobAffinity := jobObj.Spec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+
+	require.Equal(t, "kubernetes.io/os", jobAffinity.NodeSelectorTerms[0].MatchExpressions[0].Key)
+	require.Equal(t, "In", string(jobAffinity.NodeSelectorTerms[0].MatchExpressions[0].Operator))
+	require.Equal(t, "linux", jobAffinity.NodeSelectorTerms[0].MatchExpressions[0].Values[0])
+}
+
 func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *helm.Options, pullPolicy string) {
 	var jobObj k8sbatch.Job
 	UnmarshalK8SYaml(t, jobYaml, &jobObj)
