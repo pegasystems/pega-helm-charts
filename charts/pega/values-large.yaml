@@ -292,6 +292,13 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
@@ -328,6 +335,13 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -393,6 +407,13 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "bix"
       # Create a background tier for BIX processing.  This tier uses
@@ -421,6 +442,13 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "realtime"
       # Create a dedicated tier for real-time data grid processing.
@@ -448,6 +476,13 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
 # External services
 
