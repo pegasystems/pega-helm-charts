@@ -1203,7 +1203,7 @@ Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
 \>= 8.6 && < 8.8         | \= 1.0.5                     | Pega Infinity 8.6.x and 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.0.3 or later. 
-\>= 8.8                 | \= 1.3.3                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. 
+\>= 8.8                 | \= 1.3.x                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. As a best practice, use the latest available release of the clustering service. 
 
 
 #### Configuration Settings
