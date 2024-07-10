@@ -29,9 +29,17 @@ spec:
       {{- end }}
       {{ end }}
       containers:
-      - name: {{ $depName }}
+      - name: c11n-messaging
         imagePullPolicy: {{ .Values.docker.messaging.imagePullPolicy }}
         image: {{ .Values.docker.messaging.image }}
+        resources:
+          {{ if .Values.resources }}
+          {{ toYaml .Values.resources | nindent 10 }}
+          {{- end }}
+        securityContext:
+          {{- if .Values.securityContext }}
+          {{ toYaml .Values.securityContext | nindent 10 }}
+          {{- end }}
         args:
         - --max-semi-space-size=1024
         - port={{ $srvTargetPort }}
@@ -56,4 +64,5 @@ spec:
             port: {{ $srvTargetPort }}
         ports:
         - containerPort: {{ $srvTargetPort }}
+{{- include "podAffinity" .Values | indent 6 }}
 {{ end }}

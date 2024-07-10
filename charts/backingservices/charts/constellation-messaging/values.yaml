@@ -22,6 +22,21 @@ docker:
 
 urlPath: /c11n-messaging
 
+# set memoryRequest &  memoryLimit to Limit memory usage for container https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory
+# resources:
+#   requests:
+#     memory: # ex: 128Mi for MB or 2Gi for GB
+#   limits:
+#     memory: # ex: 256Mi for MB or 4Gi for GB
+securityContext:
+  seccompProfile:
+    # set seccompProfile to RuntimeDefault to not disable default seccomp profile https://kubernetes.io/docs/tutorials/security/seccomp/
+    type: Unconfined # RuntimeDefault
+  # DO NOT CHANGE readOnlyRootFilesystem VALUE to true, C11N MESSAGING WON'T WORK AS EXPECTED
+  readOnlyRootFilesystem: false
+  # set allowPrivilegeEscalation to false to Restrict container from acquiring additional privileges https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
+  allowPrivilegeEscalation: true # false
+
 # Service
 service:
   port: 3000

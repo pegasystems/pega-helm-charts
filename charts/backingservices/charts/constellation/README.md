@@ -65,6 +65,8 @@ The values.yaml file provides configuration options to define the values for the
 | `docker.registry.password`                        | Specify the password for the docker registry.                                                                                                                                                                                                                                                                                          |
 | `docker.constellation.image`                        | Specify the image version.                                                                                                                                                                                                                                                                                          |
 | `docker.messaging.imagePullPolicy`                        | Specify the image pull policy configurations for the image.                                                                                                                                                                                                                                                                                          |
+| `affinity`                        | Specify the pod affinity so that pods are restricted to run on particular node(s), or to prefer to run on particular nodes.    
+                                                                                                                                                                                                                                                                                          |
 
 Example:
 
