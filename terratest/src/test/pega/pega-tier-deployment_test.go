@@ -62,6 +62,49 @@ func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.
 	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
 }
 
+func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	var affintiyBasePath = "global.tier[0].affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution."
+	require.NoError(t, err)
+
+	var depObjWeb appsv1.Deployment
+	var depObjBatch appsv1.Deployment
+	var depObjStream appsv1.Deployment
+
+	for _, vendor := range supportedVendors {
+		var options = &helm.Options{
+			SetValues: map[string]string{
+				"global.provider":                        									vendor,
+				"global.actions.execute":                 									"deploy",
+				"global.deployment.name":                 									"pega",
+				"installer.upgrade.upgradeType":          									"zero-downtime",
+				"global.tier[0].name":                    									"web",
+				"global.tier[1].name":                    									"batch",
+				"global.tier[2].name":                    									"stream",
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].key": 			"kubernetes.io/os", 
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].operator": 	"In", 
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].values[0]": 	"linux", 
+			},
+		}
+
+		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+		yamlSplit := strings.Split(yamlContent, "---")
+
+		UnmarshalK8SYaml(t, yamlSplit[1], &depObjWeb)
+		deploymentNodeAffinityWeb := depObjWeb.Spec.Template.Spec.Affinity.NodeAffinity.RequiredDuringSchedulingIgnoredDuringExecution
+		require.Equal(t, "kubernetes.io/os", deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Key)
+		require.Equal(t, "In", string(deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Operator))
+		require.Equal(t, "linux", deploymentNodeAffinityWeb.NodeSelectorTerms[0].MatchExpressions[0].Values[0])
+		UnmarshalK8SYaml(t, yamlSplit[2], &depObjBatch)
+		deploymentAffinityBatch := depObjBatch.Spec.Template.Spec.Affinity
+		require.Empty(t, deploymentAffinityBatch)
+		UnmarshalK8SYaml(t, yamlSplit[3], &depObjStream)
+		deploymentAffinityStream := depObjStream.Spec.Template.Spec.Affinity
+		require.Empty(t, deploymentAffinityStream)
+	}	
+}
+
 func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
 	customFsGroups := map[string]int64{

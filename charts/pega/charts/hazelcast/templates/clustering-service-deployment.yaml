@@ -73,4 +73,5 @@ spec:
       {{- include "hazelcastVolumeTemplate" . | indent 6 }}
       imagePullSecrets:
 {{- include "imagePullSecrets" . | indent 6 }}
+{{- include "podAffinity" .Values | indent 6 }}
 {{ end }}
