@@ -31,6 +31,14 @@ spec:
       containers:
       - name: constellation
         image: {{ .Values.docker.constellation.image }}
+        resources:
+          {{ if .Values.resources }}
+          {{ toYaml .Values.resources | nindent 10 }}
+          {{- end }}
+        securityContext:
+          {{- if .Values.securityContext }}
+          {{ toYaml .Values.securityContext | nindent 10 }}
+          {{- end }}
         {{ if .Values.customerAssetVolumeClaimName }}
         volumeMounts:
          - name: constellation-appstatic-assets
