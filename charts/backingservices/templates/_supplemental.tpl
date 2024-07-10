@@ -4,6 +4,7 @@ backingservicesRegistrySecret
 deploymentName
 tlssecretsnippet
 backingservices.gke.backendConfig
+podAffinity
 are copied from backingservices/templates/_supplemental.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
@@ -55,4 +56,11 @@ spec:
     type: HTTP
     unhealthyThreshold: 2
 ---
+{{ end }}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
 {{ end }}
