@@ -160,6 +160,20 @@ jdbc:
   customerDataSchema: ""
 ```
 
+### JDBC Connections
+
+JDBC Connections facilitate the communication between Java applications and relational databases. They enable Java applications to run SQL statements, retrieve results, and propagate changes to the database in a standardized manner. A Connection interface represents a session with a specific database. It provides methods to create statements, commit or rollback transactions, and manage database connections.
+
+Pega provides the following three JDBC Connection types:
+
+JDBC Connection type     | Description
+---           |---
+`PegaRULES`           | The default Pega JDBC Connection.
+`PegaRULESLongRW`         | Provides a longer database connection, which results in less frequent timeouts. Starting in Pega Helm Charts v3.23.0, `PegaRULESLongRW` is enabled for all deployment tiers.
+`PegaRULESReadOnly`        | Provides a read only database connection.
+
+The JDBC Connection configurations are defined in [charts/pega/config/deploy/context.xml.tmpl](https://github.com/pegasystems/pega-helm-charts/blob/ab0cb220fe3d297a2e8d8be1c278bcdba96bd646/charts/pega/config/deploy/context.xml.tmpl#L4).
+
 ## Docker
 
 Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
@@ -695,6 +709,26 @@ tier:
       <annotation-key>: <annotation-value>
 ```
 
+### Pod affinity
+
+You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. Pod affinity may be specified by using the `affinity` element for a given `tier`. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+              - linux
+```
+
 ### Pega configuration files
 
 While Pega includes default configuration files in the Helm charts, the charts provide extension points to override the defaults with additional customizations. To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
@@ -947,6 +981,7 @@ Parameter   | Description   | Default value
 `set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the Elasticsearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
 `podAnnotations` | Configurable annotations applied to all Elasticsearch pods. | {}
+`affinity` | You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. | `""`
 
 Additional env settings supported by Elasticsearch may be specified in a `custom.env` block as shown in the example below.
 
@@ -1050,6 +1085,7 @@ Parameter   | Description   | Default value
 `image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
 `imagePullPolicy` | Specify when to pull an image. | `IfNotPresent`
 `adminPassword` | Specify a temporary, initial password to log into the Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). | `""`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
@@ -1189,7 +1225,7 @@ Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
 \>= 8.6 && < 8.8         | \= 1.0.5                     | Pega Infinity 8.6.x and 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.0.3 or later. 
-\>= 8.8                 | \= 1.3.3                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. 
+\>= 8.8                 | \= 1.3.x                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. As a best practice, use the latest available release of the clustering service. 
 
 
 #### Configuration Settings
@@ -1209,6 +1245,7 @@ Parameter   | Description   | Default value
 `hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
+`hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).  | `""`
 
 #### Example
 ```yaml
@@ -1395,4 +1432,29 @@ behavior:
       stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
    scaleUp:
       stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
+```
+
+### Custom Ports
+
+You can optionally specify custom ports for deployment tier. You can specify custom ports for your tiers as shown in the example below:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      ports:
+        - name: <name>
+          containerPort: <port>
+```
+
+You can optionally specify custom ports for tier specific service. You can specify custom ports for your service as shown in the example below:
+```yaml
+tier:
+   - name: my-tier
+     service:
+       customServicePorts:
+       - name: <name>
+         port: <port>
+         targetPort: <target port>
+          
 ```

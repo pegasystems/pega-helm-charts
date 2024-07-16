@@ -147,4 +147,5 @@ spec:
                 name: srs-elastic-credentials
                 key: password
       {{ end }}
+{{- include "podAffinity" .Values.srsRuntime | indent 6 }}
   {{ end }}

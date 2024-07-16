@@ -112,9 +112,11 @@ spec:
           requests:
             cpu: "{{ .root.Values.resources.requests.cpu }}"
             memory: "{{ .root.Values.resources.requests.memory }}"
+            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage | default "0G" }}"
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
+            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage | default "0G" }}"
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
@@ -182,5 +184,6 @@ spec:
       restartPolicy: Never
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .root.Values | indent 6 }}
 ---
 {{- end -}}
