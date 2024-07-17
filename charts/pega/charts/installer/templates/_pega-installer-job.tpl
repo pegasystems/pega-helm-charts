@@ -118,7 +118,7 @@ spec:
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
-            {{- if .root.Values.resources.requests.ephemeralStorage }}
+            {{- if .root.Values.resources.limits.ephemeralStorage }}
               ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
             {{- end }}
         volumeMounts:
