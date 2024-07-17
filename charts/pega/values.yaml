@@ -263,8 +263,8 @@ global:
       # do not affect the Pod's Volumes.
       # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
       # containerSecurityContext:
-      #   runAsUser: 7009
-      #   fsGroup: 0
+      #   capabilities:
+      #     add: ["SYS_TIME"]
       hpa:
         enabled: true
         # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
@@ -333,8 +333,8 @@ global:
       # do not affect the Pod's Volumes.
       # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
       # containerSecurityContext:
-      #   runAsUser: 7009
-      #   fsGroup: 0
+      #   capabilities:
+      #     add: ["SYS_TIME"]
 
       hpa:
         enabled: true
@@ -404,8 +404,8 @@ global:
       # do not affect the Pod's Volumes.
       # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
       # containerSecurityContext:
-      #   runAsUser: 7009
-      #   fsGroup: 0
+      #   capabilities:
+      #     add: ["SYS_TIME"]
 
       replicas: 2
 
