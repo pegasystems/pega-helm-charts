@@ -113,13 +113,13 @@ spec:
             cpu: "{{ .root.Values.resources.requests.cpu }}"
             memory: "{{ .root.Values.resources.requests.memory }}"
             {{- if .root.Values.resources.requests.ephemeralStorage }}
-              ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
+            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
             {{- end }}
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
             {{- if .root.Values.resources.limits.ephemeralStorage }}
-              ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
+            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
             {{- end }}
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
