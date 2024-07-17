@@ -83,14 +83,17 @@ upgrade:
   # Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.
   automaticResumeEnabled: "false"
 
-# Memory and CPU settings for installer
+# Memory, CPU, and ephemeral storage settings for installer
+# Ephemeral storage recommended size is 10G
 resources:
   requests:
     memory: "5Gi"
     cpu: 1
+    # ephemeralStorage: ""
   limits:
     memory: "6Gi"
     cpu: 2
+    # ephemeralStorage: ""
 
 shareProcessNamespace: false
 
