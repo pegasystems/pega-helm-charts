@@ -257,6 +257,14 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   runAsUser: 7009
+      #   fsGroup: 0
       hpa:
         enabled: true
         # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
@@ -319,6 +327,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   runAsUser: 7009
+      #   fsGroup: 0
+
       hpa:
         enabled: true
 
@@ -379,6 +396,15 @@ global:
       # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
       # securityContext:
       #   runAsUser: 9001
+      #   fsGroup: 0
+
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   runAsUser: 7009
       #   fsGroup: 0
 
       replicas: 2
