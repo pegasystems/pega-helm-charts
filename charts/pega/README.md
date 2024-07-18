@@ -1433,3 +1433,28 @@ behavior:
    scaleUp:
       stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
 ```
+
+### Custom Ports
+
+You can optionally specify custom ports for deployment tier. You can specify custom ports for your tiers as shown in the example below:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      ports:
+        - name: <name>
+          containerPort: <port>
+```
+
+You can optionally specify custom ports for tier specific service. You can specify custom ports for your service as shown in the example below:
+```yaml
+tier:
+   - name: my-tier
+     service:
+       customServicePorts:
+       - name: <name>
+         port: <port>
+         targetPort: <target port>
+          
+```
