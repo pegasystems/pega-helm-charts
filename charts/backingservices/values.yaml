@@ -32,11 +32,23 @@ srs:
     # Specify secret names as an array of comma-separated strings. For example: ["secret1", "secret2"]
     imagePullSecretNames: []
 
+    # Container securityContext
+    # securityContext:
+    #   runAsUser: 9999 # app
+    #   allowPrivilegeEscalation: false
+    #   capabilities:
+    #     drop:
+    #     - all
+
     env:
       # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
       AuthEnabled: false
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
+
+  # Pod securityContext
+  # securityContext:
+  #   runAsUser: 9999 # app
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
