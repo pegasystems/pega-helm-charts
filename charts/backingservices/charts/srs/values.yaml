@@ -27,3 +27,7 @@ srsRuntime:
     AuthEnabled: false
     # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
     OAuthPublicKeyURL: ""
+
+# Enable the Network Policy for SRS
+networkPolicy:
+  enabled: true
