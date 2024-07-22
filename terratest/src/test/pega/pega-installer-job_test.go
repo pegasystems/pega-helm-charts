@@ -188,3 +188,54 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
 	VerifyInitContainerData(t, actualInitContainers, options)
 }
+
+func TestPegaInstallerJobResourcesWithEphemeralStorage(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":         "pega",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.resources.requests.ephemeralStorage": "10Gi",
+			"installer.resources.limits.ephemeralStorage": "11Gi",
+			"installer.imagePullPolicy":      "Always",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "11Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.StorageEphemeral().String())
+    require.Equal(t, "10Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.StorageEphemeral().String())
+}
+
+
+
+func TestPegaInstallerJobResourcesWithNoEphemeralStorage(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":         "pega",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "0", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.StorageEphemeral().String())
+    require.Equal(t, "0", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.StorageEphemeral().String())
+
+}
