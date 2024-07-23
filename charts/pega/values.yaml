@@ -257,6 +257,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
       hpa:
         enabled: true
         # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
@@ -318,6 +327,15 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
+
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
 
       hpa:
         enabled: true
@@ -381,6 +399,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
       replicas: 2
 
       volumeClaimTemplate:
@@ -434,15 +461,16 @@ dds:
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
+  # are JKS and PKCS12. Default is JKS.
+  clientEncryptionStoreType: ""
   # If required, provide the trustStore certificate file name.
   # When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.
-  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
   trustStore: ""
   # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
   # If required, provide the keystore certificate file name.
   # When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.
-  # Pega deployments only support keystore using the Java Key Store (.jks) format.
   keyStore: ""
   # If required provide keyStorePassword value in plain text.
   keyStorePassword: ""
