@@ -113,6 +113,8 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.17.9`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster.                                                                |
 | `k8sProvider`                               | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].. 
 
+| `highSecureCryptoMode.enabled`                               | Set to `true` if Higly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`.. 
+
 ### Enabling security between SRS and Elasticsearch
 Enabling a secure connection between SRS and your Elasticsearch service depends on the method you chose to deploy the Elasticsearch cluster.
 To configure a secure connection between the SRS cluster and internally provisioned Elasticsearch, configure the following parameters.
@@ -178,6 +180,10 @@ srs:
       AuthEnabled: false
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
+    
+    # Set to `true` if Higly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
+    highSecureCryptoMode:
+      enabled: false
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
