@@ -18,7 +18,7 @@ spec:
         app: {{ $depName }}
     spec:
       imagePullSecrets:
-      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation-messaging" ) }}
       {{ if .Values.docker.imagePullSecretNames }}
       {{- range .Values.docker.imagePullSecretNames }}
       - name: {{ . }}
@@ -43,7 +43,7 @@ spec:
         args:
         - --max-semi-space-size=1024
         - port={{ $srvTargetPort }}
-        - path={{ .Values.urlPath }}
+        - urlPath={{ .Values.urlPath }}
         livenessProbe:
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}

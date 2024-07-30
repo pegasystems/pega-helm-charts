@@ -34,7 +34,7 @@ spec:
       {{- end }}
       {{ end }}
       containers:
-      - name: {{ $depName }}
+      - name: constellation
         imagePullPolicy: {{ .Values.docker.constellation.imagePullPolicy }}
         image: {{ .Values.docker.constellation.image }}
         resources:

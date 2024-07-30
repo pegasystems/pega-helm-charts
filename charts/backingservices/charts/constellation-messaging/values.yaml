@@ -47,6 +47,7 @@ service:
 # ingressClassName and annotations are optional and will be included if defined.
 # Due to the diverse requirements for ingresses and TLS configuration, it may be necessary to define the ingress separately from this chart.
 ingress:
+  enabled: true
   domain: YOUR_CUSTOM_DOMAIN_NAME_HERE
   ingressClassName:
   # Additional annotations for the ingress can be specified here
