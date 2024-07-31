@@ -28,6 +28,8 @@ srsRuntime:
     # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
     OAuthPublicKeyURL: ""
 
-  # Set to `true` if Higly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
-  highSecureCryptoMode:
-    enabled: false
+  # Set to `true` if Highly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
+  enableSecureCryptoMode: false
+
+  # This is used to configure Java options values.
+  javaOpts: ""

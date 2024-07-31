@@ -190,9 +190,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "javaOpts" -}}
-{{- if .Values.srsRuntime.highSecureCryptoMode.enabled }}
-{{- "-Dorg.bouncycastle.fips.approved_only=true" -}}
-{{- end -}}
+{{- .Values.srsRuntime.javaOpts }}
 {{- end -}}
 
 {{/*

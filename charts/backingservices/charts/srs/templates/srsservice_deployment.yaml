@@ -104,7 +104,7 @@ spec:
             - name: PUBLIC_KEY_URL
               value: ""
             - name: HIGH_SECURE_CRYPTO_MODE_ENABLED
-              value: "{{ .Values.srsRuntime.highSecureCryptoMode.enabled | default "false" }}"
+              value: "{{ .Values.srsRuntime.enableSecureCryptoMode | default "false" }}"
             - name: JAVA_OPTS
               value: {{ template "javaOpts" .}}
           resources:
