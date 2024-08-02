@@ -38,10 +38,10 @@ srs:
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
 
-    # This is used to configure Java options values.
+    # Use this parameter to configure values for Java options.
     javaOpts: ""
 
-    # Set to `true` if Higly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
+    # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
     enableSecureCryptoMode: false
 
   # This section specifies the elasticsearch cluster configuration.
