@@ -42,6 +42,17 @@ Example:
 ```yaml
 action: "deploy"
 ```
+
+## NIST SP 800-53 and NIST SP 800-131
+
+Set the `highlySecuredCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
+
+For example:
+```yaml
+global:
+   highlySecuredCryptoModeEnabled: true
+```
+
 ## Kerberos Configuration
 
 Use the `kerberos` section to configure Kerberos authentication for Decisioning data flows that fetch data from Kafka or HBase streams. For more information on Decisioning data flows that use Kerberos, see [Data Set types](https://docs.pega.com/bundle/platform/page/platform/decision-management/data-set-types.html).
@@ -1239,12 +1250,13 @@ Parameter   | Description   | Default value
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
 `hazelcast.enabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6. | `true`
 `hazelcast.clusteringServiceEnabled` |  Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8; if not set the installation will fail. | `false`
+`hazelcast.encryption.enabled` | Set to `true` if SSL connection is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 24.2; if not set the installation will fail, , see [this section](#optional-enabling-encryption-of-traffic-between-pega-and-hazelcast)                       | `false`
 `hazelcast.migration.initiateMigration` |  Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster. | `false`
 `hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script. | `YOUR_MIGRATION_JOB_IMAGE:TAG`
 `hazelcast.migration.embeddedToCSMigration` |  Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment. | `false`
 `hazelcast.replicas` | Number of initial members to join the Hazelcast cluster. | `3`
 `hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
-`hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
+`hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically. | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 `hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).  | `""`
 
@@ -1255,6 +1267,8 @@ hazelcast:
   clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
   enabled: true
   clusteringServiceEnabled: false
+  encryption:
+     enabled: false
   migration:
     initiateMigration: false
     migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
@@ -1263,6 +1277,22 @@ hazelcast:
   username: ""
   password: ""
   external_secret_name: ""
+```
+
+### (Optional) Enabling encryption of traffic between Pega and ClusteringService
+Run the make file in `charts/pega/Makefile` when encryption/HighlySecuredCryptoMode is enabled to generate the certificates and mount it to the Hazelcast and Pega pods before Helm Install.
+
+Parameter   | Description                                               
+---         |------------------------------------------------------------
+`NAMESPACE` | Namespace where Pega and Hazelcast is going to be deployed.
+`CLUSTERING_SERVICE_IMAGE` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. 
+`ENC_KEYSTORE_PASSWORD` | Key store password.
+`ENC_TRUSTSTORE_PASSWORD` | Trust store password.
+`HIGHLY_SECURED_CRYPTO_MODE_ENABLED` |  Enable it for complying with NIST SP 800-53 and NIST SP 800-131.
+
+#### Example
+```
+make secrets NAMESPACE=pega CLUSTERING_SERVICE_IMAGE=cloudservices-docker-dev-local.bin.pega.io/platform/clustering-service:1.3.50 ENC_KEYSTORE_PASSWORD=mystorePwd ENC_TRUSTSTORE_PASSWORD=mystorePwd HIGHLY_SECURED_CRYPTO_MODE_ENABLED=true
 ```
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod
