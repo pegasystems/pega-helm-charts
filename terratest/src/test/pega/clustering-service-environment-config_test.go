@@ -10,37 +10,97 @@ import (
 	"testing"
 )
 
-func TestClusteringServiceEnvironmentConfig(t *testing.T){
-	var supportedVendors = []string{"k8s","openshift","eks","gke","aks","pks"}
-	var supportedOperations =  []string{"deploy","install-deploy"}
+func TestClusteringServiceEnvironmentConfig(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
 
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	for _,vendor := range supportedVendors{
+	for _, vendor := range supportedVendors {
 
-		for _,operation := range supportedOperations{
+		for _, operation := range supportedOperations {
 
 			fmt.Println(vendor + "-" + operation)
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
 					"hazelcast.clusteringServiceEnabled": "true",
 				},
 			}
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-environment-config.yaml"})
-			VerifyClusteringServiceEnvironmentConfig(t,yamlContent, options)
+			VerifyClusteringServiceEnvironmentConfig(t, yamlContent, options, false, false)
 
 		}
 	}
 
+}
+
+func TestClusteringServiceEnvironmentConfigWithSSL(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"hazelcast.clusteringServiceEnabled": "true",
+					"hazelcast.encryption.enabled":       "true",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-environment-config.yaml"})
+			VerifyClusteringServiceEnvironmentConfig(t, yamlContent, options, true, false)
+
+		}
+	}
 
 }
 
-func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options) {
+func TestClusteringServiceEnvironmentConfigWithHighlySecureCryptoModeEnabled(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"hazelcast.clusteringServiceEnabled":   "true",
+					"hazelcast.encryption.enabled":         "true",
+					"global.highlySecureCryptoModeEnabled": "true",
+				},
+			}
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-environment-config.yaml"})
+			VerifyClusteringServiceEnvironmentConfig(t, yamlContent, options, true, true)
+
+		}
+	}
+
+}
+
+func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options,
+	ssl bool, highlySecureCryptoModeEnabled bool) {
 
 	var clusteringServiceEnvConfigMap k8score.ConfigMap
 	statefulSlice := strings.Split(yamlContent, "---")
@@ -52,15 +112,23 @@ func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, 
 			require.Equal(t, clusteringServiceEnvConfigData["JAVA_OPTS"], "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof -XX:+UseG1GC -XX:NewRatio=3 -XshowSettings:vm -XX:InitiatingHeapOccupancyPercent=45 -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m")
 			require.Equal(t, clusteringServiceEnvConfigData["SERVICE_NAME"], "clusteringservice-service")
 			require.Equal(t, clusteringServiceEnvConfigData["MIN_CLUSTER_SIZE"], "3")
-            require.Equal(t, clusteringServiceEnvConfigData["JMX_ENABLED"], "true")
-            require.Equal(t, clusteringServiceEnvConfigData["HEALTH_MONITORING_LEVEL"], "OFF")
-            require.Equal(t, clusteringServiceEnvConfigData["GROUP_NAME"], "prpchz")
-            require.Equal(t, clusteringServiceEnvConfigData["GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS"], "600")
-            require.Equal(t, clusteringServiceEnvConfigData["LOGGING_LEVEL"], "info")
-            require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_ENABLED"], "true")
-            require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_METRIC_LEVEL"], "info")
-            require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_FILE_COUNT"], "3")
-            require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTIC_LOG_FILE_SIZE_MB"], "50")
+			require.Equal(t, clusteringServiceEnvConfigData["JMX_ENABLED"], "true")
+			require.Equal(t, clusteringServiceEnvConfigData["HEALTH_MONITORING_LEVEL"], "OFF")
+			require.Equal(t, clusteringServiceEnvConfigData["GROUP_NAME"], "prpchz")
+			require.Equal(t, clusteringServiceEnvConfigData["GRACEFUL_SHUTDOWN_MAX_WAIT_SECONDS"], "600")
+			require.Equal(t, clusteringServiceEnvConfigData["LOGGING_LEVEL"], "info")
+			require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_ENABLED"], "true")
+			require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_METRIC_LEVEL"], "info")
+			require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTICS_FILE_COUNT"], "3")
+			require.Equal(t, clusteringServiceEnvConfigData["DIAGNOSTIC_LOG_FILE_SIZE_MB"], "50")
+			if ssl {
+				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_ENABLED"], "true")
+				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_KEYSTORE_NAME"], "cluster-keystore.jks")
+				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_TRUSTSTORE_NAME"], "cluster-truststore.jks")
+				if highlySecureCryptoModeEnabled {
+					require.Equal(t, clusteringServiceEnvConfigData["HIGHLY_SECURE_CRYPTO_MODE_ENABLED"], "true")
+				}
+			}
 
 		}
 	}
