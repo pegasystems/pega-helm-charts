@@ -45,12 +45,12 @@ action: "deploy"
 
 ## NIST SP 800-53 and NIST SP 800-131
 
-Set the `highlySecuredCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
+Set the `highlySecureCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
 
 For example:
 ```yaml
 global:
-   highlySecuredCryptoModeEnabled: true
+   highlySecureCryptoModeEnabled: true
 ```
 
 ## Kerberos Configuration
@@ -1280,7 +1280,7 @@ hazelcast:
 ```
 
 ### (Optional) Enabling encryption of traffic between Pega and ClusteringService
-Run the make file in `charts/pega/Makefile` when encryption or HighlySecuredCryptoMode is enabled to generate the certificates and mount it to the Hazelcast and Pega pods before Helm Install.
+Run the make file in `charts/pega/Makefile` when encryption or HighlySecureCryptoMode is enabled to generate the certificates and mount it to the Hazelcast and Pega pods before Helm Install.
 
 Parameter   | Description                                               
 ---         |------------------------------------------------------------
@@ -1288,11 +1288,11 @@ Parameter   | Description
 `CLUSTERING_SERVICE_IMAGE` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. 
 `ENC_KEYSTORE_PASSWORD` | Key store password.
 `ENC_TRUSTSTORE_PASSWORD` | Trust store password.
-`HIGHLY_SECURED_CRYPTO_MODE_ENABLED` |  Enable it for complying with NIST SP 800-53 and NIST SP 800-131.
+`HIGHLY_SECURE_CRYPTO_MODE_ENABLED` |  Enable it for complying with NIST SP 800-53 and NIST SP 800-131.
 
 #### Example
 ```
-make secrets NAMESPACE=pega CLUSTERING_SERVICE_IMAGE=cloudservices-docker-dev-local.bin.pega.io/platform/clustering-service:1.3.50 ENC_KEYSTORE_PASSWORD=mystorePwd ENC_TRUSTSTORE_PASSWORD=mystorePwd HIGHLY_SECURED_CRYPTO_MODE_ENABLED=true
+make secrets NAMESPACE=pega CLUSTERING_SERVICE_IMAGE=cloudservices-docker-dev-local.bin.pega.io/platform/clustering-service:1.3.50 ENC_KEYSTORE_PASSWORD=mystorePwd ENC_TRUSTSTORE_PASSWORD=mystorePwd HIGHLY_SECURE_CRYPTO_MODE_ENABLED=true
 ```
 
 ### Enabling encryption of traffic between Ingress/LoadBalancer and Pod

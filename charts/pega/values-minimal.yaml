@@ -25,7 +25,7 @@ global:
   kerberos: {}
 
   # Enable it for complying with NIST SP 800-53 and NIST SP 800-131
-  highlySecuredCryptoModeEnabled: false
+  highlySecureCryptoModeEnabled: false
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""

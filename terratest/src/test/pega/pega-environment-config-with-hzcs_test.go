@@ -99,12 +99,12 @@ func TestPegaHazelcastEnvironmentConfigForClientWithSSL(t *testing.T) {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"hazelcast.enabled":                     "false",
-					"hazelcast.clusteringServiceEnabled":    "true",
-					"hazelcast.encryption.enabled":          "true",
-					"global.highlySecuredCryptoModeEnabled": "false",
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"hazelcast.enabled":                    "false",
+					"hazelcast.clusteringServiceEnabled":   "true",
+					"hazelcast.encryption.enabled":         "true",
+					"global.highlySecureCryptoModeEnabled": "false",
 				},
 			}
 
@@ -115,7 +115,7 @@ func TestPegaHazelcastEnvironmentConfigForClientWithSSL(t *testing.T) {
 	}
 }
 
-func TestPegaHazelcastEnvironmentConfigForClientWithHighlySecuredCryptoModeEnabled(t *testing.T) {
+func TestPegaHazelcastEnvironmentConfigForClientWithHighlySecureCryptoModeEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
 
@@ -130,12 +130,12 @@ func TestPegaHazelcastEnvironmentConfigForClientWithHighlySecuredCryptoModeEnabl
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"hazelcast.enabled":                     "false",
-					"hazelcast.clusteringServiceEnabled":    "true",
-					"hazelcast.encryption.enabled":          "true",
-					"global.highlySecuredCryptoModeEnabled": "true",
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"hazelcast.enabled":                    "false",
+					"hazelcast.clusteringServiceEnabled":   "true",
+					"hazelcast.encryption.enabled":         "true",
+					"global.highlySecureCryptoModeEnabled": "true",
 				},
 			}
 
@@ -163,7 +163,7 @@ func VerifyPegaHazelcastEnvironmentConfigForClient(t *testing.T, yamlContent str
 }
 
 func VerifyClusteringServiceEnvironmentConfigForClient(t *testing.T, yamlContent string, options *helm.Options,
-	ssl bool, highlySecuredCryptoModeEnabled bool) {
+	ssl bool, highlySecureCryptoModeEnabled bool) {
 
 	var envConfigMap k8score.ConfigMap
 	statefulSlice := strings.Split(yamlContent, "---")
@@ -180,8 +180,8 @@ func VerifyClusteringServiceEnvironmentConfigForClient(t *testing.T, yamlContent
 				require.Equal(t, envConfigData["HZ_SSL_PROTOCOL"], "TLS")
 				require.Equal(t, envConfigData["HZ_SSL_KEY_STORE_NAME"], "cluster-keystore.jks")
 				require.Equal(t, envConfigData["HZ_SSL_TRUST_STORE_NAME"], "cluster-truststore.jks")
-				if highlySecuredCryptoModeEnabled {
-					require.Equal(t, envConfigData["HIGHLY_SECURED_CRYPTO_MODE_ENABLED"], "true")
+				if highlySecureCryptoModeEnabled {
+					require.Equal(t, envConfigData["HIGHLY_SECURE_CRYPTO_MODE_ENABLED"], "true")
 					require.Equal(t, envConfigData["HZ_SSL_ALGO"], "PKIX")
 				} else {
 					require.Equal(t, envConfigData["HZ_SSL_ALGO"], "SunX509")

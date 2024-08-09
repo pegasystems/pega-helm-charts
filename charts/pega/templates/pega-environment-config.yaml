@@ -184,8 +184,8 @@ data:
   HZ_SSL_PROTOCOL: "TLS"
   HZ_SSL_KEY_STORE_NAME: "cluster-keystore.jks"
   HZ_SSL_TRUST_STORE_NAME: "cluster-truststore.jks"
-  {{ if (eq (include "isHzHighlySecuredCryptoModeEnabled" .) "true") }}
-  HIGHLY_SECURED_CRYPTO_MODE_ENABLED: "true"
+  {{ if (eq (include "isHzHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
   HZ_SSL_ALGO: "PKIX"
   {{- else }}
   HZ_SSL_ALGO: "SunX509"

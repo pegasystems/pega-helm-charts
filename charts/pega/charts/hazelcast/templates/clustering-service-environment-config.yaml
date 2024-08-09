@@ -14,8 +14,8 @@ data:
   ENCRYPTION_ENABLED: {{ true | quote }}
   ENCRYPTION_KEYSTORE_NAME: "cluster-keystore.jks"
   ENCRYPTION_TRUSTSTORE_NAME: "cluster-truststore.jks"
-{{- if (eq (include "isHighlySecuredCryptoModeEnabled" .) "true") }}
-  HIGHLY_SECURED_CRYPTO_MODE_ENABLED: {{ true | quote }}
+{{- if (eq (include "isHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: {{ true | quote }}
 {{- end }}
 {{- end }}
 {{- if .Values.server.jmx_enabled }}

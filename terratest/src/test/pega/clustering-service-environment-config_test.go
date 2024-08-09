@@ -69,7 +69,7 @@ func TestClusteringServiceEnvironmentConfigWithSSL(t *testing.T) {
 
 }
 
-func TestClusteringServiceEnvironmentConfigWithHighlySecuredCryptoModeEnabled(t *testing.T) {
+func TestClusteringServiceEnvironmentConfigWithHighlySecureCryptoModeEnabled(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
 
@@ -84,11 +84,11 @@ func TestClusteringServiceEnvironmentConfigWithHighlySecuredCryptoModeEnabled(t 
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":                       vendor,
-					"global.actions.execute":                operation,
-					"hazelcast.clusteringServiceEnabled":    "true",
-					"hazelcast.encryption.enabled":          "true",
-					"global.highlySecuredCryptoModeEnabled": "true",
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"hazelcast.clusteringServiceEnabled":   "true",
+					"hazelcast.encryption.enabled":         "true",
+					"global.highlySecureCryptoModeEnabled": "true",
 				},
 			}
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-environment-config.yaml"})
@@ -100,7 +100,7 @@ func TestClusteringServiceEnvironmentConfigWithHighlySecuredCryptoModeEnabled(t 
 }
 
 func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Options,
-	ssl bool, highlySecuredCryptoModeEnabled bool) {
+	ssl bool, highlySecureCryptoModeEnabled bool) {
 
 	var clusteringServiceEnvConfigMap k8score.ConfigMap
 	statefulSlice := strings.Split(yamlContent, "---")
@@ -125,8 +125,8 @@ func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, 
 				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_ENABLED"], "true")
 				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_KEYSTORE_NAME"], "cluster-keystore.jks")
 				require.Equal(t, clusteringServiceEnvConfigData["ENCRYPTION_TRUSTSTORE_NAME"], "cluster-truststore.jks")
-				if highlySecuredCryptoModeEnabled {
-					require.Equal(t, clusteringServiceEnvConfigData["HIGHLY_SECURED_CRYPTO_MODE_ENABLED"], "true")
+				if highlySecureCryptoModeEnabled {
+					require.Equal(t, clusteringServiceEnvConfigData["HIGHLY_SECURE_CRYPTO_MODE_ENABLED"], "true")
 				}
 			}
 
