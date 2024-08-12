@@ -37,7 +37,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=4> >= 8.6 </td>
-            <td rowspan=4>1.29.1</td>
+            <td rowspan=4>1.31.2</td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
             <td>7.10.2, 7.16.3 & 7.17.9</td>
@@ -66,7 +66,7 @@ The service deployment provisions runtime service pods along with a dependency o
 
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
 To migrate to Elasticsearch version 7.17.9 or 8.10.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
-1. Update the SRS Docker image version to use v1.29.1. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
+1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To update Elasticsearch version to 7.17.9 perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
     
@@ -81,7 +81,7 @@ To migrate to Elasticsearch version 7.17.9 or 8.10.3 from the Elasticsearch vers
 
 ### If your deployment connects to an externally-managed Elasticsearch service: ###
 To migrate to Elasticsearch version 7.17.9 or 8.10.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
-1. Update the SRS Docker image version to use v1.29.1. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
+1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To use Elasticsearch version 7.17.9, upgrade your external Elasticsearch cluster to 7.17.9 according to your organization’s best practices. For more information, see official Elasticsearch version 7.17 documentation.
 3. To use Elasticsearch version 8.10.3, upgrade your external Elasticsearch cluster to 8.10.3 according to your organization’s best practices. For more information, see official Elasticsearch version 8.10 documentation.
 4. Restart the SRS pods
@@ -108,10 +108,12 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 |-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `enabled`                               | Enable the Search and Reporting Service deployment as a backing service. Set this parameter to `true` to use SRS.                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `deploymentName`                        | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.                                                                                                                                                                                                                                                                                                                                                          |
-| `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, cpu and memory resource settings in the SRS. The default minimum required number of replicas is 2, but as a best practice, deploy 3 replicas to maintain high availability.                                                                                                                                                                                                                                                                                                                                                            |
+| `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, pod affinity, cpu and memory resource settings in the SRS. The default minimum required number of replicas is 2, but as a best practice, deploy 3 replicas to maintain high availability.                                                                                                                                                                                                                                                                                                                                                            |
 | `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                                                                                      |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.17.9`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster.                                                                |
-| `k8sProvider`                               | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].. 
+| `k8sProvider`                           | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].
+| `enableSecureCryptoMode`                | Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
+| `javaOpts`                              | Use this parameter to configure values for Java options.
 
 ### Enabling security between SRS and Elasticsearch
 Enabling a secure connection between SRS and your Elasticsearch service depends on the method you chose to deploy the Elasticsearch cluster.
@@ -178,6 +180,12 @@ srs:
       AuthEnabled: false
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
+    
+    # Set to `true` if Highly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
+    enableSecureCryptoMode: false
+
+    # This is used to configure Java options values.
+    javaOpts: ""
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
