@@ -26,7 +26,7 @@ global:
 
   # Add krb5.conf file content here.
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
-  kerberos:
+  kerberos: {}
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
@@ -56,7 +56,7 @@ global:
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
-    # configure  JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
+    # configure JDBC username & password parameters in the External Secrets Manager, and enter the external secret for the credentials
     # make sure the keys in the secret should be DB_USERNAME and DB_PASSWORD respectively
     external_secret_name: ""
     # CUSTOM CONNECTION PROPERTIES
@@ -134,7 +134,7 @@ global:
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
-      # Create a an interactive tier for web users.  This tier uses
+      # Create an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
       nodeType: "WebUser"
@@ -163,6 +163,13 @@ global:
         # loadBalancerSourceRanges:
         #     - "123.123.123.0/24"
         #     - "128.128.128.64/32"
+
+        # Define custom ports for service here. If you want to use the custom ports for other services, please use the same configuration for those services.
+        # customServicePorts:
+        # - name: <name>
+        #   port: <port>
+        #   targetPort: <port>
+
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
@@ -232,15 +239,16 @@ global:
       livenessProbe:
         port: 8081
 
-      # Optionally overridde default resource specifications
-      # cpuRequest: 2
-      # memRequest: "12Gi"
-      # cpuLimit: 4
-      # memLimit: "12Gi"
-      # initialHeap: "4096m"
+      # Optionally overridde the default or add additional resource specifications.
+      # initialHeap: "8192m"
       # maxHeap: "8192m"
-      # ephemeralStorageRequest:
-      # ephemeralStorageLimit:
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # To configure an alternative group for volume mounts, set value for fsGroup
@@ -248,6 +256,15 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
+
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
 
       hpa:
         enabled: true
@@ -268,6 +285,15 @@ global:
       #  topologyKey: <string>
       #  whenUnsatisfiable: <string>
       #  labelSelector: <object>
+
+      # Tolerations allow the scheduler to schedule pods with matching taints.
+      # For more information please refer https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration
+      # If you want to apply tolerations to other tiers, please use the same configuration as described here.
+      # tolerations:
+      #  - key: "key1"
+      #    operator: "Equal"
+      #    value: "value1"
+      #    effect: "NoSchedule"
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
@@ -302,6 +328,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
       hpa:
         enabled: true
 
@@ -312,6 +347,14 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
     - name: "stream"
       # Create a stream tier for queue processing.  This tier deploys
@@ -356,6 +399,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
       replicas: 2
 
       volumeClaimTemplate:
@@ -370,6 +422,14 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
 # External services
 
@@ -401,15 +461,16 @@ dds:
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
+  # are JKS and PKCS12. Default is JKS.
+  clientEncryptionStoreType: ""
   # If required, provide the trustStore certificate file name.
   # When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.
-  # Pega deployments only support trustStores using the Java Key Store (.jks) format.
   trustStore: ""
   # If required provide trustStorePassword value in plain text.
   trustStorePassword: ""
   # If required, provide the keystore certificate file name.
   # When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.
-  # Pega deployments only support keystore using the Java Key Store (.jks) format.
   keyStore: ""
   # If required provide keyStorePassword value in plain text.
   keyStorePassword: ""
@@ -476,11 +537,22 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
-# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
   replicas: 1
+
+  # Set externalSearchService to true to use the Search and Reporting Service.
+  # Refer to the README document to configure SRS as a search functionality provider under this section.
+  externalSearchService: false
+  externalURL:
+  srsAuth:
+    enabled: false
+    url: ""
+    clientId: ""
+    authType: ""
+    privateKey: ""
+    external_secret_name: ""
 
 # Pega Installer settings.
 installer:
@@ -568,8 +640,8 @@ stream:
   # so that it is easy to distinguish them from topics created by other applications.
   # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
   streamNamePattern: "pega-{stream.name}"
-  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
-  replicationFactor: "1"
+  # Your replicationFactor value cannot be more than the number of Kafka brokers. Pega recommended value is 3.
+  replicationFactor: "3"
   # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
   # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
   # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.

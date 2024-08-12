@@ -112,9 +112,15 @@ spec:
           requests:
             cpu: "{{ .root.Values.resources.requests.cpu }}"
             memory: "{{ .root.Values.resources.requests.memory }}"
+            {{- if .root.Values.resources.requests.ephemeralStorage }}
+            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
+            {{- end }}
           limits:
             cpu: "{{ .root.Values.resources.limits.cpu }}"
             memory: "{{ .root.Values.resources.limits.memory }}"
+            {{- if .root.Values.resources.limits.ephemeralStorage }}
+            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
+            {{- end }}
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
@@ -140,10 +146,16 @@ spec:
           mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
-{{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
         env:
-        -  name: ACTION
-           value: {{ .action }}
+        - name: ACTION
+          value: {{ .action }}
+{{- if .root.Values.custom }}
+{{- if .root.Values.custom.env }}
+        # Additional custom env vars
+{{ toYaml .root.Values.custom.env | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if or (eq $arg "pre-upgrade") (eq $arg "post-upgrade") (eq $arg "upgrade")  }}
 {{- if (eq .root.Values.upgrade.isHazelcastClientServer "true") }}
         -  name: HZ_VERSION
            valueFrom:
@@ -176,5 +188,6 @@ spec:
       restartPolicy: Never
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .root.Values | indent 6 }}
 ---
 {{- end -}}

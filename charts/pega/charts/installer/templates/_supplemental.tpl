@@ -11,6 +11,7 @@ pega-db-secret-name
 pega-hz-secret-name
 deployDBSecret
 deployNonExtDBSecret
+podAffinity
 secretResolver are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
@@ -116,3 +117,10 @@ false
 {{- end -}}
 {{- end -}}
 {{- end  -}}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}

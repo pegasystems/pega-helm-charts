@@ -160,6 +160,20 @@ jdbc:
   customerDataSchema: ""
 ```
 
+### JDBC Connections
+
+JDBC Connections facilitate the communication between Java applications and relational databases. They enable Java applications to run SQL statements, retrieve results, and propagate changes to the database in a standardized manner. A Connection interface represents a session with a specific database. It provides methods to create statements, commit or rollback transactions, and manage database connections.
+
+Pega provides the following three JDBC Connection types:
+
+JDBC Connection type     | Description
+---           |---
+`PegaRULES`           | The default Pega JDBC Connection.
+`PegaRULESLongRW`         | Provides a longer database connection, which results in less frequent timeouts. Starting in Pega Helm Charts v3.23.0, `PegaRULESLongRW` is enabled for all deployment tiers.
+`PegaRULESReadOnly`        | Provides a read only database connection.
+
+The JDBC Connection configurations are defined in [charts/pega/config/deploy/context.xml.tmpl](https://github.com/pegasystems/pega-helm-charts/blob/ab0cb220fe3d297a2e8d8be1c278bcdba96bd646/charts/pega/config/deploy/context.xml.tmpl#L4).
+
 ## Docker
 
 Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
@@ -308,7 +322,7 @@ requestor:
 ### Security context
 
 By default, security context for your Pega pod deployments `pegasystems/pega` image uses `pegauser`(9001) as the user and volume mounts uses `root`(0) as the group. To configure an alternative user for your custom image, set value for `runAsUser` and to configure an alternative group for volume mounts, set value for `fsGroup`. Note that pegasystems/pega image works only with pegauser(9001).
-`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
+`runAsUser` and `fsGroup` must be configured in `securityContext` under each tier block and will be applied to Deployments/Statefulsets, along with these settings other allowed configuration can also be supplied here, see the [Kubernetes Documentation](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/).
 
 Example:
 
@@ -370,6 +384,16 @@ ingress:
   annotations:
     annotation-name-1: annotation-value-1
     annotation-name-2: annotation-value-2
+```
+Depending on what type of deployment you use, if there are any long-running operations such as import, append provider-specific ingress timeout annotation under each tier.
+
+The following example shows timeout annotation overrides for an Openshift deployment:
+
+```yaml
+ingress:
+  domain: "tier.example.com"
+  annotations:
+     haproxy.router.openshift.io/timeout: 2m
 ```
 
 #### Provider support for SSL certificate management
@@ -457,17 +481,31 @@ ingress:
 
 You can optionally configure the resource allocation and limits for a tier using the following parameters. The default value is used if you do not specify an alternative value. See [Managing Kubernetes Resources](https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/) for more information about how Kubernetes manages resources.
 
+Example:
+```yaml
+resources: 
+  requests:
+    memory: "12Gi"
+    cpu: 3
+    ephemeral-storage: 
+  limits:
+    memory: "12Gi"
+    cpu: 4
+    ephemeral-storage: 
+```
+
+
 Parameter                | Description                                            | Default value
 ---                      | ---                                                    | ---
 `replicas`               | Specify the number of Pods to deploy in the tier.      | `1`
-`cpuRequest`             | Initial CPU request for pods in the current tier.      | `3`
-`cpuLimit`               | CPU limit for pods in the current tier.                | `4`
-`memRequest`             | Initial memory request for pods in the current tier.   | `12Gi`
-`memLimit`               | Memory limit for pods in the current tier.             | `12Gi`
+`cpuRequest`             | Deprecated, use `resources.requests.cpu`. Initial CPU request for pods in the current tier.      | `3`
+`cpuLimit`               | Deprecated, use `resources.limits.cpu`. CPU limit for pods in the current tier.                | `4`
+`memRequest`             | Deprecated, use `resources.requests.memory`. Initial memory request for pods in the current tier.   | `12Gi`
+`memLimit`               | Deprecated, use `resources.limits.memory`. Memory limit for pods in the current tier.             | `12Gi`
 `initialHeap`            | Specify the initial heap size of the JVM.              | `8192m`
 `maxHeap`                | Specify the maximum heap size of the JVM.              | `8192m`
-`ephemeralStorageRequest`| Ephemeral storage request for the tomcat container.    | -
-`ephemeralStorageLimit`  | Ephemeral storage limit for the tomcat container.      | -
+`ephemeralStorageRequest`| Deprecated, use `resources.requests.ephemeral-storage`. Ephemeral storage request for the tomcat container.    | -
+`ephemeralStorageLimit`  | Deprecated, use `resources.limits.ephemeral-storage`. Ephemeral storage limit for the tomcat container.      | -
 
 ### JVM Arguments
 You can optionally pass in JVM arguments to Tomcat.  Depending on the parameter/attribute used, the arguments will be placed into `JAVA_OPTS` or `CATALINA_OPTS` environmental variables.
@@ -494,6 +532,25 @@ tier:
 
   nodeSelector:
     disktype: ssd
+```
+
+### Tolerations
+
+Pega supports configuring tolerations for workloads. Taints are applied to nodes and tolerations are applied to pods. For more information about taints and tolerations please refer official K8S [documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/).
+
+Example:
+
+```yaml
+tier:
+- name: "my-tier"
+  nodeType: "WebUser"
+  
+  tolerations:
+  - key: "key1"
+    operator: "Equal"
+    value: "value1"
+    effect: "NoSchedule"
+  
 ```
 
 ### Liveness, readiness, and startup probes
@@ -652,6 +709,26 @@ tier:
       <annotation-key>: <annotation-value>
 ```
 
+### Pod affinity
+
+You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. Pod affinity may be specified by using the `affinity` element for a given `tier`. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: kubernetes.io/os
+              operator: In
+              values:
+              - linux
+```
+
 ### Pega configuration files
 
 While Pega includes default configuration files in the Helm charts, the charts provide extension points to override the defaults with additional customizations. To change the configuration file, specify the replacement implementation to be injected into a ConfigMap.
@@ -718,31 +795,32 @@ To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and 
 
 Use the following parameters to configure the connection to your external Cassandra cluster
 
-Parameter     | Tier Level Environment Variable | Description | Default value
----           |:---:| ---|:---:
-`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
-`port` | N/A | TCP Port to connect to cassandra. | 9042
-`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
-`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
-`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
-`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
-`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
-`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
-`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
-`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations. | false
-`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra. | Empty
-`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner. | false
-`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average). | false
-`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that time out. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once.| false
-`customRetryPolicyEnabled` | CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries using the `customRetryPolicyCount` property.| false
-`customRetryPolicyCount` | CASSANDRA_CUSTOM_RETRY_POLICY_COUNT | Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. | 1
+Parameter     | Tier Level Environment Variable | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Default value
+---           |:---:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---:
+`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Empty
+`port` | N/A | TCP Port to connect to cassandra.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 9042
+`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`.                                                                                                                            | dnode_ext
+`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.                                                                                                                            | dnode_ext
+`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | false
+`clientEncryptionStoreType` | N/A | If required specify the type of Cassandra truststore and keystore that hold keys and certificates for client encryption. Available store types are JKS and PKCS12.                                                                                                                                                                                                                                                                                                                                                                                                                                            |Empty
+`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format.                                                                                                                                                                                                                                                                             | Empty
+`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD.                                                                                                                                                                                                                                                                                                                                                                                                | Empty
+`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format.                                                                                                                                                                                                                                                                                     | Empty
+`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD.                                                                                                                                                                                                                                                                                                                                                                                                    | Empty
+`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations.                                                                                                                                                                                                                                                                                                                                                                                                                                                     | false
+`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Empty
+`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner.                                                                                                                                                                                                                                                                                                                      | false
+`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average).                                                                                                                                                                                                                                                                                                                                                                                                                                                   | false
+`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that time out. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once.                                                                                                                                        | false
+`customRetryPolicyEnabled` | CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries using the `customRetryPolicyCount` property.                                                                                                                                                                                                                                                                                                                                                                                                                                                | false
+`customRetryPolicyCount` | CASSANDRA_CUSTOM_RETRY_POLICY_COUNT | Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount.                                                                                                                                                                                                                                                                                                                                                                                                | 1
 `speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and earlier releases. When enabled, Pega Platform sends a query to multiple nodes in your Cassandra service and processes the first response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and dnode/cassandra_speculative_execution_policy/max_executions. | false
-`speculativeExecutionPolicyEnabled` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and `speculativeExecutionPolicyMaxExecutions` properties. | false
-`speculativeExecutionPolicyDelay` | CASSANDRA_SPECULATIVE_EXECUTION_DELAY | Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/delay. | 100
-`speculativeExecutionPolicyMaxExecutions` | CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS | Specify the maximum number of speculative execution attempts when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/max_executions. | 2
-`jmxMetricsEnabled` | CASSANDRA_JMX_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX interface; disabling also limits the metrics being collected using the DDS landing page. | true
-`csvMetricsEnabled` | CASSANDRA_CSV_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor your Cassandra service. If you enable this property, use the Pega Platform DSS: dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By default, after you enable this property, CSV files will be written to the Pega Platform work directory. | true
-`logMetricsEnabled` | CASSANDRA_LOG_METRICS_ENABLED | Enable reporting of DDS SDK metrics to your Pega Platform logs. | false
+`speculativeExecutionPolicyEnabled` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and `speculativeExecutionPolicyMaxExecutions` properties.                                                                                                                                                                                                                                                                                                                                                 | false
+`speculativeExecutionPolicyDelay` | CASSANDRA_SPECULATIVE_EXECUTION_DELAY | Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/delay.                                                                                                                                                                                                                                                                                                                                               | 100
+`speculativeExecutionPolicyMaxExecutions` | CASSANDRA_SPECULATIVE_EXECUTION_MAX_EXECUTIONS | Specify the maximum number of speculative execution attempts when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/max_executions.                                                                                                                                                                                                                                                                                                                                                  | 2
+`jmxMetricsEnabled` | CASSANDRA_JMX_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Java Management Extension (JMX) format for use by your organization to monitor your Cassandra service. Setting this property `false` disables metrics being exposed through the JMX interface; disabling also limits the metrics being collected using the DDS landing page.                                                                                                                                                                                                                                                                                         | true
+`csvMetricsEnabled` | CASSANDRA_CSV_METRICS_ENABLED | Enable reporting of DDS SDK metrics to a Comma Separated Value (CSV) format for use by your organization to monitor your Cassandra service. If you enable this property, use the Pega Platform DSS: dnode/ddsclient/metrics/csv_directory to customize the filepath to which the deployment writes CSV files. By default, after you enable this property, CSV files will be written to the Pega Platform work directory.                                                                                                                                                                                      | true
+`logMetricsEnabled` | CASSANDRA_LOG_METRICS_ENABLED | Enable reporting of DDS SDK metrics to your Pega Platform logs.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | false
 
 
 If you configured a secret in an external secrets operator, enter the secret name in `external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
@@ -866,10 +944,12 @@ To configure authorization for the connection between Pega Infinity and the Sear
 | Parameter             | Description                                                                                                                                                                                           | Default value      |
 |-----------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
 | `enabled`             | Set the `pegasearch.srsAuth.enabled` to 'true' to use OAuth between Infinity and SRS.                                                                                                                 | false              |
-| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth service endpoint to get the token for SRS.                                                                                             | `""`               |
+| `url`                 | Set the `pegasearch.srsAuth.url` value to the URL of the OAuth token endpoint to get the token for SRS.                                                                                             | `""`               |
 | `clientId`            | Set the `pegasearch.srsAuth.clientId` value to the client id used in OAuth service.                                                                                                                   | `""`               |
 | `scopes`              | Set the `pegasearch.srsAuth.scopes` value to "pega.search:full", the scope set in the OAuth service required to grant access to SRS.                                                                  | "pega.search:full" |
-| `privateKey`          | Set the `pegasearch.srsAuth,privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
+| `authType`            | Set the `pegasearch.srsAuth.authType` value to to authentication type use when connecting to the OAuth token endpoint. Use client_secret_basic for basic authentication or private_key_jwt to use a client assertion JWT.     | `""`               |
+| `external_secret_name`| Set the `pegasearch.srsAuth.external_secret_name` value to the secret that contains the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.  The private key should be contained in the secret key SRS_OAUTH_PRIVATE_KEY.   | `""`               |
+| `privateKey`          | When not using an external secret, set the `pegasearch.srsAuth.privateKey` value to the OAuth private PKCS8 key (additionally encoded with base64) used to get an authorization token for the connection between Pega tiers and SRS.     | `""`               |
 | `privateKeyAlgorithm` | Set the `pegasearch.srsAuth.privateKeyAlgorithm` value to the algorithm used to generate a private key used by the OAuth client. Allowed values: RS256 (default), RS384, RS512, ES256, ES384, ES512.  | "RS256"            |
 
 Example:
@@ -882,6 +962,7 @@ pegasearch:
     enabled: true
     url: "https:/your-authorization-service-host/oauth2/v1/token"
     clientId: "your-client-id"
+    authType: client_secret_basic
     scopes: "pega.search:full"
     privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
     privateKeyAlgorithm: "RS256"
@@ -901,6 +982,7 @@ Parameter   | Description   | Default value
 `set_vm_max_map_count`   | Elasticsearch uses a **mmapfs** directory by default to store its indices. The default operating system limits on mmap counts is likely to be too low, which may result in out of memory exceptions. An init container is provided to set the value correctly, but this action requires privileged access. If privileged access is not allowed in your environment, you may increase this setting manually by updating the `vm.max_map_count` setting in **/etc/sysctl.conf** according to the Elasticsearch documentation and can set this parameter to `false` to disable the init container. For more information, see the [Elasticsearch documentation](https://www.elastic.co/guide/en/elasticsearch/reference/current/vm-max-map-count.html). | `true`
 `set_data_owner_on_startup`   | Set to true to enable an init container that runs a chown command on the mapped volume at startup to reset the owner of the ES data to the current user. This is needed if a random user is used to run the pod, but also requires privileges to change the ownership of files. | `false`
 `podAnnotations` | Configurable annotations applied to all Elasticsearch pods. | {}
+`affinity` | You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. | `""`
 
 Additional env settings supported by Elasticsearch may be specified in a `custom.env` block as shown in the example below.
 
@@ -1004,6 +1086,7 @@ Parameter   | Description   | Default value
 `image`   | Reference the `platform/installer` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.  | `YOUR_INSTALLER_IMAGE:TAG`
 `imagePullPolicy` | Specify when to pull an image. | `IfNotPresent`
 `adminPassword` | Specify a temporary, initial password to log into the Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
+`affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). | `""`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
@@ -1143,7 +1226,7 @@ Pega Infinity version   | Clustering Service version    |    Description
 ---                     | ---                           | ---
 < 8.6                   | NA                            | Clustering Service is not supported for releases 8.5 or below 
 \>= 8.6 && < 8.8         | \= 1.0.5                     | Pega Infinity 8.6.x and 8.7.x supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.0.3 or later. 
-\>= 8.8                 | \= 1.3.3                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. 
+\>= 8.8                 | \= 1.3.x                     | Pega Infinity 8.8 and later supports using a Pega-provided `platform-services/clustering-service` Docker Image that provides a clustering service version 1.3.0 or later. As a best practice, use the latest available release of the clustering service. 
 
 
 #### Configuration Settings
@@ -1163,6 +1246,7 @@ Parameter   | Description   | Default value
 `hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically.  | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
+`hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).  | `""`
 
 #### Example
 ```yaml
@@ -1349,4 +1433,29 @@ behavior:
       stabilizationWindowSeconds: << provide scaleDown stabilization window in seconds >>
    scaleUp:
       stabilizationWindowSeconds: << provide scaleUp stabilization window in seconds >>
+```
+
+### Custom Ports
+
+You can optionally specify custom ports for deployment tier. You can specify custom ports for your tiers as shown in the example below:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      ports:
+        - name: <name>
+          containerPort: <port>
+```
+
+You can optionally specify custom ports for tier specific service. You can specify custom ports for your service as shown in the example below:
+```yaml
+tier:
+   - name: my-tier
+     service:
+       customServicePorts:
+       - name: <name>
+         port: <port>
+         targetPort: <target port>
+          
 ```
