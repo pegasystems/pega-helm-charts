@@ -214,6 +214,10 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
+{{- if .node.containerSecurityContext }}
+        securityContext:
+{{ toYaml .node.containerSecurityContext | indent 10 }}
+{{-  end }}
         resources:
 {{- if .node.resources }}
 {{ toYaml .node.resources | indent 10 }}
@@ -337,6 +341,7 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .node | indent 6 }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:
