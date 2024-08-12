@@ -61,6 +61,9 @@ spec:
     port: {{ .node.service.tls.port }}
     targetPort: {{ .node.service.tls.targetPort }}
 {{- end }}
+{{- if .node.service.customServicePorts }}
+{{ toYaml .node.service.customServicePorts | indent 2 }}
+{{- end }}
   selector:
     app: {{ .name }}
 ---

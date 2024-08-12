@@ -22,7 +22,7 @@ global:
 
   # Add krb5.conf file content here.
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
-  kerberos:
+  kerberos: {}
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""

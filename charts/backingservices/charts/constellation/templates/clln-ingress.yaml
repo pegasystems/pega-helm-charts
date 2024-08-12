@@ -18,6 +18,9 @@ metadata:
     {{- toYaml .Values.ingressAnnotations | nindent 4 }}
     {{ end }}
 spec:
+{{- if .Values.ingressClassName }}
+  ingressClassName: {{ .Values.ingressClassName }}
+{{- end }}
   rules:
   - host: {{ .Values.domainName }}
     http:

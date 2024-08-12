@@ -99,6 +99,9 @@ data:
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
   # Whether to enable client encryption on the Cassandra connection.
   CASSANDRA_CLIENT_ENCRYPTION: "{{ .Values.dds.clientEncryption }}"
+  # Type of Cassandra truststore and keystore used to hold keys and certificates for client encryption.
+  # Available store types are JKS and PKCS12.
+  CASSANDRA_CLIENT_ENCRYPTION_STORE_TYPE: "{{ .Values.dds.clientEncryptionStoreType }}"
   # Path to a mounted trust store file for Cassandra encryption.
   CASSANDRA_TRUSTSTORE: "{{ .Values.dds.trustStore }}"
   # Path to a mounted key store file for Cassandra encryption.
