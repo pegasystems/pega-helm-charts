@@ -1,3 +1,15 @@
+{{- define "deployWithoutCPULimit" -}}
+  {{- if hasKey .node "deployWithoutCPULimit" -}}
+    {{- if eq true .node.deployWithoutCPULimit -}}
+      true
+    {{- else -}}
+      false
+    {{- end -}}
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "pegaEnvironmentConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-environment-config

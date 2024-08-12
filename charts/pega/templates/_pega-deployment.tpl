@@ -227,7 +227,7 @@ spec:
           limits:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
-          {{- else }}
+          {{- else if (ne (include "deployWithoutCPULimit" (dict "node" .node)) "true")  }}
             cpu: 4
           {{- end }}
           {{- if .node.memLimit }}
