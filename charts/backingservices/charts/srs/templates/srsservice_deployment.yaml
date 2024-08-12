@@ -103,6 +103,10 @@ spec:
               value: {{ template "oAuthPublicKeyUrl" .}}
             - name: PUBLIC_KEY_URL
               value: ""
+            - name: HIGH_SECURE_CRYPTO_MODE_ENABLED
+              value: "{{ .Values.srsRuntime.enableSecureCryptoMode | default "false" }}"
+            - name: JAVA_OPTS
+              value: {{ template "javaOpts" .}}
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
       {{- if .Values.srsStorage.tls.enabled }}
@@ -147,4 +151,5 @@ spec:
                 name: srs-elastic-credentials
                 key: password
       {{ end }}
+{{- include "podAffinity" .Values.srsRuntime | indent 6 }}
   {{ end }}
