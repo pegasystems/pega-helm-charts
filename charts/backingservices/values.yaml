@@ -18,7 +18,7 @@ srs:
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
-    image: "alpine:3.18.3"
+    image: "alpine:3.20.2"
     imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
@@ -37,6 +37,12 @@ srs:
       AuthEnabled: false
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
+
+    # Use this parameter to configure values for Java options.
+    javaOpts: ""
+
+    # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
+    enableSecureCryptoMode: false
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
@@ -90,7 +96,8 @@ constellation:
 
 constellation-messaging:
   enabled: false
-  name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
+  deployment:
+    name: YOUR_MESSAGING_SERVICE_DEPLOYMENT_NAME
   image: YOUR_MESSAGING_SERVICE_IMAGE:TAG
   replicas: 1
 

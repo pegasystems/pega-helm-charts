@@ -37,7 +37,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=4> >= 8.6 </td>
-            <td rowspan=4>1.31.2</td>
+            <td rowspan=4>1.31.8</td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
             <td>7.10.2, 7.16.3 & 7.17.9</td>
@@ -111,7 +111,9 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 | `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, pod affinity, cpu and memory resource settings in the SRS. The default minimum required number of replicas is 2, but as a best practice, deploy 3 replicas to maintain high availability.                                                                                                                                                                                                                                                                                                                                                            |
 | `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                                                                                      |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.17.9`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster.                                                                |
-| `k8sProvider`                               | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].. 
+| `k8sProvider`                           | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].
+| `enableSecureCryptoMode`                | Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
+| `javaOpts`                              | Use this parameter to configure values for Java options.
 
 ### Enabling security between SRS and Elasticsearch
 Enabling a secure connection between SRS and your Elasticsearch service depends on the method you chose to deploy the Elasticsearch cluster.
@@ -178,6 +180,12 @@ srs:
       AuthEnabled: false
       # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
       OAuthPublicKeyURL: ""
+    
+    # Set to `true` if Highly secured connection complying NIST SP 800-53 and NIST SP 800-131 is required; otherwise leave set to `false`
+    enableSecureCryptoMode: false
+
+    # This is used to configure Java options values.
+    javaOpts: ""
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
