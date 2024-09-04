@@ -7,6 +7,10 @@ metadata:
   namespace: {{ .root.Release.Namespace }}
   annotations:
 {{- $ingress := .node.ingress }}
+{{- if $ingress.labels }}
+  labels:
+{{ toYaml $ingress.labels | indent 4 }}
+{{- end }}
 {{- if $ingress.annotations }}
     # Custom annotations
 {{ toYaml $ingress.annotations | indent 4 }}
