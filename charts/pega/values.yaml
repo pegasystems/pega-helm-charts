@@ -203,7 +203,6 @@ global:
             insecureSkipVerify: false
 
       ingress:
-        labels:
         enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
@@ -214,6 +213,8 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+        labels:
+        # Configure custom labels for ingress
         tls:
           # Enable TLS encryption
           enabled: true
