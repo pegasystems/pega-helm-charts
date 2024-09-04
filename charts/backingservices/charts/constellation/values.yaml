@@ -55,7 +55,7 @@ ingress:
   # Additional annotations for the ingress can be specified here
   annotations:
   # Configure custom labels for ingress
-  labels:        
+  labels:
   tls:
     enabled: false
     secretName:
