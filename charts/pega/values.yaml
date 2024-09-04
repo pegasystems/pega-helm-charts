@@ -4,7 +4,7 @@ global:
   # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
-  provider: "openshift"
+  provider: "YOUR_KUBERNETES_PROVIDER"
 
   # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
   customerDeploymentId:
