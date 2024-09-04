@@ -4,7 +4,7 @@ global:
   # each configuration option, see the project readme.
 
   # Enter your Kubernetes provider.
-  provider: "YOUR_KUBERNETES_PROVIDER"
+  provider: "openshift"
 
   # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
   customerDeploymentId:
@@ -203,6 +203,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        labels:
         enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
