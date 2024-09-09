@@ -33,3 +33,11 @@ srsRuntime:
 
   # Use this parameter to configure values for Java options.
   javaOpts: ""
+
+  # Apply securityContext to SRS pod. For example to set `runAsUser: 9999`:
+  # securityContext:
+  #   runAsUser: 9999
+
+  # Apply securityContext to SRS container. For example to set `allowPrivilegeEscalation: false`:
+  # containerSecurityContext:
+  #   allowPrivilegeEscalation: false
