@@ -610,6 +610,13 @@ hazelcast:
   # Enter the external secret for these credentials below.
   external_secret_name: ""
 
+  # Apply securityContext to clustering service pods. For example to set `runAsUser: 1000`:
+  # securityContext:
+  #   runAsUser: 1000
+  # Apply securityContext to clustering service containers. For example to set `allowPrivilegeEscalation: false`:
+  # containerSecurityContext:
+  #   allowPrivilegeEscalation: false
+
 # Stream (externalized Kafka service) settings.
 stream:
   # Beginning with Pega Platform '23, enabled by default; when disabled, your deployment does not use a"Kafka stream service" configuration.

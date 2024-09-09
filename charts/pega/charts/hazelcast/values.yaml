@@ -62,3 +62,7 @@ server:
 # Apply securityContext to clustering service pods. For example to set `runAsUser: 1000`:
 # securityContext:
 #   runAsUser: 1000
+
+# Apply securityContext to clustering service containers. For example to set `allowPrivilegeEscalation: false`:
+# containerSecurityContext:
+#   allowPrivilegeEscalation: false
