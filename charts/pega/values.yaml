@@ -610,12 +610,18 @@ hazelcast:
   # Enter the external secret for these credentials below.
   external_secret_name: ""
 
-  # Apply securityContext to clustering service pods. For example to set `runAsUser: 1000`:
+  # Apply securityContext to clustering service pods. Example:
   # securityContext:
   #   runAsUser: 1000
-  # Apply securityContext to clustering service containers. For example to set `allowPrivilegeEscalation: false`:
+  #   fsGroup: 0
+
+  # Apply securityContext to clustering service containers. Example:
   # containerSecurityContext:
   #   allowPrivilegeEscalation: false
+  #   capabilities:
+  #     drop:
+  #     - ALL
+  #   runAsNonRoot: true
 
 # Stream (externalized Kafka service) settings.
 stream:
