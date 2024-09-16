@@ -314,8 +314,8 @@ Pega Platform deployments require that the region you select is located in the s
    f. In the **DB instance size** section, add these details:
 
    - Select **Standard classes**.
-   - Select **db.m5.large** or greater. The **db.m5.large** selection provides the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage).
-RAM
+   - Select an instance class that meets the minimum hardware requirement for Pega Platform installations (a minimum of **4** vCores and **32 GB** storage) and your organization's needs.
+     
    g. In the **Storage** section, for details, accept the default values:
 
    - **Storage type** is **Provisioned IOPS**.
