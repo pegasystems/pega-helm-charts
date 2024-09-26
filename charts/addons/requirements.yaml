@@ -27,6 +27,6 @@ dependencies:
   repository: https://kubernetes-sigs.github.io/metrics-server/
   condition: metrics-server.enabled
 - name: ingress-azure
-  version: "1.5.0"
+  version: "1.7.5"
   repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
   condition: ingress-azure.enabled

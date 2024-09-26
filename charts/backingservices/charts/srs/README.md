@@ -37,7 +37,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=4> >= 8.6 </td>
-            <td rowspan=4>1.31.2</td>
+            <td rowspan=4>1.31.8</td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
             <td>7.10.2, 7.16.3 & 7.17.9</td>
