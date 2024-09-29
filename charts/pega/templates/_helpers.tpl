@@ -476,10 +476,11 @@ servicePort: use-annotation
 {{- end -}}
 
 {{- define "hzServiceName" -}}
+{{- $hzDict := dict "Values" .Values.hazelcast -}}
   {{- if and (not .Values.hazelcast.enabled)  .Values.hazelcast.clusteringServiceEnabled -}}
-    {{ template "clusteringServiceName" }}
+    {{ template "clusteringServiceName" $hzDict }}
   {{- else -}}
-    {{ template "hazelcastName" }}
+    {{ template "hazelcastName" $hzDict }}
   {{- end -}}
 {{- end -}}
 
