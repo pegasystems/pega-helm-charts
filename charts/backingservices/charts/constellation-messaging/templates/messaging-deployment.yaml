@@ -65,4 +65,5 @@ spec:
         ports:
         - containerPort: {{ $srvTargetPort }}
 {{- include "podAffinity" .Values | indent 6 }}
+{{- include "tolerations" .Values | indent 6 }}
 {{ end }}
