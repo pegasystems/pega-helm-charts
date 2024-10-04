@@ -709,6 +709,19 @@ tier:
       <annotation-key>: <annotation-value>
 ```
 
+### Custom Labels for Pods
+
+You may optionally provide custom labels for Pods as metadata to be consumed by other tools and libraries. Pod labels may be specified by using the `podLabels` element for a given `tier`.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    podLabels:
+      <label-key>: <label-value>
+```
+
 ### Pod affinity
 
 You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. Pod affinity may be specified by using the `affinity` element for a given `tier`. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
@@ -1155,6 +1168,18 @@ installer:
     annotation-name2: annotation-value2
 ```
 
+### Installer Pod Labels
+
+You can add labels to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podLabels:
+    label-name1: label-value1
+    label-name2: label-value2
+```
 
 ### Installer Node Selector
 
