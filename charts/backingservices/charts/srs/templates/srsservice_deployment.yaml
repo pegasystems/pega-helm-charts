@@ -17,6 +17,9 @@ spec:
   template:
     metadata:
       labels:
+{{- if .Values.srsRuntime.podLabels }}
+{{ toYaml .Values.srsRuntime.podLabels | indent 8 }}
+{{- end }}
 {{- include "srs.srs-service.match-labels" . | indent 8 }}
     spec:
       imagePullSecrets:
