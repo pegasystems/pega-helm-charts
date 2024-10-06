@@ -5,6 +5,9 @@ metadata:
   name: {{ template "srs.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
+{{- if .Values.srsRuntime.deploymentLabels }}
+{{ toYaml .Values.srsRuntime.deploymentLabels | indent 4 }}
+{{- end }}
 {{- include "srs.srs-service.labels" . | indent 4 }}
 spec:
   replicas: {{ .Values.srsRuntime.replicaCount }}
