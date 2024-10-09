@@ -148,14 +148,6 @@ jobs:
     needs: [run-lint-job, run-remark-job, run-go-tests-job]
     if: ( github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') ) &&  success()
     steps:
-      - name: sync chart version
-        run: |
-          cd $GITHUB_WORKSPACE
-          chmod 777 sync_chart_version.sh
-          ./sync_chart_version.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
-
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
@@ -170,6 +162,14 @@ jobs:
         run: |
           make dependencies
 
+      - name: sync chart version
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 sync_chart_version.sh
+          ./sync_chart_version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
+
       - name: before deploy step 1
         run: |
           cd $GITHUB_WORKSPACE
@@ -179,7 +179,6 @@ jobs:
       - name: before deploy step 2
         run: |
           make examples 
-
 
       - name: deploy on github releases
         uses: softprops/action-gh-release@v1
