@@ -4,6 +4,10 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: {{ .name }}
+{{- if .node.ingress.labels }}
+  labels:
+{{ toYaml .node.ingress.labels | indent 4 }}
+{{- end }}
   annotations:
 {{- if (.node.ingress).annotations }}
     # Custom annotations
