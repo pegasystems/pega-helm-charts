@@ -148,6 +148,14 @@ jobs:
     needs: [run-lint-job, run-remark-job, run-go-tests-job]
     if: ( github.ref_type == 'tag' && startsWith(github.ref, 'refs/tags/v') ) &&  success()
     steps:
+      - name: sync chart version
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 sync_chart_version.sh
+          ./sync_chart_version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
+
       - name: Install Helm
         run: |
           wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
@@ -191,13 +199,5 @@ jobs:
           cd $GITHUB_WORKSPACE
           chmod 777 update_gh_pages.sh
           ./update_gh_pages.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
-
-      - name: sync chart version
-        run: |
-          cd $GITHUB_WORKSPACE
-          chmod 777 sync_chart_version.sh
-          ./sync_chart_version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
