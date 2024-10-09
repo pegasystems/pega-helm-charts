@@ -48,6 +48,8 @@ func TestSRSDeployment(t *testing.T) {
 				protocol: "https",
 			},
 			false,
+			[]label{},
+			[]label{},
 		})
 }
 
@@ -58,6 +60,9 @@ func TestSRSDeploymentVariables(t *testing.T) {
 			"srs.enabled":                                "true",
 			"srs.deploymentName":                         "test-srs-dev",
 			"global.imageCredentials.registry":           "docker-registry.io",
+			"srs.srsRuntime.deploymentLabels.key1":       "value1",
+			"srs.srsRuntime.deploymentLabels.key2":       "value2",
+			"srs.srsRuntime.podLabels.podkey1":           "podValue1",
 			"srs.srsRuntime.replicaCount":                "3",
 			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:1.0.0",
 			"srs.srsRuntime.imagePullSecretNames":        "{secret1, secret2}",
@@ -101,6 +106,22 @@ func TestSRSDeploymentVariables(t *testing.T) {
 				region:   "us-east-1",
 			},
 			true,
+			[]label{
+				{
+					key:   "key1",
+					value: "value1",
+				},
+				{
+					key:   "key2",
+					value: "value2",
+				},
+			},
+			[]label{
+				{
+					key:   "podkey1",
+					value: "podValue1",
+				},
+			},
 		})
 }
 
@@ -151,6 +172,8 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T) {
 				protocol: "https",
 			},
 			true,
+			[]label{},
+			[]label{},
 		})
 }
 
@@ -200,6 +223,13 @@ func VerifySRSDeployment(t *testing.T, deploymentObj appsv1.Deployment, expected
 	}
 	require.Equal(t, expectedDeployment.appName, deploymentObj.Spec.Template.Labels["app.kubernetes.io/name"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
+	// Verify labels
+	for _, labelpair := range expectedDeployment.depLabels {
+		require.Equal(t, labelpair.value, deploymentObj.Labels[labelpair.key])
+	}
+	for _, labelpair := range expectedDeployment.podLabels {
+		require.Equal(t, labelpair.value, deploymentObj.Spec.Template.Labels[labelpair.key])
+	}
 	VerifyDeployment(t, &deploymentSpec, expectedDeployment)
 }
 
@@ -300,6 +330,8 @@ type srsDeployment struct {
 	podLimits             podResources
 	elasticsearchEndPoint esDomain
 	imagePullSecretNames  bool
+	depLabels             []label
+	podLabels             []label
 }
 
 type podResources struct {
@@ -314,4 +346,9 @@ type esDomain struct {
 	port     string
 	protocol string
 	region   string
+}
+
+type label struct {
+	key   string
+	value string
 }
