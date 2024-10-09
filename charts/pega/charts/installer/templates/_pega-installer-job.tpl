@@ -189,5 +189,6 @@ spec:
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
 {{- include "podAffinity" .root.Values | indent 6 }}
+{{- include "tolerations" .root.Values | indent 6 }}
 ---
 {{- end -}}
