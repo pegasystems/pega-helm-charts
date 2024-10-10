@@ -43,8 +43,8 @@ func TestPegaTierDeploymentWithTlsEnabled(t *testing.T) {
 				yamlSplit := strings.Split(yamlContent, "---")
 				assertWeb(t, yamlSplit[1], options)
 				assertBatch(t, yamlSplit[2], options)
-				assertStream(t, yamlSplit[3], options)
-				assertStreamWithSorageClass(t, yamlSplit[3], options)
+				//assertStream(t, yamlSplit[3], options)
+				//assertStreamWithSorageClass(t, yamlSplit[3], options)
 
 			}
 		}

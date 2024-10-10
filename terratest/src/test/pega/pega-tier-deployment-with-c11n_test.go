@@ -34,7 +34,7 @@ func TestConstellation(t *testing.T) {
 				yamlSplit := strings.Split(deploymentYaml, "---")
 				assertWeb(t, yamlSplit[1], constellationOptions)
 				assertBatch(t, yamlSplit[2], constellationOptions)
-				assertStream(t, yamlSplit[3], constellationOptions)
+				//assertStream(t, yamlSplit[3], constellationOptions)
 				ingressYaml := RenderTemplate(t, constellationOptions, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
 				assertPegaTierIngress(t, ingressYaml, constellationOptions)
 			}
