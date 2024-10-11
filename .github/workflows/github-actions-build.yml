@@ -162,6 +162,14 @@ jobs:
         run: |
           make dependencies
 
+      - name: sync chart version
+        run: |
+          cd $GITHUB_WORKSPACE
+          chmod 777 sync_chart_version.sh
+          ./sync_chart_version.sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
+
       - name: before deploy step 1
         run: |
           cd $GITHUB_WORKSPACE
@@ -171,7 +179,6 @@ jobs:
       - name: before deploy step 2
         run: |
           make examples 
-
 
       - name: deploy on github releases
         uses: softprops/action-gh-release@v1
@@ -191,13 +198,5 @@ jobs:
           cd $GITHUB_WORKSPACE
           chmod 777 update_gh_pages.sh
           ./update_gh_pages.sh
-        env:
-          GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}
-
-      - name: sync chart version
-        run: |
-          cd $GITHUB_WORKSPACE
-          chmod 777 sync_chart_version.sh
-          ./sync_chart_version.sh
         env:
           GITHUB_TOKEN: ${{ secrets.GH_ACTIONS_SECRET }}

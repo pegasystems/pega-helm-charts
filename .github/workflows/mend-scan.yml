@@ -40,13 +40,13 @@ jobs:
           java -jar wss-unified-agent.jar
         fi
     - name: 'Upload WhiteSource folder'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
         name: Mend
         path: whitesource
         retention-days: 14
     - name: 'Upload Mend folder if failure'
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       if: failure()
       with:
         name: Mend
