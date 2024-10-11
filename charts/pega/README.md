@@ -1248,7 +1248,7 @@ Parameter   | Description   | Default value
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).  | `""`
 `hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).  | `""`
 `hazelcast.podLabels` | Provide custom labels for Pods as metadata to be consumed by other tools and libraries.  | `""`
-`hazelcast.deploymentLabels` | Provide custom labels for the deployment (more precisely the StatefulSet) as metadata to be consumed by other tools and libraries.  | `""`
+`hazelcast.deployment.labels` | Provide custom labels for the deployment (more precisely the StatefulSet) as metadata to be consumed by other tools and libraries.  | `""`
 
 #### Example
 ```yaml

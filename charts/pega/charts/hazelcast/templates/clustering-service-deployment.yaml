@@ -5,8 +5,8 @@ metadata:
   name: {{ template "clusteringServiceName" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-{{- if .Values.deploymentLabels }}
-{{ toYaml .Values.deploymentLabels | indent 4 }}
+{{- if and (.Values.deployment) (.Values.deployment.labels) }}
+{{ toYaml .Values.deployment.labels | indent 4 }}
 {{- end }}
 spec:
   selector:
