@@ -15,7 +15,49 @@ func TestSRSDeployment(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled":                                "true",
+			"srs.deployment.name":                        "test-srs",
+			"global.imageCredentials.registry":           "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                "1",
+			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":             "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
+			"srs.srsStorage.tls.enabled":                 "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "test-srs",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"test-srs",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "2Gi", "650m", "2Gi"},
+			esDomain{
+				domain:   "elasticsearch-master.default.svc",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
+}
+
+func TestSRSDeploymentDeprecatedNameOverNewForBackwardCompatibility(t *testing.T) {
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                "true",
 			"srs.deploymentName":                         "test-srs",
+			"srs.deployment.name":                        "test-srs-new-key",
 			"global.imageCredentials.registry":           "docker-registry.io",
 			"srs.srsRuntime.replicaCount":                "1",
 			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",
@@ -56,7 +98,7 @@ func TestSRSDeploymentVariables(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled":                                "true",
-			"srs.deploymentName":                         "test-srs-dev",
+			"srs.deployment.name":                        "test-srs-dev",
 			"global.imageCredentials.registry":           "docker-registry.io",
 			"srs.srsRuntime.replicaCount":                "3",
 			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:1.0.0",
@@ -109,7 +151,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled":                                "true",
-			"srs.deploymentName":                         "test-srs-dev",
+			"srs.deployment.name":                        "test-srs-dev",
 			"global.imageCredentials.registry":           "docker-registry.io",
 			"srs.srsRuntime.replicaCount":                "3",
 			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:1.0.0",
@@ -161,7 +203,7 @@ func TestSRSDeploymentWithAffinity(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
 			"srs.enabled":                                "true",
-			"srs.deploymentName":                         "test-srs",
+			"srs.deployment.name":                        "test-srs",
 			"global.imageCredentials.registry":           "docker-registry.io",
 			"srs.srsRuntime.replicaCount":                "1",
 			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",

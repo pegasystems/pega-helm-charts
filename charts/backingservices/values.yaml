@@ -12,8 +12,9 @@ srs:
   # Set srs.enabled=true to enable SRS
   enabled: true
 
-  # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
-  deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
+  deployment:
+    # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
+    name: "YOUR_SRS_DEPLOYMENT_NAME"
 
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster

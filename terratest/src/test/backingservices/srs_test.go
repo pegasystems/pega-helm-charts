@@ -1,17 +1,18 @@
 package backingservices
 
 import (
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
 )
 
 func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
 			"srs.enabled": "false",
-			"srs.srsStorage.provisionInternalESCluster": "false",
-			"srs.srsStorage.tls.enabled": "false",
-			"srs.deploymentName": "test-srs",
+			"srs.srsStorage.provisionInternalESCluster":  "false",
+			"srs.srsStorage.tls.enabled":                 "false",
+			"srs.deployment.name":                        "test-srs",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
@@ -34,9 +35,9 @@ func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 func Test_shouldContainSRSResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"srs.deploymentName": "test-srs",
-			"srs.srsStorage.provisionInternalESCluster": "true",
-			"srs.srsStorage.tls.enabled": "true",
+			"srs.deployment.name":                        "test-srs",
+			"srs.srsStorage.provisionInternalESCluster":  "true",
+			"srs.srsStorage.tls.enabled":                 "true",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
@@ -59,9 +60,9 @@ func Test_shouldContainSRSResourcesWhenEnabled(t *testing.T) {
 func Test_shouldContainSRSandESResourcesWhenEnabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"srs.deploymentName": "test-srs",
+			"srs.deployment.name":                       "test-srs",
 			"srs.srsStorage.provisionInternalESCluster": "true",
-			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.tls.enabled":                "false",
 		}),
 	)
 
@@ -83,12 +84,12 @@ func Test_shouldContainSRSandESResourcesWhenEnabled(t *testing.T) {
 func Test_shouldContainSRSWhenEnabledandNotESResourcesWhenDisabled(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTest(t, helmChartRelativePath, map[string]string{
-			"srs.deploymentName": "test-srs",
-			"srs.srsStorage.provisionInternalESCluster": "false",
-			"srs.srsStorage.domain": "es.managed.io",
-			"srs.srsStorage.port": "9200",
-			"srs.srsStorage.protocol": "https",
-			"srs.srsStorage.tls.enabled": "false",
+			"srs.deployment.name":                        "test-srs",
+			"srs.srsStorage.provisionInternalESCluster":  "false",
+			"srs.srsStorage.domain":                      "es.managed.io",
+			"srs.srsStorage.port":                        "9200",
+			"srs.srsStorage.protocol":                    "https",
+			"srs.srsStorage.tls.enabled":                 "false",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
 		}),
 	)
