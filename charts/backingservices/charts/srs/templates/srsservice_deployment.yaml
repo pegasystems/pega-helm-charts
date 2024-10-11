@@ -5,8 +5,8 @@ metadata:
   name: {{ template "srs.fullname" . }}
   namespace: {{ .Release.Namespace }}
   labels:
-{{- if .Values.srsRuntime.deploymentLabels }}
-{{ toYaml .Values.srsRuntime.deploymentLabels | indent 4 }}
+{{- if and (.Values.deployment) (.Values.deployment.labels) }}
+{{ toYaml .Values.deployment.labels | indent 4 }}
 {{- end }}
 {{- include "srs.srs-service.labels" . | indent 4 }}
 spec:

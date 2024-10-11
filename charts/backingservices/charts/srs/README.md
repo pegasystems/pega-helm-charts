@@ -108,7 +108,8 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 |-----------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `enabled`                               | Enable the Search and Reporting Service deployment as a backing service. Set this parameter to `true` to use SRS.                                                                                                                                                                                                                                                                                                                                                                                                                            |
 | `deploymentName`                        | Specify the name of your SRS cluster. Your deployment creates resources prefixed with this string. This is also the service name for the SRS.                                                                                                                                                                                                                                                                                                                                                          |
-| `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, deployment labels, pod labels, pod affinity, cpu and memory resource settings in the SRS. The default minimum required number of replicas is 2, but as a best practice, deploy 3 replicas to maintain high availability.                                                                                                                                                                                                                                                                                                                                                            |
+| `deployment.labels`                            | Provide custom labels for the deployment as metadata to be consumed by other tools and libraries.                                                                                                                                                                                                                                                                                                                                                            |
+| `srsRuntime`                            | Use this section to define specific resource configuration options like image, replica count, pod labels, pod affinity, cpu and memory resource settings in the SRS. The default minimum required number of replicas is 2, but as a best practice, deploy 3 replicas to maintain high availability.                                                                                                                                                                                                                                                                                                                                                            |
 | `busybox`                               | When provisioning an internally managed Elasticsearch cluster, you can customize the location and pull policy of the Alpine image used during the deployment process by specifying `busybox.image` and `busybox.imagePullPolicy`.                                                                                                                                                                                                                                                                      |
 | `elasticsearch`                         | Define the elasticsearch cluster configurations. The [Elasticsearch](https://github.com/helm/charts/tree/master/stable/elasticsearch/values.yaml) chart defines the values for Elasticsearch provisioning in the SRS cluster. For internally provisioned Elasticsearch the default version is set to `7.17.9`. Set the `elasticsearch.imageTag` parameter in values.yaml to `7.16.3` to use this supported version in the SRS cluster.                                                                |
 | `k8sProvider`                           | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].
@@ -162,6 +163,11 @@ srs:
   # specify unique name for the deployment based on org app and/or srs applicable environment name. eg: acme-demo-dev-srs
   deploymentName: "YOUR_SRS_DEPLOYMENT_NAME"
 
+  deployment:
+    # Specify additional deployment labels
+    labels:
+      key1: value1
+
   # Configure the location of the busybox image that is used during the deployment process of
   # the internal Elasticsearch cluster
   busybox:
@@ -169,9 +175,6 @@ srs:
     imagePullPolicy: "IfNotPresent"
 
   srsRuntime:
-    # Specify additional deployment labels
-    deploymentLabels:
-      key1: value1
 
     # Specify additional pod labels
     podLabels:
