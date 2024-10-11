@@ -4,6 +4,10 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "hazelcastName" . }}
   namespace: {{ .Release.Namespace }}
+  labels:
+{{- if .Values.deploymentLabels }}
+{{ toYaml .Values.deploymentLabels | indent 4 }}
+{{- end }}
 spec:
   selector:
     matchLabels:
@@ -17,6 +21,9 @@ spec:
         app: {{ template "hazelcastName" . }}
         component: "Hazelcast"
         ops.identifier: "hazelcast"
+{{- if .Values.podLabels }}
+{{ toYaml .Values.podLabels | indent 8 }}
+{{- end }}
 {{- include "generatedHazelcastServicePodLabels" . | indent 8 }}
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
