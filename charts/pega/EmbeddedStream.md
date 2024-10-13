@@ -1,19 +1,17 @@
 ### Embedded Stream with latest helm chart version
+Starting from Infinity 24.2, support for embedded Stream is removed. As a best practice, update your Stream configuration to an external Kafka service.
+To configure embedded Stream in Pega Platform ’24.1 and earlier using the Pega Helm chart version 3.25, perform the following steps.
 
-Starting from Infinity 24.2 support for embedded Stream is removed. Pega recommends you to update your Stream configuration to External Kafka.
-Use this article to configure Embedded Stream with Pega helm chart version 3.25 or later and Pega Infinity version should be older than 24.2
-
-To configure Embedded Stream you have to add Stream tier and disable External Kafka service in values.yaml(Beginning with Pega Platform '23, external Kafka service is enabled by default). 
 #### Configure values.yaml
-1. Add Stream tier details as follows in values.yaml under Pega tiers section.
+1. Add Stream tier details in the values.yaml file under Pega tiers section.
     #### Example for values.yaml and values-large.yaml 
     ```
     - name: "stream"
    # Create a stream tier for queue processing.  This tier deploys
    # as a stateful set to ensure durability of queued data. It may
    # be optionally exposed to the load balancer.
-   # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
-   # When externalized Kafka service is enabled, we should remove the entire stream tier.
+   # Note: Stream tier is deprecated. As a best practice, enable externalized Kafka service configuration under External Services.
+   # When externalized Kafka service is enabled, remove the entire stream tier.
    nodeType: "Stream"
 
    # Pega requestor specific properties
@@ -85,11 +83,11 @@ To configure Embedded Stream you have to add Stream tier and disable External Ka
     ```
     
     #### Example for values-minimal.yaml
-    for values-minimal.yaml you have to add nodeType Stream for minikube tier.
+   For values-minimal.yaml, add the Stream nodeType to the minikube tier.
     ```
    # Specify the Pega tiers to deploy
     # For a minimal deployment, use a single tier to reduce resource consumption.
-    # Note: The nodeType Stream is deprecated, please remove it and enable externalized Kafka service
+    # Note: Stream tier is deprecated. As a best practice, enable externalized Kafka service configuration under External Services.
     # configuration under External Services
     tier:
    - name: "minikube"
@@ -128,7 +126,7 @@ To configure Embedded Stream you have to add Stream tier and disable External Ka
       ```
 
 
-2. Make sure External Kafka service settings is disabled.
+2. Disable external Kafka service settings in the values.yaml file.
     ```
    # Stream (externalized Kafka service) settings.
     stream:
