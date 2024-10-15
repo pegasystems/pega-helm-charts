@@ -50,8 +50,8 @@ func renderTierForCertTest(t *testing.T, options *helm.Options, helmChartPath st
 	assertBatch(t, yamlSplit[2], options)
 	assertVolumeAndMount(t, yamlSplit[2], options, shouldHaveVol)
 
-	assertStream(t, yamlSplit[3], options)
-	assertVolumeAndMount(t, yamlSplit[3], options, shouldHaveVol)
+	//assertStream(t, yamlSplit[3], options)
+	//assertVolumeAndMount(t, yamlSplit[3], options, shouldHaveVol)
 
 	require.False(t, strings.Contains(deploymentYaml, "Conflict: cannot merge map onto non-map"), "'cannot merge map onto non-map' warning should not be logged")
 }

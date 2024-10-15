@@ -113,11 +113,11 @@ global:
 
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
-  # Note: The nodeType Stream is deprecated, please remove it and enable externalized Kafka service
+  # Note: The nodeType Stream is not supported, enable externalized Kafka service instead.
   # configuration under External Services
   tier:
     - name: "minikube"
-      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+      nodeType: "BackgroundProcessing,WebUser,Search"
 
       service:
         httpEnabled: true

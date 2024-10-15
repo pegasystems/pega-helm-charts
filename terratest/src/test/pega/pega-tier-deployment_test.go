@@ -46,21 +46,21 @@ func TestPegaTierDeployment(t *testing.T) {
 				yamlSplit := strings.Split(yamlContent, "---")
 				assertWeb(t, yamlSplit[1], options)
 				assertBatch(t, yamlSplit[2], options)
-				assertStream(t, yamlSplit[3], options)
-				assertStreamWithSorageClass(t, yamlSplit[3], options)
+				//assertStream(t, yamlSplit[3], options)
+				//assertStreamWithSorageClass(t, yamlSplit[3], options)
 
 			}
 		}
 	}
 }
 
-func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
+/*func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
 	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
 	storageClassName := "storage-class"
 	require.Equal(t, &storageClassName, statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.StorageClassName)
-}
+}*/
 
 func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
@@ -143,12 +143,12 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 	}
 }
 
-func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
+/*func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
 	require.Equal(t, statefulsetObj.ObjectMeta.Name, getObjName(options, "-stream"))
 	VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{getObjName(options, "-stream"), initContainers, "Stream", "900"}, options)
-}
+}*/
 
 func assertBatch(t *testing.T, batchYaml string, options *helm.Options) {
 	var deploymentObj appsv1.Deployment
