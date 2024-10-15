@@ -5,6 +5,10 @@ kind: Ingress
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
+{{- if .node.ingress.labels }}
+  labels:
+{{ toYaml .node.ingress.labels | indent 4 }}
+{{- end }}
   annotations:
     # Ingress class used is 'alb'
     kubernetes.io/ingress.class: alb
