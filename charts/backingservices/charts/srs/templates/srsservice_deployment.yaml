@@ -152,4 +152,5 @@ spec:
                 key: password
       {{ end }}
 {{- include "podAffinity" .Values.srsRuntime | indent 6 }}
+{{- include "tolerations" .Values.srsRuntime | indent 6 }}
   {{ end }}
