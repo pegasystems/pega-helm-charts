@@ -6,8 +6,10 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
+{{- if not (.node.ingress.ingressClassName) }}
     # Ingress class used is 'azure/application-gateway'
     kubernetes.io/ingress.class: azure/application-gateway
+{{- end }}
     # Ingress annotations for aks
     appgw.ingress.kubernetes.io/cookie-based-affinity: "true"
 {{- if .node.ingress.annotations }}
@@ -22,6 +24,9 @@ metadata:
     appgw.ingress.kubernetes.io/backend-protocol: https
 {{- end }}
 spec:
+{{- if .node.ingress.ingressClassName }}
+  ingressClassName: {{ .node.ingress.ingressClassName }}
+{{- end }}
 {{ if ( include "ingressTlsEnabled" . ) }}
 {{- if .node.ingress.tls.secretName }}
 {{ include "tlssecretsnippet" . }}

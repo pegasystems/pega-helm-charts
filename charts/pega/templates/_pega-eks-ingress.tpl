@@ -6,8 +6,10 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   annotations:
+{{- if not (.node.ingress.ingressClassName) }}
     # Ingress class used is 'alb'
     kubernetes.io/ingress.class: alb
+{{- end }}
 {{ if (.node.service.domain) }}
     {{ template "eksHttpsAnnotationSnippet" }}
 {{ else }}
@@ -43,6 +45,9 @@ metadata:
     alb.ingress.kubernetes.io/backend-protocol: HTTPS
 {{- end }}
 spec:
+{{- if .node.ingress.ingressClassName }}
+  ingressClassName: {{ .node.ingress.ingressClassName }}
+{{- end }}
   rules:
   {{ if (.node.service.domain) }}
   - http:
