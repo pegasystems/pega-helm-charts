@@ -225,9 +225,9 @@ spec:
           # Maximum CPU and Memory that the containers for {{ .name }} can use
           # Resources are configured through deprecated settings. Use .tier[].resources instead
           limits:
-          {{- if .node.cpuLimit }}
+          {{- if and .node.cpuLimit (ne (include "deployWithoutCPULimit" (dict "node" .node)) "true") }}
             cpu: "{{ .node.cpuLimit }}"
-          {{- else }}
+          {{- else if (ne (include "deployWithoutCPULimit" (dict "node" .node)) "true")  }}
             cpu: 4
           {{- end }}
           {{- if .node.memLimit }}
