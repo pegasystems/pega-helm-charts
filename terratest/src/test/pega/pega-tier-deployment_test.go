@@ -75,16 +75,16 @@ func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 	for _, vendor := range supportedVendors {
 		var options = &helm.Options{
 			SetValues: map[string]string{
-				"global.provider":                        									vendor,
-				"global.actions.execute":                 									"deploy",
-				"global.deployment.name":                 									"pega",
-				"installer.upgrade.upgradeType":          									"zero-downtime",
-				"global.tier[0].name":                    									"web",
-				"global.tier[1].name":                    									"batch",
-				"global.tier[2].name":                    									"stream",
-				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].key": 			"kubernetes.io/os", 
-				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].operator": 	"In", 
-				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].values[0]": 	"linux", 
+				"global.provider":               vendor,
+				"global.actions.execute":        "deploy",
+				"global.deployment.name":        "pega",
+				"installer.upgrade.upgradeType": "zero-downtime",
+				"global.tier[0].name":           "web",
+				"global.tier[1].name":           "batch",
+				"global.tier[2].name":           "stream",
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].key":       "kubernetes.io/os",
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].operator":  "In",
+				affintiyBasePath + "nodeSelectorTerms[0].matchExpressions[0].values[0]": "linux",
 			},
 		}
 
@@ -102,7 +102,37 @@ func TestPegaTierDeploymentWithPodAffinity(t *testing.T) {
 		UnmarshalK8SYaml(t, yamlSplit[3], &depObjStream)
 		deploymentAffinityStream := depObjStream.Spec.Template.Spec.Affinity
 		require.Empty(t, deploymentAffinityStream)
-	}	
+	}
+}
+
+func TestPegaTierDeploymentWithTCPProbe(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "eks", "gke", "aks", "pks"}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	for _, vendor := range supportedVendors {
+		var options = &helm.Options{
+			SetValues: map[string]string{
+				"global.provider":                  vendor,
+				"global.actions.execute":           "deploy",
+				"global.deployment.name":           "pega",
+				"global.tier[0].name":              "web",
+				"global.tier[0].tcpKeepAliveProbe": "10",
+			},
+		}
+
+		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+		yamlSplit := strings.Split(yamlContent, "---")
+
+		UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+		require.Equal(t, "net.ipv4.tcp_keepalive_time", *&depObj.Spec.Template.Spec.SecurityContext.Sysctls[0].Name)
+		require.Equal(t, "10", *&depObj.Spec.Template.Spec.SecurityContext.Sysctls[0].Value)
+
+	}
+
 }
 
 func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
