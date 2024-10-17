@@ -333,6 +333,20 @@ tier:
       runAsUser: RUN_AS_USER
       fsGroup: FS_GROUP
 ```
+
+Starting from Kubernetes 1.29 version, kubernetes allows to set `net.ipv4.tcp_keepalive_time` OS kernel setting using standard sysctls command.
+Please refer below example and provide the value as per your cloud provider TCP connections timeout settings.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      sysctls:
+        - name: net.ipv4.tcp_keepalive_time
+          value: "300"
+```
 ### service
 
 Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
