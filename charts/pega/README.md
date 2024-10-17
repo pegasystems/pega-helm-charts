@@ -334,8 +334,8 @@ tier:
       fsGroup: FS_GROUP
 ```
 
-Starting from Kubernetes 1.29 version, kubernetes allows to set `net.ipv4.tcp_keepalive_time` OS kernel setting using standard sysctls command.
-Please refer below example and provide the value as per your cloud provider TCP connections timeout settings.
+Starting from Kubernetes 1.29 version, kubernetes allows to set OS kernel level setting `net.ipv4.tcp_keepalive_time` using standard sysctls command.
+Please refer below example and if needed, provide the value as per your cloud provider TCP connections timeout settings.
 
 Example:
 
