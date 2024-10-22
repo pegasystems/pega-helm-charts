@@ -257,6 +257,14 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   sysctls:
+      #   - name: net.ipv4.tcp_keepalive_time
+      #     value: "300"
+
       # To specify security settings for a Container, include the securityContext field in the Container manifest
       # Security settings that you specify for a Container apply only to the pega container,
       # and they override settings made at the Pod level when there is overlap. Container settings
@@ -328,6 +336,14 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   sysctls:
+      #   - name: net.ipv4.tcp_keepalive_time
+      #     value: "300"
+
       # To specify security settings for a Container, include the securityContext field in the Container manifest
       # Security settings that you specify for a Container apply only to the pega container,
       # and they override settings made at the Pod level when there is overlap. Container settings
@@ -398,6 +414,14 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
+
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   sysctls:
+      #   - name: net.ipv4.tcp_keepalive_time
+      #     value: "300"
 
       # To specify security settings for a Container, include the securityContext field in the Container manifest
       # Security settings that you specify for a Container apply only to the pega container,
