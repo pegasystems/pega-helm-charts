@@ -17,6 +17,7 @@ git config --global user.name "$GITHUB_ACTOR"
 git config --global user.email "${GITHUB_ACTOR}@bots.github.com"
 
 echo "Creating a temporary directory to build"
+rm -rf "$tmp_build_dir"
 mkdir -p "$tmp_build_dir"
 
 
