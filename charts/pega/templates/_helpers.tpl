@@ -400,8 +400,8 @@ key: privateKey
 sysctls:
 - name: net.ipv4.tcp_keepalive_time
   value: "{{ .node.tcpKeepAliveProbe }}"
-{{- end}}
-{{- end}}
+{{- end }}
+{{- end }}
 
 {{- define "ingressApiVersion" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
