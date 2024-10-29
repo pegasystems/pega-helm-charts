@@ -233,3 +233,11 @@ affinity:
 {{- toYaml .affinity | nindent 2 }}
 {{- end }}
 {{ end }}
+
+
+{{- define "tolerations" }}
+{{- if .tolerations }}
+tolerations:
+{{- toYaml .tolerations | nindent 2 }}
+{{- end }}
+{{ end }}
