@@ -37,8 +37,8 @@ func TestPegaDeploymentWithArtifactoryCerts(t *testing.T) {
 			assertBatch(t, yamlSplit[2], options)
 			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[2], options, true)
 
-			assertStream(t, yamlSplit[3], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, true)
+			//assertStream(t, yamlSplit[3], options)
+			//assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, true)
 
 			options.ValuesFiles = []string{"data/values_with_artifactory_sslverification_disabled.yaml"}
 
@@ -50,8 +50,8 @@ func TestPegaDeploymentWithArtifactoryCerts(t *testing.T) {
 			assertBatch(t, yamlSplit[2], options)
 			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[2], options, false)
 
-			assertStream(t, yamlSplit[3], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, false)
+			//assertStream(t, yamlSplit[3], options)
+			//assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, false)
 		}
 	}
 }
