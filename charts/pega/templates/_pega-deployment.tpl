@@ -117,11 +117,7 @@ spec:
         runAsUser: 9001
         fsGroup: 0
 {{- end }}
-{{- if (.node.tcpKeepAliveProbe) }}
-        sysctls:
-        - name: "net.ipv4.tcp_keepalive_time"
-          value: "{{ .node.tcpKeepAliveProbe }}"
-{{- end }}
+{{- include "tcpKeepAliveProbe" . | indent 8 }}
 {{- if .node.securityContext }}
 {{ toYaml .node.securityContext | indent 8 }}
 {{- end }}
