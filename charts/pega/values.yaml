@@ -144,6 +144,10 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # tcpKeepAliveProbe: 300
 
       service:
         # For help configuring the service block, see the Helm chart documentation
@@ -257,14 +261,6 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
-      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
-      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
-      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
-      #   sysctls:
-      #   - name: net.ipv4.tcp_keepalive_time
-      #     value: "300"
-
       # To specify security settings for a Container, include the securityContext field in the Container manifest
       # Security settings that you specify for a Container apply only to the pega container,
       # and they override settings made at the Pod level when there is overlap. Container settings
@@ -320,6 +316,11 @@ global:
       replicas: 1
       javaOpts: ""
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # tcpKeepAliveProbe: 300
+
       deploymentStrategy:
         rollingUpdate:
           maxSurge: 1
@@ -335,14 +336,6 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
-
-      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
-      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
-      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
-      #   sysctls:
-      #   - name: net.ipv4.tcp_keepalive_time
-      #     value: "300"
 
       # To specify security settings for a Container, include the securityContext field in the Container manifest
       # Security settings that you specify for a Container apply only to the pega container,
@@ -551,6 +544,19 @@ hazelcast:
   # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
   # Enter the external secret for these credentials below.
   external_secret_name: ""
+
+  # Apply securityContext to clustering service pods. Example:
+  # securityContext:
+  #   runAsUser: 1000
+  #   fsGroup: 0
+
+  # Apply securityContext to clustering service containers. Example:
+  # containerSecurityContext:
+  #   allowPrivilegeEscalation: false
+  #   capabilities:
+  #     drop:
+  #     - ALL
+  #   runAsNonRoot: true
 
 # Stream (externalized Kafka service) settings.
 stream:
