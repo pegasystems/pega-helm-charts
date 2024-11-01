@@ -62,6 +62,15 @@ server:
   diagnostic_log_file_size_mb: "50"
   diagnostics_file_count: "3"
 
-# Apply securityContext to clustering service pods. For example to set `runAsUser: 1000`:
+# Apply securityContext to clustering service pods. Example:
 # securityContext:
 #   runAsUser: 1000
+#   fsGroup: 0
+
+# Apply securityContext to clustering service containers. Example:
+# containerSecurityContext:
+#   allowPrivilegeEscalation: false
+#   capabilities:
+#     drop:
+#     - ALL
+#   runAsNonRoot: true

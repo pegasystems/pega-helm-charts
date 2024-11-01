@@ -44,6 +44,19 @@ srs:
     # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
     enableSecureCryptoMode: false
 
+    # Apply securityContext to SRS pods. Example:
+    # securityContext:
+    #   runAsUser: 9999
+    #   fsGroup: 0
+
+    # Apply securityContext to SRS containers. Example:
+    # containerSecurityContext:
+    #   allowPrivilegeEscalation: false
+    #   capabilities:
+    #     drop:
+    #     - ALL
+    #   runAsNonRoot: true
+
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration

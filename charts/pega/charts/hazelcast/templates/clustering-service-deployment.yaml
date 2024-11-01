@@ -39,7 +39,11 @@ spec:
           mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
-            name: {{ template "clusteringServiceEnvironmentConfig" .}}
+            name: {{ template "clusteringServiceEnvironmentConfig" . }}
+{{- if .Values.containerSecurityContext }}
+        securityContext:
+{{ toYaml .Values.containerSecurityContext | indent 10 }}
+{{-  end }}
         resources:
           requests:
             cpu: "{{ .Values.resources.requests.cpu }}"

@@ -395,6 +395,14 @@ key: privateKey
 {{- end }}
 {{- end }}
 
+{{- define "tcpKeepAliveProbe" }}
+{{- if .node.tcpKeepAliveProbe }}
+sysctls:
+- name: net.ipv4.tcp_keepalive_time
+  value: "{{ .node.tcpKeepAliveProbe }}"
+{{- end }}
+{{- end }}
+
 {{- define "ingressApiVersion" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.k8s.io/v1
