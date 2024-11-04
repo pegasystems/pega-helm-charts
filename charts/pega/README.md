@@ -270,7 +270,6 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 
 #### Small deployment with a single tier
 
@@ -278,7 +277,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | With embedded Kafka, which is currently deprecated, one tier handles all foreground and background processing using the nodeType classification "WebUser,BackgroundProcessing,search,Stream". For newer Pega Platform deployments using a configuration that connects to a Kafka service managed in your organization, "Stream" nodetype not supported.
+pega        | one tier handles all foreground and background processing using the nodeType classification "WebUser,BackgroundProcessing,search". With embedded Kafka not supported, newer Pega Platform deployments should use a configuration that connects to a Kafka service managed in your organization.
 
 #### Large deployment for production isolation of processing
 
@@ -288,7 +287,6 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -343,6 +341,20 @@ tier:
     securityContext:
       runAsUser: RUN_AS_USER
       fsGroup: FS_GROUP
+```
+
+Starting in Kubernetes version 1.29, you can configure the OS Kernel level setting net.ipv4.tcp_keepalive_time using standard sysctls command.
+The following code provides an example configuration. If needed, provide the value in seconds as per the cloud provider TCP connections timeout settings.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      sysctls:
+        - name: net.ipv4.tcp_keepalive_time
+          value: "300"
 ```
 ### service
 
