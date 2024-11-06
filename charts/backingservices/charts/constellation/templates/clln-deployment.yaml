@@ -16,6 +16,9 @@ spec:
       labels:
         app: {{ $depName }}
     spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
         - name: {{ $depName }}-appstatic-assets
