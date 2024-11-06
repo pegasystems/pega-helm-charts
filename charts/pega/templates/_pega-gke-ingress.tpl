@@ -23,6 +23,9 @@ metadata:
 {{ end }}
 {{ end }}
 spec:
+{{- if .node.ingress.ingressClassName }}
+  ingressClassName: {{ .node.ingress.ingressClassName }}
+{{- end }}
 {{ if (.node.ingress) }}
 {{ if (.node.ingress.tls) }}
 {{ if (eq .node.ingress.tls.enabled true) }}
