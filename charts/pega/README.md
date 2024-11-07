@@ -259,7 +259,6 @@ Tier name     | Description
 ---           |---
 web           | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch         | Background processing nodes which handle workloads for non-interactive processing. Pega recommends that these node use the node classification “BackgroundProcessing” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)        | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 
 #### Small deployment with a single tier
 
@@ -267,7 +266,7 @@ To get started running a personal deployment of Pega on kubernetes, you can hand
 
 Tier Name   | Description
 ---         | ---
-pega        | With embedded Kafka, which is currently deprecated, one tier handles all foreground and background processing using the nodeType classification "WebUser,BackgroundProcessing,search,Stream". For newer Pega Platform deployments using a configuration that connects to a Kafka service managed in your organization, "Stream" nodetype not supported.
+pega        | one tier handles all foreground and background processing using the nodeType classification "WebUser,BackgroundProcessing,search". With embedded Kafka not supported, newer Pega Platform deployments should use a configuration that connects to a Kafka service managed in your organization.
 
 #### Large deployment for production isolation of processing
 
@@ -277,7 +276,6 @@ Tier Name   | Description
 ---         | ---
 web         | Interactive, foreground processing nodes that are exposed to the load balancer. Pega recommends that these node use the node classification “WebUser” `nodetype`.
 batch       | Background processing nodes which handle some of the non-interactive processing.  Pega recommends that these node use the node classification   “BackgroundProcessing,Search,Batch” `nodetype`. These nodes should not be exposed to the load balancer.
-stream (Deprecated)     | For Pega Platform '23, the use of the 'Stream' node classification is deprecated; new deployments running version 8.8 and later should not use "Stream" nodes. New deployments connect to a Kafka service that you manage in your organization. For existing deployments using an embedded Kafka deployment which are not exposed to the deployment cluster load balancer, Pega will continue to support the "Stream" node classification nodetype.
 bix         | Nodes dedicated to BIX processing can be helpful when the BIX workload has unique deployment or scaling characteristics. Pega recommends that these node use the node classification “Bix” `nodetype`. These nodes should not be exposed to the load balancer.
 
 ### Name (*Required*)
@@ -333,6 +331,20 @@ tier:
       runAsUser: RUN_AS_USER
       fsGroup: FS_GROUP
 ```
+
+Starting in Kubernetes version 1.29, you can configure the OS Kernel level setting net.ipv4.tcp_keepalive_time using standard sysctls command.
+The following code provides an example configuration. If needed, provide the value in seconds as per the cloud provider TCP connections timeout settings.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    securityContext:
+      sysctls:
+        - name: net.ipv4.tcp_keepalive_time
+          value: "300"
+```
 ### service
 
 Specify the `service` yaml block to expose a Pega tier to other Kubernetes run services, or externally to other systems. The name of the service will be based on the tier's name, so if your tier is "web", your service name will be "pega-web". If you omit service, no Kubernetes service object is created for the tier during the deployment. For more information on services, see the [Kubernetes Documentation](https://kubernetes.io/docs/concepts/services-networking/service).
@@ -371,6 +383,7 @@ Parameter | Description
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
 `annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes, EKS, and OpenShift deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
+`ingressClassName` | Ingress class to be used in place of the deprecated `kubernetes.io/ingress.class` annotation.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
   - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
