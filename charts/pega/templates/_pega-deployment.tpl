@@ -117,6 +117,7 @@ spec:
         runAsUser: 9001
         fsGroup: 0
 {{- end }}
+{{- include "tcpKeepAliveProbe" . | indent 8 }}
 {{- if .node.securityContext }}
 {{ toYaml .node.securityContext | indent 8 }}
 {{- end }}

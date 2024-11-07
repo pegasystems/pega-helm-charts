@@ -1,0 +1,10 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation" )) }}
+{{- $requestPath := printf "%s/v860/ping" .Values.urlPath }}
+
+{{- if .Values.enabled }}
+{{- if or (eq .Values.provider "gke") (eq .Values.cloudProvider "gke") }}
+{{- if .Values.ingress.enabled }}
+{{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath  "healthCheckPort" .Values.service.port }}
+{{ end }}
+{{ end }}
+{{ end }}
