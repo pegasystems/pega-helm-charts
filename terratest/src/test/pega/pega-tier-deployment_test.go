@@ -220,10 +220,6 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 	VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{getObjName(options, "-stream"), initContainers, "Stream", "900"}, options)
 }*/
 
-func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
-	assertStreamWithHZSSL(t, streamYaml, options, false)
-}
-
 func assertBatchWithHZSSL(t *testing.T, batchYaml string, options *helm.Options, hazelcastSSL bool) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, batchYaml, &deploymentObj)
