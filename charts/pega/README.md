@@ -1262,7 +1262,7 @@ Parameter   | Description                                                       
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.                                                                                                                                                             | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
 `hazelcast.enabled` | Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6.                                                                  | `true`
 `hazelcast.clusteringServiceEnabled` | Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8; if not set the installation will fail.                                                                                         | `false`
-`hazelcast.encryption.enabled` | Set to `true` if SSL connection is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 24.2; if not set the installation will fail, see [this section](#optional-enabling-encryption-of-traffic-between-pega-and-clusteringservice)                   | `false`
+hazelcast.encryption.enabled | Set to `true` if you require SSL connection in your Clustering Service. Note: Highly secure encryption mode is only available in Pega Platform '24.2 and later. Set this value to `false` for Pega Platform release '24.1 and earlier or the installation will fail.                                         | `false`
 `hazelcast.migration.initiateMigration` | Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster.                                                                                                    | `false`
 `hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script.                                                                                                                                                                                    | `YOUR_MIGRATION_JOB_IMAGE:TAG`
 `hazelcast.migration.embeddedToCSMigration` | Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment.                                                                                                                                                                                      | `false`
@@ -1291,16 +1291,16 @@ hazelcast:
   external_secret_name: ""
 ```
 
-### (Optional) Enabling encryption of traffic between Pega and ClusteringService
-Run the make file in `charts/pega/Makefile` when encryption or HighlySecureCryptoMode is enabled to generate the certificates and mount it to the Hazelcast and Pega pods before Helm Install.
+### (Optional) Enabling highly secure encryption of traffic between Pega Platform and the Clustering Service
+Before Helm install, run the makefile in charts/pega/Makefile with the following parameters when you enable encryption or HighlySecureCryptoMode to generate the certificates and mount them to the Clustering Service and Pega Platform pods.
 
 Parameter   | Description                                               
 ---         |------------------------------------------------------------
-`NAMESPACE` | Namespace where Pega and Hazelcast is going to be deployed.
+`NAMESPACE` | Namespace where you deploy Pega Platform and the Clustering Service.
 `CLUSTERING_SERVICE_IMAGE` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. 
-`ENC_KEYSTORE_PASSWORD` | Key store password.
-`ENC_TRUSTSTORE_PASSWORD` | Trust store password.
-`HIGHLY_SECURE_CRYPTO_MODE_ENABLED` |  Enable it for complying with NIST SP 800-53 and NIST SP 800-131.
+`ENC_KEYSTORE_PASSWORD` | Keystore password.
+`ENC_TRUSTSTORE_PASSWORD` | Truststore password.
+`HIGHLY_SECURE_CRYPTO_MODE_ENABLED` |  Set to `true` to enable the highly secure encryption mode to comply with NIST SP 800-53 and NIST SP 800-131.
 
 #### Example
 ```
