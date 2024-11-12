@@ -89,15 +89,15 @@ srs:
     basicAuthentication:
       enabled: true
     # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch/OpenSearch service in your SRS cluster,
-    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password for your externally managed elasticsearch cluster.
-    # Elasticsearch credentials can also be added under authCredentials field which supports both Elasticsearch and OpenSearch credentials.
-    # We have not removed this field to support backward compatibility and soon this field will be deprecated
     # uncomment and add the parameter details: srs.srsStorage.authCredentials.username and srs.srsStorage.authCredentials.password
-    # for your externally managed Elasticsearch/OpenSearch cluster.
-    # esCredentials:
+    # Auth Credentials added under authCredentials field which supports both Elasticsearch and OpenSearch credentials.
+    # authCredentials:
     #   username: "username"
     #   password: "password"
-    # authCredentials:
+    # for your externally managed Elasticsearch cluster.
+    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password for your externally managed elasticsearch cluster.
+    # esCredentials will be deprecated in future releases, please switch to authCredentials.
+    # esCredentials:
     #   username: "username"
     #   password: "password"
     # To use a secret to configure basic authentication or TLS-based authentication between your external Elasticsearch/OpenSearch service and SRS,
