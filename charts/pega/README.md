@@ -383,6 +383,7 @@ Parameter | Description
 `tls.useManagedCertificate` | On GKE, set to `true` to use a managed certificate; otherwise use `false`.
 `tls.ssl_annotation` | On GKE or EKS, set this value to an appropriate SSL annotation for your provider.
 `annotations` | Optionally add custom annotations for advanced configurations. For Kubernetes, EKS, and OpenShift deployments, including custom annotations overrides the default configuration; for GKE and AKS deployments, the deployment appends these custom annotations to the default list of annotations.
+`ingressClassName` | Ingress class to be used in place of the deprecated `kubernetes.io/ingress.class` annotation.
 
 Depending on your provider or type of certificate you are using use the appropriate annotation:
   - For `EKS` - use `alb.ingress.kubernetes.io/certificate-arn: \<*certificate-arn*\>` to specify required ARN certificate.
@@ -1099,6 +1100,7 @@ Parameter   | Description   | Default value
 `imagePullPolicy` | Specify when to pull an image. | `IfNotPresent`
 `adminPassword` | Specify a temporary, initial password to log into the Pega application. This will need to be changed at first login. The adminPassword value cannot start with "@". | `"ADMIN_PASSWORD"`
 `affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/). | `""`
+`tolerations` | Configures the tolerations in order to schedule the pods into the appropiate nodes. | `""`
 `upgrade.upgradeType:` |Specify the type of process, applying a patch or upgrading. | See the next table for details.
 `upgrade.upgradeSteps:` |Specify the steps of a `custom` upgrade process that you want to complete. For `zero-downtime`, `out-of-place-rules`, `out-of-place-data`, or `in-place` upgrades, leave this parameter empty. | <ul>`enable_cluster_upgrade` `rules_migration` `rules_upgrade` `data_upgrade` `disable_cluster_upgrade`</ul>
 `upgrade.targetRulesSchema:` |Specify the name of the schema you created the process creates for the new rules schema. | `""`
