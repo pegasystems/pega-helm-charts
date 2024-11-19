@@ -20,6 +20,7 @@ The service deployment provisions runtime service pods along with a dependency o
         <tr>
             <th>Pega Infinity version</th>
             <th>SRS version</th>
+            <th>Docker image</th>
             <th>Kubernetes version</th>
             <th>Authentication</th>
             <th>Certified Elasticsearch/OpenSearch version</th>
@@ -33,11 +34,13 @@ The service deployment provisions runtime service pods along with a dependency o
             <td>NA</td>
             <td>NA</td>
             <td>NA</td>
+            <td>NA</td>
             <td>SRS can be used with Pega Infinity 8.6 and later.</td>
         </tr>
         <tr>
             <td rowspan=5> >= 8.6 </td>
-            <td rowspan=4> <b>search-n-reporting-service</b> v1.31.8 or later</td>
+            <td rowspan=5> 1.35.0 or later </td>
+            <td rowspan=4> <b>search-n-reporting-service</b></td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
             <td>Elasticsearch 7.10.2, 7.16.3 & 7.17.9</td>
@@ -60,10 +63,10 @@ The service deployment provisions runtime service pods along with a dependency o
             <td>As a best practice, use Elasticsearch version 8.10.3.</td>
         </tr>
         <tr>
-            <td> <b>search-n-reporting-service-os</b> v1.32.2 or later</td>
+            <td> <b>search-n-reporting-service-os</b></td>
             <td> All versions </td>
             <td>Enabled</td>
-            <td> AWS OpenSearch Elasticsearch 7.10 <br> OpenSearch 1.3 <br> OpenSearch 2.15</td>
+            <td><ul><li>Elasticsearch 7.10 on AWS OpenSearch service</li><li>OpenSearch 1.3 </li><li>OpenSearch 2.15</li></ul></td>
             <td> As a best practice, use OpenSearch 2.15. </td>
         </tr>
     </tbody>
