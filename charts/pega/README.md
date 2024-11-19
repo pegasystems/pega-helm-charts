@@ -1262,7 +1262,7 @@ Parameter   | Description                                                       
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.                                                                                                                                                             | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
 `hazelcast.enabled` | Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6.                                                                  | `true`
 `hazelcast.clusteringServiceEnabled` | Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: Set this value to `false` for Pega platform versions below 8.8; if not set the installation will fail.                                                                                         | `false`
-`hazelcast.encryption.enabled` | Set to `true` if you require SSL connection in your Clustering Service. Note: Highly secure encryption mode is only available in Pega Platform '24.2 and later. Set this value to `false` for Pega Platform release '24.1 and earlier or the installation will fail.                                         | `false`
+`hazelcast.encryption.enabled` | Set to `true` if you require SSL connection in your Clustering Service. Note: Highly Secure Crypto Mode is only available in Pega Platform '24.2 and later. Set this value to `false` for Pega Platform release '24.1 and earlier or the installation will fail.                                         | `false`
 `hazelcast.migration.initiateMigration` | Set to `true` after creating parallel cluster (new Hazelcast) to establish the connection with platform and migrate the data; Set to `false` during a deployment that removes an older Hazelcast cluster.                                                                                                    | `false`
 `hazelcast.migration.migrationJobImage` | Reference the `platform/clustering-service-kubectl` Docker image to create the migration job to run the migration script.                                                                                                                                                                                    | `YOUR_MIGRATION_JOB_IMAGE:TAG`
 `hazelcast.migration.embeddedToCSMigration` | Set to `true` while migrating the data from existing embedded Hazelcast deployment to the new c/s Hazelcast deployment.                                                                                                                                                                                      | `false`
@@ -1300,7 +1300,7 @@ Parameter   | Description
 `CLUSTERING_SERVICE_IMAGE` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access. 
 `ENC_KEYSTORE_PASSWORD` | Keystore password.
 `ENC_TRUSTSTORE_PASSWORD` | Truststore password.
-`HIGHLY_SECURE_CRYPTO_MODE_ENABLED` |  Set to `true` to enable the highly secure encryption mode to comply with NIST SP 800-53 and NIST SP 800-131.
+`HIGHLY_SECURE_CRYPTO_MODE_ENABLED` |  Set to `true` to enable the highly secure crypto mode to comply with NIST SP 800-53 and NIST SP 800-131.
 
 #### Example
 ```
