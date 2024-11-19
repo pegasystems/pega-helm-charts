@@ -48,8 +48,8 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9 & 8.10.3</td>
-            <td>As a best practice, use Elasticsearch version 8.10.3.</td>
+            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9, 8.10.3 & 8.15.1</td>
+            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
         </tr>
         <tr>
             <td rowspan=2>>= 1.25</td>
@@ -59,8 +59,8 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.17.9 & 8.10.3</td>
-            <td>As a best practice, use Elasticsearch version 8.10.3.</td>
+            <td>Elasticsearch 7.17.9, 8.10.3 & 8.15.1</td>
+            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
         </tr>
         <tr>
             <td> <b>search-n-reporting-service-os</b></td>
