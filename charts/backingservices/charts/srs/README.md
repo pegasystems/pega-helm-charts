@@ -1,6 +1,6 @@
 # Search and Reporting Service Helm chart
 
-The Pega `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with a Pega Infinity environment.
+The Pega `Search and Reporting Service` or `SRS` backing service provides the search and reporting capabilities of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service in a Pega Infinity environment.
 
 ## Configuring a backing service with your pega environment
 
