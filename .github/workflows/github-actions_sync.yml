@@ -1,0 +1,31 @@
+name: Sync Upstream
+
+env:
+  # Required, URL to upstream (fork base)
+  UPSTREAM_URL: "https://github.com/pegasystems/pega-helm-charts.git"
+  # Required, token to authenticate bot, could use ${{ secrets.GITHUB_TOKEN }} 
+  # Over here, we use a PAT instead to authenticate workflow file changes.
+  WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
+  # Optional, defaults to main
+  UPSTREAM_BRANCH: "master"
+  # Optional, defaults to UPSTREAM_BRANCH
+  DOWNSTREAM_BRANCH: "master"
+
+# This runs every day on 1801 UTC
+on:
+  schedule:
+    - cron: '0 6,8,10,12,14,16,18,20,22 * * *'
+  # Allows manual workflow run (must in default branch to work)
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: GitHub Sync to Upstream Repository
+        uses: dabreadman/sync-upstream-repo@v1.2.0.b
+        with: 
+          upstream_repo: ${{ env.UPSTREAM_URL }}
+          upstream_branch: ${{ env.UPSTREAM_BRANCH }}
+          downstream_branch: ${{ env.DOWNSTREAM_BRANCH }}
+          token: ${{ env.WORKFLOW_TOKEN }}
