@@ -58,7 +58,7 @@ global:
 
 ## JDBC Configuration
 
-Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes.  
+Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes. For more information about supported databases and jdbc driver versions, see the [Platform Support Guide](https://docs.pega.com/bundle/platform/page/platform/deployment/platform-support-guide/platform-support-guide.html) 
 
 ### URL and Driver Class
 These required connection details will point Pega to the correct database and provide the type of driver used to connect. Examples of the correct format to use are provided below. 
