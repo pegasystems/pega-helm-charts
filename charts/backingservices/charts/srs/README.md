@@ -1,6 +1,6 @@
 # Search and Reporting Service Helm chart
 
-The Pega `Search and Reporting Service` or `SRS` backing service can replace the embedded search feature of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service which provides search and reporting capabilities with a Pega Infinity environment.
+The Pega `Search and Reporting Service` or `SRS` backing service provides the search and reporting capabilities of Pega Infinity Platform. To use it in your deployment, you provision and deploy it independently as an external service in a Pega Infinity environment.
 
 ## Configuring a backing service with your pega environment
 
@@ -20,9 +20,10 @@ The service deployment provisions runtime service pods along with a dependency o
         <tr>
             <th>Pega Infinity version</th>
             <th>SRS version</th>
+            <th>Docker image</th>
             <th>Kubernetes version</th>
             <th>Authentication</th>
-            <th>Certified Elasticsearch version</th>
+            <th>Certified Elasticsearch/OpenSearch version</th>
             <th>Description</th>
         </tr>
     </thead>
@@ -33,57 +34,67 @@ The service deployment provisions runtime service pods along with a dependency o
             <td>NA</td>
             <td>NA</td>
             <td>NA</td>
+            <td>NA</td>
             <td>SRS can be used with Pega Infinity 8.6 and later.</td>
         </tr>
         <tr>
-            <td rowspan=4> >= 8.6 </td>
-            <td rowspan=4>1.31.8</td>
+            <td rowspan=5> >= 8.6 </td>
+            <td rowspan=5> 1.35.0 or later </td>
+            <td rowspan=4> <b>search-n-reporting-service</b></td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
-            <td>7.10.2, 7.16.3 & 7.17.9</td>
+            <td>Elasticsearch 7.10.2, 7.16.3 & 7.17.9</td>
             <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>7.10.2, 7.16.3, 7.17.9 & 8.10.3</td>
-            <td>As a best practice, use Elasticsearch version 8.10.3.</td>
+            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9, 8.10.3 & 8.15.1</td>
+            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
         </tr>
         <tr>
             <td rowspan=2>>= 1.25</td>
             <td>Not enabled</td>
-            <td>7.17.9</td>
+            <td>Elasticsearch 7.17.9</td>
             <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>7.17.9 & 8.10.3</td>
-            <td>As a best practice, use Elasticsearch version 8.10.3.</td>
+            <td>Elasticsearch 7.17.9, 8.10.3 & 8.15.1</td>
+            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
+        </tr>
+        <tr>
+            <td> <b>search-n-reporting-service-os</b></td>
+            <td> All versions </td>
+            <td>Enabled</td>
+            <td><ul><li>Elasticsearch 7.10 on AWS OpenSearch service</li><li>OpenSearch 1.3 </li><li>OpenSearch 2.15</li></ul></td>
+            <td> As a best practice, use OpenSearch 2.15. </td>
         </tr>
     </tbody>
 </table>
 
+
 **Note:**
 
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
-To migrate to Elasticsearch version 7.17.9 or 8.10.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 8.10.3 or 8.15.1 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To update Elasticsearch version to 7.17.9 perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
     
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.  
     * Update the elasticsearch.imageTag in the Backing Services Helm chart to 7.17.9.
-3. To update Elasticsearch version to 8.10.3, perform the following actions:
+3. To update Elasticsearch version to 8.10.3 or 8.15.1, perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 8.5.1.
 
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.
-    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3.
+    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3 or 8.15.1.
 4. Restart the SRS pods
 
 ### If your deployment connects to an externally-managed Elasticsearch service: ###
-To migrate to Elasticsearch version 7.17.9 or 8.10.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 8.10.3 or 8.15.1 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To use Elasticsearch version 7.17.9, upgrade your external Elasticsearch cluster to 7.17.9 according to your organization’s best practices. For more information, see official Elasticsearch version 7.17 documentation.
-3. To use Elasticsearch version 8.10.3, upgrade your external Elasticsearch cluster to 8.10.3 according to your organization’s best practices. For more information, see official Elasticsearch version 8.10 documentation.
+3. To use Elasticsearch version 8.10.3 or 8.15.1, upgrade your external Elasticsearch cluster to 8.10.3 or 8.15.1 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
 4. Restart the SRS pods
 
 ### SRS runtime configuration
@@ -96,7 +107,7 @@ You may enable the component of [Elasticsearch](https://github.com/helm/charts/t
 
 Note: Pega does **not** actively update the elasticsearch dependency in `requirements.yaml`. To leverage SRS, you must do one of the following:
 
-* To use the internally-provided Elasticsearch service in the SRS cluster, use the default `srs.enabled.true` parameter and set the Elasticsearch version by updating the `elasticsearch.imageTag` parameter in the [values.yaml](./values.yaml) to match the `dependencies.version` parameter in the [requirements.yaml](../../requirements.yaml). This method streamlines the deployment process for development and testing environments, but it is not suitable for production environments, which require a fully external Elasticsearch cluster. Additionally, even though you deploy SRS and Elasticsearch together, Pega does not license the Elasticsearch cluster deployed using this method and does not maintain it as part of the Pega Platform support.
+* To use the internally-provided Elasticsearch service in the SRS cluster, use the default `srs.enabled.true` parameter and set the Elasticsearch version by updating the `elasticsearch.imageTag` parameter in the [values.yaml](./values.yaml) to match the `dependencies.version` parameter in the [requirements.yaml](../../requirements.yaml). This method streamlines the deployment process for development and testing environments, but it is not suitable for production environments, which require a fully external Elasticsearch cluster. Additionally, even though you deploy SRS and Elasticsearch together, Pega does not license the Elasticsearch cluster deployed using this method and does not maintain it as part of the Pega Platform support. <b>Note: You cannot use OpenSearch for the internally provisioned cluster.</b>
 * To use an externally-provided Elasticsearch service with SRS, use the default `srs.enabled.true` parameter, update the `srs.srsStorage.provisionInternalESCluster` parameter in the [values.yaml](./values.yaml) to `false` and then provide connection details as documented below. This is the recommended method and is suitable for production environments.
 
 ### Deploying SRS with Pega-provided busybox images
@@ -123,7 +134,7 @@ To configure a secure connection between the SRS cluster and internally provisio
 | Configuration                            | Usage                                                                                                                                                                                                                                            |
 |------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
 | `tls`                                    | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                  |
-| `srsStorage.provisionInternalESCluster`  | <ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `true` to provide an internally managed and secured Elasticsearch cluster.</li><li>In the [requirements.yaml](../../requirements.yaml) file, set the `dependencies.version` parameter to the same version you configured for the `elasticsearch.imageTag` version in the Backing Services Helm chart [values.yaml](../../values.yaml) file.</li><li>From the Backing Services Helm chart directory in your environment, run the following command to create your Elasticsearch certificates and pass them to secrets: <p>`$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION>`</p><p>Where `NAMESPACE` references your deployment namespace of the SRS cluster and `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use in [values.yaml](../../values.yaml) and [requirements.yaml](../../requirements.yaml).</p></li></ol> |
+| `srsStorage.provisionInternalESCluster`  | <b>Note: You cannot use OpenSearch for the internally provisioned cluster.</b><br><br><ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `true` to provide an internally managed and secured Elasticsearch cluster.</li><li>In the [requirements.yaml](../../requirements.yaml) file, set the `dependencies.version` parameter to the same version you configured for the `elasticsearch.imageTag` version in the Backing Services Helm chart [values.yaml](../../values.yaml) file.</li><li>From the Backing Services Helm chart directory in your environment, run the following command to create your Elasticsearch certificates and pass them to secrets: <p>`$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION>`</p><p>Where `NAMESPACE` references your deployment namespace of the SRS cluster and `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use in [values.yaml](../../values.yaml) and [requirements.yaml](../../requirements.yaml).</p></li></ol> |
 
 To configure a secure connection between SRS and an external Elasticsearch cluster, configure the following parameters.
 
@@ -134,12 +145,13 @@ To configure a secure connection between SRS and an external Elasticsearch clust
 | `certificatePassword`                   | Enter the tls certificate password if any. Default value will be empty if not used.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |                                             
 | `certsSecret`                | To specify a certificate using a secret, uncomment the certsSecret parameter and provide the secret name containing your certificate and certificate password. Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or“certificate.jks”) as a key name in the secret. Use this key name to configure the “certificateName”parameter.Use a key name “password” to provide the certificate password in the secret. Defaults to "srs-certificates".|
 | `authSecret`                | Specify the secret with your Elasticsearch credentials. Use “username” and “password” as keys for your secret.This parameter applies to both basic authentication and TLS-based authentication. Defaults to "srs-elastic-credentials".|
-| `esCredentials.username`                | Enter the username for your available Elasticsearch service. This username value must match the values you set in the connection info section of esCredentials.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
-| `esCredentials.password`                | Enter the required password for your available Elasticsearch service. This password value must match the values you set in the connection info section of esCredentials.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `srsStorage.provisionInternalESCluster` | <ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `false` to disable the internally provisioned Elasticsearch cluster and connect to your available external Elasticsearch service.</li><li>To secure the connection between SRS and your external Elasticsearch service, you must provide the appropriate TLS certificates in an accessible location, for example, /home/certs.</li><li>To pass the required certificates to the cluster using a secrets file, run the following command: <p>`$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`</p><p>Where NAMESPACE references your deployment namespace of the SRS cluster, `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use, and `PATH_TO_CERTIFICATE` points to the location where you copied the required certificates on your location machine, for example:</p><p>`$ make external-es-secrets NAMESPACE=pegabackingservices ELASTICSEARCH_VERSION=7.10.2 PATH_TO_CERTIFICATE=/home/certs/truststore.jks`</p></li><li>To update the SRS and External Elasticsearch certificates, use the following command: <p>`$ make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>`</p></li></ol> |
+| `esCredentials.username`                | Enter the username for your available Elasticsearch service. This username value must match the values you set in the connection info section of esCredentials. <br><b>Note:</b> This parameter will be deprecated in future releases, so as a best practice, use `authCredentials.username`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| `esCredentials.password`                | Enter the required password for your available Elasticsearch service. This password value must match the values you set in the connection info section of esCredentials. <br><b>Note:</b> This parameter will be deprecated in future releases, so as a best practice, use `authCredentials.password`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      
+| `authCredentials.username`                | Enter the username for your available Elasticsearch/OpenSearch service. This username value must match the values you set in the connection info section of authCredentials.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| `authCredentials.password`                | Enter the required password for your available Elasticsearch/OpenSearch service. This password value must match the values you set in the connection info section of authCredentials.     |
+| `srsStorage.provisionInternalESCluster` | <ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `false` to disable the internally provisioned Elasticsearch cluster and connect to your available external Elasticsearch service.</li><li>To secure the connection between SRS and your external Elasticsearch service, you must provide the appropriate TLS certificates in an accessible location, for example, /home/certs.</li><li>To pass the required certificates to the cluster using a secrets file, run the following command: <p>`$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`</p><p>Where NAMESPACE references your deployment namespace of the SRS cluster, `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use, and `PATH_TO_CERTIFICATE` points to the location where you copied the required certificates on your location machine, for example:</p><p>`$ make external-es-secrets NAMESPACE=pegabackingservices ELASTICSEARCH_VERSION=7.10.2 PATH_TO_CERTIFICATE=/home/certs/truststore.jks`</p></li><li>To update the SRS and External Elasticsearch certificates, use the following command: <p>`$ make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>`</p><p>Note: Only .p12 and .jks certificates are supported.</p></li></ol> |
 | `domain`                                | Enter the DNS entry associated with your external Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
-Note: Only .p12 and .jks certificates are supported.
 
 
 ### Enable request authentication/authorization mechanism using identity provider(IdP) between SRS and Pega Infinity
@@ -225,7 +237,15 @@ srs:
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
       enabled: true
-    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch service in your SRS cluster, uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password.
+    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch/OpenSearch service in your SRS cluster,
+    # uncomment and add the parameter details: srs.srsStorage.authCredentials.username and srs.srsStorage.authCredentials.password
+    # Auth Credentials added under authCredentials field which supports both Elasticsearch and OpenSearch credentials.
+    # authCredentials:
+    #   username: "username"
+    #   password: "password"
+    # for your externally managed Elasticsearch cluster.
+    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password for your externally managed elasticsearch cluster.
+    # esCredentials will be deprecated in future releases, please switch to authCredentials.
     # esCredentials:
     #   username: "username"
     #   password: "password"
