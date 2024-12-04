@@ -204,6 +204,9 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- define "generatedInstallerPodLabels" }}
 {{- end }}
 
+# Override this template to generate additional job labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedInstallerJobLabels" }}
+{{- end }}
 
 # Compose REST Service URL for pre- and post- upgrade ZDT tasks
 {{- define "pegaRestURL" }}
