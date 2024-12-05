@@ -23,6 +23,7 @@ metadata:
 {{- end }}{{- end }}
   labels:
     app: {{ .name }}
+    {{ include "generatedInstallerJobLabels" .root | indent 4 }}
 spec:
   backoffLimit: 0
   template:
