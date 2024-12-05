@@ -68,6 +68,47 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string) {
 	}
 }
 
+func TestClusteringServiceDeploymentName(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                    vendor,
+					"global.actions.execute":             operation,
+					"hazelcast.clusteringServiceEnabled": "true",
+					"hazelcast.deployment.name":          "clusteringservice-test",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/clustering-service-deployment.yaml"})
+			VerifyClusteringServiceDeploymentName(t, yamlContent)
+
+		}
+	}
+}
+
+func VerifyClusteringServiceDeploymentName(t *testing.T, yamlContent string) {
+	var statefulsetObj appsv1beta2.StatefulSet
+	statefulSlice := strings.Split(yamlContent, "---")
+	for index, statefulInfo := range statefulSlice {
+		if index >= 1 {
+			UnmarshalK8SYaml(t, statefulInfo, &statefulsetObj)
+			require.Equal(t, statefulsetObj.Name, "clusteringservice-test")
+			require.Equal(t, statefulsetObj.Spec.ServiceName, "clusteringservice-test-service")
+		}
+	}
+}
+
 func TestClusteringServiceDeploymentSecurityContext(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
