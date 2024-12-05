@@ -77,6 +77,12 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+{{- end }}
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
@@ -295,6 +301,10 @@ spec:
 {{- if .root.Values.global.kerberos }}
         - name: {{ template "pegaKerberosConfig" }}-config
           mountPath: "/opt/pega/kerberos"
+{{- end }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.

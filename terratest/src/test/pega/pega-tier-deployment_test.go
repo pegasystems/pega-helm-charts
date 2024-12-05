@@ -54,6 +54,46 @@ func TestPegaTierDeployment(t *testing.T) {
 	}
 }
 
+func TestPegaTierDeploymentWithHazelcastSSL(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":                    vendor,
+						"global.actions.execute":             operation,
+						"global.deployment.name":             depName,
+						"installer.upgrade.upgradeType":      "zero-downtime",
+						"global.storageClassName":            "storage-class",
+						"hazelcast.clusteringServiceEnabled": "true",
+						"hazelcast.encryption.enabled":       "true",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")
+				assertWeb(t, yamlSplit[1], options)
+				assertBatch(t, yamlSplit[2], options)
+				//assertStream(t, yamlSplit[3], options)
+				//assertStreamWithSorageClass(t, yamlSplit[3], options)
+
+			}
+		}
+	}
+}
+
 /*func assertStreamWithSorageClass(t *testing.T, streamYaml string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
@@ -180,25 +220,36 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 	VerifyPegaStatefulSet(t, &statefulsetObj, pegaDeployment{getObjName(options, "-stream"), initContainers, "Stream", "900"}, options)
 }*/
 
-func assertBatch(t *testing.T, batchYaml string, options *helm.Options) {
+func assertBatchWithHZSSL(t *testing.T, batchYaml string, options *helm.Options, hazelcastSSL bool) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, batchYaml, &deploymentObj)
 	require.Equal(t, deploymentObj.ObjectMeta.Name, getObjName(options, "-batch"))
 	VerifyPegaDeployment(t, &deploymentObj,
-		pegaDeployment{getObjName(options, "-batch"), initContainers, "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
-		options)
+		pegaDeployment{getObjName(options, "-batch"), initContainers,
+			"BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX", ""},
+		options, hazelcastSSL)
 
 }
 
-func assertWeb(t *testing.T, webYaml string, options *helm.Options) {
+func assertBatch(t *testing.T, batchYaml string, options *helm.Options) {
+	assertBatchWithHZSSL(t, batchYaml, options, false)
+}
+
+func assertWebWithHZSSL(t *testing.T, webYaml string, options *helm.Options, hazelcastSSL bool) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
 	require.Equal(t, deploymentObj.ObjectMeta.Name, getObjName(options, "-web"))
-	VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{getObjName(options, "-web"), initContainers, "WebUser", "900"}, options)
+	VerifyPegaDeployment(t, &deploymentObj, pegaDeployment{getObjName(options, "-web"),
+		initContainers, "WebUser", "900"}, options, hazelcastSSL)
+}
+
+func assertWeb(t *testing.T, webYaml string, options *helm.Options) {
+	assertWebWithHZSSL(t, webYaml, options, false)
 }
 
 // VerifyPegaStatefulSet - Performs specific Pega statefulset assertions with the values as provided in default values.yaml
-func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet, expectedStatefulset pegaDeployment, options *helm.Options) {
+func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet,
+	expectedStatefulset pegaDeployment, options *helm.Options, hazelcastSSL bool) {
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.VolumeClaimTemplates[0].Name)
 	require.Equal(t, k8score.PersistentVolumeAccessMode("ReadWriteOnce"), statefulsetObj.Spec.VolumeClaimTemplates[0].Spec.AccessModes[0])
 	require.Equal(t, getObjName(options, "-stream"), statefulsetObj.Spec.ServiceName)
@@ -207,11 +258,12 @@ func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet
 	require.Equal(t, "/opt/pega/kafkadata", statefulsetSpec.Containers[0].VolumeMounts[1].MountPath)
 	require.Equal(t, "pega-volume-credentials", statefulsetSpec.Containers[0].VolumeMounts[2].Name)
 	require.Equal(t, "/opt/pega/secrets", statefulsetSpec.Containers[0].VolumeMounts[2].MountPath)
-	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options)
+	VerifyDeployment(t, &statefulsetSpec, expectedStatefulset, options, hazelcastSSL)
 }
 
 // VerifyPegaDeployment - Performs specific Pega deployment assertions with the values as provided in default values.yaml
-func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expectedDeployment pegaDeployment, options *helm.Options) {
+func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment,
+	expectedDeployment pegaDeployment, options *helm.Options, hazelcastSSL bool) {
 	require.Equal(t, int32(1), *deploymentObj.Spec.Replicas)
 	require.Equal(t, int32(2147483647), *deploymentObj.Spec.ProgressDeadlineSeconds)
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Selector.MatchLabels["app"])
@@ -222,11 +274,12 @@ func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment, expect
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-check"])
 	require.NotEmpty(t, deploymentObj.Spec.Template.Annotations["config-tier-check"])
 	deploymentSpec := deploymentObj.Spec.Template.Spec
-	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options)
+	VerifyDeployment(t, &deploymentSpec, expectedDeployment, options, hazelcastSSL)
 }
 
 // VerifyDeployment - Performs common pega deployment/statefulset assertions with the values as provided in default values.yaml
-func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment, options *helm.Options) {
+func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeployment, options *helm.Options,
+	hazelcastSSL bool) {
 	require.Equal(t, "pega-volume-config", pod.Volumes[0].Name)
 	require.Equal(t, expectedSpec.name, pod.Volumes[0].VolumeSource.ConfigMap.LocalObjectReference.Name)
 	require.Equal(t, volumeDefaultModePtr, pod.Volumes[0].VolumeSource.ConfigMap.DefaultMode)
@@ -330,7 +383,11 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "/opt/pega/config", pod.Containers[0].VolumeMounts[0].MountPath)
 	require.Equal(t, "pega-volume-config", pod.Volumes[0].Name)
 	require.Equal(t, "pega-volume-credentials", pod.Volumes[1].Name)
-
+	if hazelcastSSL {
+		require.Equal(t, "hz-encryption-secrets", pod.Volumes[2].Name)
+		require.Equal(t, "hz-encryption-secrets", pod.Containers[0].VolumeMounts[1].Name)
+		require.Equal(t, "/opt/hazelcast/certs", pod.Containers[0].VolumeMounts[1].MountPath)
+	}
 }
 
 type pegaDeployment struct {
