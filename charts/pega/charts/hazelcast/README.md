@@ -59,6 +59,8 @@ imagePullPolicy: "Always"
 replicas: 3
 enabled: true
 clusteringServiceEnabled: false
+encryption:
+  enabled: false
 migration:
   enabled: false
   migrationJobImage: "YOUR_MIGRATION_JOB_IMAGE:TAG"
