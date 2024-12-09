@@ -156,6 +156,12 @@ spec:
 {{ toYaml .custom.ports | indent 8 }}
 {{- end }}
 {{- end }}
+{{- if .custom }}
+{{- if .custom.containerLifecycleHooks }}
+        lifecycle:
+{{ toYaml .custom.containerLifecycleHooks | indent 10 }}
+{{- end }}
+{{- end }}
         # Specify any of the container environment variables here
         env:	
         # Node type of the Pega nodes for {{ .name }}
