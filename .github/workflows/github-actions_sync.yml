@@ -30,6 +30,7 @@ jobs:
       # Step 3: Sync master with upstream/master
       - name: Sync Master
         run: |
+          git fetch origin
           git checkout origin/master
           git merge upstream/master
           git push origin master --force-with-lease
