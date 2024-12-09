@@ -19,6 +19,7 @@ jobs:
         with:
           persist-credentials: false # Disable default GitHub token
           fetch-depth: 0 # Fetch all history for all branches
+          token: ${{ secrets.GH_PEGA_PAT }}
 
       # Step 2: Add the upstream repository
       - name: Add Upstream
