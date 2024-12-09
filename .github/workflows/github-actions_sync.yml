@@ -1,29 +1,43 @@
-name: Sync Upstream
+name: Sync Fork and Update Branches
 
-env:
-  # Required, URL to upstream (fork base)
-  UPSTREAM_URL: "https://github.com/pegasystems/pega-helm-charts.git"
-  # Required, token to authenticate bot, could use ${{ secrets.GITHUB_TOKEN }} 
-  # Over here, we use a PAT instead to authenticate workflow file changes.
-  WORKFLOW_TOKEN: ${{ secrets.WORKFLOW_TOKEN }}
-  # Optional, defaults to main
-  UPSTREAM_BRANCH: "master"
-  # Optional, defaults to UPSTREAM_BRANCH
-  DOWNSTREAM_BRANCH: "master"
-
-# This runs every day on 1801 UTC
 on:
-  # Allows manual workflow run (must in default branch to work)
-  workflow_dispatch:
+  schedule:
+    - cron: '0 22 25 * *' # Runs daily at 23
+  workflow_dispatch: # Manual trigger
+  push:
+    branches:
+      - master # Trigger on pushes to the master branch
 
 jobs:
-  build:
+  sync-fork:
     runs-on: ubuntu-latest
+
     steps:
-      - name: GitHub Sync to Upstream Repository
-        uses: dabreadman/sync-upstream-repo@v1.2.0.b
-        with: 
-          upstream_repo: ${{ env.UPSTREAM_URL }}
-          upstream_branch: ${{ env.UPSTREAM_BRANCH }}
-          downstream_branch: ${{ env.DOWNSTREAM_BRANCH }}
-          token: ${{ env.WORKFLOW_TOKEN }}
+      # Step 1: Checkout your repository
+      - name: Checkout Fork
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false # Disable default GitHub token
+          fetch-depth: 0 # Fetch all history for all branches
+
+      # Step 2: Add the upstream repository
+      - name: Add Upstream
+        run: |
+          git remote add upstream https://github.com/pegasystems/pega-helm-charts.git
+          git fetch upstream
+
+      # Step 3: Sync master with upstream/master
+      - name: Sync Master
+        run: |
+          git checkout master
+          git rebase upstream/master || git merge upstream/master
+          git push origin master --force-with-lease
+
+      # Step 4: Update Feature Branches
+      - name: Update Feature Branches
+        run: |
+          for branch in $(git branch --list | grep -v master); do
+            git checkout $branch
+            git rebase master || git merge master
+            git push origin $branch --force-with-lease
+          done
