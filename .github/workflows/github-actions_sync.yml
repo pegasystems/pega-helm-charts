@@ -2,7 +2,7 @@ name: Sync Fork and Update Branches
 
 on:
   schedule:
-    - cron: '0 22 25 * *' # Runs daily at 23
+    - cron: '0 0 * * *' # Runs daily at midnight
   workflow_dispatch: # Manual trigger
   push:
     branches:
@@ -29,15 +29,15 @@ jobs:
       # Step 3: Sync master with upstream/master
       - name: Sync Master
         run: |
-          git checkout master
-          git rebase upstream/master || git merge upstream/master
+          git checkout origin/master
+          git merge upstream/master
           git push origin master --force-with-lease
 
       # Step 4: Update Feature Branches
       - name: Update Feature Branches
         run: |
           for branch in $(git branch --list | grep -v master); do
-            git checkout $branch
-            git rebase master || git merge master
+            git checkout origin/$branch
+            git merge origin/master
             git push origin $branch --force-with-lease
           done
