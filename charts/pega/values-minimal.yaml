@@ -24,6 +24,9 @@ global:
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
   kerberos: {}
 
+  # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  highlySecureCryptoModeEnabled: false
+
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
@@ -245,7 +248,9 @@ hazelcast:
 
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
-
+  # Set to true to enforce SSL communication between the Clustering Service and Pega Platform.
+  encryption:
+    enabled: false
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.
