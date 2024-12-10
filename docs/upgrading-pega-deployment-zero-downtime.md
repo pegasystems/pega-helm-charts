@@ -2,7 +2,7 @@
 
 After you deploy Pega Platform™ on your kubernetes environment, you can use a Pega-provided Docker image-based process to upgrade your Pega software with zero-downtime. The following procedures are written for any level of user, from a system administrator to a development engineer who wants to use helm charts and Pega Docker images to upgrade the Pega software you have deployed in any supported kubernetes environment.
 
-For the latest Pega Community articles about Pega-provided docker images, see [About client managed cloud](https://community.pega.com/knowledgebase/articles/client-managed-cloud/86/about-client-managed-cloud).
+For more information, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 ## Kubernetes-based zero-downtime upgrade process overview
 

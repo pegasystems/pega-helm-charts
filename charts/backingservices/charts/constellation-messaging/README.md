@@ -6,7 +6,7 @@ Once the service routing (with TLS) is set up, configure the Pega Infinity Const
 
 Only a single Messaging Service deployment is necessary to support an entire organization.  Do not install the service in every namespace or for every application or project.
 
-Complete information on the design of the service including architecture, scalability, reliability, operations and troubleshooting is available at [https://documents.constellation.pega.io/messaging/introduction.html](https://documents.constellation.pega.io/messaging/introduction.html).
+Complete information on the design of the service including architecture, scalability, reliability, operations and troubleshooting is available at [Constellation service deployment](https://docs.pega.com/bundle/platform/page/platform/deployment/constellation/constellation-overview.html).
 
 ## Configuration settings
 
