@@ -193,7 +193,7 @@ data:
 {{- end }}
 
 {{ if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
-  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
 {{-end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
