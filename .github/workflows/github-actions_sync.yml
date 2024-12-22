@@ -31,6 +31,7 @@ jobs:
       # Step 3: Sync master with upstream/master
       - name: Sync Master
         run: |
+          git fetch origin
           git checkout master
           git fetch upstream
           git merge upstream/master
