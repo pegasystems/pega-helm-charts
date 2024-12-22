@@ -27,12 +27,12 @@ jobs:
           git config --global user.name "Githib Actions"
           git config --global user.email actions@github.com
           git remote add upstream https://github.com/pegasystems/pega-helm-charts.git
-          git fetch upstream
 
       # Step 3: Sync master with upstream/master
       - name: Sync Master
         run: |
-          git checkout origin/master
+          git checkout master
+          git fetch upstream
           git merge upstream/master
           git add .
           git commit -m "Automatically merged upstream master"
