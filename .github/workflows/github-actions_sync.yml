@@ -38,11 +38,11 @@ jobs:
       # Step 4: Update Feature Branches
       - name: Update Feature Branches
         run: |
-          for branch in $(git branch --list | grep -v "master")
+          for branch in $(git branch --list | grep -v "master" | tr "\n" " "))
           do
             git checkout $branch
             git merge master
             git push origin $branch
             echo "Merge Branch: $branch"
-            echo "Array $(git branch --list | grep -v "master")"
+            echo "Array $(git branch --list | grep -v "master" | tr "\n" " ")"
           done
