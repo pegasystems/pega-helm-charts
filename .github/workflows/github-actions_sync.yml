@@ -35,8 +35,6 @@ jobs:
           git checkout master
           git fetch upstream
           git merge upstream/master
-          git add .
-          git commit -m "Automatically merged upstream master"
           git push origin master --force-with-lease
 
       # Step 4: Update Feature Branches
