@@ -24,7 +24,7 @@ jobs:
       # Step 2: Add the upstream repository
       - name: Add Upstream
         run: |
-          git config --global user.name "Githib Actions"
+          git config --global user.name "Github Actions"
           git config --global user.email actions@github.com
           git remote add upstream https://github.com/pegasystems/pega-helm-charts.git
 
@@ -35,7 +35,7 @@ jobs:
           git checkout master
           git fetch upstream
           git merge upstream/master
-          git push origin master --force-with-lease
+          git push origin master
 
       # Step 4: Update Feature Branches
       - name: Update Feature Branches
