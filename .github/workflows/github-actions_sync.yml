@@ -45,5 +45,5 @@ jobs:
             git merge master
             git push origin $branch
             echo "Merge Branch: $branch"
-            echo "Array $(git branch --list | grep -v "master" | tr "\n" " ")"
+            echo "Array $(git branch --list)"
           done
