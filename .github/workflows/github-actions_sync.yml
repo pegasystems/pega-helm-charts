@@ -39,7 +39,7 @@ jobs:
       - name: Update Feature Branches
         run: |
           for branch in $(git branch --list | grep -v master); do
-            git checkout origin/$branch
-            git merge origin/master
-            git push origin $branch --force-with-lease
+            git checkout $branch
+            git merge master
+            git push origin $branch
           done
