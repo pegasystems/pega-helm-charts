@@ -3,18 +3,17 @@ Building a Pega Platform installer docker image
 
 These instructions require the Pega Platform distribution image to install the Pega Platform onto your database.
 
-Clients with appropriate licenses can download a distribution image from Pega. For additional instructions, see [Pega Digital Software Delivery User Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
+Clients with appropriate licenses can download a distribution image from Pega. For additional instructions, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 ## Downloading a Pega Platform distribution to your local system
 
-These instructions require the Pega Platform distribution image to install the Pega Platform onto your database. To obtain a copy, you must download an image from Pega. For detailed instructions, see [Pega Digital Software Delivery User Guide](https://community.pega.com/knowledgebase/documents/pega-digital-software-delivery-user-guide).
+These instructions require the Pega Platform distribution image to install the Pega Platform onto your database. To obtain a copy, you must download an image from Pega. For detailed instructions, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 ### Requesting access to a Pega Platform distribution
 
 1. In the browser of your choice, navigate to the Pega [Digital Software Delivery](https://community.pega.com/digital-delivery) site.
 
-2. Log into the [Pega Community](https://community.pega.com/knowledgebase/articles/pega-cloud/pega-cloud-services-patch-process-releases-83x-and-later)
-    site with the credentials your Pega representative provided.
+2. Log into the site with the credentials your Pega representative provided.
 
 3. In the **Download and Upgrade Licensed Software** area, click **New
     request**.
