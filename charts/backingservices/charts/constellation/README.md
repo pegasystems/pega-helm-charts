@@ -1,9 +1,6 @@
 # Constellation UI setup
 
-Please refer to 
- > https://documents.constellation.pega.io/static/88/introduction.html
-
-for instructions related to the pegastatic content delivery setup. Once that is complete please proceed with the instructions below for the constellation appstatic service setup.
+Please refer to [Constellation service deployment](https://docs.pega.com/bundle/platform/page/platform/deployment/constellation/constellation-overview.html) for instructions related to the pegastatic content delivery setup. Once that is complete please proceed with the instructions below for the constellation appstatic service setup.
 
 ## ConstellationUI helm chart
 
@@ -30,7 +27,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/constellation-appstatic-service/docker-image:xxxxxxx
 ```
 
-For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/pega-provided-docker-images).
+For details about downloading and then pushing Docker images to your repository for your deployment, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 
 #### Constellationui runtime configuration
