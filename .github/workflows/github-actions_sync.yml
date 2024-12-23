@@ -1,8 +1,8 @@
 name: Sync Fork and Update Branches
 
 on:
-  #schedule:
-  #  - cron: '0 0 * * *' # Runs daily at midnight
+  schedule:
+    - cron: '0 19 * * *' # Runs daily at midnight
   workflow_dispatch: # Manual trigger
   push:
     branches:
@@ -44,6 +44,5 @@ jobs:
             git checkout $branch
             git merge master
             git push origin $branch
-            echo "Merge Branch: $branch"
-            echo "Array $(git branch --list)"
+            echo "Merged branch: $branch"
           done
