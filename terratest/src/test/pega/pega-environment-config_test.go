@@ -102,7 +102,7 @@ func TestPegaHighlySecureCryptoModeEnabledEnvConfigParam(t *testing.T) {
 			VerifyEnvNotPresent(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED")
 			
 			options.SetValues["global.highlySecureCryptoModeEnabled"] = "true"
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 			VerifyEnvValue(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED", "true")
 
 		}
