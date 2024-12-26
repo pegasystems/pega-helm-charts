@@ -531,6 +531,14 @@ servicePort: use-annotation
   {{- end -}}
 {{- end -}}
 
+{{- define "isPegaHighlySecureCryptoModeEnabled" }}
+  {{- if .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
   projected:
