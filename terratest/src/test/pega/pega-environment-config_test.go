@@ -77,6 +77,38 @@ func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
 }
 
+func TestPegaHighlySecureCryptoModeEnabledEnvConfigParam(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"global.highlySecureCryptoModeEnabled": "false",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED")
+			
+			options.SetValues["global.highlySecureCryptoModeEnabled"] = "true"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvValue(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED", "true")
+
+		}
+	}
+}
+
 func VerifyEnvNotPresent(t *testing.T, yamlContent string, entry string) {
 	var envConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
