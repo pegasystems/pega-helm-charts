@@ -515,6 +515,30 @@ servicePort: use-annotation
   {{- end -}}
 {{- end -}}
 
+{{- define "isHzEncryptionEnabled" }}
+  {{- if .Values.hazelcast.encryption.enabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isHzHighlySecureCryptoModeEnabled" }}
+  {{- if and .Values.hazelcast.encryption.enabled  .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isPegaHighlySecureCryptoModeEnabled" }}
+  {{- if .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
   projected:
@@ -537,5 +561,13 @@ servicePort: use-annotation
 
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
-
+  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+    - secret:
+        name: hz-encryption-secrets
+        items:
+          - key: HZ_SSL_KEYSTORE_PASSWORD
+            path: HZ_SSL_KEYSTORE_PASSWORD
+          - key: HZ_SSL_TRUSTSTORE_PASSWORD
+            path: HZ_SSL_TRUSTSTORE_PASSWORD
+  {{- end}}
 {{- end}}

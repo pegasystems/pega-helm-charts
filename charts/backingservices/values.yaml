@@ -63,20 +63,20 @@ srs:
     # specified in the `elasticsearch` section
     # If you do not enable SRS and the srs.enabled parameter is set to false, always set srs.srsStorage.provisionInternalESCluster=false
     provisionInternalESCluster: true
-    # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
-    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
+    # To use your own Elasticsearch/OpenSearch cluster, set srsStorage.provisionInternalESCluster to false and then
+    # set the external Elasticsearch/OpenSearch cluster URL and port details below when using an externally managed Elasticsearch/OpenSearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
     # domain: ""
     # port: 9200
     # protocol: https
-    # The elasticsearch connection supports three authentication methods: basic authentication ,
-    # AWS IAM role-based authentication and Elasticsearch secure connection(tls).
-    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch service
+    # The Elasticsearch/OpenSearch connection supports three authentication methods: basic authentication ,
+    # AWS IAM role-based authentication and Elasticsearch/OpenSearch secure connection(tls).
+    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch/OpenSearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     tls:
       enabled: false
-    # To specify a certificate used to authenticate an external Elasticsearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false),
-    # uncomment the following lines to specify the TLS certificate name with password for your Elasticsearch service.
+    # To specify a certificate used to authenticate an external Elasticsearch/OpenSearch service (with tls.enabled: true and srsStorage.provisionInternalESCluster: false),
+    # uncomment the following lines to specify the TLS certificate name with password for your Elasticsearch/OpenSearch service.
     # Default certificatePassword value will be empty if not used.
     # certificateName: "Certificate_Name"
     # certificatePassword: "password"
@@ -84,23 +84,30 @@ srs:
     # Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or “certificate.jks”) as a key name in the secret. Use this key name
     # to configure the “certificateName” parameter. Use a key name “password” to provide the certificate password in the secret.
     # certsSecret: srs-certificates
-    # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
+    # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch/OpenSearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
       enabled: true
-    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch service in your SRS cluster,
-    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password.
+    # To configure basic authentication or TLS-based authentication to your externally-managed Elasticsearch/OpenSearch service in your SRS cluster,
+    # uncomment and add the parameter details: srs.srsStorage.authCredentials.username and srs.srsStorage.authCredentials.password
+    # Auth Credentials added under authCredentials field which supports both Elasticsearch and OpenSearch credentials.
+    # authCredentials:
+    #   username: "username"
+    #   password: "password"
+    # for your externally managed Elasticsearch cluster.
+    # uncomment and add the parameter details: srs.srsStorage.esCredentials.username and srs.srsStorage.esCredentials.password for your externally managed elasticsearch cluster.
+    # esCredentials will be deprecated in future releases, please switch to authCredentials.
     # esCredentials:
     #   username: "username"
     #   password: "password"
-    # To use a secret to configure basic authentication or TLS-based authentication between your external Elasticsearch service and SRS,
+    # To use a secret to configure basic authentication or TLS-based authentication between your external Elasticsearch/OpenSearch service and SRS,
     # uncomment the authSecret parameter and set it to the secret name. Use "username" and "password" as keys for your secret.
     # authSecret: srs-elastic-credentials
-    # To configure AWS IAM role-based authentication to your externally-managed Elasticsearch cluster, uncomment
+    # To configure AWS IAM role-based authentication to your externally-managed Elasticsearch/OpenSearch cluster, uncomment
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
-    #   region: "AWS_ELASTICSEARCH_REGION"
-    # To configure either authentication method, when the elasticsearch domain requires an open internet connection,
+    #   region: "AWS_ELASTICSEARCH_REGION"/"AWS_OPENSEARCH_REGION"
+    # To configure either authentication method, when the Elasticsearch/OpenSearch domain requires an open internet connection,
     # set the requireInternetAccess parameter to "true".
     requireInternetAccess: false
 

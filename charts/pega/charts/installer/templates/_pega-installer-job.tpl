@@ -23,6 +23,7 @@ metadata:
 {{- end }}{{- end }}
   labels:
     app: {{ .name }}
+    {{ include "generatedInstallerJobLabels" .root | indent 4 }}
 spec:
   backoffLimit: 0
   template:
@@ -189,5 +190,6 @@ spec:
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
 {{- include "podAffinity" .root.Values | indent 6 }}
+{{- include "tolerations" .root.Values | indent 6 }}
 ---
 {{- end -}}
