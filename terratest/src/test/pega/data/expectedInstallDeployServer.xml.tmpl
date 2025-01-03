@@ -72,6 +72,7 @@
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
                connectionTimeout="20000"
+               keepAliveTimeout="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_KEEPALIVETIMEOUT 20000 }}"
                maxHeaderCount="100"
                maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_MAXTHREADS 200 }}" />
 
