@@ -41,7 +41,7 @@ func TestSRSDeployment(t *testing.T) {
 			"false",
 			"",
 			false,
-			podResources{"1300m", "2Gi", "650m", "2Gi"},
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
 			esDomain{
 				domain:   "elasticsearch-master.default.svc",
 				port:     "9200",
