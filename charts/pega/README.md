@@ -829,7 +829,7 @@ Garbage collection (GC) logs are diagnostic tools for application memory managem
    
    The system now stores the GC logs using the path `/usr/local/tomcat/logs/gc.log` within the pod.
    
-   For more information, see [JVM Arguments for better tunability](../charts/pega/RecommendedJVMArgs.md).
+   For more information, see [RecommendedJVMArgs.md](./RecommendedJVMArgs.md)).
 
 3. To collect and store GC logs persistently, configure the EFK stack (Elasticsearch-Fluentd-Kibana) or other logging tool of your choice to tail the GC logs path.
 
@@ -844,7 +844,7 @@ Garbage collection (GC) logs are diagnostic tools for application memory managem
        pos_file: /usr/local/tomcat/logs/gc.pos
     ```
 
-   For more information, see [EFK logging stack](../charts/addons/README.md#logging-with-elasticsearch-fluentd-kibana-efk).
+   For more information, see [EFK logging stack](../addons/README.md#logging-with-elasticsearch-fluentd-kibana-efk).
 
 #### Persist heap dumps
 
@@ -864,7 +864,7 @@ When your application runs out of memory (OOM), capturing a heap dump can help i
    
    The system now stores the heap dumps in the `/heapdumps` location.
 
-   For more information, see [JVM Arguments for better tunability](../charts/pega/RecommendedJVMArgs.md).
+   For more information, see [RecommendedJVMArgs.md](./RecommendedJVMArgs.md).
 
 4. To persist heap dumps, configure a persistent storage using Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
 
