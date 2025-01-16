@@ -197,6 +197,14 @@
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="false">
 
+            {{ if 
+
+          <Context path="">
+               <Manager className="org.apache.catalina.session.StandardManager"
+                    secureRandomProvider="BCFIPS"
+                    secureRandomAlgorithm="DEFAULT"/>
+          </Context>
+
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->
         <!--
