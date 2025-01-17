@@ -197,7 +197,7 @@
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="false">
 
-            {{ if isTrue .Env.FIPS_140_3_MODE }}
+            {{ if .Env.FIPS_140_3_MODE }}
 
           <Context path="">
                <Manager className="org.apache.catalina.session.StandardManager"
