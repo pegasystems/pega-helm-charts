@@ -77,7 +77,7 @@ data:
 {{ else }}
 {{ .root.Files.Get "config/deploy/server.xml.tmpl" | indent 6 }}
 {{- end }}
-{{ if isTrue .root.fips140_3Mode }}
+{{ if eq .root.fips140_3Mode "true" }}
       security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
       security.provider.2=org.bouncycastle.jsse.provider.BouncyCastleJsseProvider fips:BCFIPS
       security.provider.3=SUN
