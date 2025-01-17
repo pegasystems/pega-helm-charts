@@ -75,9 +75,9 @@ data:
 {{- if $custom_config.javaSecurity }}
 {{ $custom_config.javaSecurity | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/server.xml.tmpl" | indent 6 }}
+{{ .root.Files.Get "config/deploy/java.security.overwrite" | indent 6 }}
 {{- end }}
-{{ if eq .root.fips140_3Mode "true" }}
+{{ if eq .root.Values.global.fips140_3Mode true }}
       security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
       security.provider.2=org.bouncycastle.jsse.provider.BouncyCastleJsseProvider fips:BCFIPS
       security.provider.3=SUN

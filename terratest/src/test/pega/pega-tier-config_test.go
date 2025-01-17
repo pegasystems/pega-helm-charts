@@ -39,7 +39,7 @@ func TestPegaTierConfig(t *testing.T) {
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
 				VerifyTierConfig(t, yamlContent, options, false)
 
-				options.SetValues["fips140_3Mode"] = "true"
+				options.SetValues["global.fips140_3Mode"] = "true"
 				yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
 				VerifyTierConfig(t, yamlContent, options, true)
 			}

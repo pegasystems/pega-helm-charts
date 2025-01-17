@@ -135,11 +135,11 @@ func TestFipsModeParam(t *testing.T) {
 
 			options.SetValues["global.fips140_3Mode"] = "false"
 			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-			VerifyEnvValue(t, yamlContent, "FIPS_140_3_MODE", "false")
+			VerifyEnvNotPresent(t, yamlContent, "FIPS_140_3_MODE")
 
 			options.SetValues["global.fips140_3Mode"] = "true"
 			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-			VerifyEnvValue(t, yamlContent, "FIPS_140_3_MODE", "false")
+			VerifyEnvValue(t, yamlContent, "FIPS_140_3_MODE", "true")
 
 		}
 	}
