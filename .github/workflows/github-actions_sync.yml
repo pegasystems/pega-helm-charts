@@ -39,7 +39,7 @@ jobs:
       - name: Update Feature Branches
         run: |
           git fetch origin
-          for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/master' | sed 's/origin\///' | sed 's/>//g')
+          for branch in $(git branch -r | grep 'origin/' | grep -v 'origin/master' | sed 's/origin\///')
           do
             git checkout $branch
             git merge master
