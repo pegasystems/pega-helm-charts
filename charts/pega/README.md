@@ -731,6 +731,19 @@ tier:
       <annotation-key>: <annotation-value>
 ```
 
+### Custom Labels for Pods
+
+You may optionally provide custom labels for Pods as metadata to be consumed by other tools and libraries. Pod labels may be specified by using the `podLabels` element for a given `tier`.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    podLabels:
+      <label-key>: <label-value>
+```
+
 ### Pod affinity
 
 You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. Pod affinity may be specified by using the `affinity` element for a given `tier`. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
@@ -806,6 +819,88 @@ cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
 ### Pega diagnostic user
 
 While most cloud native deployments will take advantage of aggregated logging using a tool such as EFK, there may be a need to access the logs from Tomcat directly. In the event of a need to download the logs from tomcat, a username and password will be required.  You may set `pegaDiagnosticUser` and `pegaDiagnosticPassword` to set up authentication for Tomcat.
+
+### Persisting garbage collection (GC) logs and heap dumps
+
+By default, the system saves GC logs and heap dumps in the pod storage, which is ephemeral. When a pod crashes, all logs and heap dumps stored in the pod are lost. You can use one of the following options to persist the data:
+
+#### Persist garbage collection (GC) logs
+
+Garbage collection (GC) logs are diagnostic tools for application memory management. To take advantage of GC logs in your Pega Platform deployment, perform the following steps:
+
+1. To enable GC logging, set the following JVM argument flag within the `javaOpts` parameter in the Pega Helm chart values.yaml file:
+
+   `-Xlog:gc*,gc+heap=debug,gc+humongous=debug:file=/usr/local/tomcat/logs/gc.log:uptime,pid,level,time,tags:filecount=3,filesize=2M`
+
+   Example:
+
+   ```yaml
+   tier:
+    - name: my-tier
+      javaOpts: "-Xlog:gc*,gc+heap=debug,gc+humongous=debug:file=/usr/local/tomcat/logs/gc.log:uptime,pid,level,time,tags:filecount=3,filesize=2M"
+   ```
+   
+   The system now stores the GC logs using the path `/usr/local/tomcat/logs/gc.log` within the pod.
+   
+   For more information, see [RecommendedJVMArgs.md](./RecommendedJVMArgs.md)).
+
+3. To collect and store GC logs persistently, configure the EFK stack (Elasticsearch-Fluentd-Kibana) or other logging tool of your choice to tail the GC logs path.
+
+   The following code shows an example fluentd configuration file for `/usr/local/tomcat/logs/gc.log`:
+
+   ```yaml
+   config:
+     - source:
+       $type: tail
+       tag: java.gc
+       path: /usr/local/tomcat/logs/gc.log
+       pos_file: /usr/local/tomcat/logs/gc.pos
+    ```
+
+   For more information, see [EFK logging stack](../addons/README.md#logging-with-elasticsearch-fluentd-kibana-efk).
+
+#### Persist heap dumps
+
+When your application runs out of memory (OOM), capturing a heap dump can help in identifying the root cause. To take advantage of heap fumps in your Pega Platform deployment, perform the following steps: 
+
+1. To enable automatic heap dumps, set the following JVM argument flag within the `javaOpts` parameter in `values.yaml` file:
+
+   `-XX:+HeapDumpOnOutOfMemoryError`
+
+   Example:
+
+   ```yaml
+   tier:
+    - name: my-tier
+      javaOpts: "-XX:+HeapDumpOnOutOfMemoryError"
+   ```
+   
+   The system now stores the heap dumps in the `/heapdumps` location.
+
+   For more information, see [RecommendedJVMArgs.md](./RecommendedJVMArgs.md).
+
+4. To persist heap dumps, configure a persistent storage using Persistent Volumes (PVs) and Persistent Volume Claims (PVCs).
+
+   For more information on persistent volumes, see official [Kubernetes documentation](https://kubernetes.io/docs/concepts/storage/persistent-volumes/). For more information on adding storage to Pega Platform, see [Custom volumes](https://github.com/pegasystems/pega-helm-charts/tree/master/charts/pega#custom-volumes).
+
+   Include the following configuration snippet for each tier in `values.yaml` file.
+
+   Use the `/heapdumps` location as the mount path in your `values.yaml` file.
+
+   Example:
+
+   ```yaml
+   tier:
+     - name: my-tier
+       custom:
+         volumes:
+           - name: <volume name>
+             persistentVolumeClaim:
+               claimName: <persistent volume claim name>
+         volumeMounts:
+           - mountPath: /heapdumps
+             name: <volume name>
+   ```
 
 ## Cassandra and Pega Customer Decision Hub deployments
 
@@ -1178,6 +1273,18 @@ installer:
     annotation-name2: annotation-value2
 ```
 
+### Installer Pod Labels
+
+You can add labels to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podLabels:
+    label-name1: label-value1
+    label-name2: label-value2
+```
 
 ### Installer Node Selector
 
