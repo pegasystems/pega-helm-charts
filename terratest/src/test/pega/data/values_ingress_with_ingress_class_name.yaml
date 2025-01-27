@@ -28,9 +28,6 @@ global:
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
   kerberos: {}
 
-  # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
-  highlySecureCryptoModeEnabled: false
-
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
@@ -137,7 +134,7 @@ global:
   # Specify the Pega tiers to deploy
   tier:
     - name: "web"
-      # Create a an interactive tier for web users.  This tier uses
+      # Create an interactive tier for web users.  This tier uses
       # the WebUser node type and will be exposed via a service to
       # the load balancer.
       nodeType: "WebUser"
@@ -166,6 +163,13 @@ global:
         # loadBalancerSourceRanges:
         #     - "123.123.123.0/24"
         #     - "128.128.128.64/32"
+
+        # Define custom ports for service here. If you want to use the custom ports for other services, please use the same configuration for those services.
+        # customServicePorts:
+        # - name: <name>
+        #   port: <port>
+        #   targetPort: <port>
+
         # To configure TLS between the ingress/load balancer and the backend, set the following:
         tls:
           enabled: false
@@ -199,6 +203,7 @@ global:
             insecureSkipVerify: false
 
       ingress:
+        ingressClassName: nginx-web
         enabled: true
         # For help configuring the ingress block including TLS, see the Helm chart documentation
         # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#ingress
@@ -212,14 +217,9 @@ global:
         tls:
           # Enable TLS encryption
           enabled: true
-          secretName:
-          # For GKE Managed Certificate, mention true if Google Managed Certificate has to be created and annotation specified
-          useManagedCertificate: false
-          # Provide appropriate certificate annotations for EKS or GKE
-          # For EKS, use alb.ingress.kubernetes.io/certificate-arn: <certificate-arn>
-          # For GKE Pre-shared Certificate, use ingress.gcp.kubernetes.io/pre-shared-cert: <pre-shared-certificate-name>
-          # For GKE to use static IP for load balancer, use kubernetes.io/ingress.global-static-ip-name: <global-static-ip-name>
-          ssl_annotation:
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
           # For Openshift, Pega deployments enable TLS to secure the connection
           # from the browser to the router by creating the route using reencrypt termination policy.
           # Add your certificate, the corresponding key using the appropriate .pem or .crt format and
@@ -230,8 +230,6 @@ global:
 
       replicas: 1
       javaOpts: ""
-      # Check the 'JVM Arguments' section in https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md
-      catalinaOpts: "-XX:InitialCodeCacheSize=256M -XX:ReservedCodeCacheSize=512M -XX:MetaspaceSize=512M"
 
       deploymentStrategy:
         rollingUpdate:
@@ -242,15 +240,16 @@ global:
       livenessProbe:
         port: 8081
 
-      # Optionally overridde default resource specifications
-      # cpuRequest: 2
-      # memRequest: "12Gi"
-      # cpuLimit: 4
-      # memLimit: "12Gi"
-      # initialHeap: "4096m"
+      # Optionally overridde the default or add additional resource specifications.
+      # initialHeap: "8192m"
       # maxHeap: "8192m"
-      # ephemeralStorageRequest:
-      # ephemeralStorageLimit:
+      resources:
+        requests:
+          memory: "12Gi"
+          cpu: 3
+        limits:
+          memory: "12Gi"
+          cpu: 4
 
       # To configure an alternative user for custom image, set value for runAsUser.
       # To configure an alternative group for volume mounts, set value for fsGroup
@@ -258,6 +257,15 @@ global:
       # securityContext:
       #   runAsUser: 9001
       #   fsGroup: 0
+
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
 
       hpa:
         enabled: true
@@ -295,19 +303,12 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
-      resources:
-        requests:
-          memory: "12Gi"
-          cpu: 3
-        limits:
-          memory: "12Gi"
-          cpu: 4
 
     - name: "batch"
       # Create a background tier for batch processing.  This tier uses
       # a collection of background node types and will not be exposed to
       # the load balancer.
-      nodeType: "BackgroundProcessing,Search,Batch,Custom1,Custom2,Custom3,Custom4,Custom5"
+      nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
 
       replicas: 1
       javaOpts: ""
@@ -328,6 +329,15 @@ global:
       #   runAsUser: 9001
       #   fsGroup: 0
 
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
       hpa:
         enabled: true
 
@@ -338,6 +348,7 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
+
       resources:
         requests:
           memory: "12Gi"
@@ -346,26 +357,65 @@ global:
           memory: "12Gi"
           cpu: 4
 
+    - name: "stream"
+      # Create a stream tier for queue processing.  This tier deploys
+      # as a stateful set to ensure durability of queued data. It may
+      # be optionally exposed to the load balancer.
+      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
+      # When externalized Kafka service is enabled, we should remove the entire stream tier.
+      nodeType: "Stream"
 
-    - name: "bix"
-      # Create a background tier for BIX processing.  This tier uses
-      # the BIX node type and will not be exposed to the load balancer.
-      nodeType: "BIX"
+      # Pega requestor specific properties
+      requestor:
+        # Inactivity time after which requestor is passivated
+        passivationTimeSec: 900
 
-      replicas: 1
-      javaOpts: ""
+      service:
+        port: 7003
+        targetPort: 7003
 
-      deploymentStrategy:
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
-        type: RollingUpdate
+      # If a nodeSelector is required for this or any tier, it may be specified here:
+      # nodeSelector:
+      #  disktype: ssd
+
+      ingress:
+        ingressClassName: nginx-stream
+        enabled: true
+        # Enter the domain name to access web nodes via a load balancer.
+        #  e.g. web.mypega.example.com
+        domain: "YOUR_STREAM_NODE_DOMAIN"
+        tls:
+          # Enable TLS encryption
+          enabled: true
+          # secretName:
+          # useManagedCertificate: false
+          # ssl_annotation:
 
       livenessProbe:
         port: 8081
 
-      hpa:
-        enabled: true
+      # To configure an alternative user for your custom image, set value for runAsUser
+      # To configure an alternative group for volume mounts, set value for fsGroup
+      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # securityContext:
+      #   runAsUser: 9001
+      #   fsGroup: 0
+
+      # To specify security settings for a Container, include the securityContext field in the Container manifest
+      # Security settings that you specify for a Container apply only to the pega container,
+      # and they override settings made at the Pod level when there is overlap. Container settings
+      # do not affect the Pod's Volumes.
+      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
+      # containerSecurityContext:
+      #   capabilities:
+      #     add: ["SYS_TIME"]
+
+      replicas: 2
+
+      volumeClaimTemplate:
+        resources:
+          requests:
+            storage: 5Gi
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
@@ -374,40 +424,7 @@ global:
         enabled: false
         minAvailable: 1
         # maxUnavailable: "50%"
-      resources:
-        requests:
-          memory: "12Gi"
-          cpu: 3
-        limits:
-          memory: "12Gi"
-          cpu: 4
 
-    - name: "realtime"
-      # Create a dedicated tier for real-time data grid processing.
-      nodeType: "RealTime"
-
-      replicas: 1
-      javaOpts: ""
-
-      deploymentStrategy:
-        rollingUpdate:
-          maxSurge: 1
-          maxUnavailable: 0
-        type: RollingUpdate
-
-      livenessProbe:
-        port: 8081
-
-      hpa:
-        enabled: true
-
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
-      pdb:
-        enabled: false
-        minAvailable: 1
-        # maxUnavailable: "50%"
       resources:
         requests:
           memory: "12Gi"
@@ -573,9 +590,7 @@ hazelcast:
 
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
-  # Set to true to enforce SSL communication between the Clustering Service and Pega Platform.
-  encryption:
-    enabled: false
+
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.
