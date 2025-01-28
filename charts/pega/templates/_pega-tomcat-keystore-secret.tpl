@@ -25,7 +25,11 @@ data:
 {{- if .node.service.tls.keystore }}
   TOMCAT_KEYSTORE_CONTENT: {{ .node.service.tls.keystore | quote -}}
 {{- else }}
-  TOMCAT_KEYSTORE_CONTENT: {{ .root.Files.Get "config/certs/pegakeystore.jks"  | b64enc | indent 2 }}
+{{- $default_keystore := "config/certs/pegakeystore.jks" -}}
+{{- if .root.Values.global.fips140_3Mode -}}
+{{- $default_keystore = "config/certs/pegakeystore.bcfks" -}}
+{{- end }}
+  TOMCAT_KEYSTORE_CONTENT: {{ .root.Files.Get $default_keystore  | b64enc | indent 2 }}
 {{- end }}
 # this field is used for traefik, it expects the root CA certificate in a secret under the field ca.crt
 {{- if .node.service.tls.cacertificate }}
