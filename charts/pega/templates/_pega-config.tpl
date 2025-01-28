@@ -77,23 +77,6 @@ data:
 {{ else }}
 {{ .root.Files.Get "config/deploy/java.security.overwrite" | indent 6 }}
 {{- end }}
-{{ if eq .root.Values.global.fips140_3Mode true }}
-      security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
-      security.provider.2=org.bouncycastle.jsse.provider.BouncyCastleJsseProvider fips:BCFIPS
-      security.provider.3=SUN
-      security.provider.4=SunRsaSign
-      security.provider.5=SunEC
-      security.provider.6=SunJSSE
-      security.provider.7=SunJCE
-      security.provider.8=SunJGSS
-      security.provider.9=SunSASL
-      security.provider.10=XMLDSig
-      security.provider.11=SunPCSC
-      security.provider.12=JdkLDAP
-      security.provider.13=JdkSASL
-      security.provider.14=SunPKCS11
-      ssl.KeyManagerFactory.algorithm=PKIX
-{{ end }}
 
 {{- end }}
 {{- end }}
