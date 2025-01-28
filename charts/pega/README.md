@@ -1298,6 +1298,16 @@ installer:
     label: value
 ```
 
+### Installer Service Account
+If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+
+Example:
+
+```yaml
+installer:
+  serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
+```
+
 ### Mount the custom certificates into the Tomcat container
 
 Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
