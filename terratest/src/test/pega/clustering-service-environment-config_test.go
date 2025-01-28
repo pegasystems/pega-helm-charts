@@ -112,6 +112,7 @@ func VerifyClusteringServiceEnvironmentConfig(t *testing.T, yamlContent string, 
 			require.Equal(t, clusteringServiceEnvConfigData["JAVA_OPTS"], "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof -XX:+UseG1GC -XX:NewRatio=3 -XshowSettings:vm -XX:InitiatingHeapOccupancyPercent=45 -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m")
 			require.Equal(t, clusteringServiceEnvConfigData["SERVICE_NAME"], "clusteringservice-service")
 			require.Equal(t, clusteringServiceEnvConfigData["MIN_CLUSTER_SIZE"], "3")
+		    require.Equal(t, clusteringServiceEnvConfigData["SERVICE_DNS"], "clusteringservice-service.default.svc.cluster.local")
 			require.Equal(t, clusteringServiceEnvConfigData["JMX_ENABLED"], "true")
 			require.Equal(t, clusteringServiceEnvConfigData["HEALTH_MONITORING_LEVEL"], "OFF")
 			require.Equal(t, clusteringServiceEnvConfigData["GROUP_NAME"], "prpchz")
