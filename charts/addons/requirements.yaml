@@ -28,5 +28,5 @@ dependencies:
   condition: metrics-server.enabled
 - name: ingress-azure
   version: "1.7.5"
-  repository: https://appgwingress.blob.core.windows.net/ingress-azure-helm-package/
+  repository: oci://mcr.microsoft.com/azure-application-gateway/charts/ingress-azure
   condition: ingress-azure.enabled
