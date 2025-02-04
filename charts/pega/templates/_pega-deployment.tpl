@@ -77,6 +77,12 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+{{- end }}
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
@@ -117,11 +123,7 @@ spec:
         runAsUser: 9001
         fsGroup: 0
 {{- end }}
-{{- if (.node.tcpKeepAliveProbe) }}
-        sysctls:
-        - name: "net.ipv4.tcp_keepalive_time"
-          value: "{{ .node.tcpKeepAliveProbe }}"
-{{- end }}
+{{- include "tcpKeepAliveProbe" . | indent 8 }}
 {{- if .node.securityContext }}
 {{ toYaml .node.securityContext | indent 8 }}
 {{- end }}
@@ -152,6 +154,12 @@ spec:
 {{- if .custom.ports }}
         # Additional custom ports
 {{ toYaml .custom.ports | indent 8 }}
+{{- end }}
+{{- end }}
+{{- if .custom }}
+{{- if .custom.containerLifecycleHooks }}
+        lifecycle:
+{{ toYaml .custom.containerLifecycleHooks | indent 10 }}
 {{- end }}
 {{- end }}
         # Specify any of the container environment variables here
@@ -293,6 +301,10 @@ spec:
 {{- if .root.Values.global.kerberos }}
         - name: {{ template "pegaKerberosConfig" }}-config
           mountPath: "/opt/pega/kerberos"
+{{- end }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.
