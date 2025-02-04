@@ -1,7 +1,7 @@
 #Force the jvm to frequently requery dns
 networkaddress.cache.ttl=30
 
-
+{{ if .Env.FIPS_140_3_MODE }}
 security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
 security.provider.2=org.bouncycastle.jsse.provider.BouncyCastleJsseProvider fips:BCFIPS
 security.provider.3=SUN
@@ -17,3 +17,4 @@ security.provider.12=JdkLDAP
 security.provider.13=JdkSASL
 security.provider.14=SunPKCS11
 ssl.KeyManagerFactory.algorithm=PKIX
+{{ end }}

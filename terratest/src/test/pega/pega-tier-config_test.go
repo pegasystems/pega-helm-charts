@@ -37,11 +37,11 @@ func TestPegaTierConfig(t *testing.T) {
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
-				VerifyTierConfig(t, yamlContent, options, false)
+				VerifyTierConfig(t, yamlContent, options)
 
 				options.SetValues["global.fips140_3Mode"] = "true"
 				yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-config.yaml"})
-				VerifyTierConfig(t, yamlContent, options, true)
+				VerifyTierConfig(t, yamlContent, options)
 			}
 		}
 	}
@@ -49,7 +49,7 @@ func TestPegaTierConfig(t *testing.T) {
 }
 
 // VerifyTierConfig - Performs the tier specific configuration assertions with the values as provided in default values.yaml
-func VerifyTierConfig(t *testing.T, yamlContent string, options *helm.Options, fipsMode bool) {
+func VerifyTierConfig(t *testing.T, yamlContent string, options *helm.Options) {
 	var pegaConfigMap k8score.ConfigMap
 	configSlice := strings.Split(yamlContent, "---")
 	for index, configData := range configSlice {
@@ -74,11 +74,7 @@ func VerifyTierConfig(t *testing.T, yamlContent string, options *helm.Options, f
 			compareConfigMapData(t, pegaConfigMapData["prlog4j2.xml"], "data/expectedInstallDeployPRlog4j2.xml")
 			compareConfigMapData(t, pegaConfigMapData["server.xml.tmpl"], "data/expectedInstallDeployServer.xml.tmpl")
 			require.Equal(t, "", pegaConfigMapData["web.xml"])
-			if fipsMode {
-				compareConfigMapData(t, pegaConfigMapData["java.security.overwrite"], "data/expectedFipsJava.security.overwrite")
-			} else {
-				compareConfigMapData(t, pegaConfigMapData["java.security.overwrite"], "data/expectedJava.security.overwrite")
-			}
+			compareConfigMapData(t, pegaConfigMapData["java.security.overwrite.tmpl"], "data/expectedJava.security.overwrite.tmpl")
 		}
 	}
 }
