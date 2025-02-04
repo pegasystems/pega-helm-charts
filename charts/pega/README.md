@@ -731,6 +731,19 @@ tier:
       <annotation-key>: <annotation-value>
 ```
 
+### Custom Labels for Pods
+
+You may optionally provide custom labels for Pods as metadata to be consumed by other tools and libraries. Pod labels may be specified by using the `podLabels` element for a given `tier`.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    podLabels:
+      <label-key>: <label-value>
+```
+
 ### Pod affinity
 
 You may optionally configure the pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. Pod affinity may be specified by using the `affinity` element for a given `tier`. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).
@@ -1260,6 +1273,18 @@ installer:
     annotation-name2: annotation-value2
 ```
 
+### Installer Pod Labels
+
+You can add labels to the installer pod.
+
+Example:
+
+```yaml
+installer:
+  podLabels:
+    label-name1: label-value1
+    label-name2: label-value2
+```
 
 ### Installer Node Selector
 
@@ -1271,6 +1296,16 @@ Example:
 installer:
   nodeSelector:
     label: value
+```
+
+### Installer Service Account
+If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+
+Example:
+
+```yaml
+installer:
+  serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 ```
 
 ### Mount the custom certificates into the Tomcat container
