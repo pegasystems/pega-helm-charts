@@ -32,12 +32,14 @@ func TestPegaTomcatKeystoreSecret(t *testing.T) {
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
 					},
+					SetStrValues: map[string]string{
+						"service.tls.enabled": "true",
+					},
 				}
 
-				yamlContent, error := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-tomcat-keystore-secret.yaml"})
-				if error != nil {
-					VerifyTomcatCertificatesSecret(t, yamlContent, options)
-				}
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tomcat-keystore-secret.yaml"})
+				fmt.Println("yamlContent: ", yamlContent)
+				VerifyTomcatCertificatesSecret(t, yamlContent, options)
 
 			}
 		}
