@@ -71,11 +71,11 @@ data:
 {{- end }}
 
   # java security overwrite file
-  java.security.overwrite: |-
+  java.security.overwrite.tmpl: |-
 {{- if $custom_config.javaSecurity }}
 {{ $custom_config.javaSecurity | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/java.security.overwrite" | indent 6 }}
+{{ .root.Files.Get "config/deploy/java.security.overwrite.tmpl" | indent 6 }}
 {{- end }}
 
 {{- end }}
