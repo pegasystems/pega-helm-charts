@@ -1,8 +1,6 @@
 dependencies:
 	helm repo add incubator https://charts.helm.sh/incubator
 	helm repo add stable https://charts.helm.sh/stable
-	helm repo add application-gateway-kubernetes-ingress oci://mcr.microsoft.com/azure-application-gateway/charts/ingress-azure
-
 	helm repo add kiwigrid https://kiwigrid.github.io
 	helm repo add elastic https://helm.elastic.co
 	helm repo list	
