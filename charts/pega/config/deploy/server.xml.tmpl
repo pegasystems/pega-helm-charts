@@ -97,9 +97,14 @@
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
                            {{ if ( and (exists .Env.TOMCAT_KEYSTORE_CONTENT) .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
-                           <Certificate {{ if .Env.FIPS_140_3_MODE }}certificateKeystoreType="BCFKS"{{end}}
+                           {{ if .Env.FIPS_140_3_MODE }}
+                           <Certificate certificateKeystoreType="BCFKS"
                                         certificateKeystoreFile="{{ .Env.TOMCAT_KEYSTORE_CONTENT }}"
                                         certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
+                           {{ else }}
+                           <Certificate certificateKeystoreFile="{{ .Env.TOMCAT_KEYSTORE_CONTENT }}"
+                                        certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
+                           {{ end }}
 
                            {{ else }}
 
