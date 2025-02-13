@@ -69,6 +69,15 @@ data:
 {{ .root.Files.Get "config/deploy/web.xml" | indent 6 }}
 {{- end }}
 {{- end }}
+
+  # java security overwrite file
+  java.security.overwrite.tmpl: |-
+{{- if $custom_config.javaSecurity }}
+{{ $custom_config.javaSecurity | indent 6 }}
+{{ else }}
+{{ .root.Files.Get "config/deploy/java.security.overwrite.tmpl" | indent 6 }}
+{{- end }}
+
 {{- end }}
 {{- end }}
 ---
