@@ -2,11 +2,12 @@ package pega
 
 import (
 	"fmt"
+	"path/filepath"
+	"testing"
+
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
-	"path/filepath"
-	"testing"
 )
 
 func TestPegaEnvironmentConfig(t *testing.T) {
@@ -75,6 +76,73 @@ func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
+}
+
+func TestPegaHighlySecureCryptoModeEnabledEnvConfigParam(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"global.highlySecureCryptoModeEnabled": "false",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED")
+
+			options.SetValues["global.highlySecureCryptoModeEnabled"] = "true"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvValue(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED", "true")
+
+		}
+	}
+}
+
+func TestFipsModeParam(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "FIPS_140_3_MODE")
+
+			options.SetValues["global.fips140_3Mode"] = "false"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "FIPS_140_3_MODE")
+
+			options.SetValues["global.fips140_3Mode"] = "true"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvValue(t, yamlContent, "FIPS_140_3_MODE", "true")
+
+		}
+	}
 }
 
 func VerifyEnvNotPresent(t *testing.T, yamlContent string, entry string) {

@@ -10,6 +10,7 @@ data:
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
   SERVICE_NAME: {{ template "clusteringServiceName" . }}-service
   MIN_CLUSTER_SIZE: {{ .Values.replicas | quote }}
+  SERVICE_DNS:  {{ template "clusteringServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
 {{- if (eq (include "isEncryptionEnabled" .) "true") }}
   ENCRYPTION_ENABLED: {{ true | quote }}
   ENCRYPTION_KEYSTORE_NAME: "cluster-keystore.jks"
