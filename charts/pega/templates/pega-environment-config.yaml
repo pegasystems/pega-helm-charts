@@ -179,6 +179,21 @@ data:
 {{- end }}
   # Hostname of Hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+{{ if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  HZ_SSL_ENABLED: "true"
+  HZ_SSL_PROTOCOL: "TLS"
+  HZ_SSL_KEY_STORE_NAME: "cluster-keystore.jks"
+  HZ_SSL_TRUST_STORE_NAME: "cluster-truststore.jks"
+  {{ if (eq (include "isHzHighlySecureCryptoModeEnabled" .) "true") }}
+  HZ_SSL_ALGO: "PKIX"
+  {{- else }}
+  HZ_SSL_ALGO: "SunX509"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{ if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
@@ -212,5 +227,8 @@ data:
   STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
   STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
   STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
+{{- end }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}"
 {{- end }}
 {{ end }}
