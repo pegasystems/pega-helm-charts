@@ -39,6 +39,54 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 	}
 }
 
+func TestPegaEnvironmentConfigPegaVersionCheck(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":        "k8s",
+			"global.actions.execute": "deploy",
+		},
+	}
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+	options.SetValues["global.pegaVersion"] = ""
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+	options.SetValues["global.pegaVersion"] = "8.25.0"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "8.25.0-dev-1234"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "8.26.1"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "25.1.0"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "26.1.1"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "8.24.50"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+	options.SetValues["global.pegaVersion"] = "8.8.5"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+}
+
 func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)

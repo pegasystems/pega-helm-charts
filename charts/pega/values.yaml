@@ -17,6 +17,9 @@ global:
   actions:
     execute: "deploy"
 
+  # The Pega version being deployed, required starting in Infinity '25
+  pegaVersion:
+
   # Add custom certificates to be mounted to container
   # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
   # to support multiple custom certificates as external secrets, specify each of your external secrets

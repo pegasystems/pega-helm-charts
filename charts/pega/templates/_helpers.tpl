@@ -571,3 +571,19 @@ servicePort: use-annotation
             path: HZ_SSL_TRUSTSTORE_PASSWORD
   {{- end}}
 {{- end}}
+
+{{- define "isPega25OrLater"}}
+  {{- if .Values.global.pegaVersion }}
+    {{- /* Check provided release if using 8.x version pattern */ -}}
+    {{- if (semverCompare "^8.25.0-0" .Values.global.pegaVersion) -}}
+      "true"
+    {{- /* Check provided release if using 25.x.x version pattern */ -}}
+    {{- else if (semverCompare ">= 25.1.0-0" .Values.global.pegaVersion) -}}
+      "true"
+    {{- else -}}
+      "false"
+    {{- end -}}
+  {{- else }}
+    "false"
+  {{- end }}
+{{- end }}
