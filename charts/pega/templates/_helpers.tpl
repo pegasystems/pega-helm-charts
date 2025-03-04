@@ -575,10 +575,10 @@ servicePort: use-annotation
 {{- define "isPega25OrLater"}}
   {{- if .Values.global.pegaVersion }}
     {{- /* Check provided release if using 8.x version pattern */ -}}
-    {{- if (semverCompare "^8.25.0-0" .Values.global.pegaVersion) -}}
+    {{- if (semverCompare "^8.25.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
       "true"
     {{- /* Check provided release if using 25.x.x version pattern */ -}}
-    {{- else if (semverCompare ">= 25.1.0-0" .Values.global.pegaVersion) -}}
+    {{- else if (semverCompare ">= 25.1.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
       "true"
     {{- else -}}
       "false"

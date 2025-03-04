@@ -65,6 +65,14 @@ func TestPegaEnvironmentConfigPegaVersionCheck(t *testing.T) {
 	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
 
+	options.SetValues["global.pegaVersion"] = "branch-8.25.0-bugfix-BUG-12345-4"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "branch-8.24.3-bugfix-BUG-12345-4"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
 	options.SetValues["global.pegaVersion"] = "8.26.1"
 	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
