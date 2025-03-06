@@ -228,4 +228,8 @@ data:
   STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
   STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
 {{- end }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}"
+{{- end }}
+  IS_PEGA_25_OR_LATER: {{ (include "isPega25OrLater" .) }}
 {{ end }}
