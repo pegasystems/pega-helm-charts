@@ -513,6 +513,11 @@ installer:
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
+    # To avoid exposing username & password, leave the installer.upgrade.pegaRESTUsername & installer.upgrade.pegaRESTPassword
+    # parameters empty (no quotes), configure pegaRESTUsername ane pegaRESTPassword values in the External Secrets Manager, and enter
+    # the external secret for the credentials. Make sure the keys in the secret should be PEGA_REST_USERNAME and PEGA_REST_PASSWORD respectively.
+    pega_rest_external_secret_name: ""
+
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   # Hazelcast docker image for platform version 8.6 through 8.7.x
