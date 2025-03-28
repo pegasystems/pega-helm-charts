@@ -22,6 +22,9 @@ spec:
         {{ toYaml .Values.podLabels | nindent 8 }}
         {{- end }}
     spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
         - name: {{ $depName }}-appstatic-assets
