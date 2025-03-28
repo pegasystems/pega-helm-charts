@@ -1308,6 +1308,23 @@ installer:
   serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 ```
 
+### Installer Custom Volumes and Volume Mounts
+You can specify custom volume and volume mounts for the installer pod.
+
+Example:
+```
+installer:
+  custom:
+    volumeMounts:
+      - name: my-volume
+        mountPath: /path/to/mount
+    volumes:
+      - name: my-volume
+        configMap:
+          name: my-configmap 
+```
+Both `installer.custom.volumes` and `installer.custom.volumeMounts` take in a list of volume and volumeMounts (respectively) as defined by Kubernetes.
+
 ### Mount the custom certificates into the Tomcat container
 
 Pega supports mounting and passing custom certificates into the tomcat container during your Pega Platform deployment. Pega supports the following certificate formats as long as they are encoded in base64: X.509 certificates such as PEM, DER, CER, CRT. To mount and pass the your custom certificates, use the `certificates` attributes as a map in the `values.yaml` file using the format in the following example.
