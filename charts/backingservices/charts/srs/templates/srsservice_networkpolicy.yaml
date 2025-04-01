@@ -32,6 +32,9 @@ spec:
     - podSelector:
         matchLabels:
           app: "elasticsearch-master"
+    - podSelector:
+        matchLabels:
+          app.kubernetes.io/name: "opensearch"
     ports:
     - protocol: TCP
       port: 9200
