@@ -231,5 +231,7 @@ data:
 {{- if .Values.global.fips140_3Mode }}
   FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}"
 {{- end }}
+{{- if .Values.global.pegaVersion }}
   IS_PEGA_25_OR_LATER: {{ (include "isPega25OrLater" .) }}
+{{- end }}
 {{ end }}
