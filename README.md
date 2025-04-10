@@ -150,6 +150,8 @@ All Docker images for Pega Platform releases that are in Standard Support underg
 
 For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
+For details about customizing your Pega-provided Docker images, see [Build your own custom Pega images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html#ariaid-title5).
+
 From Helm chart versions `2.2.0` and above, update your Pega Platform version to the latest patch version.
 
 # Debugging failed upgrades using helm commands
