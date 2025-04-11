@@ -23,6 +23,7 @@ func TestSRSDeployment(t *testing.T) {
 			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
 			"srs.srsStorage.tls.enabled":                 "true",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
 		},
 			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -75,6 +76,7 @@ func TestSRSDeploymentVariables(t *testing.T) {
 			"srs.srsStorage.awsIAM.region":               "us-east-1",
 			"srs.srsStorage.requireInternetAccess":       "true",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
 		},
 			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -126,6 +128,7 @@ func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T) {
 			"srs.srsStorage.protocol":                    "https",
 			"srs.srsStorage.tls.enabled":                 "false",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
 		},
 			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
 	)
@@ -169,6 +172,7 @@ func TestSRSDeploymentWithAffinity(t *testing.T) {
 			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
 			"srs.srsStorage.tls.enabled":                 "true",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
 			affintiyBasePath + "key":                     "kubernetes.io/os",
 			affintiyBasePath + "operator":                "In",
 			affintiyBasePath + "values[0]":               "linux",
