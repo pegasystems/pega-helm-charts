@@ -46,3 +46,8 @@ srsRuntime:
   #     drop:
   #     - ALL
   #   runAsNonRoot: true
+
+# By default we enable SRS network policy.
+srsStorage:
+  networkPolicy:
+    enabled: true
