@@ -14,6 +14,7 @@ func TestSRSServiceNetworkPolicy(t *testing.T) {
 			"srs.enabled":                "true",
 			"srs.deployment.name":        "test-srs",
 			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled": "true",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
 	)
@@ -35,6 +36,7 @@ func TestSRSServiceNetworkPolicyWithProvisionInternalESCluster(t *testing.T) {
 			"srs.srsStorage.tls.enabled":                "false",
 			"srs.srsStorage.requireInternetAccess":      "true",
 			"srs.srsStorage.provisionInternalESCluster": "true",
+			"srs.srsStorage.networkPolicy.enabled": "true",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
 	)
@@ -60,6 +62,7 @@ func TestSRSServiceNetworkPolicyWithProvisionInternalESClusterFalse(t *testing.T
 			"srs.srsStorage.port":                        "8008",
 			"srs.srsStorage.protocol":                    "https",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled": "true",
 		},
 			[]string{"charts/srs/templates/srsservice_networkpolicy.yaml"}),
 	)
