@@ -32,6 +32,8 @@ distributionKitVolumeClaimName: ""
 bypassLoadEngineClasses: "false"
 # Bypass loading assembly classes into database
 bypassLoadAssembledClasses: "false"
+# Custom JVM arguments for the installer
+customJVMArgs: ""
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
 # Optionally specify specific service account
