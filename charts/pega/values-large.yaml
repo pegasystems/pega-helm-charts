@@ -17,7 +17,7 @@ global:
   actions:
     execute: "deploy"
 
-  # New versions of the Pega Platform require that certain libraries are included in the bootstrap classpath
+  # Pega Platform versions 25.0 and above require that certain libraries are included in the bootstrap classpath
   # for Tomcat.  As this chart supports multiple versions of the Pega Platform, the version is determined
   # dynamically at startup.  If there is a problem performing the version check, it can be bypassed by setting
   # the field below with the Pega Platform version (for example, "8.8.4").
