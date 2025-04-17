@@ -1,0 +1,11 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
+{{- $requestPath := printf "%s/ping" .Values.urlPath }}
+{{- $srvPort := .Values.service.port }}{{ if .Values.pegaMessagingPort }}{{ $srvPort = .Values.pegaMessagingPort }}{{ end }}
+
+{{- if .Values.enabled }}
+{{- if (eq .Values.provider "gke") }}
+{{- if .Values.ingress.enabled }}
+{{ template "backingservices.gke.backendConfig" dict "root" .Values "name" $depName "requestPath" $requestPath "healthCheckPort" $srvPort }}
+{{ end }}
+{{ end }}
+{{ end }}

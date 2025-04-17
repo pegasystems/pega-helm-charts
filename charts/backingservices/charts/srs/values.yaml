@@ -17,13 +17,37 @@ srsRuntime:
   resources:
     limits:
       cpu: 1300m
-      memory: "2Gi"
+      memory: "4Gi"
     requests:
       cpu: 650m
-      memory: "2Gi"
+      memory: "4Gi"
   serviceType: "ClusterIP"
   env:
     # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
     AuthEnabled: false
     # When `AuthEnabled` is `true`, enter the appropriate public key URL. When `AuthEnabled` is `false`(default), leave this parameter empty.
     OAuthPublicKeyURL: ""
+
+  # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
+  enableSecureCryptoMode: false
+
+  # Use this parameter to configure values for Java options.
+  javaOpts: ""
+
+  # Apply securityContext to SRS pods. Example:
+  # securityContext:
+  #   runAsUser: 9999
+  #   fsGroup: 0
+
+  # Apply securityContext to SRS containers. Example:
+  # containerSecurityContext:
+  #   allowPrivilegeEscalation: false
+  #   capabilities:
+  #     drop:
+  #     - ALL
+  #   runAsNonRoot: true
+
+# By default we enable SRS network policy.
+srsStorage:
+  networkPolicy:
+    enabled: true

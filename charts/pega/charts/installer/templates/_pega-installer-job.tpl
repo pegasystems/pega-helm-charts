@@ -23,6 +23,7 @@ metadata:
 {{- end }}{{- end }}
   labels:
     app: {{ .name }}
+    {{ include "generatedInstallerJobLabels" .root | indent 4 }}
 spec:
   backoffLimit: 0
   template:
@@ -66,6 +67,11 @@ spec:
 
           {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
           {{ include "secretResolver" $artifactoryDict | indent 10}}
+
+          {{- $extRestSecretName := "" }}
+          {{- if .root.Values.upgrade }}{{- if .root.Values.upgrade.pega_rest_external_secret_name }}{{- $extRestSecretName = .root.Values.upgrade.pega_rest_external_secret_name }}{{- end }}{{- end }}
+          {{- $pegaRestDict := dict "deploySecret" "deployPegaRESTSecret" "deployNonExtsecret" "deployNonExtPegaRESTSecret" "extSecretName" $extRestSecretName "nonExtSecretName" "pega-upgrade-rest-secret-name" "context" .root -}}
+          {{ include "secretResolver" $pegaRestDict | indent 10}}
 
           # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
           {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
@@ -189,5 +195,6 @@ spec:
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
 {{- include "podAffinity" .root.Values | indent 6 }}
+{{- include "tolerations" .root.Values | indent 6 }}
 ---
 {{- end -}}

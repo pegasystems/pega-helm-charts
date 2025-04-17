@@ -72,6 +72,7 @@
                maxHttpHeaderSize="16384"
                maxSavePostSize="65536"
                connectionTimeout="20000"
+               keepAliveTimeout="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_KEEPALIVETIMEOUT 20000 }}"
                maxHeaderCount="100"
                maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_MAXTHREADS 200 }}" />
 
@@ -96,8 +97,14 @@
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS">
                            {{ if ( and (exists .Env.TOMCAT_KEYSTORE_CONTENT) .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
+                           {{ if .Env.FIPS_140_3_MODE }}
+                           <Certificate certificateKeystoreType="BCFKS"
+                                        certificateKeystoreFile="{{ .Env.TOMCAT_KEYSTORE_CONTENT }}"
+                                        certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
+                           {{ else }}
                            <Certificate certificateKeystoreFile="{{ .Env.TOMCAT_KEYSTORE_CONTENT }}"
                                         certificateKeystorePassword="{{ .Env.TOMCAT_KEYSTORE_PASSWORD }}" />
+                           {{ end }}
 
                            {{ else }}
 
@@ -195,6 +202,16 @@
 
       <Host name="localhost"  appBase="webapps"
             unpackWARs="true" autoDeploy="false">
+
+            {{ if .Env.FIPS_140_3_MODE }}
+
+          <Context path="">
+               <Manager className="org.apache.catalina.session.StandardManager"
+                    secureRandomProvider="BCFIPS"
+                    secureRandomAlgorithm="DEFAULT"/>
+          </Context>
+
+            {{ end }}
 
         <!-- SingleSignOn valve, share authentication between web applications
              Documentation at: /docs/config/valve.html -->

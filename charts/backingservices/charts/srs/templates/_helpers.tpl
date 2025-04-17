@@ -154,11 +154,27 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 
+{{- define "srsStorageCredentials.username" -}}
+{{- if  .Values.srsStorage.esCredentials -}}
+{{- .Values.srsStorage.esCredentials.username |  b64enc}}
+{{- else if  .Values.srsStorage.authCredentials -}}
+{{- .Values.srsStorage.authCredentials.username |  b64enc}}
+{{- end }}
+{{- end }}
+
+{{- define "srsStorageCredentials.password" -}}
+{{- if  .Values.srsStorage.esCredentials -}}
+{{- .Values.srsStorage.esCredentials.password |  b64enc}}
+{{- else if  .Values.srsStorage.authCredentials -}}
+{{- .Values.srsStorage.authCredentials.password |  b64enc}}
+{{- end }}
+{{- end }}
+
 {{- define "esDeploymentUsername" -}}
 {{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
-{{- .Values.srsStorage.esCredentials.username  |  b64enc }}
+{{- include "srsStorageCredentials.username" . }}
 {{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
-{{- .Values.srsStorage.esCredentials.username  |  b64enc }}
+{{- include "srsStorageCredentials.username" . }}
 {{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.awsIAM) }}
 {{- "elastic" |  b64enc }}
 {{- end}}
@@ -166,9 +182,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 {{- define "esDeploymentPassword" -}}
 {{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
-{{- .Values.srsStorage.esCredentials.password | b64enc }}
+{{- include "srsStorageCredentials.password" . }}
 {{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
-{{- .Values.srsStorage.esCredentials.password | b64enc }}
+{{- include "srsStorageCredentials.password" . }}
 {{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.awsIAM) }}
 {{- $secret := (lookup "v1" "Secret" .Release.Namespace "srs-elastic-credentials") }}
 {{- if $secret }}
@@ -188,6 +204,10 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "javaOpts" -}}
+{{- .Values.srsRuntime.javaOpts }}
+{{- end -}}
 
 {{/*
 Network policy: `openshift-dns` for openshift cluster, `kube-dns | core-dns` for other supported providers.

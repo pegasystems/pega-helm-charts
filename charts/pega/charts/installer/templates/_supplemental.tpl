@@ -12,6 +12,7 @@ pega-hz-secret-name
 deployDBSecret
 deployNonExtDBSecret
 podAffinity
+tolerations
 secretResolver are copied from pega/templates/_helpers.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
@@ -90,6 +91,11 @@ false
 {{- $depName -}}-db-secret
 {{- end -}}
 
+{{- define "pega-upgrade-rest-secret-name" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-upgrade-rest-secret
+{{- end -}}
+
 {{- define "pega-hz-secret-name" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-hz-secret
@@ -101,6 +107,18 @@ true
 
 {{- define "deployNonExtDBSecret" }}
 {{- if and (eq (include "deployDBSecret" .) "true") (not (.Values.global.jdbc).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "deployPegaRESTSecret" -}}
+true
+{{- end }}
+
+{{- define "deployNonExtPegaRESTSecret" }}
+{{- if and (eq (include "deployPegaRESTSecret" .) "true") (not (.Values.upgrade).pega_rest_external_secret_name) -}}
 true
 {{- else -}}
 false
@@ -122,5 +140,12 @@ false
 {{- if .affinity }}
 affinity:
 {{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}
+
+{{- define "tolerations" }}
+{{- if .tolerations }}
+tolerations:
+{{- toYaml .tolerations | nindent 2 }}
 {{- end }}
 {{ end }}

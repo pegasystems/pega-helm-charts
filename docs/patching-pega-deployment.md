@@ -4,15 +4,16 @@ After you deploy Pega Platform™ on your kubernetes environment, the Pega-prov
 
 Useful links to Pega software patching information:
 
-- [Pega software maintenance and extended support policy](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-software-maintenance-and-extended-support-policy)
+- [Pega software maintenance program](https://docs.pega.com/bundle/keeping-current/page/keeping-current/kc/pega-software-maintenance.html)
+- [Pega Extended Support program](https://docs.pega.com/bundle/keeping-current/page/keeping-current/kc/extended-support-policy.html)
 - [Pega Infinity patch calendar](https://community.pega.com/knowledgebase/articles/keeping-current-pega/pega-infinity-patch-calendar)
-- [Pega Infinity patch frequently asked questions](https://community.pega.com/knowledgebase/articles/keeping-current-pega/85/pega-infinity-patch-frequently-asked-questions)
+- [Pega software maintenance policies frequently asked questions](https://docs.pega.com/bundle/keeping-current/page/keeping-current/kc/pega-software-maintenance-faqs.html)
 
 ## Kubernetes-based patching process overview
 
-Pega supports client-managed cloud clients applying patches for releases 8.4 and later using a zero-downtime patch process to apply the latest cumulative bundle of bug and security fixes since the last minor release. For the latest Pega Community articles, see [About client managed cloud](https://community.pega.com/knowledgebase/articles/client-managed-cloud/85/about-client-managed-cloud).
+Pega supports client-managed cloud clients applying patches for releases 8.4 and later using a zero-downtime patch process to apply the latest cumulative bundle of bug and security fixes since the last minor release. For more information, see [Containerized deployments in Kubernetes environments](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/containerized-deployments-kubernetes.html).
 
-The Pega zero-downtime patch process uses the zero-downtime patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary data schema and the patch migration script moves the rules between the appropriate schema and then performs the required rolling reboot of your deployment cluster. For a detailed overview of the process, see [Applying a patch without downtime](https://community.pega.com/knowledgebase/articles/keeping-current-pega/86/applying-patch-without-downtime).
+The Pega zero-downtime patch process uses the zero-downtime patch process so you and your customers can continue working in your application while you patch your system. Pega zero-downtime patch scripts use a temporary data schema and the patch migration script moves the rules between the appropriate schema and then performs the required rolling reboot of your deployment cluster.
 
 ## Client-required steps
 Client-managed cloud clients use the same Pega Kubernetes tools and Helm charts in the same Pega repository that you used to install Pega Platform in a supported Kubernetes environment. The client-managed cloud patch process includes the following tasks:

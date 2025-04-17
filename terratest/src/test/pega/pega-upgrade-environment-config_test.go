@@ -120,9 +120,41 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["RUN_RULESET_CLEANUP"], "false")
 	require.Equal(t, upgradeEnvConfigData["REBUILD_INDEXES"], "false")
 	require.Equal(t, upgradeEnvConfigData["PEGA_REST_SERVER_URL"], expectedValues["PEGA_REST_SERVER_URL"])
-	require.Equal(t, upgradeEnvConfigData["PEGA_REST_USERNAME"], expectedValues["PEGA_REST_USERNAME"])
-	require.Equal(t, upgradeEnvConfigData["PEGA_REST_PASSWORD"], expectedValues["PEGA_REST_PASSWORD"])
 	require.Equal(t, upgradeEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, upgradeEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["AUTOMATIC_RESUME_ENABLED"], "false")
+	require.Equal(t, upgradeEnvConfigData["CUSTOM_JVM_ARGS"], "")
+}
+
+
+func TestPegaUpgradeEnvironmentConfigWithCustomJVMArgs(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"upgrade", "upgrade-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"installer.upgrade.upgradeType":  "out-of-place",
+					"installer.customJVMArgs": "-Da=1",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"})
+			assertUpgradeEnvironmentConfigWithCustomJVMArgs(t, yamlContent, options)
+		}
+	}
+}
+
+func assertUpgradeEnvironmentConfigWithCustomJVMArgs(t *testing.T, configYaml string, options *helm.Options) {
+    var envConfigMap k8score.ConfigMap
+    UnmarshalK8SYaml(t, configYaml, &envConfigMap)
+    envConfigData := envConfigMap.Data
+    require.Equal(t, envConfigData["CUSTOM_JVM_ARGS"], "-Da=1")
 }
