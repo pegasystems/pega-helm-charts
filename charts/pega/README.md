@@ -699,7 +699,7 @@ tier:
 
 ### Custom /etc/hosts entries
 
-You can optionally specify custom entries to add in the /etc/hosts file for your deployment tier by adding `hostAliases`.  For an overview of `hostAliases` and their use, refer to [Adding entries to Pod /etc/hosts with HostAliases](https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/)
+You can optionally specify custom entries to add in the /etc/hosts file for your deployment tier by adding `hostAliases`.  For an overview of `hostAliases` and their use, refer to [Adding entries to Pod /etc/hosts with HostAliases](https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/).
 
 Example:
 
@@ -708,10 +708,10 @@ tier:
   - name: my-tier
     custom:
       hostAliases:
-      - ip: "127.0.0.1"
-        hostnames:
-          - "test1.local"
-          - "test2.local"
+        - ip: "127.0.0.1"
+          hostnames:
+            - "test1.local"
+            - "test2.local"
 ```
 
 ### Sidecar Containers
