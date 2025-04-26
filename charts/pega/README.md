@@ -697,6 +697,23 @@ tier:
             name: my-configmap 
 ```
 
+### Custom /etc/hosts entries
+
+You can optionally specify custom entries to add in the /etc/hosts file for your deployment tier by adding `hostAliases`.  For an overview of `hostAliases` and their use, refer to [Adding entries to Pod /etc/hosts with HostAliases](https://kubernetes.io/docs/tasks/network/customize-hosts-file-for-pods/)
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      hostAliases:
+      - ip: "127.0.0.1"
+        hostnames:
+          - "test1.local"
+          - "test2.local"
+```
+
 ### Sidecar Containers
 
 Pega supports adding sidecar containers to manage requirements for your Pega application services that live outside of the primary tomcat container. This may include company policy requirements, utility images, networking containers, or other examples. For an overview of the versatility sidecar containers present, see [How Pods manage multiple containers](https://kubernetes.io/docs/concepts/workloads/pods/#how-pods-manage-multiple-containers).

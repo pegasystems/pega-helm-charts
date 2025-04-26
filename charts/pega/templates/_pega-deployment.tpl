@@ -67,6 +67,10 @@ spec:
 {{- if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
 {{- end }}
+{{- if .custom.hostAliases }}
+      hostAliases:
+{{ toYaml .custom.hostAliases | indent 6 }}
+{{- end }}
 {{- end }}
       volumes:
       # Volume used to mount config files.
