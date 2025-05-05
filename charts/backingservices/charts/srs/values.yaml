@@ -17,10 +17,10 @@ srsRuntime:
   resources:
     limits:
       cpu: 1300m
-      memory: "2Gi"
+      memory: "4Gi"
     requests:
       cpu: 650m
-      memory: "2Gi"
+      memory: "4Gi"
   serviceType: "ClusterIP"
   env:
     # AuthEnabled may be set to true when there is an authentication mechanism in place between SRS and Pega Infinity.
@@ -46,3 +46,8 @@ srsRuntime:
   #     drop:
   #     - ALL
   #   runAsNonRoot: true
+
+# By default we enable SRS network policy.
+srsStorage:
+  networkPolicy:
+    enabled: true

@@ -68,6 +68,11 @@ spec:
           {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
           {{ include "secretResolver" $artifactoryDict | indent 10}}
 
+          {{- $extRestSecretName := "" }}
+          {{- if .root.Values.upgrade }}{{- if .root.Values.upgrade.pega_rest_external_secret_name }}{{- $extRestSecretName = .root.Values.upgrade.pega_rest_external_secret_name }}{{- end }}{{- end }}
+          {{- $pegaRestDict := dict "deploySecret" "deployPegaRESTSecret" "deployNonExtsecret" "deployNonExtPegaRESTSecret" "extSecretName" $extRestSecretName "nonExtSecretName" "pega-upgrade-rest-secret-name" "context" .root -}}
+          {{ include "secretResolver" $pegaRestDict | indent 10}}
+
           # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
           {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
@@ -161,17 +166,17 @@ spec:
         -  name: HZ_VERSION
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_VERSION
         -  name: HZ_CLUSTER_NAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_CLUSTER_NAME
         -  name: HZ_SERVER_HOSTNAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root}}
               key: HZ_SERVER_HOSTNAME
 {{- end }}
         envFrom:
