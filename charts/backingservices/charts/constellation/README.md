@@ -68,6 +68,9 @@ The values.yaml file provides configuration options to define the values for the
 | `serviceAccountName`                        | Specify a custom [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) for the pods of your deployment.                                                                                                                                                                                                                                                                                          |
 | `affinity`                        | Specify the pod affinity so that pods are restricted to run on particular node(s), or to prefer to run on particular nodes.    
                                                                                                                                                                                                                                                                                           |
+| `tolerations`                        | Specify pod tolerations so that it is allowed to run on node(s) with particular taints.    
+                                                                                                                                                                                                                                                                                          |
+                                                                                                                                                                                                                                                                                          
 
 Example:
 
