@@ -10,7 +10,9 @@ enabled: true
 # Setting below to true will deploy the Pega Platform in client-server Hazelcast model for version 8.8 and later.
 # Note: Make sure to set this value as "false" in case of Pega platform version before "8.8". If not set this will fail the installation.
 clusteringServiceEnabled: false
-
+# Set to true to enforce SSL communication between the Clustering Service and Pega Platform.
+encryption:
+  enabled: false
 # Setting related to Hazelcast migration.
 migration:
   # Set to `true` to initiate the migration job.
@@ -39,7 +41,8 @@ client:
 # Server side settings for Hazelcast
 server:
   java_opts: "-XX:MaxRAMPercentage=80.0 -XX:InitialRAMPercentage=80.0 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=/opt/hazelcast/logs/heapdump.hprof
-  -XX:+UseParallelGC -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m -XshowSettings:vm"
+   -XX:+UseG1GC -XX:NewRatio=3 -XshowSettings:vm -XX:InitiatingHeapOccupancyPercent=45
+   -Xlog:gc*,gc+phases=debug:file=/opt/hazelcast/logs/gc.log:time,pid,tags:filecount=5,filesize=3m"
   jmx_enabled: "true"
   health_monitoring_level: "OFF"
   operation_generic_thread_count: ""
@@ -57,3 +60,16 @@ server:
   diagnostics_metric_level: "info"
   diagnostic_log_file_size_mb: "50"
   diagnostics_file_count: "3"
+
+# Apply securityContext to clustering service pods. Example:
+# securityContext:
+#   runAsUser: 1000
+#   fsGroup: 0
+
+# Apply securityContext to clustering service containers. Example:
+# containerSecurityContext:
+#   allowPrivilegeEscalation: false
+#   capabilities:
+#     drop:
+#     - ALL
+#   runAsNonRoot: true

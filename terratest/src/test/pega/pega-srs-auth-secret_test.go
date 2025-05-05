@@ -89,8 +89,38 @@ func TestPegaSRSAuthSecretNotCreatedForMissingPrivateKey(t *testing.T) {
 				}
 
 				yamlContent, err := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-srs-auth-secret.yaml"})
-				require.Contains(t, yamlContent, "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true")
-				require.Contains(t, err.Error(), "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true")
+				require.Contains(t, yamlContent, "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true.")
+				require.Contains(t, err.Error(), "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true.")
+			}
+		}
+	}
+}
+
+func TestPegaSRSAuthSecretNotCreatedForDeploymentWithEnabledSRSAuthAndExternalSecret(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			for _, depName := range deploymentNames {
+				fmt.Println(vendor + "-" + operation + "-" + depName)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.deployment.name":                     depName,
+						"global.provider":                            vendor,
+						"pegasearch.externalSearchService":           "true",
+						"pegasearch.srsAuth.enabled":                 "true",
+						"pegasearch.srsAuth.external_secret_name":    "test-external-secret",
+					},
+				}
+
+				yamlContent, err := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-srs-auth-secret.yaml"})
+				VerifySRSAuthSecretIsNotCreated(t, yamlContent, err)
 			}
 		}
 	}

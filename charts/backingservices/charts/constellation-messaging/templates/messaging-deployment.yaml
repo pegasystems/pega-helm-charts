@@ -1,0 +1,74 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
+{{- $srvTargetPort := .Values.service.targetPort }}{{ if .Values.pegaMessagingTargetPort }}{{ $srvTargetPort = .Values.pegaMessagingTargetPort }}{{ end }}
+{{- if .Values.enabled }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $depName }}
+  labels:
+    app: {{ $depName }}
+    {{- if and (.Values.deployment) (.Values.deployment.labels) }}
+    {{ toYaml .Values.deployment.labels | nindent 4 }}
+    {{- end }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $depName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $depName }}
+        {{- if .Values.podLabels }}
+        {{ toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
+    spec:
+      imagePullSecrets:
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation-messaging" ) }}
+      {{ if .Values.docker.imagePullSecretNames }}
+      {{- range .Values.docker.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
+      {{ else if .Values.imagePullSecretNames }}
+      {{- range .Values.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
+      {{ end }}
+      containers:
+      - name: c11n-messaging
+        imagePullPolicy: {{ .Values.docker.messaging.imagePullPolicy }}
+        image: {{ .Values.docker.messaging.image }}
+        resources:
+          {{ if .Values.resources }}
+          {{ toYaml .Values.resources | nindent 10 }}
+          {{- end }}
+        securityContext:
+          {{- if .Values.securityContext }}
+          {{ toYaml .Values.securityContext | nindent 10 }}
+          {{- end }}
+        args:
+        - --max-semi-space-size=1024
+        - port={{ $srvTargetPort }}
+        - urlPath={{ .Values.urlPath }}
+        livenessProbe:
+          initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.livenessProbe.periodSeconds }}
+          successThreshold: {{ .Values.livenessProbe.successThreshold }}
+          failureThreshold: {{ .Values.livenessProbe.failureThreshold }}
+          httpGet:
+            path: {{ .Values.urlPath }}/ping
+            port: {{ $srvTargetPort }}
+        readinessProbe:
+          initialDelaySeconds: {{ .Values.readinessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.readinessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.readinessProbe.periodSeconds }}
+          successThreshold: {{ .Values.readinessProbe.successThreshold }}
+          failureThreshold: {{ .Values.readinessProbe.failureThreshold }}
+          httpGet:
+            path: {{ .Values.urlPath }}/ping
+            port: {{ $srvTargetPort }}
+        ports:
+        - containerPort: {{ $srvTargetPort }}
+{{- include "podAffinity" .Values | indent 6 }}
+{{ end }}

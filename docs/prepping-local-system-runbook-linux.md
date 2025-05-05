@@ -70,7 +70,7 @@ Helm provides a script that you can download and then run to install the latest 
 
 1. To download the Helm installation script from the Helm Git repository, from your home directory, enter:
 
-`$ curl
+    `$ curl
 https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
 get_helm.sh`
 
@@ -80,22 +80,22 @@ get_helm.sh`
 
 3. To run the script, enter:
 
-```bash
-$ ./get_helm.sh
-Helm v3.0.1 is available.
-Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
-Preparing to install helm into /usr/local/bin
-helm installed into /usr/local/bin/helm
-```
+    ```bash
+    $ ./get_helm.sh
+    Helm v3.0.1 is available.
+    Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
+    Preparing to install helm into /usr/local/bin
+    helm installed into /usr/local/bin/helm
+    ```
 
 4. To review your version, enter:
 
-```bash
-$ helm version
-version.BuildInfo{Version:"v3.0.1",
-GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
-GoVersion:"go1.13.4"}
-```
+    ```bash
+    $ helm version
+    version.BuildInfo{Version:"v3.0.1",
+    GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
+    GoVersion:"go1.13.4"}
+    ```
 
 For additional information, see [Helm documentation](https://helm.sh/docs/); for details about installation methods for previous Helm versions, see <https://v2.helm.sh/docs/using_helm/#installing-helm>.
 
@@ -105,12 +105,12 @@ Kubernetes supports a variety of installation methods for the kubectl command. T
 
 1. To download the latest binary from their git repository, enter:
 
-```bash
-$ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s
-https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
-```
+    ```bash
+    $ curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s
+    https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+    ```
 
-This command downloads and parses the \`stable.txt\` in the repository, navigates to the version listed in the file, and downloads the kubectl binary file in the /bin/linux/amd64/ directory.
+    This command downloads and parses the \`stable.txt\` in the repository, navigates to the version listed in the file, and downloads the kubectl binary file in the /bin/linux/amd64/ directory.
 
 2. Make the kubectl binary executable:
 
@@ -193,28 +193,28 @@ To install the Google Cloud SDK:
 
 10. In your command prompt, select a Cloud Platform project from the list of those where you have Owner, Editor or Viewer permissions:
 
-```bash
-Pick cloud project to use:
- [1] [my-project-1]
- [2] [my-project-2]
- ...
- Please enter your numeric choice or text value (must exactly match list item):
-```
+    ```bash
+    Pick cloud project to use:
+     [1] [my-project-1]
+     [2] [my-project-2]
+     ...
+     Please enter your numeric choice or text value (must exactly match list item):
+    ```
 
-If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
+    If you only have one project, `gcloud init` selects it for you. After your selection, the command confirms that you completed the setup steps successfully:
 
-```bash
-Your current project has been set to: [my-project-name].
-...
-Your Google Cloud SDK is configured and ready to use!
-
-* Commands that require authentication will use [my-account-name] by default
-* Commands will reference project `[my-project-name]` by default
-Run `gcloud help config` to learn how to change individual settings
-
-This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
-Run `gcloud topic configurations` to learn more.
-```
+    ```bash
+    Your current project has been set to: [my-project-name].
+    ...
+    Your Google Cloud SDK is configured and ready to use!
+    
+    * Commands that require authentication will use [my-account-name] by default
+    * Commands will reference project `[my-project-name]` by default
+    Run `gcloud help config` to learn how to change individual settings
+    
+    This gcloud configuration is called [default]. You can create additional configurations if you work with multiple accounts and/or projects.
+    Run `gcloud topic configurations` to learn more.
+    ```
 
 11. To list accounts whose credentials are stored on the local system, enter:
 
@@ -232,12 +232,12 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
 1. To download the latest binary from the AWS site, from your home directory, enter:
 
-```bash
-   $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
-   % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                  Dload  Upload   Total   Spent    Left  Speed
-   100 33.6M  100 33.6M    0     0  1996k      0  0:00:17  0:00:17 --:--:-- 4786k
-```
+    ```bash
+       $ curl -o aws-iam-authenticator https://amazon-eks.s3.us-west-2.amazonaws.com/1.15.10/2020-02-22/bin/linux/amd64/aws-iam-authenticator
+       % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                      Dload  Upload   Total   Spent    Left  Speed
+       100 33.6M  100 33.6M    0     0  1996k      0  0:00:17  0:00:17 --:--:-- 4786k
+    ```
 
 2. To make the AWS IAM Authenticator binary executable, enter:
 
@@ -251,7 +251,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
    `$ echo 'export PATH=$PATH:$HOME/bin' >> ~/.bashrc`
 
-5.  To verify the AWS IAM Authenticator is working, enter:
+5. To verify the AWS IAM Authenticator is working, enter:
 
    ```bash
    $ aws-iam-authenticator help
@@ -259,7 +259,7 @@ Pega recommends using the AWS IAM Authenticator for Kubernetes to authenticate w
 
    Usage:
      aws-iam-authenticator [command]
-```
+   ```
 
 These instructions were sourced from the AWS document, [Installing aws-iam-authenticator](https://docs.aws.amazon.com/eks/latest/userguide/install-aws-iam-authenticator.html).
 
@@ -323,17 +323,16 @@ For Linux command line users, you can follow these steps to install Docker Commu
 
     The command should return:
 
-```bash
-pub 4096R/0EBFCD88 2017-02-22
-9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
-uid Docker Release (CE deb) <docker@docker.com>
-sub 4096R/F273FCD8 2017-02-22
-```
+    ```bash
+    pub 4096R/0EBFCD88 2017-02-22
+    9DC8 5822 9FC7 DD38 854A E2D8 8D81 803C 0EBF CD88
+    uid Docker Release (CE deb) <docker@docker.com>
+    sub 4096R/F273FCD8 2017-02-22
+    ```
 
 5. Use the following command to set up the stable repository. You always need the stable repository, even if you want to install builds from the edge or test repositories as well. To add the edge or test repository, add the word "edge" or "test" (or both) after the word stable in the commands below.
 
-`$ sudo add-apt-repository "deb [arch=amd64]
-https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
+    `$ sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"`
 
 Note: Starting with Docker 17.06, stable releases are also pushed to the edge
 and test repositories.
@@ -388,12 +387,12 @@ Use the generation method best suited to your company standards. The following s
 
 5. Using the DNS lookup management system of your choice, associate the generated name/host record with the verification value. For instance:
 
-```java
-Name          :   _acme-challenge.demotest.dev.pega.io
-Type          :   TXT
-TTL (Seconds) :   1
-Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
-```
+    ```java
+    Name          :   _acme-challenge.demotest.dev.pega.io
+    Type          :   TXT
+    TTL (Seconds) :   1
+    Value         :  "ezEiD0Lkvvzlgfaqdohe3ZcX7s4vVF6hHlBBKI3sL38"
+    ```
 
 With the host name associated with the verification value, wait several minutes to ensure the configuration is established.
 
@@ -420,9 +419,9 @@ Pegasystems uses a standard naming practice of hostname/product/image:tag. Pega 
 -------------|-------------------------------------------------------|----------|
 `platform/installer`   | A utility image with which you install all of the Pega-specific rules and database tables in the “Pega” database that you have configured for your deployment. This installation is required before a deployment can take place.| `<version>` |
 `platform/pega`  | (Download required) Deploys Pega Platform with its customized version of the Tomcat application server.| `<version>` or `<version>-YYYYMMDD` |
-`platform/search` | (Download required) Deploys the required search engine for Pega Platform search and reporting capabilities. This Docker image contains Elasticsearch and includes all required plugins.| `<version>` or `<version>-YYYYMMDD` |
 `platform/clustering-service`  | (Download required) Deploys the required clustering service(Hazelcast) for the caching capabilities in Pega platform as a backing service. This Docker image contains Hazelcast clustering Service. <br/><br/>*Note: This feature is supported only from platform version "8.6" to deploy the platform in client-server Hazelcast model. Embedded deployment would not be supported in future platform releases.*| `<version>` |
-`platform-services/search-n-reporting-service` | [optional and compatible only with Pega version 8.6 and later] (Download required) Deploys the latest Pega generation of search and reporting capabilities in Pega Infinity on dedicated, backing service nodes. This Docker image contains Pega Search and Reporting Services and allows you to optimize Elasticsearch processing in your Pega deployment. To optimize Elasticsearch processing, you must deploy this image and the matching release of the platform/search image. For more information about this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md). | `<version>` |
+`platform-services/search-n-reporting-service` | (Download required) Deploys the latest Pega generation of search and reporting capabilities in Pega Infinity on dedicated, backing service nodes. This Docker image contains Pega Search and Reporting Service (SRS) and allows you to optimize Elasticsearch processing in your Pega deployment. For more information about this service, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-23/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html). | `<version>` |
+`platform/search` | (Deprecated) Deploys the deprecated legacy external client-server solution for Elasticsearch. The Docker image contains an Elasticsearch plug-in configured to directly connect to your Pega Platform environment. Note: The Elasticsearch plug-in is deprecated starting in Pega Platform version 8.8. Use the `platform-services/search-n-reporting-service` to deploy the Search and Reporting Service (SRS) instead. For more information, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-23/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).| `<version>` or `<version>-YYYYMMDD` |
 
 When you decide on a Pega Platform version for your downloaded Docker images, you should use the same version tag for each of the images you download.
 
@@ -438,7 +437,7 @@ this client-server model using Hazelcast. Embedded deployment would not be suppo
 To deploy Pega platform and Hazelcast using this client-server deployment model, you must download and push the Clustering Service Docker image,
 `platform/clustering-service` to your Docker repository and use with the Hazelcast subchart under [Pega charts](../charts/pega/charts).For the `platform/clustering-service` image, the :tag represents the version of Clustering Service you want to install, for example the tag :1.0.3 will install clustering-service version 1.0.3.
 
-The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](../charts/backingservices/charts/srs) under [backing services](../charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. This service is optional and is an alternate search feature to the previously used `platform/search` image-based Elasticsearch deployment. To configure this service, see [Instructions to configure the Pega backingservices](../charts/backingservices/README.md).
+The Docker image `platform-services/search-n-reporting-service` is used with the [Search and Reporting Service](../charts/backingservices/charts/srs) under [backing services](../charts/backingservices). The SRS subchart deployment provisions the latest generation of search and reporting capabilities in Pega Infinity. To configure this service, see [External Elasticsearch in your deployment](https://docs.pega.com/bundle/platform-23/page/platform/deployment/externalization-of-services/externalize-search-in-your-deployment.html).
 The docker image format is different for backing services and does not follow the datestamp pattern. For installations of or upgrades to Pega Infinity 8.6, you may configure Docker image `platform-services/search-n-reporting-service` with `<srs-version>` compatible with the Pega version as provided in [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix).
 
 The datestamp ensures that the image you download includes the changes that Pega engineering commits to the repository using pull requests by a certain date. While Pega builds the most current patch version of each minor release one time each day, Pega makes the last five daily-built images available for client downloads.  After Pega releases a new patch version, the prior patch version no longer receives daily builds with a datestamp tag.
@@ -465,17 +464,17 @@ Clients with appropriate licenses can log in to the image repository and downloa
 
 4. In the right side of the page, click **Request access key**.
 
-![Select your distribution](media/dockerimage-download.png)
+   ![Select your distribution](media/dockerimage-download.png)
 
 5. Enter your credential details.
 
    After you enter valid credentials, you recieve confirmation that an email is on the way. 
 
-![Select your distribution](media/dockerimage-download-access.png)
+   ![Select your distribution](media/dockerimage-download-access.png)
 
 6. Open the email you received. It will look similar to the image shown.
 
-![Confirmation email with access key details](media/dockerimage-access-email.png)
+   ![Confirmation email with access key details](media/dockerimage-access-email.png)
 
 7. Save your access key to a text file the <local filepath>\<platform>-demo folder so you can pass it into your docker login command to ensure the it will not display in your bash history or logs.
 
@@ -546,23 +545,7 @@ It is a best practice to retag each of your Pega Docker images by including your
 
    `$ docker push <Registry host name:Port>/my-pega:8.4.0`
 
-5. To download your preferred version of the `search` image to your local system, specify the version tag when you enter:
- 
-    ```bash
-    $ docker pull pega-docker.downloads.pega.com/platform/search:<version>
-    Digest: <encryption verification>
-    Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
-    ```
-
-6. To retag the `search` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-search:<Pega Platform version>`, enter:
-
-   `$ docker tag pega-docker.downloads.pega.com/platform/search:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
-
-7. To push the retagged `my-pega-search` image to your registry, enter:
-
-   `$ docker push <Registry host name:Port>/my-pega-search:8.4.0`
-
-8. To download your preferred version of the `installer` image to your local system, specify the version tag when you enter:
+5. To download your preferred version of the `installer` image to your local system, specify the version tag when you enter:
 
     ```bash
     $ docker pull pega-docker.downloads.pega.com/platform/installer:<version>
@@ -570,15 +553,15 @@ It is a best practice to retag each of your Pega Docker images by including your
     Status: Downloaded pega-docker.downloads.pega.com/platform/installer:<version>
     ```
 
-9. To retag the `installer` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-installer:<Pega Platform version>`, enter:
+6. To retag the `installer` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-installer:<Pega Platform version>`, enter:
 
    `$ docker tag pega-docker.downloads.pega.com/platform/installer:8.4.0 <Registry host name:Port>/my-pega-installer:8.4.0`
 
-10. To push the retagged `my-pega-installer` image to your registry, enter:
+7. To push the retagged `my-pega-installer` image to your registry, enter:
 
     `$ docker push <Registry host name:Port>/my-pega-installer:8.4.0`
    
-11. To download your preferred version of the `clustering-service` image to your local system, specify the version tag when you enter:
+8. To download your preferred version of the `clustering-service` image to your local system, specify the version tag when you enter:
 
     ```bash
     $ docker pull pega-docker.downloads.pega.com/platform/clustering-service:<version>
@@ -586,17 +569,17 @@ It is a best practice to retag each of your Pega Docker images by including your
     Status: Downloaded pega-docker.downloads.pega.com/platform/clustering-service:<version>
     ```
 
-12. To retag the `clustering-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-clustering-service:<Clustering Service version>`, enter:
+9. To retag the `clustering-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-clustering-service:<Clustering Service version>`, enter:
 
     `$ docker tag pega-docker.downloads.pega.com/platform/clustering-service:1.0.3 <Registry host name:Port>/my-clustering-service:1.0.3`
 
-13. To push the retagged `my-clustering-service` image to your registry, enter:
+10. To push the retagged `my-clustering-service` image to your registry, enter:
 
     `$ docker push <Registry host name:Port>/my-clustering-service:1.0.3`
 
     After you push these downloaded images to your private Docker registry, you are ready to begin deploying Pega Platform to a support Kubernetes environment. Use the runbook in this Github directory for your deployment.
 
-14. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag (refer [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix)) when you enter:
+11. To download your preferred version of the `search-n-reporting-service` image to your local system, specify the version tag (refer [compatibility matrix](../charts/backingservices/charts/srs/README.md#srs-version-compatibility-matrix)) when you enter:
  
     ```bash
     $ docker pull pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>
@@ -604,11 +587,26 @@ It is a best practice to retag each of your Pega Docker images by including your
     Status: Downloaded pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version>
     ```
 
-15. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
+12. To retag the `search-n-reporting-service` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-srs:<Pega Platform version>`, enter:
 
     `$ docker tag pega-docker.downloads.pega.com/platform-services/search-n-reporting-service:<srs-version> <Registry host name:Port>/my-pega-srs:8.6.0`
 
-16. To push the retagged `my-pega-srs` image to your registry, enter:
+13. To push the retagged `my-pega-srs` image to your registry, enter:
 
     `$ docker push <Registry host name:Port>/my-pega-srs:8.6.0`
 
+14. To download your preferred version of the `search` image to your local system, specify the version tag when you enter:
+ 
+    ```bash
+    $ docker pull pega-docker.downloads.pega.com/platform/search:<version>
+    Digest: <encryption verification>
+    Status: Downloaded pega-docker.downloads.pega.com/platform/search:<version>
+    ```
+
+15. To retag the `search` image for your deployment with a customized tag that includes your Docker registry host name and a name that is useful to your organization, such as `<Registry host name:Port>/my-pega-search:<Pega Platform version>`, enter:
+
+    `$ docker tag pega-docker.downloads.pega.com/platform/search:8.4.0 <Registry host name:Port>/my-pega-search:8.4.0`
+
+18. To push the retagged `my-pega-search` image to your registry, enter:
+
+    `$ docker push <Registry host name:Port>/my-pega-search:8.4.0`

@@ -77,6 +77,12 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+      - name: hz-encryption-secrets
+        secret:
+          defaultMode: 444
+          secretName: hz-encryption-secrets
+{{- end }}
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
 {{- include "pegaImportCertificatesTemplate" .root | indent 6 }}
 {{ end }}
@@ -112,23 +118,22 @@ spec:
       nodeSelector:
 {{ toYaml .node.nodeSelector | indent 8 }}
 {{- end }}
-{{- if (ne .root.Values.global.provider "openshift") }}
       securityContext:
+{{- if (ne .root.Values.global.provider "openshift") }}
+        runAsUser: 9001
+        fsGroup: 0
+{{- end }}
+{{- include "tcpKeepAliveProbe" . | indent 8 }}
 {{- if .node.securityContext }}
-{{- if .node.securityContext.runAsUser }}
-        runAsUser: {{ .node.securityContext.runAsUser }}
-{{- else }}
-        runAsUser: 9001
+{{ toYaml .node.securityContext | indent 8 }}
 {{- end }}
-{{- if .node.securityContext.fsGroup }}
-        fsGroup: {{ .node.securityContext.fsGroup }}
-{{- else }}
-        fsGroup: 0
+{{- if .node.topologySpreadConstraints }}
+      topologySpreadConstraints:
+{{ toYaml .node.topologySpreadConstraints | indent 8 }}
 {{- end }}
-{{- else }}
-        runAsUser: 9001
-        fsGroup: 0
-{{- end }}
+{{- if .node.tolerations }}
+      tolerations:
+{{ toYaml .node.tolerations | indent 8 }}
 {{- end }}
       containers:
       # Name of the container
@@ -151,6 +156,12 @@ spec:
 {{ toYaml .custom.ports | indent 8 }}
 {{- end }}
 {{- end }}
+{{- if .custom }}
+{{- if .custom.containerLifecycleHooks }}
+        lifecycle:
+{{ toYaml .custom.containerLifecycleHooks | indent 10 }}
+{{- end }}
+{{- end }}
         # Specify any of the container environment variables here
         env:	
         # Node type of the Pega nodes for {{ .name }}
@@ -165,6 +176,11 @@ spec:
           value: {{ .nodeType }}
         - name: PEGA_APP_CONTEXT_PATH
           value: {{ template "pega.applicationContextPath" . }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+                apiVersion: v1
+                fieldPath: metadata.name
 {{- if .node.requestor }}
         - name: REQUESTOR_PASSIVATION_TIMEOUT
           value: "{{ .node.requestor.passivationTimeSec }}"
@@ -172,6 +188,12 @@ spec:
 {{- if and .root.Values.constellation (eq .root.Values.constellation.enabled true) }}
         - name: COSMOS_SETTINGS
           value: "Pega-UIEngine/cosmosservicesURI=/c11n"
+{{- end }}
+{{- if ((.node.service).tls).enabled }}
+        - name: EXTERNAL_KEYSTORE_NAME
+          value: "{{ (((.node.service).tls).external_keystore_name) }}"
+        - name: EXTERNAL_KEYSTORE_PASSWORD
+          value: "{{ (((.node.service).tls).external_keystore_password) }}"
 {{- end }}
 {{- if .custom }}
 {{- if .custom.env }}
@@ -188,17 +210,33 @@ spec:
         - name: MAX_RETRIES
           value: {{ include "tierClassloaderMaxRetries" (dict "failureThreshold" $livenessProbeFailureThreshold "periodSeconds" $livenessProbePeriodSeconds ) | quote }}
 {{- if and (.root.Values.pegasearch.externalSearchService) ((.root.Values.pegasearch.srsAuth).enabled) }}
+{{- if or (not .root.Values.pegasearch.srsAuth.authType) (eq .root.Values.pegasearch.srsAuth.authType "private_key_jwt") }}
         - name: SERV_AUTH_PRIVATE_KEY
           valueFrom:
             secretKeyRef:
-              name: pega-srs-auth-secret
-              key: privateKey
+{{- include "srsAuthEnvSecretFrom"  .root | indent 14 }}
+{{- else if eq .root.Values.pegasearch.srsAuth.authType "client_secret_basic" }}
+        - name: SERV_AUTH_CLIENT_SECRET
+          valueFrom:
+            secretKeyRef:
+{{- include "srsAuthEnvSecretFrom"  .root | indent 14 }}
+{{- else }}
+  {{- fail "pegasearch.srsAuth.authType must be either private_key_jwt or client_secret_basic." }}
+{{- end }}
 {{- end }}
         envFrom:
         - configMapRef:
             name: {{ template "pegaEnvironmentConfig" .root }}
+{{- if .node.containerSecurityContext }}
+        securityContext:
+{{ toYaml .node.containerSecurityContext | indent 10 }}
+{{-  end }}
         resources:
+{{- if .node.resources }}
+{{ toYaml .node.resources | indent 10 }}
+{{- else }}
           # Maximum CPU and Memory that the containers for {{ .name }} can use
+          # Resources are configured through deprecated settings. Use .tier[].resources instead
           limits:
           {{- if .node.cpuLimit }}
             cpu: "{{ .node.cpuLimit }}"
@@ -209,6 +247,9 @@ spec:
             memory: "{{ .node.memLimit }}"
           {{- else }}
             memory: "12Gi"
+          {{- end }}
+          {{- if .node.ephemeralStorageLimit }}
+            ephemeral-storage: "{{ .node.ephemeralStorageLimit }}"
           {{- end }}
           # CPU and Memory that the containers for {{ .name }} request
           requests:
@@ -221,6 +262,10 @@ spec:
             memory: "{{ .node.memRequest }}"
           {{- else }}
             memory: "12Gi"
+          {{- end }}
+          {{- if .node.ephemeralStorageRequest }}
+            ephemeral-storage: "{{ .node.ephemeralStorageRequest }}"
+          {{- end }}
           {{- end }}
         volumeMounts:
         # The given mountpath is mapped to volume with the specified name.  The config map files are mounted here.
@@ -256,6 +301,10 @@ spec:
 {{- if .root.Values.global.kerberos }}
         - name: {{ template "pegaKerberosConfig" }}-config
           mountPath: "/opt/pega/kerberos"
+{{- end }}
+{{- if (.root.Values.hazelcast.encryption.enabled) }}
+        - name: hz-encryption-secrets
+          mountPath: "/opt/hazelcast/certs"
 {{- end }}
 
         # LivenessProbe: indicates whether the container is live, i.e. running.
@@ -309,6 +358,7 @@ spec:
       # If the image is in a protected registry, you must specify a secret to access it.
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
+{{- include "podAffinity" .node | indent 6 }}
 {{- if (.node.volumeClaimTemplate) }}
   volumeClaimTemplates:
   - metadata:

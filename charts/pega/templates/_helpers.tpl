@@ -58,15 +58,19 @@
 
 {{- define "pegaVolumeTomcatKeystoreTemplate" }}
 - name: {{ template "pegaVolumeTomcatKeystore" }}
-  secret:
-    # This name will be referred in the volume mounts kind.
-  {{ if ((.node.service).tls).external_secret_name }}
-    secretName: {{ ((.node.service).tls).external_secret_name }}
-  {{ else }}
-    secretName: {{ template "pegaTomcatKeystoreSecret" $ }}
-  {{ end }}
-    # Used to specify permissions on files within the volume.
+  projected:
     defaultMode: 420
+    sources:
+  {{ if (((.node.service).tls).external_secret_names) }}
+  {{- range (((.node.service).tls).external_secret_names) }}
+    - secret:
+        name: {{ . }}
+  {{- end }}
+  {{ else }}
+    # This name will be referred in the volume mounts kind.
+    - secret:
+        name: {{ template "pegaTomcatKeystoreSecret" $ }}
+  {{ end }}
 {{- end}}
 
 {{- define "pegaVolumeConfig" }}pega-volume-config{{- end }}
@@ -357,6 +361,11 @@ true
 dnsConfig:
   searches:
   - {{ .Values.global.privateHostedZoneDomainName }}
+{{ if (.Values.global.serviceDNSPolicyNdots) }}
+  options:
+    - name: ndots
+      value: {{ .Values.global.serviceDNSPolicyNdots | quote }}
+  {{- end }}
 {{- end }}
 {{- end }}
 
@@ -371,8 +380,26 @@ dnsConfig:
     {{- if (.Values.pegasearch.srsAuth).privateKey }}
         {{- .Values.pegasearch.srsAuth.privateKey | b64enc }}
     {{- else }}
-        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote}}
+        {{- fail "A valid entry is required for pegasearch.srsAuth.privateKey or pegasearch.srsAuth.external_secret_name, when request authentication mechanism(IDP) is enabled between SRS and Pega Infinity i.e. pegasearch.srsAuth.enabled is true." | quote }}
     {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "srsAuthEnvSecretFrom" }}
+{{- if .Values.pegasearch.srsAuth.external_secret_name }}
+name: {{ .Values.pegasearch.srsAuth.external_secret_name }}
+key: SRS_OAUTH_PRIVATE_KEY
+{{- else }}
+name: pega-srs-auth-secret
+key: privateKey
+{{- end }}
+{{- end }}
+
+{{- define "tcpKeepAliveProbe" }}
+{{- if .node.tcpKeepAliveProbe }}
+sysctls:
+- name: net.ipv4.tcp_keepalive_time
+  value: "{{ .node.tcpKeepAliveProbe }}"
 {{- end }}
 {{- end }}
 
@@ -488,6 +515,30 @@ servicePort: use-annotation
   {{- end -}}
 {{- end -}}
 
+{{- define "isHzEncryptionEnabled" }}
+  {{- if .Values.hazelcast.encryption.enabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isHzHighlySecureCryptoModeEnabled" }}
+  {{- if and .Values.hazelcast.encryption.enabled  .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isPegaHighlySecureCryptoModeEnabled" }}
+  {{- if .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
   projected:
@@ -510,5 +561,29 @@ servicePort: use-annotation
 
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
-
+  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+    - secret:
+        name: hz-encryption-secrets
+        items:
+          - key: HZ_SSL_KEYSTORE_PASSWORD
+            path: HZ_SSL_KEYSTORE_PASSWORD
+          - key: HZ_SSL_TRUSTSTORE_PASSWORD
+            path: HZ_SSL_TRUSTSTORE_PASSWORD
+  {{- end}}
 {{- end}}
+
+{{- define "isPega25OrLater"}}
+  {{- if .Values.global.pegaVersion }}
+    {{- /* Check provided release if using 8.x version pattern */ -}}
+    {{- if (semverCompare "^8.25.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+      "true"
+    {{- /* Check provided release if using 25.x.x version pattern */ -}}
+    {{- else if (semverCompare ">= 25.1.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+      "true"
+    {{- else -}}
+      "false"
+    {{- end -}}
+  {{- else }}
+    "false"
+  {{- end }}
+{{- end }}

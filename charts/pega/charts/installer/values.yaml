@@ -32,8 +32,12 @@ distributionKitVolumeClaimName: ""
 bypassLoadEngineClasses: "false"
 # Bypass loading assembly classes into database
 bypassLoadAssembledClasses: "false"
+# Custom JVM arguments for the installer
+customJVMArgs: ""
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
+# Optionally specify specific service account
+# serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5
@@ -83,14 +87,17 @@ upgrade:
   # Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.
   automaticResumeEnabled: "false"
 
-# Memory and CPU settings for installer
+# Memory, CPU, and ephemeral storage settings for installer
+# Ephemeral storage recommended size is 10G
 resources:
   requests:
     memory: "5Gi"
     cpu: 1
+    # ephemeralStorage: ""
   limits:
     memory: "6Gi"
     cpu: 2
+    # ephemeralStorage: ""
 
 shareProcessNamespace: false
 

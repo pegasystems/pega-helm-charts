@@ -7,9 +7,13 @@ global:
   # Enter your Kubernetes provider.
   provider: "k8s"
 
+  # Enter a name for the deployment if using multi-tenant services such as the Search and Reporting Service.
+  customerDeploymentId:
+
   # Deploy Pega nodes
   actions:
     execute: "deploy"
+
   # Add custom certificates to be mounted to container
   # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
   # to support multiple custom certificates as external secrets, specify each of your external secrets
@@ -19,7 +23,10 @@ global:
 
   # Add krb5.conf file content here.
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
-  kerberos:
+  kerberos: {}
+
+  # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  highlySecureCryptoModeEnabled: false
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
@@ -105,13 +112,16 @@ global:
       # waitTimeSeconds: 2
       # maxRetries: 1
 
+  pegaDiagnosticUser: ""
+  pegaDiagnosticPassword: ""
+
   # Specify the Pega tiers to deploy
   # For a minimal deployment, use a single tier to reduce resource consumption.
-  # Note: The nodeType Stream is deprecated, please remove it and enable externalized Kafka service
+  # Note: The nodeType Stream is not supported, enable externalized Kafka service instead.
   # configuration under External Services
   tier:
     - name: "minikube"
-      nodeType: "Stream,BackgroundProcessing,WebUser,Search"
+      nodeType: "BackgroundProcessing,WebUser,Search"
 
       service:
         httpEnabled: true
@@ -164,15 +174,16 @@ global:
 
       # Set resource consumption to minimal levels
       replicas: 1
-      cpuRequest: 200m
-      memRequest: "6Gi"
-      cpuLimit: 2
-      memLimit: "6Gi"
       javaOpts: ""
       initialHeap: "4096m"
       maxHeap: "4096m"
-      pegaDiagnosticUser: ""
-      pegaDiagnosticPassword: ""
+      resources:
+        requests:
+          memory: "6Gi"
+          cpu: 200m
+        limits:
+          memory: "6Gi"
+          cpu: 2
       volumeClaimTemplate:
         resources:
           requests:
@@ -204,10 +215,21 @@ dds:
 # Elasticsearch deployment settings.
 # Note: This Elasticsearch deployment is used for Pega search, and is not the same Elasticsearch deployment used by the EFK stack.
 # These search nodes will be deployed regardless of the Elasticsearch configuration above.
-# Refer to README document to configure `Search and Reporting Service` as a search functionality provider under this section.
 pegasearch:
   image: "pegasystems/search"
   memLimit: "3Gi"
+
+  # Set externalSearchService to true to use the Search and Reporting Service.
+  # Refer to the README document to configure SRS as a search functionality provider under this section.
+  externalSearchService: false
+  externalURL:
+  srsAuth:
+    enabled: false
+    url: ""
+    clientId: ""
+    authType: ""
+    privateKey: ""
+    external_secret_name: ""
 
 # Pega Installer settings
 installer:
@@ -227,7 +249,9 @@ hazelcast:
 
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
-
+  # Set to true to enforce SSL communication between the Clustering Service and Pega Platform.
+  encryption:
+    enabled: false
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.
@@ -279,8 +303,8 @@ stream:
   # so that it is easy to distinguish them from topics created by other applications.
   # Pega supports customizing the name pattern for your Externalized Kafka configuration for each deployment.
   streamNamePattern: "pega-{stream.name}"
-  # Your replicationFactor value cannot be more than the number of Kafka brokers and 3.
-  replicationFactor: "1"
+  # Your replicationFactor value cannot be more than the number of Kafka brokers.Pega recommended value is 3.
+  replicationFactor: "3"
   # To avoid exposing trustStorePassword, keyStorePassword, and jaasConfig parameters, leave the values empty and
   # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
   # STREAM_TRUSTSTORE_PASSWORD, STREAM_KEYSTORE_PASSWORD and STREAM_JAAS_CONFIG.

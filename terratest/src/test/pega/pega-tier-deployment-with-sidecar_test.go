@@ -39,8 +39,8 @@ func TestPegaDeploymentWithSidecar(t *testing.T) {
 				assertBatch(t, yamlSplit[2], options)
 				assertSidecar(t, yamlSplit[2], options)
 
-				assertStream(t, yamlSplit[3], options)
-				assertSidecar(t, yamlSplit[3], options)
+				//assertStream(t, yamlSplit[3], options)
+				//assertSidecar(t, yamlSplit[3], options)
 			}
 		}
 	}

@@ -44,12 +44,6 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **Pega Recommendation**: Set to use *dev/urandom* <br>
 **Note**: *This JVM argument is hardcoded in the Docker image with the recommended value. You cannot explicitly overwrite this argument.*
 
-**Flag**: `-XX:+ExitOnOutOfMemoryError` <br>
-**Purpose**: Exits the JVM when an OutOfMemoryError occurs. Exiting is required, as allowing the JVM to run after OutOfMemoryError leads to inconsistent system state.<br>
-**JVM default**: *ExitOnOutOfMemoryError=false* equivalent to `-XX:-ExitOnOutOfMemoryError`<br>
-**Pega Recommendation**: Set to Exit the JVM in case of OutOfMemoryError <br>
-**Note**: *This JVM argument is hardcoded in the Docker image with the recommended value. You cannot explicitly overwrite this argument.*
-
 **Flag**: `-Xlog:gc*,gc+heap=debug,gc+humongous=debug:file=/usr/local/tomcat/logs/gc.log:uptime,pid,level,time,tags:filecount=3,filesize=2M` <br>
 **Purpose**: Dumps the GC logs with the provided tags into local log file. <br>
 **JVM default**: No GC logs will be emitted by default.<br>
@@ -59,4 +53,9 @@ This is the Java8+ equivalent of *PermGen* space. This space is unbounded by def
 **Flag**: `-Duser.timezone=TIMEZONE`<br>
 **Purpose**: Sets the timezone the JVM will use.<br>
 **JVM default**: By default, the JVM obtains time zone from the operating system.  The Pega docker image is configured to Etc/UTC.<br>
-**Pega Recommendation**: Pega requires the JVM timezone to be the same as the timezone used by the database.   Set this if your database is not Etc/UTC.
+**Pega Recommendation**: Set the JVM time zone to match your database time zone. Set this parameter if your database time zone is not Etc/UTC.
+
+**Flag**: `-XX:+HeapDumpOnOutOfMemoryError` <br>
+**Purpose**: Generate a heap dump when an OutOfMemory Occurs.<br>
+**JVM default**: JVM terminates the application when it encounters an OutOfMemoryError without generating heap dump<br>
+**Pega Recommendation**: Set to generate heap dumps in case of OutOfMemoryError <br>
