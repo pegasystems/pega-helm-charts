@@ -4,7 +4,7 @@ global:
     - name: "web"
       custom:
         hostAliases:
-        - ip: "127.0.0.1"
-          hostnames:
-            - "test1.local"
-            - "test2.local"
+          - ip: "127.0.0.1"
+            hostnames:
+              - "test1.local"
+              - "test2.local"
