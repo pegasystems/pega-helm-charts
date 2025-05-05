@@ -166,17 +166,17 @@ spec:
         -  name: HZ_VERSION
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_VERSION
         -  name: HZ_CLUSTER_NAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_CLUSTER_NAME
         -  name: HZ_SERVER_HOSTNAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root}}
               key: HZ_SERVER_HOSTNAME
 {{- end }}
         envFrom:
