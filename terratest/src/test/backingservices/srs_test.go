@@ -13,6 +13,7 @@ func Test_shouldNotContainSRSResourcesWhenDisabled(t *testing.T) {
 			"srs.srsStorage.tls.enabled": "false",
 			"srs.deploymentName": "test-srs",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled": "false",
 		}),
 	)
 
