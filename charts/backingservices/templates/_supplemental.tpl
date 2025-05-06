@@ -5,6 +5,7 @@ deploymentName
 tlssecretsnippet
 backingservices.gke.backendConfig
 podAffinity
+tolerations
 are copied from backingservices/templates/_supplemental.tpl because helm lint requires
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 */}}
@@ -62,5 +63,12 @@ spec:
 {{- if .affinity }}
 affinity:
 {{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}
+
+{{- define "tolerations" }}
+{{- if .tolerations }}
+tolerations:
+{{- toYaml .tolerations | nindent 2 }}
 {{- end }}
 {{ end }}
