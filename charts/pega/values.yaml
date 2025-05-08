@@ -131,10 +131,11 @@ global:
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
 
-  # add comments
+  # PEGA RASP (Runtime Application Self Protection) feature settings.
+  # For Pega Infinity version 8.25.0 and later
   rasp:
-    enabled: false
-    action:
+    enabled: false # Set to true to enable RASP protection; set to false to disable it.
+    action: WARN # Allowed values: WARN, BLOCK
 
   pegaDiagnosticUser: ""
   pegaDiagnosticPassword: ""
