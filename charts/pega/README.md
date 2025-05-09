@@ -816,6 +816,26 @@ cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
   compressedConfigurations: true
 ```
 
+### Pega RASP (Runtime Application Self-Protection)
+
+To enable the Pega RASP feature, set the 'rasp.enabled' in values.yaml to 'true' and specify the action using 'rasp.action' in values.yaml.
+For exmaple:
+```yaml
+  rasp:
+    enabled: true
+    action: WARN
+```
+Set the 'rasp.action' value to control how violations are handled. The supported values are:
+
+Action value   | Description   
+---         | ---           
+`IGNORE`   | the violation is ignored.
+`WARN` | a warning will be logged, but the violation will be ignored
+`BLOCK` | the violation will be blocked by throwing an exception. An error will be logged.
+`ERROR` | the violation will be blocked by throwing an error, which will terminate the JVM unless caught. A fatal error will be logged.
+`EXIT`   | the JVM will exit immediately. A fatal error will be loggged.
+
+
 ### Pega diagnostic user
 
 While most cloud native deployments will take advantage of aggregated logging using a tool such as EFK, there may be a need to access the logs from Tomcat directly. In the event of a need to download the logs from tomcat, a username and password will be required.  You may set `pegaDiagnosticUser` and `pegaDiagnosticPassword` to set up authentication for Tomcat.

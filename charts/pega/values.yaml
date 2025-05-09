@@ -135,7 +135,7 @@ global:
   # For Pega Infinity version 8.25.0 and later
   rasp:
     enabled: false # Set to true to enable RASP protection; set to false to disable it.
-    action: WARN # Allowed values: WARN, BLOCK
+    action: WARN # Allowed values: IGNORE, WARN, BLOCK, ERROR, EXIT
 
   pegaDiagnosticUser: ""
   pegaDiagnosticPassword: ""
