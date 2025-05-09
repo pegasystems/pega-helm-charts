@@ -346,6 +346,8 @@ dds:
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # Whether to enable client certificate verification on the Cassandra connection.
+  clientAuth: false
   # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
   # are JKS and PKCS12. Default is JKS.
   clientEncryptionStoreType: ""
