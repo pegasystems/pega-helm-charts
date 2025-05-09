@@ -1,7 +1,7 @@
 module github.com/pegasystems/pega-helm-charts/terratest/src/test
 
 go 1.21
-toolchain go1.23.7
+toolchain go1.24.1
 
 require (
 	github.com/GoogleCloudPlatform/gke-managed-certs v0.3.4
