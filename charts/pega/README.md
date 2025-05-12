@@ -823,13 +823,15 @@ For exmaple:
 ```yaml
   rasp:
     enabled: true
-    action: WARN
+    action: ""
 ```
-Set the 'rasp.action' value to control how violations are handled. The supported values are:
+Set the 'rasp.action' value to control how violations are handled
+- Leave this field as an empty string (""), as shown in the example above, to let RASP automatically configure the default behavior internally.
+- To override the default action, provide one of the following allowed values
 
 Action value   | Description   
 ---         | ---           
-`IGNORE`   | the violation is ignored.
+`IGNORE`  | the violation is ignored.
 `WARN` | a warning will be logged, but the violation will be ignored
 `BLOCK` | the violation will be blocked by throwing an exception. An error will be logged.
 `ERROR` | the violation will be blocked by throwing an error, which will terminate the JVM unless caught. A fatal error will be logged.

@@ -52,7 +52,9 @@ data:
 {{- end }}
 {{- if .Values.global.rasp.enabled }}
   IS_RASP_ENABLED: "{{ .Values.global.rasp.enabled }}"
+  {{- if .Values.global.rasp.action }}
   RASP_ACTION: "{{.Values.global.rasp.action}}"
+  {{- end }}
 {{- else }}
   IS_RASP_ENABLED: "false"
 {{- end }}
