@@ -39,7 +39,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=5> >= 8.6 </td>
-            <td rowspan=5>1.37.9</td>
+            <td rowspan=5>1.38.2</td>
             <td rowspan=4> <b>search-n-reporting-service</b></td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
@@ -72,6 +72,7 @@ The service deployment provisions runtime service pods along with a dependency o
     </tbody>
 </table>
 
+**Important:** Pega supports only official Elasticsearch and OpenSearch Docker images. Custom images, for example, `bitnami/elasticsearch`, are not supported.
 
 **Note:**
 
