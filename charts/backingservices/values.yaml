@@ -107,7 +107,7 @@ srs:
     # and add the parameter details: srs.srsStorage.awsIAM and its associated region, srs.srsStorage.awsIAM.region
     # awsIAM:
     #   region: "AWS_ELASTICSEARCH_REGION"/"AWS_OPENSEARCH_REGION"
-    # Set srs.srsStorage.networkPolicy.enabled: true to enable network policy for the SRS service
+    # Set srs.srsStorage.networkPolicy.enabled: false to disable network policy for the SRS service. The default value is true.
     networkPolicy:
       enabled: true
     # To configure either authentication method, when the Elasticsearch/OpenSearch domain requires an open internet connection,
