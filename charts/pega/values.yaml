@@ -132,13 +132,12 @@ global:
   compressedConfigurations: false
 
   # PEGA RASP (Runtime Application Self Protection) feature settings.
-  # For Pega Infinity version 8.25.0 and later
-  # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-rasp-runtime-application-self-protection
+  # Available in Pega Platform ‘25 and later.
   rasp:
     # Set to true to enable RASP protection; set to false to disable it.
     enabled: false
     # Leave empty ("") to use the default behavior configured by RASP.
-    # To override, set one of the following values: IGNORE, WARN, BLOCK, ERROR, EXIT
+    # To override, set one of the following values: IGNORE, WARN, BLOCK, ERROR, EXIT.
     action: ""
 
   pegaDiagnosticUser: ""

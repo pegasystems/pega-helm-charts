@@ -818,16 +818,17 @@ cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
 
 ### Pega RASP (Runtime Application Self-Protection)
 
-To enable the Pega RASP feature, set the 'rasp.enabled' in values.yaml to 'true' and specify the action using 'rasp.action' in values.yaml.
-For exmaple:
+For Pega Platform ’25 and later, you can improve security by enabling the Pega Runtime Application Self-Protection (RASP) feature, which detects and blocks security violations by taking advantage of information from inside the running software. To enable RASP, set the 'rasp.enabled' in values.yaml to 'true' and specify the action using 'rasp.action' in values.yaml.
+
+For example:
 ```yaml
   rasp:
     enabled: true
     action: ""
 ```
-Set the 'rasp.action' value to control how violations are handled
+Set the 'rasp.action' value to control how violations are handled:
 - Leave this field as an empty string (""), as shown in the example above, to let RASP automatically configure the default behavior internally.
-- To override the default action, provide one of the following allowed values
+- To override the default action, provide one of the following allowed values:
 
 Action value   | Description   
 ---         | ---           
