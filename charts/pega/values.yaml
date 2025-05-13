@@ -230,6 +230,10 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+
+        # Configure custom labels for ingress
+        labels:
+
         tls:
           # Enable TLS encryption
           enabled: true
