@@ -17,6 +17,12 @@ global:
   actions:
     execute: "deploy"
 
+  # Pega Platform versions 25.0 and above require that certain libraries are included in the bootstrap classpath
+  # for Tomcat.  As this chart supports multiple versions of the Pega Platform, the version is determined
+  # dynamically at startup.  If there is a problem performing the version check, it can be bypassed by setting
+  # the field below with the Pega Platform version (for example, "8.8.4").
+  # version: major.minor.patch
+
   # Add custom certificates to be mounted to container
   # to support custom certificates as plain text (less secure), pass them directly using the certificates parameter;
   # to support multiple custom certificates as external secrets, specify each of your external secrets
