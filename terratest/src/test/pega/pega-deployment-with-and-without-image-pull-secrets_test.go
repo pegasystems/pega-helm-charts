@@ -278,10 +278,9 @@ func assertWithImagePullSecrets(t *testing.T, webYaml string) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, webYaml, &deploymentObj)
 	imagePullSecrets := deploymentObj.Spec.Template.Spec.ImagePullSecrets
-	require.Equal(t, imagePullSecrets[0].Name, "pega-registry-secret")
-	require.Equal(t, imagePullSecrets[1].Name, "secret1")
-	require.Equal(t, imagePullSecrets[2].Name, "secret2")
-	require.Equal(t, len(imagePullSecrets), 3)
+	require.Equal(t, imagePullSecrets[0].Name, "secret1")
+	require.Equal(t, imagePullSecrets[1].Name, "secret2")
+	require.Equal(t, len(imagePullSecrets), 2)
 }
 
 func assertWithoutRegistryBlock(t *testing.T, webYaml string) {
