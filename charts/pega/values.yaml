@@ -131,6 +131,15 @@ global:
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
 
+  # PEGA RASP (Runtime Application Self Protection) feature settings.
+  # Available in Pega Platform ‘25 and later.
+  rasp:
+    # Set to true to enable RASP protection; set to false to disable it.
+    enabled: false
+    # Leave empty ("") to use the default behavior configured by RASP.
+    # To override, set one of the following values: IGNORE, WARN, BLOCK, ERROR, EXIT.
+    action: ""
+
   pegaDiagnosticUser: ""
   pegaDiagnosticPassword: ""
 
