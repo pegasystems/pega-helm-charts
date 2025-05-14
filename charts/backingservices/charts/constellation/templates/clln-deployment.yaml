@@ -22,6 +22,9 @@ spec:
         {{ toYaml .Values.podLabels | nindent 8 }}
         {{- end }}
     spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
         - name: {{ $depName }}-appstatic-assets
@@ -82,4 +85,5 @@ spec:
         ports:
         - containerPort: {{ .Values.service.targetPort }}
 {{- include "podAffinity" .Values | indent 6 }}
+{{- include "tolerations" .Values | indent 6 }}
 {{ end }}
