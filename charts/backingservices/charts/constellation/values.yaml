@@ -7,7 +7,7 @@ provider: "aws"
 # For aws cloud provider enter your acm certificate ARN here.
 awsCertificateArn: arn:aws:acm:us-west-2:xxxxx:certificate/xxxxxxx
 # Customer assets must be stored on a persistent storage volume.  Create a volume claim and provide the name.
-customerAssetVolumeClaimName:
+customerAssetVolumeClaimName: 
 
 # Docker repos and tag for image
 docker:
@@ -74,3 +74,12 @@ readinessProbe:
   periodSeconds: 30
   successThreshold: 1
   failureThreshold: 3
+
+# custom: # Custom configuration volumes and mounts /mnt/custom-path
+  # volumes:
+  #   - name: CUSTOM_VOLUMES
+  #     hostPath:
+  #        path: /mnt/custom-path
+  # volumeMounts:
+  #   - name: CUSTOM_VOLUMES_MOUNT
+  #     mountPath: CUSTOM_MOUNT_PATH

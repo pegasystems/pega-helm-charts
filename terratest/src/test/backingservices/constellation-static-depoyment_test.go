@@ -60,3 +60,100 @@ func TestConstellationStaticDeploymentWithTolerations(t *testing.T) {
 	require.Equal(t, "NotSchedule", string(deploymentTolerations[0].Effect))
 	require.Empty(t, cllnDeploymentObj.Spec.Template.Spec.Affinity)
 }
+
+func TestConstellationStaticDeploymentCustomVolumes(t *testing.T) {
+	t.Run("Only customerAssetVolumeClaimName is set", func(t *testing.T) {
+		helmChartParser := NewHelmConfigParser(
+			NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+				"constellation.enabled": "true",
+				"constellation.customerAssetVolumeClaimName": "customer-claim",
+			},
+				[]string{"charts/constellation/templates/clln-deployment.yaml"}),
+		)
+	
+		var deployment appsv1.Deployment
+		helmChartParser.getResourceYAML(SearchResourceOption{
+			Name: "constellation",
+			Kind: "Deployment",
+		}, &deployment)
+	
+		volumes := deployment.Spec.Template.Spec.Volumes
+		var foundCustomer bool
+		for _, vol := range volumes {
+			if vol.Name == "constellation-appstatic-assets" {
+				foundCustomer = true
+			}
+		}
+	
+		require.True(t, foundCustomer, "Expected volume with claimName 'customer-claim' not found")
+		require.Equal(t, 1, len(volumes), "Expected exactly one volume named 'constellation-appstatic-assets'")
+
+	})
+
+	t.Run("Only custom.volumes is set", func(t *testing.T) {
+		helmChartParser := NewHelmConfigParser(
+			NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+				"constellation.enabled": "true",
+				"constellation.custom.volumes[0].name": "custom-volume",
+				"constellation.custom.volumes[0].hostPath.path": "/mnt/custom-path",
+
+
+			},
+				[]string{"charts/constellation/templates/clln-deployment.yaml"}),
+		)
+
+		var deployment appsv1.Deployment
+		helmChartParser.getResourceYAML(SearchResourceOption{
+			Name: "constellation",
+			Kind: "Deployment",
+		}, &deployment)
+
+		volumes := deployment.Spec.Template.Spec.Volumes
+		var foundCustom bool
+
+		for _, vol := range volumes {
+			t.Logf("Volume Name: %s", vol.Name)
+			if vol.Name == "custom-volume"  {
+				foundCustom = true
+			}
+		}
+		require.True(t, foundCustom, "Expected volume with claimName 'custom-volume' not found")
+
+	})
+
+	t.Run("Both customerAssetVolumeClaimName and custom.volumes are set", func(t *testing.T) {
+		helmChartParser := NewHelmConfigParser(
+			NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+				"constellation.enabled": "true",
+				"constellation.customerAssetVolumeClaimName": "customer-claim",
+				"constellation.custom.volumes[0].name": "custom-volume",
+				"constellation.custom.volumes[0].hostPath.path": "/mnt/custom-path",
+
+
+			},
+				[]string{"charts/constellation/templates/clln-deployment.yaml"}),
+		)
+
+		var deployment appsv1.Deployment
+		helmChartParser.getResourceYAML(SearchResourceOption{
+			Name: "constellation",
+			Kind: "Deployment",
+		}, &deployment)
+
+		volumes := deployment.Spec.Template.Spec.Volumes
+		foundCustomer := false
+		foundCustom := false
+		for _, vol := range volumes {
+			// log the volume names for debugging
+			t.Logf("Volume Name: %s", vol.Name)
+			if vol.Name == "constellation-appstatic-assets"  {
+				foundCustomer = true
+			}
+			if vol.Name == "custom-volume"  {
+				foundCustom = true
+			}
+		}
+		require.True(t, foundCustomer, "Expected volume with claimName 'customer-claim' not found")
+		require.True(t, foundCustom, "Expected volume with claimName 'custom-volume' not found")
+	})
+}

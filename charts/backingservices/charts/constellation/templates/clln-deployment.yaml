@@ -25,11 +25,16 @@ spec:
       {{- if .Values.serviceAccountName }}
       serviceAccountName: {{ .Values.serviceAccountName }}
       {{- end }}
-      {{- if .Values.customerAssetVolumeClaimName }}
+      {{- if (or (and .Values.custom .Values.custom.volumes) .Values.customerAssetVolumeClaimName)}}
       volumes:
+        {{- if (and .Values.custom .Values.custom.volumes) }}
+        {{ toYaml .Values.custom.volumes | nindent 8}}
+        {{- end }}
+        {{- if .Values.customerAssetVolumeClaimName }}
         - name: {{ $depName }}-appstatic-assets
           persistentVolumeClaim:
             claimName: {{ .Values.customerAssetVolumeClaimName }}
+        {{- end }}
       {{- end }}
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation" ) }}
@@ -54,10 +59,15 @@ spec:
           {{- if .Values.securityContext }}
           {{ toYaml .Values.securityContext | nindent 10 }}
           {{- end }}
-        {{ if .Values.customerAssetVolumeClaimName }}
+        {{- if (or (and .Values.custom .Values.custom.volumes) .Values.customerAssetVolumeClaimName)}}
         volumeMounts:
-         - name: {{ $depName }}-appstatic-assets
-           mountPath: /usr/src/app/dist/customers
+          {{ if (and .Values.custom .Values.custom.volumeMounts) }}
+          {{ toYaml .Values.custom.volumeMounts | nindent 10 }}
+          {{- end }}
+          {{- if .Values.customerAssetVolumeClaimName }}
+          - name: {{ $depName }}-appstatic-assets
+            mountPath: /usr/src/app/dist/customers
+          {{- end }}
         {{- end }}
         args:
         - port={{ .Values.service.targetPort }}
