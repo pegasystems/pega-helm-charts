@@ -260,3 +260,43 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_LOG_METRICS_ENABLED"], "false")
 	require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 }
+
+func TestPegaRASPEnvironmentConfig(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider": "k8s",
+			//"global.actions.execute": "deploy",
+		},
+	}
+
+	options.SetValues["global.rasp.enabled"] = "true"
+	options.SetValues["global.rasp.action"] = ""
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
+	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
+
+	options.SetValues["global.rasp.enabled"] = "true"
+	options.SetValues["global.rasp.action"] = "WARN"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
+	VerifyEnvValue(t, yamlContent, "RASP_ACTION", "WARN")
+
+	options.SetValues["global.rasp.enabled"] = "false"
+	options.SetValues["global.rasp.action"] = ""
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
+	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
+
+	options.SetValues["global.rasp.enabled"] = "false"
+	options.SetValues["global.rasp.action"] = "WARN"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
+	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
+}
