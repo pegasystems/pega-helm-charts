@@ -28,8 +28,11 @@ metadata:
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
-  # Replicas specify the number of copies for {{ .name }}
+
+{{- if or (not .node.hpa) (eq .node.hpa.enabled false) }}
+  # Replicas specify the number of copies for {{ .name }} when HPA is not in use
   replicas: {{ .node.replicas }}
+{{- end }}
 {{- if (eq .kind "Deployment") }}
   progressDeadlineSeconds: 2147483647
 {{- end }}
