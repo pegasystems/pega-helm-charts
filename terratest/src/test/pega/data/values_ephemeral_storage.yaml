@@ -5,6 +5,8 @@ global:
       nodeType: "WebUser"
       requestor:
         passivationTimeSec: 900
+      hpa:
+        enabled: true
       replicas: 1
       deploymentStrategy:
         rollingUpdate:

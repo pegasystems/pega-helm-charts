@@ -6,6 +6,8 @@ global:
       nodeType: "WebUser"
       requestor:
         passivationTimeSec: 900
+      hpa:
+        enabled: true
       replicas: 1
       deploymentStrategy:
         rollingUpdate:
@@ -18,6 +20,8 @@ global:
       custom:
     - name: "batch"
       nodeType: "BackgroundProcessing,Search,Batch,RealTime,Custom1,Custom2,Custom3,Custom4,Custom5,BIX"
+      hpa:
+        enabled: true
       replicas: 1
       deploymentStrategy:
         rollingUpdate:
