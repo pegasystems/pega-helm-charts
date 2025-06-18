@@ -287,7 +287,7 @@ global:
       #     add: ["SYS_TIME"]
 
       hpa:
-        enabled: true
+        enabled: false
         # To configure behavior specifications for hpa, set the required scaleUp & scaleDown values.
         # See, https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#stabilization-window
         # behavior:
@@ -363,7 +363,7 @@ global:
       #     add: ["SYS_TIME"]
 
       hpa:
-        enabled: true
+        enabled: false
 
       # Set enabled to true to include a Pod Disruption Budget for this tier.
       # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
@@ -412,8 +412,6 @@ dds:
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
-  # Whether to enable client certificate verification on the Cassandra connection.
-  clientAuth: false
   # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
   # are JKS and PKCS12. Default is JKS.
   clientEncryptionStoreType: ""
@@ -513,16 +511,6 @@ installer:
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
-  # Specifies the system name. Default name is "pega".
-  systemName: "pega"
-  # Sets the system's production level during installation.
-  # Valid production level values (1-5):
-  # 5 = Production
-  # 4 = Preproduction
-  # 3 = Test
-  # 2 = Development (Default)
-  # 1 = Experimental
-  productionLevel: 2
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
