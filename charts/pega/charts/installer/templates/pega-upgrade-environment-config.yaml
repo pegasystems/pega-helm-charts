@@ -12,7 +12,7 @@ metadata:
 {{- if .Values.upgrade.upgradeSteps }}
   UPGRADE_STEP: {{ .Values.upgrade.upgradeSteps }}
 {{- end }}
-  PEGA_REST_SERVER_URL: {{ include "pegaRestURL" $ | quote }}
+  PEGA_REST_SERVER_URL: {{ include "pegaRestURLOverride" $ | quote }}
 {{- if .Values.upgrade.targetRulesSchema }}
   # Target Rules Schema name
   TARGET_RULES_SCHEMA: {{ .Values.upgrade.targetRulesSchema }}
