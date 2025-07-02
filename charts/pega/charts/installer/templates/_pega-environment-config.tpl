@@ -55,8 +55,10 @@ data:
 {{- if .Values.global.fips140_3Mode }}
   FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}
 {{- end }}
-{{- if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
+{{- if .Values.global.highlySecureCryptoModeEnabled }}
   HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
+{{- else }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "false"
 {{- end }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
