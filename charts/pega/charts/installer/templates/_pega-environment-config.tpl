@@ -52,6 +52,12 @@ data:
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: {{ .Values.global.customArtifactory.enableSSLVerification | quote }}
   # Custom JVM arguments for the installer
   CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}
+{{- end }}
+{{- if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
+{{- end }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
 {{- range .Values.advancedSettings }}
