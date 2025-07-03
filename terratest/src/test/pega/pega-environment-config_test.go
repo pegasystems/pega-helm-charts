@@ -272,31 +272,13 @@ func TestPegaRASPEnvironmentConfig(t *testing.T) {
 		},
 	}
 
-	options.SetValues["global.rasp.enabled"] = "true"
 	options.SetValues["global.rasp.action"] = ""
 	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
 	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
 
-	options.SetValues["global.rasp.enabled"] = "true"
 	options.SetValues["global.rasp.action"] = "WARN"
 	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
 	VerifyEnvValue(t, yamlContent, "RASP_ACTION", "WARN")
-
-	options.SetValues["global.rasp.enabled"] = "false"
-	options.SetValues["global.rasp.action"] = ""
-	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
-	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
-
-	options.SetValues["global.rasp.enabled"] = "false"
-	options.SetValues["global.rasp.action"] = "WARN"
-	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
-	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
 }
