@@ -1,0 +1,12 @@
+installer:
+  jobSpecificImages:
+    pega-db-install: MY_INSTALLER_IMAGE:TAG
+  resources:
+    override:
+      pega-db-install:
+        requests:
+          cpu: "200m"
+          memory: "1Gi"
+        limits:
+          cpu: "200m"
+          memory: "1Gi"
