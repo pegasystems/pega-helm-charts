@@ -223,7 +223,7 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- $webAppContextPath := "prweb" }}
 {{- range $index, $tier := .Values.global.tier }}
   {{- if hasKey $tier "nodeType" }}
-    {{- if and (contains $tier.nodeType "WebUser") (hasKey $tier "service") }}
+    {{- if and (contains "WebUser" $tier.nodeType) (hasKey $tier "service") }}
     {{- $webTier = $tier.name }}
     {{- if eq "" $webTierServiceName }}
       {{- $webTierServiceName = printf "%s-%s" $depName $webTier }}
