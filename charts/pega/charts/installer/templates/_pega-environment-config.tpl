@@ -53,12 +53,10 @@ data:
   # Custom JVM arguments for the installer
   CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs }}
 {{- if .Values.global.fips140_3Mode }}
-  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: {{ .Values.global.fips140_3Mode | quote }}
 {{- end }}
 {{- if .Values.global.highlySecureCryptoModeEnabled }}
   HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
-{{- else }}
-  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "false"
 {{- end }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
