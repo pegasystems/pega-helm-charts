@@ -208,6 +208,16 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- define "generatedInstallerJobLabels" }}
 {{- end }}
 
+# Check for External REST URL
+{{- define "pegaRestURLOverride" }}
+{{- $useRestURLOverride := false }}
+{{- if (.Values.upgrade) }}{{- if (.Values.upgrade.pegaRESTServerURL) }}
+{{- $useRestURLOverride = true }}
+{{- end }}{{- end }}
+{{- if ($useRestURLOverride) }}{{- .Values.upgrade.pegaRESTServerURL -}}{{- else -}}{{ include "pegaRestURL" $ }}{{- end -}}
+{{- end }}
+
+
 # Compose REST Service URL for pre- and post- upgrade ZDT tasks
 {{- define "pegaRestURL" }}
 {{- $depName := "pega" }}
@@ -256,3 +266,44 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end }}
 
 {{- define "pegaInstallerCredentialsVolume" }}pega-installer-credentials-volume{{- end }}
+
+
+{{- define "pegaInstallerResources" }}
+{{- $overriddenResources := dict }}
+{{- if (.root.Values.resources.override) }}
+  {{- if (hasKey .root.Values.resources.override .name ) }}
+  {{- $overriddenResources = get .root.Values.resources.override .name }}
+  {{- end }}
+{{- end }}
+{{- if ($overriddenResources.requests) }}
+# Using job-specific resource specification for {{ .name }}
+{{ toYaml $overriddenResources }}
+{{- else }}
+requests:
+  cpu: "{{ .root.Values.resources.requests.cpu }}"
+  memory: "{{ .root.Values.resources.requests.memory }}"
+  {{- if .root.Values.resources.requests.ephemeralStorage }}
+  ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
+  {{- end }}
+limits:
+  cpu: "{{ .root.Values.resources.limits.cpu }}"
+  memory: "{{ .root.Values.resources.limits.memory }}"
+  {{- if .root.Values.resources.limits.ephemeralStorage }}
+  ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "pegaInstallerImage" }}
+{{- $imageOverride := dict }}
+{{- if (.root.Values.jobSpecificImages) }}
+  {{- if (hasKey .root.Values.jobSpecificImages .name ) }}
+  {{- $imageOverride = get .root.Values.jobSpecificImages .name }}
+  {{- end }}
+{{- end }}
+{{- if ($imageOverride) }}
+{{- $imageOverride }}
+{{- else }}
+{{- .root.Values.image }}
+{{- end }}
+{{- end }}
