@@ -818,7 +818,7 @@ cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
 
 ### Pega RASP (Runtime Application Self-Protection)
 
-Starting with Pega Platform version 25, the Runtime Application Self-Protection (RASP) feature is enabled by default to enhance security, which detects and blocks security violations by taking advantage of information from inside the running software.
+Starting with Pega Platform version 25, the Runtime Application Self-Protection (RASP) feature is enabled by default to enhance security. RASP detects and blocks security violations by taking advantage of information from inside the running software.
 
 You can configure RASP action in values.yaml: 
 ```yaml

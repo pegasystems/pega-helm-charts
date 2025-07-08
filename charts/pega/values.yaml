@@ -135,7 +135,7 @@ global:
   # Available in Pega Platform ‘25 and later.
   rasp:
     # By default, RASP is enabled in Pega Platform ‘25 and later.
-    # To disable the RASP, set the action to 'DISABLE'.
+    # To disable RASP, set the action to 'DISABLE'.
     # Leave empty ("") to use the default action behavior configured by RASP.
     # To override the RASP action, set one of the following values: IGNORE, WARN, BLOCK, ERROR, EXIT.
     action: ""
