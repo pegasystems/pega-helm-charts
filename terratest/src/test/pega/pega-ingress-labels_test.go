@@ -71,3 +71,44 @@ func TestPegaIngressLabels(t *testing.T) {
 		}
 	}
 }
+
+
+func TestPegaEKSIngressHealthcheck(t *testing.T) {
+	var deploymentNames = []string{"pega", "myapp-dev"}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err, "Failed to resolve Helm chart path")
+
+    for _, deploymentName := range deploymentNames {
+        // Set the Helm values to configure the labels
+        options := &helm.Options{
+            SetValues: map[string]string{
+                "global.provider":                        "eks",
+                "global.actions.execute":                 "deploy",
+                "global.deployment.name":                 deploymentName,
+                "global.tier[0].name":                    "web",
+                "global.tier[0].ingress.enabled":         "true",
+                "global.tier[0].ingress.domain":          "pega.local",
+                "global.tier[0].service.port":            "80",
+            },
+        }
+
+        // Render the Kubernetes manifests using Helm
+        output := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-ingress.yaml"})
+
+        // Create a YAML decoder from the output
+        decoder := yaml.NewYAMLOrJSONDecoder(bytes.NewReader([]byte(output)), 4096)
+        for {
+            var resource unstructured.Unstructured
+            err := decoder.Decode(&resource)
+            if err != nil {
+                // Break on EOF
+                break
+            }
+
+            assert.Equal(t, resource.GetKind(), "Ingress", "Should be an ingress")
+            annotations := resource.GetAnnotations()
+            assert.Contains(t, annotations, "alb.ingress.kubernetes.io/healthcheck-path", "Expected ingress to specify healthcheck path annotation.")
+            assert.Equal(t, annotations["alb.ingress.kubernetes.io/healthcheck-path"], "/healthz.html", "Annotation should have the correct value.")
+        }
+	}
+}
