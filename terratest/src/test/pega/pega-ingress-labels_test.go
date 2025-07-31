@@ -110,5 +110,5 @@ func TestPegaEKSIngressHealthcheck(t *testing.T) {
             assert.Contains(t, annotations, "alb.ingress.kubernetes.io/healthcheck-path", "Expected ingress to specify healthcheck path annotation.")
             assert.Equal(t, annotations["alb.ingress.kubernetes.io/healthcheck-path"], "/healthz.html", "Annotation should have the correct value.")
         }
-	}
+    }
 }
