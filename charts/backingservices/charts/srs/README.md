@@ -43,12 +43,12 @@ The service deployment provisions runtime service pods along with a dependency o
             <td rowspan=4> <b>search-n-reporting-service</b></td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3 & 7.17.9</td>
+            <td>Elasticsearch 7.17.9</td>
             <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
+            <td>Elasticsearch 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
             <td>As a best practice, use Elasticsearch version 8.18.2.</td>
         </tr>
         <tr>
@@ -67,14 +67,16 @@ The service deployment provisions runtime service pods along with a dependency o
             <td> All versions </td>
             <td>Enabled</td>
             <td><ul><li>Elasticsearch 7.10 on AWS OpenSearch service</li><li>OpenSearch 1.3 </li><li>OpenSearch 2.15</li></ul></td>
-            <td> As a best practice, use OpenSearch 2.15. </td>
+            <td> The <b>search-n-reporting-service-os</b> replaced the earlier <b>search-n-reporting-service-aws</b> image.
+The image supports all OpenSearch deployment options (cloud or self-managed).
+As a best practice, use OpenSearch 2.15. </td>
         </tr>
     </tbody>
 </table>
 
+**Note:** Elasticsearch 7.10.2 and 7.16.3 reached end of vendor support and are no longer supported. Elasticsearch 7.17.9 will reach vendor end of support on Jan 15, 2026.
+                
 **Important:** Pega supports only official Elasticsearch and OpenSearch Docker images. Custom images, for example, `bitnami/elasticsearch`, are not supported.
-
-**Note:**
 
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
 To migrate to Elasticsearch version 7.17.9, 8.10.3, 8.15.1, 8.15.5 or 8.18.2 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
