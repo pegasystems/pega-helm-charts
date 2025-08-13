@@ -43,13 +43,13 @@ The service deployment provisions runtime service pods along with a dependency o
             <td rowspan=4> <b>search-n-reporting-service</b></td>
             <td rowspan=2>< 1.25</td>
             <td>Not enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3 & 7.17.9</td>
+            <td>Elasticsearch 7.17.9</td>
             <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9, 8.10.3 & 8.15.1</td>
-            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
+            <td>Elasticsearch 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
+            <td>As a best practice, use Elasticsearch version 8.18.2.</td>
         </tr>
         <tr>
             <td rowspan=2>>= 1.25</td>
@@ -59,43 +59,45 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.17.9, 8.10.3 & 8.15.1</td>
-            <td>As a best practice, use Elasticsearch version 8.15.1.</td>
+            <td>Elasticsearch 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
+            <td>As a best practice, use Elasticsearch version 8.18.2.</td>
         </tr>
         <tr>
             <td> <b>search-n-reporting-service-os</b></td>
             <td> All versions </td>
             <td>Enabled</td>
             <td><ul><li>Elasticsearch 7.10 on AWS OpenSearch service</li><li>OpenSearch 1.3 </li><li>OpenSearch 2.15</li></ul></td>
-            <td> As a best practice, use OpenSearch 2.15. </td>
+            <td> The <b>search-n-reporting-service-os</b> replaced the earlier <b>search-n-reporting-service-aws</b> image.
+The image supports all OpenSearch deployment options (cloud or self-managed).
+As a best practice, use OpenSearch 2.15. </td>
         </tr>
     </tbody>
 </table>
 
+**Note:** Elasticsearch 7.10.2 and 7.16.3 reached end of vendor support and are no longer supported. Elasticsearch 7.17.9 will reach vendor end of support on Jan 15, 2026.
+                
 **Important:** Pega supports only official Elasticsearch and OpenSearch Docker images. Custom images, for example, `bitnami/elasticsearch`, are not supported.
 
-**Note:**
-
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
-To migrate to Elasticsearch version 7.17.9, 8.10.3 or 8.15.1 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 8.10.3, 8.15.1, 8.15.5 or 8.18.2 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To update Elasticsearch version to 7.17.9 perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
     
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.  
     * Update the elasticsearch.imageTag in the Backing Services Helm chart to 7.17.9.
-3. To update Elasticsearch version to 8.10.3 or 8.15.1, perform the following actions:
+3. To update Elasticsearch version to 8.10.3, 8.15.1, 8.15.5 or 8.18.2, perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 8.5.1.
 
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.
-    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3 or 8.15.1.
+    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3, 8.15.1, 8.15.5 or 8.18.2.
 4. Restart the SRS pods
 
 ### If your deployment connects to an externally-managed Elasticsearch service: ###
-To migrate to Elasticsearch version 7.17.9, 8.10.3 or 8.15.1 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 8.10.3, 8.15.1, 8.15.5 or 8.18.2 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To use Elasticsearch version 7.17.9, upgrade your external Elasticsearch cluster to 7.17.9 according to your organization’s best practices. For more information, see official Elasticsearch version 7.17 documentation.
-3. To use Elasticsearch version 8.10.3 or 8.15.1, upgrade your external Elasticsearch cluster to 8.10.3 or 8.15.1 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
+3. To use Elasticsearch version 8.10.3, 8.15.1, 8.15.5 or 8.18.2, upgrade your external Elasticsearch cluster to 8.10.3, 8.15.1, 8.15.5 or 8.18.2 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
 4. Restart the SRS pods
 
 ### SRS runtime configuration
