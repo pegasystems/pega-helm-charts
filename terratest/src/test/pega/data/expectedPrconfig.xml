@@ -46,4 +46,5 @@
   <env name="install/parallel/index/threadcount" value="-1" />
   <env name="compiler/javasourcelevel" value="1.7" />
   <env name="cluster/hazelcast/v4/enabled" value="true" type="java.lang.String"/>
+  <env name="cluster/client/connection/timeout/milliseconds" value="300000" type="java.lang.String"/>
 </pegarules>
