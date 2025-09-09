@@ -44,6 +44,40 @@ srs:
     # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
     enableSecureCryptoMode: false
 
+    # The following sections helps in enabling TLS/mTLS(https) for SRS.
+    # Set srs.srsRuntime.ssl.enabled to true if you require a secure connection to srs (either TLS or mTLS)
+    ssl:
+      enabled: false
+      # Set client-authentication to `want`, i.e., accept a client certificate if available, but don’t block access without one.
+      # To require a client certificate for all requests, change to `need`.
+      # To enforce mTLS enable ssl and set client-authentication to 'need'
+      # And for a simple TLS(Https) mode, set client-authentication to 'want'
+      # Pass the required keystore & truststore paths and their passwords along with the file type.
+      # If mTLS is enforced at Elasticsearch/OpenSearch level, make sure to have the required certificates signed onto the truststore for establishing the secure connection between SRS and Elasticsearch/OpenSearch
+      # clientAuthentication: want
+      # keystore:
+        # file: "keystore.p12"
+        # password: "keystorePassword"
+        # type: "PKCS12"
+      # truststore:
+        # file: "truststore.jks"
+        # password: "truststorePassword"
+        # type: "JKS"
+      # The following details are required to be passed in case if mtls enabled for SRS the readiness probe has to pass the required certificates. So please provide the client certificate and client key below
+      # cacertName: "cacertName"
+      # clientCertificate:
+        # crt: "certificateName"
+        # key: "keyFileName"
+      # caCertificate: "caCertificateName"
+      # Here type refers to the type/extension of the keystore/truststore. Ex : PKCS12, JKS
+      # To specify a keystore, truststore and ca-certificate using a secret, uncomment the below srs.srsRuntime.ssl.certsSecret parameter and provide the secret name containing your certificates and their respective passwords.
+      # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”, cacert.crt, cacert.pem) as a key name in the secret. Use the respective key names
+      # to configure the “srs.srsRuntime.ssl.keystore.file”, "srs.srsRuntime.ssl.truststore.file" & "srs.srsRuntime.ssl.cacertName" parameters.
+      # To specify the passwords of both keystore and truststore use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
+      # Default passwords of keystore and truststore will be empty if not used.
+      # Even if you are providing the certificates and passwords through secrets, you must still configure "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type".
+      # certsSecret: srs-ssl-certificates
+
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
     # Setting srsStorage.provisionInternalESCluster to true will provision an internal elasticsearch cluster using the configuration
@@ -51,14 +85,14 @@ srs:
     # If you do not enable SRS and the srs.enabled parameter is set to false, always set srs.srsStorage.provisionInternalESCluster=false
     provisionInternalESCluster: true
     # To use your own Elasticsearch cluster, set srsStorage.provisionInternalESCluster to false and then
-    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch
+    # set the external Elasticsearch cluster URL and port details below when using an externally managed elasticsearch/OpenSearch
     # Ensure that the specified endpoint is accessible from the kubernetes cluster pods.
     # domain: ""
     # port: 9200
     # protocol: https
-    # The elasticsearch connection supports three authentication methods: basic authentication ,
-    # AWS IAM role-based authentication and Elasticsearch secure connection(tls).
-    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch service
+    # The Elasticsearch/OpenSearch connection supports four authentication methods: basic authentication ,
+    # AWS IAM role-based authentication, Elasticsearch/OpenSearch secure connection(tls) and secure connection with mutual TLS(mTLS).
+    # Set srs.srsStorage.tls.enabled: true to enable the use of TLS-based authentication to your Elasticsearch/OpenSearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     tls:
       enabled: false
@@ -71,6 +105,39 @@ srs:
     # Use the full name of the certificate file (together with file extension, for example, “certificate.p12” or “certificate.jks”) as a key name in the secret. Use this key name
     # to configure the “certificateName” parameter. Use a key name “password” to provide the certificate password in the secret.
     # certsSecret: srs-certificates
+
+    # The following section specifies the mTLS information
+    # Set srs.srsStorage.mtls.enabled: true to enable the use of mTLS-based authentication to your Elasticsearch/OpenSearch service
+    # whether is it running as an internalized or externalized service in your SRS cluster.
+    # In order to enable mTLS between SRS and Elasticsearch/OpenSearch(External), enable the mTLS flag
+    # and pass the truststore, keystore and their respective passwords of the external Elasticsearch/OpenSearch
+    # Note that above srs.srsRuntime.ssl.enabled flag is used to enabled tls/mTLS for SRS.
+    # The below srs.srsStorage.mtls.enabled flag is used specify that the Elasticsearch/Opensearch being used is enabled with mTLS and all the communication will be through mutual TLS(mTLS) between SRS and Elasticsearch/OpenSearch.
+    mtls:
+      enabled: false
+      # When srs.srsStorage.mtls.enabled is set to true, then for the mutual handshake between SRS and Elasticsearch/OpenSearch, we need to pass the required keystore and truststore certificates.
+      # The below certificate details are used for establishing mTLS between SRS and Elasticsearch/OpenSearch
+      # The keystore and truststore can either be the same as passed above for SRS (srs.srsRuntime.ssl.key-store & srs.srsRuntime.ssl.trust-store) or can be different altogether.
+      # Make sure to have the required CA certificates added to the truststore being passed here as this will be used for a secure connection between SRS and Elasticsearch/OpenSearch in case of mTLS.
+      # Uncomment the below key-store and trust-store details and pass the required certificate paths and their passwords
+      # NOTE :
+      # Technically if either one of the below pointers is satisfied, then we can use the same keystore and truststore here:
+        # a) if the CA certificate used for generating keystore and truststore for Elasticsearch/OpenSearch are same as the one used for SRS,
+        # b) CA certificates used for SRS and ES are different but, both the CA Certificates were signed against the truststore of ES and truststore of SRS
+      # Though the recommended way is to use keystore & truststore of SRS(where the truststore is signed against both CA certificates of SRS and ES) to establish connectivity between SRS and ES,
+      # you can use a different keystore and truststore for establishing connectivity between SRS and ES.
+      # To specify a different keystore & truststore using a secret, uncomment the below 'srs.srsStorage.mtls.certsSecret' parameter and provide the secret name containing your certificates and their respective passwords.
+      # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”) as a key name in the secret. Use the respective key names
+      # to configure the “srs.srsStorage.mtls.keystore.file”, "srs.srsStorage.mtls.truststore.file"
+      # To specify the passwords of both keystore and truststore use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
+      # keystore:
+        # file: "keystorePath"
+        # password: "keystorePassword"
+      # truststore:
+        # file: "truststorePath"
+        # password: "truststorePassword"
+      # certsSecret: "es-ssl-certificates"
+
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
     basicAuthentication:
@@ -116,7 +183,7 @@ elasticsearch:
   esJavaOpts: "-Xmx1024m -Xms1024m"
   # Allocate smaller chunks of memory per pod.
   # This section specifies the elasticsearch cluster configuration for authentication and TLS.
-  # If you previously set srs.srsStorage.tls.enabled: true, you must uncomment the line to use protocol: https parameter.
+  # If you previously set srs.srsStorage.tls.enabled: true (or) srs.srsStorage.mtls.enabled: true, you must uncomment the line to use protocol: https parameter.
   # protocol: https
 
   # Uncomment the below lines if you want to deploy/upgrade Elasticsearch server version >= 8.x
@@ -130,6 +197,23 @@ elasticsearch:
   # xpack.security.http.ssl.enabled: true
   # xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
   # xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
+
+  # For deployments that use mTLS-based authentication to an internal Elasticsearch service in the SRS cluster,
+  # uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
+  # xpack.security.http.ssl.enabled=true
+  # xpack.security.http.ssl.client_authentication=required
+  # xpack.security.http.ssl.truststore.password=mtlspass
+  # xpack.security.http.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+  # xpack.security.http.ssl.keystore.password=mtlspass
+  # xpack.security.http.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+
+  # (Optional)For inter-node https communication uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
+  # xpack.security.transport.ssl.enabled=true
+  # xpack.security.transport.ssl.verification_mode=certificate
+  # xpack.security.transport.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+  # xpack.security.transport.ssl.keystore.password=mtlspass
+  # xpack.security.transport.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
+  # xpack.security.transport.ssl.truststore.password=mtlspass
 
   esConfig:
     elasticsearch.yml: |
