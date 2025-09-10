@@ -46,6 +46,9 @@ spec:
           volumeMounts:
             - name: srs-ssl-certificates
               mountPath: /usr/share/ssl/srs/
+          volumeMounts:
+            - name: srs-readiness-certificates
+              mountPath: /usr/share/ssl/srs/readiness/
           {{ end }}
           {{- if .Values.srsStorage.mtls.enabled }}
           volumeMounts:
@@ -57,9 +60,9 @@ spec:
             exec:
               command:
                 - wget
-                - --certificate=/usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.clientCertificate.crt | default "client.crt"}}
-                - --private-key=/usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.clientCertificate.key | default "client.key"}}
-                - --ca-certificate=/usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.caCertificate | default "ca.crt"}}
+                - --certificate=/usr/share/ssl/srs/client.crt
+                - --private-key=/usr/share/ssl/srs/client.key
+                - --ca-certificate=/usr/share/ssl/srs/ca.crt
                 - --no-check-certificate
                 - --no-verbose
                 - --spider
@@ -123,7 +126,6 @@ spec:
             {{- end }}
             {{- end}}
             {{- if eq (include "elasticsearch.authProvider" $) "mtls" }}
-            #TODO
             - name: PATH_TO_ES_KEYSTORE
               value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.keystore.file | default "keystore.p12"}}"
             - name: PATH_TO_ES_TRUSTSTORE
@@ -204,6 +206,9 @@ spec:
       - name: srs-ssl-certificates
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+      - name: srs-readiness-certificates
+        secret:
+          secretName: "srs-readiness-certs"
       {{ end }}
       {{- if .Values.srsStorage.mtls.enabled }}
       volumes:

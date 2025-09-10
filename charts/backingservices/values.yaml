@@ -63,16 +63,10 @@ srs:
         # file: "truststore.jks"
         # password: "truststorePassword"
         # type: "JKS"
-      # The following details are required to be passed in case if mtls enabled for SRS the readiness probe has to pass the required certificates. So please provide the client certificate and client key below
-      # cacertName: "cacertName"
-      # clientCertificate:
-        # crt: "certificateName"
-        # key: "keyFileName"
-      # caCertificate: "caCertificateName"
       # Here type refers to the type/extension of the keystore/truststore. Ex : PKCS12, JKS
       # To specify a keystore, truststore and ca-certificate using a secret, uncomment the below srs.srsRuntime.ssl.certsSecret parameter and provide the secret name containing your certificates and their respective passwords.
-      # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”, cacert.crt, cacert.pem) as a key name in the secret. Use the respective key names
-      # to configure the “srs.srsRuntime.ssl.keystore.file”, "srs.srsRuntime.ssl.truststore.file" & "srs.srsRuntime.ssl.cacertName" parameters.
+      # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”) as a key name in the secret. Use the respective key names
+      # to configure the “srs.srsRuntime.ssl.keystore.file”, "srs.srsRuntime.ssl.truststore.file" parameters.
       # To specify the passwords of both keystore and truststore use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
       # Default passwords of keystore and truststore will be empty if not used.
       # Even if you are providing the certificates and passwords through secrets, you must still configure "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type".
@@ -136,7 +130,7 @@ srs:
       # truststore:
         # file: "truststorePath"
         # password: "truststorePassword"
-      # certsSecret: "es-ssl-certificates"
+      # certsSecret: "srs-ssl-certificates"
 
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch service
     # whether is it running as an internalized or externalized service in your SRS cluster.
@@ -197,23 +191,6 @@ elasticsearch:
   # xpack.security.http.ssl.enabled: true
   # xpack.security.http.ssl.truststore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
   # xpack.security.http.ssl.keystore.path: /usr/share/elasticsearch/config/certs/elastic-certificates.p12
-
-  # For deployments that use mTLS-based authentication to an internal Elasticsearch service in the SRS cluster,
-  # uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
-  # xpack.security.http.ssl.enabled=true
-  # xpack.security.http.ssl.client_authentication=required
-  # xpack.security.http.ssl.truststore.password=mtlspass
-  # xpack.security.http.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-  # xpack.security.http.ssl.keystore.password=mtlspass
-  # xpack.security.http.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-
-  # (Optional)For inter-node https communication uncomment and appropriately add below lines under esConfig.elasticsearch.yml.
-  # xpack.security.transport.ssl.enabled=true
-  # xpack.security.transport.ssl.verification_mode=certificate
-  # xpack.security.transport.ssl.keystore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-  # xpack.security.transport.ssl.keystore.password=mtlspass
-  # xpack.security.transport.ssl.truststore.path=/usr/share/elasticsearch/config/certs/elastic-certificates.p12
-  # xpack.security.transport.ssl.truststore.password=mtlspass
 
   esConfig:
     elasticsearch.yml: |
