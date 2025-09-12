@@ -51,8 +51,10 @@ spec:
           volumeMounts:
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
+              {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
             - name: srs-readiness-volume
               mountPath: /usr/share/ssl/srs/readiness/
+              {{ end }}
               {{- if .Values.srsStorage.mtls.enabled }}
             - name: es-ssl-volume
               mountPath: /usr/share/ssl/es/
@@ -67,9 +69,11 @@ spec:
             exec:
               command:
                 - wget
+                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
                 - --certificate=/usr/share/ssl/srs/readiness/client.crt
                 - --private-key=/usr/share/ssl/srs/readiness/client.key
                 - --ca-certificate=/usr/share/ssl/srs/readiness/ca.crt
+                {{ end }}
                 - --no-check-certificate
                 - --no-verbose
                 - --spider
@@ -230,9 +234,11 @@ spec:
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+        {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
       - name: srs-readiness-volume
         secret:
           secretName: "srs-readiness-certs"
+        {{ end }}
         {{- if .Values.srsStorage.mtls.enabled }}
       - name: es-ssl-volume
         secret:

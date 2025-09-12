@@ -64,12 +64,12 @@ srs:
         # password: "truststorePassword"
         # type: "JKS"
       # Here type refers to the type/extension of the keystore/truststore. Ex : PKCS12, JKS
-      # To specify a keystore, truststore and ca-certificate using a secret, uncomment the below srs.srsRuntime.ssl.certsSecret parameter and provide the secret name containing your certificates and their respective passwords.
+      # To specify a keystore & truststore using a secret, uncomment the below srs.srsRuntime.ssl.certsSecret parameter and provide the secret name containing your certificates and their respective passwords.
       # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”) as a key name in the secret. Use the respective key names
       # to configure the “srs.srsRuntime.ssl.keystore.file”, "srs.srsRuntime.ssl.truststore.file" parameters.
-      # To specify the passwords of both keystore and truststore use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
-      # Default passwords of keystore and truststore will be empty if not used.
-      # Even if you are providing the certificates and passwords through secrets, you must still configure "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type".
+      # Specify the passwords of both keystore & truststore in the secret and use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
+      # If there is no password for the keystore/truststore, please pass empty string value('') to the passwords of keystore & truststore in the secret.
+      # Despite the certificates and passwords being passed through secrets, you must still configure "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type" with the type of store file it is (x : PKCS12, JKS)
       # certsSecret: srs-ssl-certificates
 
   # This section specifies the elasticsearch cluster configuration.
@@ -102,7 +102,7 @@ srs:
 
     # The following section specifies the mTLS information
     # Set srs.srsStorage.mtls.enabled: true to enable the use of mTLS-based authentication to your Elasticsearch/OpenSearch service
-    # whether is it running as an internalized or externalized service in your SRS cluster.
+    # SRS to Elasticsearch/Opensearch mTLS is supported only with external Elasticsearch/OpenSearch. mTLS is not supported for internal ES.
     # In order to enable mTLS between SRS and Elasticsearch/OpenSearch(External), enable the mTLS flag
     # and pass the truststore, keystore and their respective passwords of the external Elasticsearch/OpenSearch
     # Note that above srs.srsRuntime.ssl.enabled flag is used to enabled tls/mTLS for SRS.
@@ -123,7 +123,7 @@ srs:
       # To specify a different keystore & truststore using a secret, uncomment the below 'srs.srsStorage.mtls.certsSecret' parameter and provide the secret name containing your certificates and their respective passwords.
       # Use the full name of the certificate files (together with file extension, for example, “keystore.p12”, “truststore.jks”) as a key name in the secret. Use the respective key names
       # to configure the “srs.srsStorage.mtls.keystore.file”, "srs.srsStorage.mtls.truststore.file"
-      # To specify the passwords of both keystore and truststore use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
+      # Specify the passwords of both keystore & truststore in the secret and use the key names “keystorePassword” for keystore password and "truststorePassword" for truststore password in the secret.
       # keystore:
         # file: "keystorePath"
         # password: "keystorePassword"
