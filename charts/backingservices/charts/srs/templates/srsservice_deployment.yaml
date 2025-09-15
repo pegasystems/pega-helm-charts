@@ -154,9 +154,9 @@ spec:
                   name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
                   key: password
             - name: PATH_TO_ES_KEYSTORE
-              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.keystore.file | default "keystore.p12"}}"
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.keystore.file | default "es-keystore.p12"}}"
             - name: PATH_TO_ES_TRUSTSTORE
-              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.truststore.file | default "truststore.jks"}}"
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.truststore.file | default "es-truststore.jks"}}"
               {{ if not .Values.srsStorage.mtls.certsSecret }}
             - name: SRS_KEYSTORE_PASSWORD
               value: "{{ .Values.srsStorage.mtls.keystore.password | default ""}}"
@@ -179,15 +179,15 @@ spec:
             - name: SSL_ENABLED
               value: "true"
             - name: SRS_TLS_CLIENT_AUTHENTICATION
-              value: "{{ .Values.srsRuntime.ssl.clientAuthentication | default ""}}"
+              value: "{{ .Values.srsRuntime.ssl.clientAuthentication | default "want"}}"
             - name: PATH_TO_SRS_KEYSTORE
-              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.keystore.file | default "keystore.p12"}}"
+              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.keystore.file | default "srs-keystore.p12"}}"
             - name: SRS_KEYSTORE_TYPE
-              value: "{{ .Values.srsRuntime.ssl.keystore.type | default ""}}"
+              value: "{{ .Values.srsRuntime.ssl.keystore.type | default "PKCS12"}}"
             - name: PATH_TO_SRS_TRUSTSTORE
-              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.truststore.file | default "truststore.jks"}}"
+              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.truststore.file | default "srs-truststore.jks"}}"
             - name: SRS_TRUSTSTORE_TYPE
-              value: "{{ .Values.srsRuntime.ssl.truststore.type | default ""}}"
+              value: "{{ .Values.srsRuntime.ssl.truststore.type | default "JKS"}}"
             {{ if not .Values.srsRuntime.ssl.certsSecret }}
             - name: SRS_KEYSTORE_PASSWORD
               value: "{{ .Values.srsRuntime.ssl.keystore.password | default ""}}"
