@@ -131,11 +131,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "elasticsearch.authProvider" -}}
-{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) -}}
+{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "basic-authentication" }}
-{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) -}}
+{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "aws-iam"}}
-{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) -}}
+{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "tls"}}
 {{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) -}}
 {{- "mtls"}}

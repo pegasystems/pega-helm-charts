@@ -44,8 +44,10 @@ spec:
               {{- if .Values.srsRuntime.ssl.enabled }}
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
+                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
             - name: srs-readiness-volume
               mountPath: /usr/share/ssl/srs/readiness/
+                {{ end }}
               {{ end }}
           {{- else if .Values.srsRuntime.ssl.enabled }}
           volumeMounts:
@@ -225,9 +227,11 @@ spec:
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+          {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
       - name: srs-readiness-volume
         secret:
           secretName: "srs-readiness-certs"
+          {{ end }}
         {{ end }}
       {{- else if .Values.srsRuntime.ssl.enabled }}
       volumes:
