@@ -158,21 +158,21 @@ spec:
             - name: PATH_TO_ES_TRUSTSTORE
               value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.truststore.file | default "es-truststore.jks"}}"
               {{ if not .Values.srsStorage.mtls.certsSecret }}
-            - name: SRS_KEYSTORE_PASSWORD
+            - name: ES_KEYSTORE_PASS
               value: "{{ .Values.srsStorage.mtls.keystore.password | default ""}}"
-            - name: SRS_TRUSTSTORE_PASSWORD
+            - name: ES_TRUSTSTORE_PASS
               value: "{{ .Values.srsStorage.mtls.truststore.password | default ""}}"
               {{ else }}
-            - name: ES_TRUSTSTORE_PASS
-              valueFrom:
-                secretKeyRef:
-                  name: "{{ .Values.srsStorage.mtls.certsSecret | default "es-ssl-certificates"}}"
-                  key: truststorePassword
             - name: ES_KEYSTORE_PASS
               valueFrom:
                 secretKeyRef:
                   name: "{{ .Values.srsStorage.mtls.certsSecret | default "es-ssl-certificates"}}"
                   key: keystorePassword
+            - name: ES_TRUSTSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.mtls.certsSecret | default "es-ssl-certificates"}}"
+                  key: truststorePassword
               {{- end }}
             {{ end }}
             {{- if .Values.srsRuntime.ssl.enabled }}
