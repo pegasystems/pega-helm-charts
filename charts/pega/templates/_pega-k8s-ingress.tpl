@@ -5,16 +5,23 @@ kind: Ingress
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
-  annotations:
 {{- $ingress := .node.ingress }}
+{{- if $ingress.labels }}
+  labels:
+{{ toYaml $ingress.labels | indent 4 }}
+{{- end }}
+  annotations:
 {{- if $ingress.annotations }}
     # Custom annotations
 {{ toYaml $ingress.annotations | indent 4 }}
-{{- else }}
+{{- else if not ($ingress.ingressClassName) }}
     # Ingress class used is 'traefik'
     kubernetes.io/ingress.class: traefik
 {{- end }}
 spec:
+{{- if $ingress.ingressClassName }}
+  ingressClassName: {{ $ingress.ingressClassName }}
+{{- end }}
 {{ if ( include "ingressTlsEnabled" . ) }}
 {{- if $ingress.tls.secretName }}
 {{ include "tlssecretsnippet" . }}

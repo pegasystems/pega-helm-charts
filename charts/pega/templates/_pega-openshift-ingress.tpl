@@ -4,6 +4,10 @@ kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
   name: {{ .name }}
+{{- if .node.ingress.labels }}
+  labels:
+{{ toYaml .node.ingress.labels | indent 4 }}
+{{- end }}
   annotations:
 {{- if (.node.ingress).annotations }}
     # Custom annotations
@@ -17,6 +21,9 @@ metadata:
     haproxy.router.openshift.io/timeout: 2m
 {{- end }}
 spec:
+{{- if .node.ingress.ingressClassName }}
+  ingressClassName: {{ .node.ingress.ingressClassName }}
+{{- end }}
   # Host on which you can reach mentioned service.
   host: {{ template "domainName" dict "node" .node }}
 {{- if ((.node.service).tls).enabled }}

@@ -32,8 +32,12 @@ distributionKitVolumeClaimName: ""
 bypassLoadEngineClasses: "false"
 # Bypass loading assembly classes into database
 bypassLoadAssembledClasses: "false"
+# Custom JVM arguments for the installer
+customJVMArgs: ""
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
+# Optionally specify specific service account
+# serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5
@@ -76,7 +80,11 @@ upgrade:
   # This flag has to be set for CMC use cases if hazelcast is running in client server mode. Default is false.Set it to true for HZ c/s mode.
   # This is needed to ensure Installer connect to HZ C/S while data upgrade.
   isHazelcastClientServer: "false"
-  # Specify the server URL and the required server username and password to access a Pega REST server used to perform pre- and post-update actions during zero-downtime updates.
+  # Specify the server URL (optional) and the required server username and password to access a Pega REST server used to perform pre-
+  # and post-update actions during zero-downtime updates. If the pegaRESTServerURL is left unset / blank, the URL will be composed
+  # using the kubernetes service name for the web tier.  This will work so long as the 'Require TLS/SSL for REST services in this package'
+  # is not checked on the "SystemManagement"  service package in the Pega Platform -- if this is checked, specify the
+  # external URL for the platform REST service.
   pegaRESTServerURL: ""
   pegaRESTUsername: ""
   pegaRESTPassword: ""

@@ -1,9 +1,6 @@
 # Constellation UI setup
 
-Please refer to 
- > https://documents.constellation.pega.io/static/88/introduction.html
-
-for instructions related to the pegastatic content delivery setup. Once that is complete please proceed with the instructions below for the constellation appstatic service setup.
+Please refer to [Constellation service deployment](https://docs.pega.com/bundle/platform/page/platform/deployment/constellation/constellation-overview.html) for instructions related to the pegastatic content delivery setup. Once that is complete please proceed with the instructions below for the constellation appstatic service setup.
 
 ## ConstellationUI helm chart
 
@@ -30,7 +27,7 @@ Digest: <encryption verification>
 Status: Downloaded pega-docker.downloads.pega.com/constellation-appstatic-service/docker-image:xxxxxxx
 ```
 
-For details about downloading and then pushing Docker images to your repository for your deployment, see [Using Pega-provided Docker images](https://docs.pega.com/client-managed-cloud/87/pega-provided-docker-images).
+For details about downloading and then pushing Docker images to your repository for your deployment, see [Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/pega-docker-images-manage.html).
 
 
 #### Constellationui runtime configuration
@@ -45,6 +42,9 @@ The values.yaml file provides configuration options to define the values for the
 | `cloudProvider`                        | Deprecated, use `provider`. Specify the cloud provider details. Accepted values are aws.                                                                                                                                                                                                                                                                                          |
 | `provider`                        | Enter your Kubernetes provider. Accepted values are aws, gke or k8s.   |                                                                                                                                                                     
 | `awsCertificateArn`                        | Specify the arn for the AWS ACM certificate.                                                                                                                                                                                                                                                                                          |
+| `podLabels`                        | Provide custom labels for Pods as metadata to be consumed by other tools and libraries.                                                                                                                                                                                                                                                                                                                                                          |
+| `deployment.name`                        | Specify the name of constellation deployment. Your deployment creates resources prefixed with this string.                                                                                                                                                                                                                                                                                                                                                          |
+| `deployment.labels`                               | Provide custom labels for the deployment as metadata to be consumed by other tools and libraries.                                                                                                                                                                                                               |
 | `service.port`                        | The port of the tier to be exposed to the cluster. The default value is `3000`.                                                                                                                                                                                                                                               |
 | `service.targetPort`                        | The target port of the container to expose. The constellation container exposes web traffic on port `3000`.                                                                                                                                                                                                                                               |
 | `service.serviceType`                        | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose.                                                                                                                                                                                                                                               |
@@ -65,8 +65,12 @@ The values.yaml file provides configuration options to define the values for the
 | `docker.registry.password`                        | Specify the password for the docker registry.                                                                                                                                                                                                                                                                                          |
 | `docker.constellation.image`                        | Specify the image version.                                                                                                                                                                                                                                                                                          |
 | `docker.messaging.imagePullPolicy`                        | Specify the image pull policy configurations for the image.                                                                                                                                                                                                                                                                                          |
+| `serviceAccountName`                        | Specify a custom [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/) for the pods of your deployment.                                                                                                                                                                                                                                                                                          |
 | `affinity`                        | Specify the pod affinity so that pods are restricted to run on particular node(s), or to prefer to run on particular nodes.    
                                                                                                                                                                                                                                                                                           |
+| `tolerations`                        | Specify pod tolerations so that it is allowed to run on node(s) with particular taints.    
+                                                                                                                                                                                                                                                                                          |
+                                                                                                                                                                                                                                                                                          
 
 Example:
 

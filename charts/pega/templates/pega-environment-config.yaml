@@ -50,6 +50,9 @@ data:
 {{- else }}
   IS_PEGA_CONFIG_COMPRESSED: "false"
 {{- end }}
+{{- if .Values.global.rasp.action }}
+  RASP_ACTION: "{{.Values.global.rasp.action}}"
+{{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
   RULES_SCHEMA: {{ .Values.installer.upgrade.targetRulesSchema }}
@@ -99,6 +102,8 @@ data:
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
   # Whether to enable client encryption on the Cassandra connection.
   CASSANDRA_CLIENT_ENCRYPTION: "{{ .Values.dds.clientEncryption }}"
+  # Whether to enable client certificate verification on the Cassandra connection.
+  CASSANDRA_CLIENT_AUTH: "{{ .Values.dds.clientAuth }}"
   # Type of Cassandra truststore and keystore used to hold keys and certificates for client encryption.
   # Available store types are JKS and PKCS12.
   CASSANDRA_CLIENT_ENCRYPTION_STORE_TYPE: "{{ .Values.dds.clientEncryptionStoreType }}"
@@ -179,6 +184,21 @@ data:
 {{- end }}
   # Hostname of Hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+{{ if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  HZ_SSL_ENABLED: "true"
+  HZ_SSL_PROTOCOL: "TLS"
+  HZ_SSL_KEY_STORE_NAME: "cluster-keystore.jks"
+  HZ_SSL_TRUST_STORE_NAME: "cluster-truststore.jks"
+  {{ if (eq (include "isHzHighlySecureCryptoModeEnabled" .) "true") }}
+  HZ_SSL_ALGO: "PKIX"
+  {{- else }}
+  HZ_SSL_ALGO: "SunX509"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{ if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
@@ -212,5 +232,11 @@ data:
   STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
   STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
   STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
+{{- end }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}"
+{{- end }}
+{{- if .Values.global.pegaVersion }}
+  IS_PEGA_25_OR_LATER: {{ (include "isPega25OrLater" .) }}
 {{- end }}
 {{ end }}

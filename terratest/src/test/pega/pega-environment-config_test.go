@@ -2,11 +2,12 @@ package pega
 
 import (
 	"fmt"
+	"path/filepath"
+	"testing"
+
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
-	"path/filepath"
-	"testing"
 )
 
 func TestPegaEnvironmentConfig(t *testing.T) {
@@ -36,6 +37,62 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 			}
 		}
 	}
+}
+
+func TestPegaEnvironmentConfigPegaVersionCheck(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":        "k8s",
+			"global.actions.execute": "deploy",
+		},
+	}
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvNotPresent(t, yamlContent, "IS_PEGA_25_OR_LATER")
+
+	options.SetValues["global.pegaVersion"] = ""
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvNotPresent(t, yamlContent, "IS_PEGA_25_OR_LATER")
+
+	options.SetValues["global.pegaVersion"] = "8.25.0"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "8.25.0-dev-1234"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "branch-8.25.0-bugfix-BUG-12345-4"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "branch-8.24.3-bugfix-BUG-12345-4"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+	options.SetValues["global.pegaVersion"] = "8.26.1"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "25.1.0"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "26.1.1"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "true")
+
+	options.SetValues["global.pegaVersion"] = "8.24.50"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
+	options.SetValues["global.pegaVersion"] = "8.8.5"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "IS_PEGA_25_OR_LATER", "false")
+
 }
 
 func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
@@ -75,6 +132,73 @@ func TestPegaEnvironmentConfigJDBCTimeouts(t *testing.T) {
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES", "socketTimeout=90;")
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RW", "socketTimeout=120;")
 	VerifyEnvValue(t, yamlContent, "JDBC_TIMEOUT_PROPERTIES_RO", "socketTimeout=150;")
+}
+
+func TestPegaHighlySecureCryptoModeEnabledEnvConfigParam(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                      vendor,
+					"global.actions.execute":               operation,
+					"global.highlySecureCryptoModeEnabled": "false",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED")
+
+			options.SetValues["global.highlySecureCryptoModeEnabled"] = "true"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvValue(t, yamlContent, "HIGHLY_SECURE_CRYPTO_MODE_ENABLED", "true")
+
+		}
+	}
+}
+
+func TestFipsModeParam(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "FIPS_140_3_MODE")
+
+			options.SetValues["global.fips140_3Mode"] = "false"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvNotPresent(t, yamlContent, "FIPS_140_3_MODE")
+
+			options.SetValues["global.fips140_3Mode"] = "true"
+			yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyEnvValue(t, yamlContent, "FIPS_140_3_MODE", "true")
+
+		}
+	}
 }
 
 func VerifyEnvNotPresent(t *testing.T, yamlContent string, entry string) {
@@ -135,4 +259,26 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CSV_METRICS_ENABLED"], "false")
 	require.Equal(t, envConfigData["CASSANDRA_LOG_METRICS_ENABLED"], "false")
 	require.Equal(t, envConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
+}
+
+func TestPegaRASPEnvironmentConfig(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider": "k8s",
+			//"global.actions.execute": "deploy",
+		},
+	}
+
+	options.SetValues["global.rasp.action"] = ""
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
+
+	options.SetValues["global.rasp.action"] = "WARN"
+	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+
+	VerifyEnvValue(t, yamlContent, "RASP_ACTION", "WARN")
 }

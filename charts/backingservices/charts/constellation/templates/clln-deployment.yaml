@@ -6,6 +6,9 @@ metadata:
   name: {{ $depName }}
   labels:
     app: {{ $depName }}
+    {{- if and (.Values.deployment) (.Values.deployment.labels) }}
+    {{ toYaml .Values.deployment.labels | nindent 4 }}
+    {{- end }}
 spec:
   replicas: {{ .Values.replicas }}
   selector:
@@ -15,7 +18,13 @@ spec:
     metadata:
       labels:
         app: {{ $depName }}
+        {{- if .Values.podLabels }}
+        {{ toYaml .Values.podLabels | nindent 8 }}
+        {{- end }}
     spec:
+      {{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+      {{- end }}
       {{- if .Values.customerAssetVolumeClaimName }}
       volumes:
         - name: {{ $depName }}-appstatic-assets
@@ -76,4 +85,5 @@ spec:
         ports:
         - containerPort: {{ .Values.service.targetPort }}
 {{- include "podAffinity" .Values | indent 6 }}
+{{- include "tolerations" .Values | indent 6 }}
 {{ end }}

@@ -23,6 +23,10 @@ spec:
         - name: {{ . }}
         {{- end -}}
         {{ end }}
+{{- if .Values.srsRuntime.securityContext }}
+      securityContext:
+{{ toYaml .Values.srsRuntime.securityContext | indent 8 }}
+{{- end }}
       containers:
         - name: srs-service
           image: {{ .Values.srsRuntime.srsImage }}
@@ -216,6 +220,10 @@ spec:
               value: "{{ .Values.srsRuntime.enableSecureCryptoMode | default "false" }}"
             - name: JAVA_OPTS
               value: {{ template "javaOpts" .}}
+{{- if .Values.srsRuntime.containerSecurityContext }}
+          securityContext:
+{{ toYaml .Values.srsRuntime.containerSecurityContext | indent 12 }}
+{{-  end }}
           resources:
             {{- toYaml .Values.srsRuntime.resources | nindent 12 }}
       {{- if .Values.srsStorage.tls.enabled }}

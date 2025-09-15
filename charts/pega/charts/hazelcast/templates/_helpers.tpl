@@ -29,6 +29,22 @@
  {{- end -}}
 {{- end }}
 
+{{- define "isEncryptionEnabled" }}
+  {{- if .Values.encryption.enabled  -}}
+   true
+  {{- else -}}
+   false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isHighlySecureCryptoModeEnabled" }}
+  {{- if and ( .Values.encryption.enabled ) ( .Values.global.highlySecureCryptoModeEnabled) -}}
+   true
+  {{- else -}}
+   false
+  {{- end -}}
+{{- end -}}
+
 {{- define "hazelcastVolumeCredentials" }}hazelcast-volume-credentials{{- end }}
 
 {{- define "hazelcastVolumeTemplate" }}
