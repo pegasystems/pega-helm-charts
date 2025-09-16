@@ -94,6 +94,14 @@ data:
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ include "pegaSearchURL" $ }}
 {{- end }}
+{{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsMTLS).enabled) }}
+  # To enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+  SEARCH_MTLS_ENABLED: "{{ .Values.pegasearch.srsMTLS.enabled }}"
+  # Path to a mounted trust store file for MTLS connection to SRS
+  SEARCH_TRUSTSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.trustStore }}"
+  # Path to a mounted key store file for MTLS connection to SRS
+  SEARCH_KEYSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.keyStore }}"
+{{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled".
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
   # Comma separated list of cassandra hosts.
