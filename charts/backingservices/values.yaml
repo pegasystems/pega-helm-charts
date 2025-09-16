@@ -44,6 +44,19 @@ srs:
     # Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
     enableSecureCryptoMode: false
 
+    # Apply securityContext to SRS pods. Example:
+    # securityContext:
+    #   runAsUser: 9999
+    #   fsGroup: 0
+
+    # Apply securityContext to SRS containers. Example:
+    # containerSecurityContext:
+    #   allowPrivilegeEscalation: false
+    #   capabilities:
+    #     drop:
+    #     - ALL
+    #   runAsNonRoot: true
+
     # The following sections helps in enabling TLS/mTLS(https) for SRS.
     # Set srs.srsRuntime.ssl.enabled to true if you require a secure connection to srs (either TLS or mTLS)
     ssl:
@@ -76,20 +89,6 @@ srs:
       # Despite the certificates and passwords being passed through secrets, you must still configure
       # "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type" with the type of store file it is (Ex : PKCS12, JKS)
       # certsSecret: srs-ssl-certificates
-
-
-    # Apply securityContext to SRS pods. Example:
-    # securityContext:
-    #   runAsUser: 9999
-    #   fsGroup: 0
-
-    # Apply securityContext to SRS containers. Example:
-    # containerSecurityContext:
-    #   allowPrivilegeEscalation: false
-    #   capabilities:
-    #     drop:
-    #     - ALL
-    #   runAsNonRoot: true
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
