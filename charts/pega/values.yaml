@@ -511,7 +511,7 @@ pegasearch:
     privateKey: ""
     external_secret_name: ""
   srsMTLS:
-    #Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    # Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
     enabled: false
     # Provide trustStore certificate file name
     # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
