@@ -203,6 +203,10 @@ dds:
   externalNodes: ""
   # TCP Port to connect to cassandra.
   port: "9042"
+  # The local Cassandra datacenter.
+  localDatacenter: ""
+  # A list of all the datacenters in the Cassandra cluster.
+  datacenters: ""
   # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
   # The password for authentication with the Cassandra cluster.
