@@ -86,6 +86,18 @@
         </Policies>
     </RollingRandomAccessFile>
 
+    <!-- RollingFile Appender for PegaDDSMetrics logs -->
+    <RollingRandomAccessFile name="DDSMETRICS" fileName="${sys:pega.logdir}/PegaDDSMetrics.log"
+                             filePattern="${sys:pega.logdir}/PegaDDSMetrics-%d{MM-dd-yyyy}-%i.log.gz">
+        <PatternLayout>
+            <Pattern>%d (%30.30c{3}) %-5p - %m%n</Pattern>
+        </PatternLayout>
+        <Policies>
+            <TimeBasedTriggeringPolicy/>
+            <SizeBasedTriggeringPolicy size="50 MB"/>
+        </Policies>
+    </RollingRandomAccessFile>
+
     <!-- RollingFile Appender for PegaMOBILE logs -->
     <RollingRandomAccessFile name="MOBILE" fileName="${sys:pega.logdir}/PegaMOBILE.log" filePattern="${sys:pega.logdir}/PegaMOBILE-%d{MM-dd-yyyy}-%i.log.gz">
         <PatternLayout>
@@ -158,6 +170,9 @@
     </Logger>
     <Logger name="com.pega.dsm.dnode.impl.dataflow.service.DataFlowDiagnosticsFileLogger" additivity="true" level="info">
         <AppenderRef ref="DATAFLOW"/>
+    </Logger>
+    <Logger name="com.pega.platform.service.dds.client.metrics.reporters.DdsMetricsLogger" additivity="true" level="info">
+        <AppenderRef ref="DDSMETRICS"/>
     </Logger>
     <!-- Added for Usage Metrics -->
     <AsyncLogger name="com.pega.pegarules.session.internal.usagemetrics" additivity="true" level="info">
