@@ -171,7 +171,7 @@
     <Logger name="com.pega.dsm.dnode.impl.dataflow.service.DataFlowDiagnosticsFileLogger" additivity="true" level="info">
         <AppenderRef ref="DATAFLOW"/>
     </Logger>
-    <Logger name="com.pega.platform.service.dds.client.metrics.reporters.DdsMetricsLogger" additivity="false" level="info">
+    <Logger name="com.pega.platform.service.dds.client.metrics.reporters.DdsMetricsLogger" additivity="true" level="info">
         <AppenderRef ref="DDSMETRICS"/>
     </Logger>
     <!-- Added for Usage Metrics -->
