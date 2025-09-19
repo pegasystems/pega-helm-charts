@@ -939,6 +939,8 @@ Parameter     | Tier Level Environment Variable | Description | Default value
 ---           |:---:| ---|:---:
 `externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
 `port` | N/A | TCP Port to connect to cassandra. | 9042
+`localDatacenter` | CASSANDRA_LOCAL_DATACENTER | The datacenter in the Cassandra cluster which should be treated as local. | 
+`datacenters` | CASSANDRA_DATACENTERS | A list of all the datacenters in the Cassandra cluster. | 
 `username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
 `password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
 `clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
