@@ -95,11 +95,11 @@ upgrade:
 # Ephemeral storage recommended size is 10G
 resources:
   requests:
-    memory: "5Gi"
+    memory: "12Gi"
     cpu: 1
     # ephemeralStorage: ""
   limits:
-    memory: "6Gi"
+    memory: "12Gi"
     cpu: 2
     # ephemeralStorage: ""
 
