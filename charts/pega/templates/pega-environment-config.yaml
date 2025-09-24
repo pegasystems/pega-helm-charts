@@ -100,6 +100,10 @@ data:
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with.
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  # The datacenter in the Cassandra cluster which should be treated as local.
+  CASSANDRA_LOCAL_DATACENTER: "{{ .Values.dds.localDatacenter }}"
+  # A list of all the datacenters in the Cassandra cluster.
+  CASSANDRA_DATACENTERS: "{{ .Values.dds.datacenters }}"
   # Whether to enable client encryption on the Cassandra connection.
   CASSANDRA_CLIENT_ENCRYPTION: "{{ .Values.dds.clientEncryption }}"
   # Whether to enable client certificate verification on the Cassandra connection.
