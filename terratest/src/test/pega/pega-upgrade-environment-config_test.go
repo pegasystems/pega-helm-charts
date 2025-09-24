@@ -151,6 +151,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
 	require.Equal(t, upgradeEnvConfigData["AUTOMATIC_RESUME_ENABLED"], "false")
 	require.Equal(t, upgradeEnvConfigData["CUSTOM_JVM_ARGS"], "")
+	require.Equal(t, upgradeEnvConfigData["DEFAULT_MAX_HEAP_SIZE"], "-Xmx8g")
 }
 
 

@@ -34,6 +34,8 @@ bypassLoadEngineClasses: "false"
 bypassLoadAssembledClasses: "false"
 # Custom JVM arguments for the installer
 customJVMArgs: ""
+# Installer java max heap size -- remember to set in conjuction with installer memory request/limit
+# installerMaxHeap: 8g
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
 # Optionally specify specific service account
@@ -95,11 +97,11 @@ upgrade:
 # Ephemeral storage recommended size is 10G
 resources:
   requests:
-    memory: "5Gi"
+    memory: "12Gi"
     cpu: 1
     # ephemeralStorage: ""
   limits:
-    memory: "6Gi"
+    memory: "12Gi"
     cpu: 2
     # ephemeralStorage: ""
 
