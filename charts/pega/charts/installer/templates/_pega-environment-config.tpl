@@ -58,6 +58,7 @@ data:
 {{- if .Values.global.highlySecureCryptoModeEnabled }}
   HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
 {{- end }}
+  DEFAULT_MAX_HEAP_SIZE: {{ include "installerDefaultMaxHeapSize" . }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
 {{- range .Values.advancedSettings }}
