@@ -103,7 +103,7 @@ spec:
 {{- end }}
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
-        image: {{ .root.Values.image }}
+        image: {{ include "pegaInstallerImage" . }}
 {{- if .root.Values.imagePullPolicy }}
         imagePullPolicy: {{ .root.Values.imagePullPolicy  }}
 {{- end }}
@@ -115,18 +115,7 @@ spec:
 {{- end }}
         resources:
           # CPU and Memory that the containers for {{ .name }} request
-          requests:
-            cpu: "{{ .root.Values.resources.requests.cpu }}"
-            memory: "{{ .root.Values.resources.requests.memory }}"
-            {{- if .root.Values.resources.requests.ephemeralStorage }}
-            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
-            {{- end }}
-          limits:
-            cpu: "{{ .root.Values.resources.limits.cpu }}"
-            memory: "{{ .root.Values.resources.limits.memory }}"
-            {{- if .root.Values.resources.limits.ephemeralStorage }}
-            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
-            {{- end }}
+          {{- include "pegaInstallerResources" . | indent 10 }}
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
@@ -166,17 +155,17 @@ spec:
         -  name: HZ_VERSION
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_VERSION
         -  name: HZ_CLUSTER_NAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_CLUSTER_NAME
         -  name: HZ_SERVER_HOSTNAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root}}
               key: HZ_SERVER_HOSTNAME
 {{- end }}
         envFrom:
