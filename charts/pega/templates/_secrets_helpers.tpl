@@ -8,6 +8,11 @@
 {{- $depName -}}-stream-secret
 {{- end -}}
 
+{{- define "pega-srs-mtls-secret-name" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-srs-mtls-secret
+{{- end -}}
+
 {{- define "pega-custom-artifactory-secret-name" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-artifactory-secret
@@ -28,6 +33,22 @@ false
 
 {{- define "deployNonExtStreamSecret" }}
 {{- if and (eq (include "deployStreamSecret" .) "true") (not (.Values.stream).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "deploySRSSecret" }}
+{{- if and (eq (include "performDeployment" .) "true") ((.Values.pegasearch.srsMTLS).enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end }}
+
+{{- define "deployNonExtSRSSecret" }}
+{{- if and (eq (include "deploySRSSecret" .) "true") (not (.Values.pegasearch.srsMTLS).external_secret_name) -}}
 true
 {{- else -}}
 false
