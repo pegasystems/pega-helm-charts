@@ -28,10 +28,10 @@ func TestPegaInstallEnvironmentConfig(t *testing.T) {
 
 			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"})
 			assertInstallerEnvironmentConfig(t, yamlContent, options)
+			assertInstallerEnvironmentConfigDefaultInstallerHeap(t, yamlContent, options)
 		}
 	}
 }
-
 
 func TestPegaInstallEnvironmentConfigWithCustomJVMArgs(t *testing.T) {
 
@@ -62,6 +62,46 @@ func assertInstallerEnvironmentConfigWithCustomJVMArgs(t *testing.T, configYaml 
     UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
     installEnvConfigData := installEnvConfigMap.Data
     require.Equal(t, installEnvConfigData["CUSTOM_JVM_ARGS"], "-Da=1")
+}
+
+func TestPegaInstallEnvironmentConfigCustomInstallerHeap(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"installer.installerMaxHeap": "10g",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"})
+			assertInstallerEnvironmentConfigCustomInstallerHeap(t, yamlContent, options)
+		}
+	}
+}
+
+func assertInstallerEnvironmentConfigCustomInstallerHeap(t *testing.T, configYaml string, options *helm.Options) {
+	var installEnvConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
+	installEnvConfigData := installEnvConfigMap.Data
+
+    require.Equal(t, installEnvConfigData["DEFAULT_MAX_HEAP_SIZE"], "-Xmx10g")
+}
+
+func assertInstallerEnvironmentConfigDefaultInstallerHeap(t *testing.T, configYaml string, options *helm.Options) {
+	var installEnvConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
+	installEnvConfigData := installEnvConfigMap.Data
+
+    require.Equal(t, installEnvConfigData["DEFAULT_MAX_HEAP_SIZE"], "-Xmx8g")
 }
 
 func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *helm.Options) {
