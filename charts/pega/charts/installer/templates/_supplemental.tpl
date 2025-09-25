@@ -51,7 +51,7 @@ false
 {{- end }}
 
 {{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
+{{- if and .Values.global.docker.registry (not .Values.global.docker.imagePullSecretNames) }}
 - name: {{ template "pegaRegistrySecret" $ }}
 {{- end }}
 {{- if (.Values.global.docker.imagePullSecretNames) }}
