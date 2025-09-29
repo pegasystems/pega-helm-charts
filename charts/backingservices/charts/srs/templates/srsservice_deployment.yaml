@@ -134,8 +134,17 @@ spec:
             {{ if not .Values.srsStorage.certsSecret }}
             - name: TRUSTSTORE_PASS
               value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
+            {{/*  The below env variable is a redundant variable of TRUSTSTORE_PASS, added to provide backward compatibility. This would be removed in the future releases */}}
+            - name: PATH_TO_KEYSTORE
+              value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
             {{ else }}
             - name: TRUSTSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
+                  key: password
+            {{/*  The below env variable is a redundant variable of TRUSTSTORE_PASS, added to provide backward compatibility. This would be removed in the future releases */}}
+            - name: PATH_TO_KEYSTORE
               valueFrom:
                 secretKeyRef:
                   name: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
@@ -157,12 +166,7 @@ spec:
               value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.keystore.file | default "es-keystore.p12"}}"
             - name: PATH_TO_ES_TRUSTSTORE
               value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.truststore.file | default "es-truststore.jks"}}"
-              {{ if not .Values.srsStorage.mtls.certsSecret }}
-            - name: ES_KEYSTORE_PASS
-              value: "{{ .Values.srsStorage.mtls.keystore.password | default ""}}"
-            - name: ES_TRUSTSTORE_PASS
-              value: "{{ .Values.srsStorage.mtls.truststore.password | default ""}}"
-              {{ else }}
+              {{ if .Values.srsStorage.mtls.certsSecret }}
             - name: ES_KEYSTORE_PASS
               valueFrom:
                 secretKeyRef:
@@ -188,12 +192,7 @@ spec:
               value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.truststore.file | default "srs-truststore.jks"}}"
             - name: SRS_TRUSTSTORE_TYPE
               value: "{{ .Values.srsRuntime.ssl.truststore.type | default "JKS"}}"
-            {{ if not .Values.srsRuntime.ssl.certsSecret }}
-            - name: SRS_KEYSTORE_PASSWORD
-              value: "{{ .Values.srsRuntime.ssl.keystore.password | default ""}}"
-            - name: SRS_TRUSTSTORE_PASSWORD
-              value: "{{ .Values.srsRuntime.ssl.truststore.password | default ""}}"
-            {{ else }}
+            {{ if .Values.srsRuntime.ssl.certsSecret }}
             - name: SRS_KEYSTORE_PASSWORD
               valueFrom:
                 secretKeyRef:

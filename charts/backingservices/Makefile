@@ -46,5 +46,5 @@ srs-mtls-prerequisite:
 	openssl pkcs12 -in $(KEYSTORE_PATH) -clcerts -nokeys -out client.crt -passin pass:$(KEYSTORE_PASS)
 	openssl pkcs12 -in $(KEYSTORE_PATH) -nocerts -nodes -out client.key -passin pass:$(KEYSTORE_PASS)
 	cp $(CA_CERT_PATH) ./ca.crt
-	kubectl create secret generic srs-readiness-certs --from-file=client.crt --from-file=client.key --from-file=ca.crt --namespace=mtls
+	kubectl create secret generic srs-readiness-certs --from-file=client.crt --from-file=client.key --from-file=ca.crt --namespace=$(NAMESPACE)
 	rm -f client.crt client.key ca.crt

@@ -272,7 +272,7 @@ To enable Transport Layer Security(TLS) or Mutual TLS(mTLS) for SRS, configure t
 #### Pre-requisite Step to enable mTLS for SRS
 In order to enable mTLS for SRS, you need to perform the following make command.
   ```bash
-  make srs-mtls-prerequisite CA_CERT_PATH=<PATH_TO_THE_CA_CERT_OF_SRS> KEYSTORE_PATH=<PATH_TO_THE_KEYSTORE_OF_SRS> KEYSTORE_PASS=<PASSWORD_TO_THE_KEYSTORE_OF_SRS>
+  make srs-mtls-prerequisite CA_CERT_PATH=<PATH_TO_THE_CA_CERT_OF_SRS> KEYSTORE_PATH=<PATH_TO_THE_KEYSTORE_OF_SRS> KEYSTORE_PASS=<PASSWORD_TO_THE_KEYSTORE_OF_SRS> NAMESPACE=<KUBERNETES_NAMESPACE_WHERE_SRS_IS_DEPLOYED>
   ```
 - Since mTLS is enforced, we need to pass the client certificate & it's key along with the CA certificate to be able to check the health of an SRS container.
 - We need to run the above make command to make sure that required certificates are created for the readiness probe to check the health of SRS containers.
