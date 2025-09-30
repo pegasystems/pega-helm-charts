@@ -29,6 +29,8 @@ func TestPegaEnvironmentConfig(t *testing.T) {
 						"global.provider":               vendor,
 						"global.actions.execute":        operation,
 						"installer.upgrade.upgradeType": "zero-downtime",
+						"dds.localDatacenter": "datacenter1",
+						"dds.datacenters": "datacenter1",
 					},
 				}
 
@@ -244,6 +246,8 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["CASSANDRA_CLUSTER"], "true")
 	require.Equal(t, envConfigData["CASSANDRA_NODES"], "pega-cassandra")
 	require.Equal(t, envConfigData["CASSANDRA_PORT"], "9042")
+	require.Equal(t, envConfigData["CASSANDRA_LOCAL_DATACENTER"], "datacenter1")
+	require.Equal(t, envConfigData["CASSANDRA_DATACENTERS"], "datacenter1")
 	require.Equal(t, envConfigData["CASSANDRA_ASYNC_PROCESSING_ENABLED"], "false")
 	require.Equal(t, envConfigData["CASSANDRA_KEYSPACES_PREFIX"], "")
 	require.Equal(t, envConfigData["CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY"], "false")
@@ -272,31 +276,13 @@ func TestPegaRASPEnvironmentConfig(t *testing.T) {
 		},
 	}
 
-	options.SetValues["global.rasp.enabled"] = "true"
 	options.SetValues["global.rasp.action"] = ""
 	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
 	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
 
-	options.SetValues["global.rasp.enabled"] = "true"
 	options.SetValues["global.rasp.action"] = "WARN"
 	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
 
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "true")
 	VerifyEnvValue(t, yamlContent, "RASP_ACTION", "WARN")
-
-	options.SetValues["global.rasp.enabled"] = "false"
-	options.SetValues["global.rasp.action"] = ""
-	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
-	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
-
-	options.SetValues["global.rasp.enabled"] = "false"
-	options.SetValues["global.rasp.action"] = "WARN"
-	yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-
-	VerifyEnvValue(t, yamlContent, "IS_RASP_ENABLED", "false")
-	VerifyEnvNotPresent(t, yamlContent, "RASP_ACTION")
 }

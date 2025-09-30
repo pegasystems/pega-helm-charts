@@ -34,6 +34,7 @@ metadata:
 {{- if .node.ingress.annotations }}
 {{ toYaml .node.ingress.annotations | indent 4 }}
 {{- else }}
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz.html
     # override the default scheme internal as ALB should be internet-facing
     alb.ingress.kubernetes.io/scheme: internet-facing
     # set to ip mode to route traffic directly to the pods ip

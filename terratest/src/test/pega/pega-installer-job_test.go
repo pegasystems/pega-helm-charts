@@ -178,6 +178,65 @@ func TestPegaInstallerJobWithNodeSelector(t *testing.T) {
 
 }
 
+func TestPegaInstallerJobWithOverriddenImageAndResources(t *testing.T) {
+	var options = &helm.Options{
+	    ValuesFiles: []string{"data/pega-installer-override-resources_values.yaml"},
+		SetValues: map[string]string{
+			"global.deployment.name":         "install-ns",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+			"installer.upgrade.upgradeType":  "zero-downtime",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "MY_INSTALLER_IMAGE:TAG", jobObj.Spec.Template.Spec.Containers[0].Image)
+
+    require.Equal(t, "200m", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
+    require.Equal(t, "1Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
+
+    require.Equal(t, "200m", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+    require.Equal(t, "1Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+}
+
+func TestPegaInstallerJobWithNonOverriddenImageAndResources(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":         "install-ns",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+			"installer.upgrade.upgradeType":  "zero-downtime",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobObj.Spec.Template.Spec.Containers[0].Image)
+
+    require.Equal(t, "1", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
+
+    require.Equal(t, "2", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+}
+
 func TestPegaInstallerJobWithAffinity(t *testing.T) {
 
 	var affinityBasePath = "installer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0]."

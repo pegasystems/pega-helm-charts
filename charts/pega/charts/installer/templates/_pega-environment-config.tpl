@@ -52,6 +52,13 @@ data:
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: {{ .Values.global.customArtifactory.enableSSLVerification | quote }}
   # Custom JVM arguments for the installer
   CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: {{ .Values.global.fips140_3Mode | quote }}
+{{- end }}
+{{- if .Values.global.highlySecureCryptoModeEnabled }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
+{{- end }}
+  DEFAULT_MAX_HEAP_SIZE: {{ include "installerDefaultMaxHeapSize" . }}
 {{- if .Values.advancedSettings }}
   ADVANCED_SETTINGS: |-
 {{- range .Values.advancedSettings }}

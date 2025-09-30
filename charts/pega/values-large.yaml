@@ -446,12 +446,18 @@ dds:
   externalNodes: ""
   # TCP Port to connect to cassandra.
   port: "9042"
+  # The local Cassandra datacenter.
+  localDatacenter: ""
+  # A list of all the datacenters in the Cassandra cluster.
+  datacenters: ""
   # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
   # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # Whether to enable client certificate verification on the Cassandra connection.
+  clientAuth: false
   # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
   # are JKS and PKCS12. Default is JKS.
   clientEncryptionStoreType: ""
@@ -551,6 +557,16 @@ installer:
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
+  # Specifies the system name. Default name is "pega".
+  systemName: "pega"
+  # Sets the system's production level during installation.
+  # Valid production level values (1-5):
+  # 5 = Production
+  # 4 = Preproduction
+  # 3 = Test
+  # 2 = Development (Default)
+  # 1 = Experimental
+  productionLevel: 2
   # Upgrade specific properties
   upgrade:
     # Type of upgrade

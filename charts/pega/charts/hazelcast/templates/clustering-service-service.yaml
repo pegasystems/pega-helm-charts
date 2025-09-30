@@ -11,7 +11,8 @@ metadata:
 {{- include "generatedClusteringServiceAnnotations" . | indent 8 }}
 spec:
   ports:
-  - name: tcp-hzport
+  - appProtocol: tcp
+    name: tcp-hzport
     port: 5701
     targetPort: 5701   
   clusterIP: None
