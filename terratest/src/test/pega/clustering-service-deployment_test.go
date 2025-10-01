@@ -30,6 +30,7 @@ func TestClusteringServiceDeployment(t *testing.T) {
 					"global.provider":                    vendor,
 					"global.actions.execute":             operation,
 					"hazelcast.clusteringServiceEnabled": "true",
+					"hazelcast.podLabels.key1":           "value1",
 				},
 			}
 
@@ -74,6 +75,8 @@ func VerifyClusteringServiceDeployment(t *testing.T, yamlContent string, ssl boo
 	for index, statefulInfo := range statefulSlice {
 		if index >= 1 {
 			UnmarshalK8SYaml(t, statefulInfo, &statefulsetObj)
+			require.Empty(t, statefulsetObj.Labels)
+			require.Equal(t, statefulsetObj.Spec.Template.Labels["key1"], "value1")
 			require.Equal(t, *statefulsetObj.Spec.Replicas, int32(3))
 			require.Equal(t, statefulsetObj.Spec.ServiceName, "clusteringservice-service")
 			statefulsetSpec := statefulsetObj.Spec.Template.Spec
