@@ -148,6 +148,7 @@ func Test_ConstellationWithLabels(t *testing.T) {
 	require.Equal(t, cllnDeployment.Spec.Template.Labels["app"], deploymentName)
 }
 
+// Test case to verify pod annotations
 func Test_ConstellationWithPodAnnotations(t *testing.T) {
 
 	var deploymentName string = "constellation-static"
