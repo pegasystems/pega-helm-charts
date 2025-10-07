@@ -404,6 +404,9 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 		require.Equal(t, "TRUSTSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 		envIndex++
+		require.Equal(t, "PATH_TO_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
 
 		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "srs-certificates")
 		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/")
