@@ -1130,14 +1130,14 @@ pegasearch:
     # If required, provide trustStore certificate file name
     # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
     # in the global.certificatesSecrets parameter.
-    # Pega deployments only support trustStores using the Java Key Store (.jks) format.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
     trustStore: "pega-srs-truststore.jks"
     # If required provide trustStorePassword value in plain text.
     trustStorePassword: ""
     # If required, provide keyStore certificate file name
     # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
     # in the global.certificatesSecrets parameter.
-    # Pega deployments only support keyStores using the Java Key Store (.jks) format.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
     keyStore: "pega-srs-keystore.jks"
     # If required, provide keyStore value in plain text.
     keyStorePassword: ""
