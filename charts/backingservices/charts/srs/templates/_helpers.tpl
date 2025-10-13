@@ -119,9 +119,7 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 
 {{- define "elasticsearch.protocol" -}}
-{{- if and (.Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) }}
-{{- "https" | quote }}
-{{- else if and (.Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) }}
+{{- if and (.Values.srsStorage.provisionInternalESCluster) (or .Values.srsStorage.tls.enabled .Values.srsStorage.mtls.enabled) }}
 {{- "https" | quote }}
 {{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) }}
 {{- "http" | quote }}
