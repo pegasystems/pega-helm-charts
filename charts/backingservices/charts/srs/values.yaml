@@ -107,7 +107,8 @@ srsStorage:
     # When srs.srsStorage.mtls.enabled is set to true, then for the mutual handshake between SRS and Elasticsearch/OpenSearch,
     # you need to configure the required keystore and truststore certificates.
     # The below certificate details are used for establishing mTLS between SRS and Elasticsearch/OpenSearch.
-    # You can use the same keystore and truststore can that you configured above for SRS (srs.srsRuntime.ssl.key-store and srs.srsRuntime.ssl.trust-store) or you can use a new keystore and truststore.
+    # You can use the same keystore and truststore can that you configured above for SRS (srs.srsRuntime.ssl.key-store and srs.srsRuntime.ssl.trust-store)
+    # or you can use a new keystore and truststore.
     # Ensure that you add the required CA certificates to the truststore to establish a secure
     # connection between SRS and Elasticsearch/OpenSearch in case of mTLS.
     # Uncomment the keystore and truststore details below and configure the required certificate paths.
