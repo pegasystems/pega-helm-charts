@@ -57,12 +57,12 @@ srs:
     #     - ALL
     #   runAsNonRoot: true
 
-    # The following sections helps in enabling TLS/mTLS(https) for SRS.
+    # The following section enables TLS/mTLS(https) for SRS.
     # Set srs.srsRuntime.ssl.enabled to true if you require a secure connection to srs (either TLS or mTLS).
     ssl:
       enabled: false
-      # Set client-authentication to wantto accept a client certificate if available, but not block access without one.
-      # To require a client certificate for all requests, change to need.
+      # Set client-authentication to `want` to accept a client certificate if available, but not block access without one.
+      # To require a client certificate for all requests, change to `need`.
       # To enforce mTLS, enable ssl and set client-authentication to 'need'.
       # For a simple TLS(HTTPS) mode, set client-authentication to 'want'.
       # Configure the required keystore and truststore file names along with the file type.
