@@ -106,6 +106,154 @@ func TestSRSDeploymentVariables(t *testing.T) {
 		})
 }
 
+func TestSRSDeploymentWithSRSMTLS(t *testing.T) {
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                "true",
+			"srs.deploymentName":                         "srs-test-mtls",
+			"global.imageCredentials.registry":           "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                "1",
+			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":             "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
+			"srs.srsRuntime.ssl.enabled":                 "true",
+			"srs.srsRuntime.ssl.clientAuthentication":    "need",
+			"srs.srsRuntime.ssl.keystore.file":           "srs-keystore.p12",
+			"srs.srsRuntime.ssl.keystore.password":       "",
+			"srs.srsRuntime.ssl.keystore.type":           "PKCS12",
+			"srs.srsRuntime.ssl.truststore.file":         "srs-truststore.jks",
+			"srs.srsRuntime.ssl.truststore.password":     "",
+			"srs.srsRuntime.ssl.truststore.type":         "JKS",
+			"srs.srsRuntime.ssl.certsSecret":             "srs-ssl-certssecrets",
+			"srs.srsStorage.tls.enabled":                 "true",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "srs-test-mtls",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"srs-test-mtls",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
+			esDomain{
+				domain:   "elasticsearch-master.default.svc",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
+}
+
+func TestSRSDeploymentSrsEsMtls(t *testing.T) {
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                "true",
+			"srs.deploymentName":                         "srs-es-mtls",
+			"global.imageCredentials.registry":           "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                "1",
+			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":             "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
+			"srs.srsRuntime.ssl.enabled":                 "true",
+			"srs.srsRuntime.ssl.clientAuthentication":    "need",
+			"srs.srsRuntime.ssl.keystore.file":           "srs-keystore.p12",
+			"srs.srsRuntime.ssl.keystore.password":       "",
+			"srs.srsRuntime.ssl.keystore.type":           "PKCS12",
+			"srs.srsRuntime.ssl.truststore.file":         "srs-truststore.jks",
+			"srs.srsRuntime.ssl.truststore.password":     "",
+			"srs.srsRuntime.ssl.truststore.type":         "JKS",
+			"srs.srsRuntime.ssl.certsSecret":             "srs-ssl-certssecrets",
+			"srs.srsStorage.mtls.enabled":                "true",
+			"srs.srsStorage.mtls.keystore.file":          "keystore.p12",
+			"srs.srsStorage.mtls.certsSecret":            "es-mtls-certssecret",
+			"srs.srsStorage.mtls.truststore.file":        "truststore.jks",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "srs-es-mtls",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"srs-es-mtls",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
+			esDomain{
+				domain:   "elasticsearch-master.default.svc",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
+}
+
+func TestSRSDeploymentWithESMTLS(t *testing.T) {
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                "true",
+			"srs.deploymentName":                         "srs-test-mtls-es",
+			"global.imageCredentials.registry":           "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                "1",
+			"srs.srsRuntime.srsImage":                    "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":             "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":       "",
+			"srs.srsStorage.mtls.enabled":                "true",
+			"srs.srsStorage.mtls.keystore.file":          "keystore.p12",
+			"srs.srsStorage.mtls.certsSecret":            "es-mtls-certssecret",
+			"srs.srsStorage.mtls.truststore.file":        "truststore.jks",
+			"srs.srsStorage.basicAuthentication.enabled": "false",
+			"srs.srsStorage.networkPolicy.enabled":       "true",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "srs-test-mtls-es",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"srs-test-mtls-es",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
+			esDomain{
+				domain:   "elasticsearch-master.default.svc",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
+}
+
 func TestSRSDeploymentVariablesDefaultInternetEgress(t *testing.T) {
 
 	helmChartParser := NewHelmConfigParser(
@@ -211,9 +359,8 @@ func VerifySRSDeployment(t *testing.T, deploymentObj appsv1.Deployment, expected
 func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeployment) {
 	require.Equal(t, pod.Containers[0].Name, "srs-service")
 	require.Equal(t, pod.Containers[0].Image, expectedSpec.imageURI)
-	require.Equal(t, pod.Containers[0].Ports[0].Name, "srs-port")
-	require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
 	var envIndex int32 = 0
+	var volumeIndex int32 = 0
 	require.Equal(t, "ELASTICSEARCH_HOST", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.elasticsearchEndPoint.domain, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
@@ -254,9 +401,88 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 		require.Equal(t, "PATH_TO_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "/usr/share/elastic-certificates.p12", pod.Containers[0].Env[envIndex].Value)
 		envIndex++
+		require.Equal(t, "TRUSTSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
 		require.Equal(t, "PATH_TO_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "", pod.Containers[0].Env[envIndex].Value)
 		envIndex++
+
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "srs-certificates")
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/")
+		volumeIndex++
+	}
+	if strings.EqualFold("mtls", authProvider) {
+		require.Equal(t, "ELASTICSEARCH_USERNAME", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "username", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+		require.Equal(t, "ELASTICSEARCH_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "srs-elastic-credentials", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "password", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+		require.Equal(t, "PATH_TO_ES_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "/usr/share/ssl/es/keystore.p12", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "PATH_TO_ES_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "/usr/share/ssl/es/truststore.jks", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "ES_KEYSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "es-mtls-certssecret", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "keystorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+		require.Equal(t, "ES_TRUSTSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "es-mtls-certssecret", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "truststorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+	}
+	if strings.EqualFold("SSL_ENABLED", pod.Containers[0].Env[envIndex].Name) {
+		require.Equal(t, "SSL_ENABLED", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "true", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "SRS_TLS_CLIENT_AUTHENTICATION", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "need", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "PATH_TO_SRS_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "file:///usr/share/ssl/srs/srs-keystore.p12", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "SRS_KEYSTORE_TYPE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "PKCS12", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "PATH_TO_SRS_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "file:///usr/share/ssl/srs/srs-truststore.jks", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "SRS_TRUSTSTORE_TYPE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "JKS", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "SRS_KEYSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "srs-ssl-certssecrets", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "keystorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+		require.Equal(t, "SRS_TRUSTSTORE_PASSWORD", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "srs-ssl-certssecrets", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "truststorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+
+		require.Equal(t, pod.Containers[0].Ports[0].Name, "srs-https-port")
+		require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8443))
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "srs-ssl-volume")
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/ssl/srs/")
+		volumeIndex++
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "srs-readiness-volume")
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/ssl/srs/readiness/")
+		volumeIndex++
+		require.Equal(t, pod.Containers[0].ReadinessProbe.Exec.Command, ([]string{"wget", "--certificate=/usr/share/ssl/srs/readiness/client.crt", "--private-key=/usr/share/ssl/srs/readiness/client.key", "--ca-certificate=/usr/share/ssl/srs/readiness/ca.crt", "--no-check-certificate", "--no-verbose", "--spider", "https://localhost:8443/health"}))
+	} else {
+		require.Equal(t, pod.Containers[0].Ports[0].Name, "srs-port")
+		require.Equal(t, pod.Containers[0].Ports[0].ContainerPort, int32(8080))
+		require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/health")
+		require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromString("srs-port"))
+		require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
+	}
+	if strings.EqualFold("mtls", authProvider) {
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "es-ssl-volume")
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/ssl/es/")
 	}
 	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "0.0.0.0", pod.Containers[0].Env[envIndex].Value)
@@ -279,9 +505,6 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	require.Equal(t, pod.Containers[0].ReadinessProbe.InitialDelaySeconds, int32(2))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.TimeoutSeconds, int32(30))
 	require.Equal(t, pod.Containers[0].ReadinessProbe.PeriodSeconds, int32(5))
-	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Path, "/health")
-	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Port, intstr.FromString("srs-port"))
-	require.Equal(t, pod.Containers[0].ReadinessProbe.HTTPGet.Scheme, k8score.URIScheme("HTTP"))
 
 	require.Equal(t, pod.ImagePullSecrets[0].Name, expectedSpec.name+"-reg-secret")
 	if expectedSpec.imagePullSecretNames {

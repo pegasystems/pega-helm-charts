@@ -2,6 +2,9 @@ default: es-prerequisite
 
 NAMESPACE := <YOUR_NAMESPACE>
 ELASTICSEARCH_IMAGE := docker.elastic.co/elasticsearch/elasticsearch:$(ELASTICSEARCH_VERSION)
+KEYSTORE_PATH := <SRS_KEYSTORE_PATH>
+KEYSTORE_PASS := <SRS_KEYSTORE_PASS>
+CA_CERT_PATH := <SRS_CA_CERT_PATH>
 
 es-prerequisite: es-secrets
 
@@ -38,3 +41,10 @@ update-secrets: purge-secrets
 
 update-external-es-secrets: purge-srs-secrets
 	make external-es-secrets
+
+srs-mtls-prerequisite:
+	openssl pkcs12 -in $(KEYSTORE_PATH) -clcerts -nokeys -out client.crt -passin pass:$(KEYSTORE_PASS)
+	openssl pkcs12 -in $(KEYSTORE_PATH) -nocerts -nodes -out client.key -passin pass:$(KEYSTORE_PASS)
+	cp $(CA_CERT_PATH) ./ca.crt
+	kubectl create secret generic srs-readiness-certs --from-file=client.crt --from-file=client.key --from-file=ca.crt --namespace=$(NAMESPACE)
+	rm -f client.crt client.key ca.crt

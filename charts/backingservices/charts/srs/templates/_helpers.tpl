@@ -119,9 +119,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 
 
 {{- define "elasticsearch.protocol" -}}
-{{- if and (.Values.srsStorage.provisionInternalESCluster) (.Values.srsStorage.tls.enabled) }}
+{{- if and (.Values.srsStorage.provisionInternalESCluster) (or .Values.srsStorage.tls.enabled .Values.srsStorage.mtls.enabled) }}
 {{- "https" | quote }}
-{{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
+{{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) }}
 {{- "http" | quote }}
 {{- else }}
 {{- required "A valid ''.Values.srsStorage.protocol' entry is required when connecting to external Elasticsearch!" .Values.srsStorage.protocol | quote  }}
@@ -129,13 +129,15 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "elasticsearch.authProvider" -}}
-{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) -}}
+{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "basic-authentication" }}
-{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) -}}
+{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "aws-iam"}}
-{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) -}}
+{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtls.enabled) -}}
 {{- "tls"}}
-{{- else if and  (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.tls.enabled)}}
+{{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) -}}
+{{- "mtls"}}
+{{- else if and  (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled)}}
 {{- "none" }}
 {{- else if and (.Values.srsStorage.basicAuthentication.enabled) (.Values.srsStorage.tls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication.enabled" | quote  }}
@@ -145,6 +147,20 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM" | quote  }}
 {{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and (.Values.srsStorage.mtls.enabled) (.Values.srsStorage.tls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled" | quote  }}
+{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled" | quote  }}
+{{- else if and (.Values.srsStorage.awsIAM) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.awsIAM" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) (.Values.srsStorage.tls.enabled) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.tls.enabled when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and (.Values.srsStorage.tls.enabled) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/..Values.srsStorage.tls.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled) (.Values.srsStorage.mtls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- end }}
 {{- end }}
 
@@ -171,9 +187,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "esDeploymentUsername" -}}
-{{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
+{{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
 {{- include "srsStorageCredentials.username" . }}
-{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
+{{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
+{{- include "srsStorageCredentials.username" . }}
+{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled)}}
 {{- include "srsStorageCredentials.username" . }}
 {{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.awsIAM) }}
 {{- "elastic" |  b64enc }}
@@ -181,9 +199,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end}}
 
 {{- define "esDeploymentPassword" -}}
-{{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
+{{- if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
 {{- include "srsStorageCredentials.password" . }}
-{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) }}
+{{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM)}}
+{{- include "srsStorageCredentials.password" . }}
+{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) }}
 {{- include "srsStorageCredentials.password" . }}
 {{- else if and (.Values.srsStorage.provisionInternalESCluster) (not .Values.srsStorage.awsIAM) }}
 {{- $secret := (lookup "v1" "Secret" .Release.Namespace "srs-elastic-credentials") }}
