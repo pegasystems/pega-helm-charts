@@ -1664,7 +1664,7 @@ tier:
 
 ### Specifying the PegaRULESReadOnly Datasource Connection
 
-To configure the PegaRULESReadOnly jdbc datasource, you can use the following parameter in the `values.yaml`:
+To configure the PegaRULESReadOnly jdbc datasource, use the following parameter in the `values.yaml` file:
 
 Example:
 ```yaml
@@ -1674,7 +1674,7 @@ global:
 ```
 
 Additionally, you can specify the read-only database username and password for each tier using environment variables.
-Set DB_RO_USERNAME and DB_RO_PASSWORD in the env section of the corresponding tier. Refer to the [Environment Variables section](#environment-variables)
+Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables)
 
 Example:
 ```yaml
