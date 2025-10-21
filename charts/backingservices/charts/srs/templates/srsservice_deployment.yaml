@@ -32,19 +32,64 @@ spec:
           image: {{ .Values.srsRuntime.srsImage }}
           imagePullPolicy: {{ .Values.srsRuntime.imagePullPolicy }}
           ports:
+            {{- if not .Values.srsRuntime.ssl.enabled }}
             - name: srs-port
               containerPort: 8080
               protocol: TCP
+            {{- else }}
+            - name: srs-https-port
+              containerPort: 8443
+              protocol: TCP
+            {{ end }}
           {{- if .Values.srsStorage.tls.enabled }}
           volumeMounts:
             - name: srs-certificates
               mountPath: /usr/share/
+              {{- if .Values.srsRuntime.ssl.enabled }}
+            - name: srs-ssl-volume
+              mountPath: /usr/share/ssl/srs/
+                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
+            - name: srs-readiness-volume
+              mountPath: /usr/share/ssl/srs/readiness/
+                {{ end }}
+              {{ end }}
+          {{- else if .Values.srsRuntime.ssl.enabled }}
+          volumeMounts:
+            - name: srs-ssl-volume
+              mountPath: /usr/share/ssl/srs/
+              {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
+            - name: srs-readiness-volume
+              mountPath: /usr/share/ssl/srs/readiness/
+              {{ end }}
+              {{- if .Values.srsStorage.mtls.enabled }}
+            - name: es-ssl-volume
+              mountPath: /usr/share/ssl/es/
+              {{ end }}
+          {{- else if .Values.srsStorage.mtls.enabled }}
+          volumeMounts:
+            - name: es-ssl-volume
+              mountPath: /usr/share/ssl/es/
           {{ end }}
           readinessProbe:
+              {{- if .Values.srsRuntime.ssl.enabled }}
+            exec:
+              command:
+                - wget
+                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
+                - --certificate=/usr/share/ssl/srs/readiness/client.crt
+                - --private-key=/usr/share/ssl/srs/readiness/client.key
+                - --ca-certificate=/usr/share/ssl/srs/readiness/ca.crt
+                {{ end }}
+                - --no-check-certificate
+                - --no-verbose
+                - --spider
+                - https://localhost:8443/health
+              {{- else }}
             httpGet:
               path: /health
               port: srs-port
               scheme: HTTP
+              {{ end }}
             initialDelaySeconds: 2
             periodSeconds: 5
             timeoutSeconds: 30
@@ -87,9 +132,18 @@ spec:
             - name: PATH_TO_TRUSTSTORE
               value: "/usr/share/{{ .Values.srsStorage.certificateName | default "elastic-certificates.p12"}}"
             {{ if not .Values.srsStorage.certsSecret }}
+            - name: TRUSTSTORE_PASS
+              value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
+            {{/*  The below env variable is a redundant variable of TRUSTSTORE_PASS, added to provide backward compatibility. This would be removed in the future releases */}}
             - name: PATH_TO_KEYSTORE
               value: "{{ .Values.srsStorage.certificatePassword | default ""}}"
             {{ else }}
+            - name: TRUSTSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
+                  key: password
+            {{/*  The below env variable is a redundant variable of TRUSTSTORE_PASS, added to provide backward compatibility. This would be removed in the future releases */}}
             - name: PATH_TO_KEYSTORE
               valueFrom:
                 secretKeyRef:
@@ -97,6 +151,60 @@ spec:
                   key: password
             {{- end }}
             {{- end}}
+            {{- if eq (include "elasticsearch.authProvider" $) "mtls" }}
+            - name: ELASTICSEARCH_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
+                  key: username
+            - name: ELASTICSEARCH_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.authSecret | default "srs-elastic-credentials"}}"
+                  key: password
+            - name: PATH_TO_ES_KEYSTORE
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.keystore.file | default "es-keystore.p12"}}"
+            - name: PATH_TO_ES_TRUSTSTORE
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtls.truststore.file | default "es-truststore.jks"}}"
+              {{ if .Values.srsStorage.mtls.certsSecret }}
+            - name: ES_KEYSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.mtls.certsSecret | default "es-ssl-certificates"}}"
+                  key: keystorePassword
+            - name: ES_TRUSTSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.mtls.certsSecret | default "es-ssl-certificates"}}"
+                  key: truststorePassword
+              {{- end }}
+            {{ end }}
+            {{- if .Values.srsRuntime.ssl.enabled }}
+            - name: SSL_ENABLED
+              value: "true"
+            - name: SRS_TLS_CLIENT_AUTHENTICATION
+              value: "{{ .Values.srsRuntime.ssl.clientAuthentication | default "want"}}"
+            - name: PATH_TO_SRS_KEYSTORE
+              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.keystore.file | default "srs-keystore.p12"}}"
+            - name: SRS_KEYSTORE_TYPE
+              value: "{{ .Values.srsRuntime.ssl.keystore.type | default "PKCS12"}}"
+            - name: PATH_TO_SRS_TRUSTSTORE
+              value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.truststore.file | default "srs-truststore.jks"}}"
+            - name: SRS_TRUSTSTORE_TYPE
+              value: "{{ .Values.srsRuntime.ssl.truststore.type | default "JKS"}}"
+            {{ if .Values.srsRuntime.ssl.certsSecret }}
+            - name: SRS_KEYSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+                  key: keystorePassword
+            - name: SRS_TRUSTSTORE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+                  key: truststorePassword
+            {{- end }}
+            {{- end }}
             - name: APPLICATION_HOST
               value: "0.0.0.0"
             - name: APPLICATION_PORT
@@ -122,6 +230,36 @@ spec:
       - name: srs-certificates
         secret:
           secretName: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
+        {{- if .Values.srsRuntime.ssl.enabled }}
+      - name: srs-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+          {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
+      - name: srs-readiness-volume
+        secret:
+          secretName: "srs-readiness-certs"
+          {{ end }}
+        {{ end }}
+      {{- else if .Values.srsRuntime.ssl.enabled }}
+      volumes:
+      - name: srs-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
+        {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
+      - name: srs-readiness-volume
+        secret:
+          secretName: "srs-readiness-certs"
+        {{ end }}
+        {{- if .Values.srsStorage.mtls.enabled }}
+      - name: es-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsStorage.mtls.certsSecret  | default "es-ssl-certificates"}}"
+        {{ end }}
+      {{- else if .Values.srsStorage.mtls.enabled }}
+      volumes:
+      - name: es-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsStorage.mtls.certsSecret  | default "es-ssl-certificates"}}"
       {{ end }}
       {{- if .Values.srsStorage.provisionInternalESCluster }}
       initContainers:
