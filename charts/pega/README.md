@@ -1673,8 +1673,8 @@ global:
      readerurl: <JDBC_URL_FOR_READ_ONLY_DATASOURCE>
 ```
 
-Additionally, you can specify the read only database username and password for each tier using environment variables.
-Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables)
+Additionally, you can specify the read-only database username and password for each tier using environment variables.
+Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables).
 
 Example:
 ```yaml
