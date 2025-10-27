@@ -169,7 +169,7 @@ srs:
       enabled: false
       # When srs.srsStorage.mtlsWithPKI.enabled is set to true, configure the required keystore and truststore certificates for PKI authentication.
       # The below certificate details are used for establishing mTLS with PKI authentication between SRS and Elasticsearch/OpenSearch.
-      # Ensure that the client certificate in the keystore is properly signed by a Certificate Authority (CA) 
+      # Ensure that the client certificate in the keystore is properly signed by a Certificate Authority (CA)
       # that is trusted by the Elasticsearch/OpenSearch server for PKI authentication.
       # To specify keystore and truststore using a secret, uncomment the below 'srs.srsStorage.mtlsWithPKI.certsSecret' parameter
       # and provide the secret name containing your certificates and their respective passwords.
