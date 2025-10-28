@@ -510,6 +510,28 @@ pegasearch:
     authType: ""
     privateKey: ""
     external_secret_name: ""
+  srsMTLS:
+    # Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    enabled: false
+    # Provide trustStore certificate file name.
+    # When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
+    trustStore: ""
+    # If required, provide trustStorePassword value in plain text.
+    trustStorePassword: ""
+    # Provide keyStore certificate file name.
+    # When using a keyStore certificate, you must also include a Kubernetes secret name that contains the keyStore certificate
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
+    keyStore: ""
+    # If required, provide keyStorePassword value in plain text.
+    keyStorePassword: ""
+    # To avoid exposing trustStorePassword abd keyStorePassword leave the values empty for trustStorePassword and keyStorePassword and
+    # configure them using an External Secrets Manager, ensuring that you configure the keys in the secret in the following order:
+    # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
+    # Enter the external secret name below.
+    external_secret_name: ""
 
 # Pega Installer settings.
 installer:

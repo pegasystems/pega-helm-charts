@@ -559,6 +559,9 @@ servicePort: use-annotation
     {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
     {{ include "secretResolver" $artifactoryDict | indent 4}}
 
+    {{- $srsDict := dict "deploySecret" "deploySRSSecret" "deployNonExtsecret" "deployNonExtSRSSecret" "extSecretName" .Values.pegasearch.srsMTLS.external_secret_name "nonExtSecretName" "pega-srs-mtls-secret-name" "context" $ -}}
+    {{ include "secretResolver" $srsDict | indent 4}}
+
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
   {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
