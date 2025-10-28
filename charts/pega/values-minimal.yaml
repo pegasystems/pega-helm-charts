@@ -135,7 +135,7 @@ global:
           # To avoid entering the certificate values in plain text, configure the keystore, keystorepassword, cacertificate parameter
           # values in the External Secrets Manager, and enter the external secret name below
           # make sure the keys in the secret should be TOMCAT_KEYSTORE_CONTENT, TOMCAT_KEYSTORE_PASSWORD and ca.crt respectively
-          external_secret_name: ""
+          external_secret_names: []
           keystore:
           keystorepassword:
           port: 443
