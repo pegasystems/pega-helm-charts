@@ -227,7 +227,7 @@
              Note: The pattern used is equivalent to using pattern="common" -->
         <Valve className="org.apache.catalina.valves.AccessLogValve" directory="logs"
                prefix="localhost_access_log" suffix=".txt"
-               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b %D %I %S %{User-Agent}i"
+               pattern="%{X-Forwarded-For}i %h %l %u %t &quot;%r&quot; %s %b %D %I %S &quot%{User-Agent}i&quot"
                resolveHosts="false" />
 
         <Valve className="org.apache.catalina.valves.ErrorReportValve"
