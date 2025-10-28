@@ -15,8 +15,8 @@ dependencies:
   repository: https://helm.elastic.co/
   condition: elasticsearch.enabled
 - name: fluentd-elasticsearch
-  version: "9.6.0"
-  repository: https://kiwigrid.github.io/
+  version: "15.0.0"
+  repository: https://kokuwaio.github.io/helm-charts
   condition: fluentd-elasticsearch.enabled
 - name: kibana
   version: "7.17.3"
