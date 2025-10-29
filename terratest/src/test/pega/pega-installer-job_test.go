@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
-
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8sbatch "k8s.io/api/batch/v1"
@@ -24,7 +23,14 @@ var customArtifactorySecret = "artifactory_secret"
 var volDefaultModePointer = &volDefaultMode
 
 func TestPegaInstallerJob(t *testing.T) {
+    runPegaInstallerJobTest(t, "")
+}
 
+func TestPegaInstallerJobWithExternalPegaRESTSecret(t *testing.T) {
+    runPegaInstallerJobTest(t, "my-pega-rest-external-secret")
+}
+
+func runPegaInstallerJobTest(t *testing.T, externalSecretName string) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 	var deploymentNames = []string{"pega", "myapp-dev"}
@@ -44,6 +50,9 @@ func TestPegaInstallerJob(t *testing.T) {
 							"global.customArtifactory.authentication.external_secret_name": customArtifactorySecret,
 							"installer.imagePullPolicy":                                    pullPolicy,
 							"installer.upgrade.upgradeType":                                "zero-downtime",
+							"installer.upgrade.pegaRESTUsername": "username",
+                            "installer.upgrade.pegaRESTPassword": "password",
+                            "installer.upgrade.pega_rest_external_secret_name": externalSecretName,
 						},
 					}
 					yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
@@ -62,15 +71,15 @@ func TestPegaInstallerJob(t *testing.T) {
 									expectedJob = pegaDbJob{"pega-post-upgrade", []string{"wait-for-pegaupgrade", "wait-for-rolling-updates"}, "pega-upgrade-environment-config", "pega-installer", "post-upgrade"}
 								}
 
-								assertJob(t, jobInfo, expectedJob, options, pullPolicy)
+								assertJob(t, jobInfo, expectedJob, options, pullPolicy, externalSecretName)
 							}
 
 						}
 					} else {
 						if operation == "install" || operation == "install-deploy" {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, externalSecretName)
 						} else {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, externalSecretName)
 						}
 					}
 
@@ -81,7 +90,11 @@ func TestPegaInstallerJob(t *testing.T) {
 	}
 }
 
-func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *helm.Options, pullPolicy string) {
+
+
+
+
+func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *helm.Options, pullPolicy string, externalSecretName string) {
 	var jobObj k8sbatch.Job
 	UnmarshalK8SYaml(t, jobYaml, &jobObj)
 
@@ -95,6 +108,13 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[1].Secret.Name, customArtifactorySecret)
+
+	if externalSecretName == "" {
+	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, getObjName(options, "-upgrade-rest-secret"))
+	} else {
+	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, externalSecretName)
+	}
+
 	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
 	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
 	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-install-config" {
@@ -158,9 +178,68 @@ func TestPegaInstallerJobWithNodeSelector(t *testing.T) {
 
 }
 
+func TestPegaInstallerJobWithOverriddenImageAndResources(t *testing.T) {
+	var options = &helm.Options{
+	    ValuesFiles: []string{"data/pega-installer-override-resources_values.yaml"},
+		SetValues: map[string]string{
+			"global.deployment.name":         "install-ns",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+			"installer.upgrade.upgradeType":  "zero-downtime",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "MY_INSTALLER_IMAGE:TAG", jobObj.Spec.Template.Spec.Containers[0].Image)
+
+    require.Equal(t, "200m", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
+    require.Equal(t, "1Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
+
+    require.Equal(t, "200m", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+    require.Equal(t, "1Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+}
+
+func TestPegaInstallerJobWithNonOverriddenImageAndResources(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":         "install-ns",
+			"global.provider":                "k8s",
+			"global.actions.execute":         "install",
+			"installer.imagePullPolicy":      "Always",
+			"installer.upgrade.upgradeType":  "zero-downtime",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &jobObj)
+
+    require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobObj.Spec.Template.Spec.Containers[0].Image)
+
+    require.Equal(t, "1", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
+
+    require.Equal(t, "2", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+}
+
 func TestPegaInstallerJobWithAffinity(t *testing.T) {
 
-	var affintiyBasePath = "installer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0]."
+	var affinityBasePath = "installer.affinity.nodeAffinity.requiredDuringSchedulingIgnoredDuringExecution.nodeSelectorTerms[0].matchExpressions[0]."
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 
@@ -174,9 +253,9 @@ func TestPegaInstallerJobWithAffinity(t *testing.T) {
 					"global.actions.execute":        operation,
 					"installer.imagePullPolicy":     "Always",
 					"installer.upgrade.upgradeType": "zero-downtime",
-					affintiyBasePath + "key":        "kubernetes.io/os",
-					affintiyBasePath + "operator":   "In",
-					affintiyBasePath + "values[0]":  "linux",
+					affinityBasePath + "key":        "kubernetes.io/os",
+					affinityBasePath + "operator":   "In",
+					affinityBasePath + "values[0]":  "linux",
 				},
 			}
 

@@ -27,18 +27,15 @@ func TestPegaTomcatKeystoreSecret(t *testing.T) {
 
 				var options = &helm.Options{
 					SetValues: map[string]string{
-						"global.deployment.name":        depName,
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
-						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.deployment.name":             depName,
+						"global.provider":                    vendor,
+						"global.actions.execute":             operation,
+						"global.tier[0].service.tls.enabled": "true",
+						"installer.upgrade.upgradeType":      "zero-downtime",
 					},
 				}
-
-				yamlContent, error := RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-tomcat-keystore-secret.yaml"})
-				if error != nil {
-					VerifyTomcatCertificatesSecret(t, yamlContent, options)
-				}
-
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tomcat-keystore-secret.yaml"})
+				VerifyTomcatCertificatesSecret(t, yamlContent, options)
 			}
 		}
 	}
@@ -49,12 +46,7 @@ func VerifyTomcatCertificatesSecret(t *testing.T, yamlContent string, options *h
 	var importCertSecret k8score.Secret
 	UnmarshalK8SYaml(t, yamlContent, &importCertSecret)
 
-	importCertSecretData := importCertSecret.StringData
-	if len(importCertSecretData) != 0 {
-		require.Equal(t, importCertSecret.ObjectMeta.Name, getObjName(options, "-tomcat-keystore-secret"))
-		require.Equal(t, importCertSecretData["CERT_PASSWORD"], "123456")
-	} else {
-		require.Nil(t, importCertSecret.Data)
-	}
-
+	importCertSecretData := importCertSecret.Data
+	require.Equal(t, importCertSecret.ObjectMeta.Name, getObjName(options, "-tomcat-keystore-secret"))
+	require.Equal(t, "123456", string(importCertSecretData["TOMCAT_KEYSTORE_PASSWORD"]))
 }

@@ -51,7 +51,7 @@ false
 {{- end }}
 
 {{- define "imagePullSecrets" }}
-{{- if .Values.global.docker.registry }}
+{{- if and .Values.global.docker.registry (not .Values.global.docker.imagePullSecretNames) }}
 - name: {{ template "pegaRegistrySecret" $ }}
 {{- end }}
 {{- if (.Values.global.docker.imagePullSecretNames) }}
@@ -91,6 +91,11 @@ false
 {{- $depName -}}-db-secret
 {{- end -}}
 
+{{- define "pega-upgrade-rest-secret-name" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-upgrade-rest-secret
+{{- end -}}
+
 {{- define "pega-hz-secret-name" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-hz-secret
@@ -102,6 +107,18 @@ true
 
 {{- define "deployNonExtDBSecret" }}
 {{- if and (eq (include "deployDBSecret" .) "true") (not (.Values.global.jdbc).external_secret_name) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
+{{- define "deployPegaRESTSecret" -}}
+true
+{{- end }}
+
+{{- define "deployNonExtPegaRESTSecret" }}
+{{- if and (eq (include "deployPegaRESTSecret" .) "true") (not (.Values.upgrade).pega_rest_external_secret_name) -}}
 true
 {{- else -}}
 false
