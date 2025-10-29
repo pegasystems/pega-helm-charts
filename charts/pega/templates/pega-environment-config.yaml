@@ -50,6 +50,9 @@ data:
 {{- else }}
   IS_PEGA_CONFIG_COMPRESSED: "false"
 {{- end }}
+{{- if .Values.global.rasp.action }}
+  RASP_ACTION: "{{.Values.global.rasp.action}}"
+{{- end }}
   # Rules schema of the Pega installation
 {{ if (eq (include "performUpgradeAndDeployment" .) "true") }}
   RULES_SCHEMA: {{ .Values.installer.upgrade.targetRulesSchema }}
@@ -91,14 +94,28 @@ data:
   # URL to connect to Elastic Search
   PEGA_SEARCH_URL: {{ include "pegaSearchURL" $ }}
 {{- end }}
+{{- if and (.Values.pegasearch.externalSearchService) ((.Values.pegasearch.srsMTLS).enabled) }}
+  # To enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+  SRS_MTLS_ENABLED: "{{ .Values.pegasearch.srsMTLS.enabled }}"
+  # Path to a mounted trust store file for MTLS connection to SRS
+  SRS_TRUSTSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.trustStore }}"
+  # Path to a mounted key store file for MTLS connection to SRS
+  SRS_KEYSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.keyStore }}"
+{{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled".
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
   # Comma separated list of cassandra hosts.
   CASSANDRA_NODES: "{{ include "cassandraNodes" . }}"
   # Port to connect to cassandra with.
   CASSANDRA_PORT: "{{ .Values.dds.port }}"
+  # The datacenter in the Cassandra cluster which should be treated as local.
+  CASSANDRA_LOCAL_DATACENTER: "{{ .Values.dds.localDatacenter }}"
+  # A list of all the datacenters in the Cassandra cluster.
+  CASSANDRA_DATACENTERS: "{{ .Values.dds.datacenters }}"
   # Whether to enable client encryption on the Cassandra connection.
   CASSANDRA_CLIENT_ENCRYPTION: "{{ .Values.dds.clientEncryption }}"
+  # Whether to enable client certificate verification on the Cassandra connection.
+  CASSANDRA_CLIENT_AUTH: "{{ .Values.dds.clientAuth }}"
   # Type of Cassandra truststore and keystore used to hold keys and certificates for client encryption.
   # Available store types are JKS and PKCS12.
   CASSANDRA_CLIENT_ENCRYPTION_STORE_TYPE: "{{ .Values.dds.clientEncryptionStoreType }}"
@@ -179,6 +196,21 @@ data:
 {{- end }}
   # Hostname of Hazelcast server
   HZ_SERVER_HOSTNAME: {{ template "hzServiceName" . }}-service.{{ .Release.Namespace }}.svc.cluster.local
+{{ if (eq (include "isHzEncryptionEnabled" .) "true") }}
+  HZ_SSL_ENABLED: "true"
+  HZ_SSL_PROTOCOL: "TLS"
+  HZ_SSL_KEY_STORE_NAME: "cluster-keystore.jks"
+  HZ_SSL_TRUST_STORE_NAME: "cluster-truststore.jks"
+  {{ if (eq (include "isHzHighlySecureCryptoModeEnabled" .) "true") }}
+  HZ_SSL_ALGO: "PKIX"
+  {{- else }}
+  HZ_SSL_ALGO: "SunX509"
+  {{- end }}
+{{- end }}
+{{- end }}
+
+{{ if (eq (include "isPegaHighlySecureCryptoModeEnabled" .) "true") }}
+  HIGHLY_SECURE_CRYPTO_MODE_ENABLED: "true"
 {{- end }}
   # enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
@@ -212,5 +244,11 @@ data:
   STREAM_KEYSTORE_TYPE: "{{ .Values.stream.keyStoreType }}"
   STREAM_NAME_PATTERN: "{{ .Values.stream.streamNamePattern }}"
   STREAM_REPLICATION_FACTOR: "{{ .Values.stream.replicationFactor }}"
+{{- end }}
+{{- if .Values.global.fips140_3Mode }}
+  FIPS_140_3_MODE: "{{ .Values.global.fips140_3Mode }}"
+{{- end }}
+{{- if .Values.global.pegaVersion }}
+  IS_PEGA_25_OR_LATER: {{ (include "isPega25OrLater" .) }}
 {{- end }}
 {{ end }}

@@ -6,6 +6,10 @@ metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
 {{ if (.node.ingress) }}
+{{- if (.node.ingress.labels) }}
+  labels:
+{{ toYaml .node.ingress.labels | indent 4 }}
+{{- end }}
 {{ if (.node.ingress.tls) }}
 {{ if (eq .node.ingress.tls.enabled true) }}
   annotations:
@@ -23,6 +27,9 @@ metadata:
 {{ end }}
 {{ end }}
 spec:
+{{- if .node.ingress.ingressClassName }}
+  ingressClassName: {{ .node.ingress.ingressClassName }}
+{{- end }}
 {{ if (.node.ingress) }}
 {{ if (.node.ingress.tls) }}
 {{ if (eq .node.ingress.tls.enabled true) }}

@@ -28,6 +28,9 @@ global:
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
   kerberos: {}
 
+  # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  highlySecureCryptoModeEnabled: false
+
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
   storageClassName: ""
   # Provide JDBC connection information to the Pega relational database
@@ -128,6 +131,15 @@ global:
   # For more information, see the “Pega compressed configuration files” section in the Pega Helm chart documentation.
   compressedConfigurations: false
 
+  # PEGA RASP (Runtime Application Self Protection) feature settings.
+  # Available in Pega Platform ‘25 and later.
+  rasp:
+    # By default, RASP is enabled in Pega Platform ‘25 and later.
+    # To disable RASP, set the action to 'DISABLE'.
+    # Leave empty ("") to use the default action behavior configured by RASP.
+    # To override the RASP action, set one of the following values: IGNORE, WARN, BLOCK, ERROR, EXIT.
+    action: ""
+
   pegaDiagnosticUser: ""
   pegaDiagnosticPassword: ""
 
@@ -144,6 +156,10 @@ global:
         # Inactivity time after which requestor is passivated
         passivationTimeSec: 900
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # tcpKeepAliveProbe: 300
 
       service:
         # For help configuring the service block, see the Helm chart documentation
@@ -213,6 +229,10 @@ global:
         # Configure custom path for given host along with pathType. Default pathType is ImplementationSpecific.
         # path:
         # pathType:
+
+        # Configure custom labels for ingress
+        labels:
+
         tls:
           # Enable TLS encryption
           enabled: true
@@ -312,6 +332,11 @@ global:
       replicas: 1
       javaOpts: ""
 
+      # To configure net.ipv4.tcp_keepalive_time OS Kernel setting, set the value in seconds.
+      # This setting only works for Kubernetes version 1.29 onwards. For more information, see below,
+      # https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
+      # tcpKeepAliveProbe: 300
+
       deploymentStrategy:
         rollingUpdate:
           maxSurge: 1
@@ -356,80 +381,6 @@ global:
           memory: "12Gi"
           cpu: 4
 
-    - name: "stream"
-      # Create a stream tier for queue processing.  This tier deploys
-      # as a stateful set to ensure durability of queued data. It may
-      # be optionally exposed to the load balancer.
-      # Note: Stream tier is deprecated, please enable externalized Kafka service configuration under External Services.
-      # When externalized Kafka service is enabled, we should remove the entire stream tier.
-      nodeType: "Stream"
-
-      # Pega requestor specific properties
-      requestor:
-        # Inactivity time after which requestor is passivated
-        passivationTimeSec: 900
-
-      service:
-        port: 7003
-        targetPort: 7003
-
-      # If a nodeSelector is required for this or any tier, it may be specified here:
-      # nodeSelector:
-      #  disktype: ssd
-
-      ingress:
-        enabled: true
-        # Enter the domain name to access web nodes via a load balancer.
-        #  e.g. web.mypega.example.com
-        domain: "YOUR_STREAM_NODE_DOMAIN"
-        tls:
-          # Enable TLS encryption
-          enabled: true
-          # secretName:
-          # useManagedCertificate: false
-          # ssl_annotation:
-
-      livenessProbe:
-        port: 8081
-
-      # To configure an alternative user for your custom image, set value for runAsUser
-      # To configure an alternative group for volume mounts, set value for fsGroup
-      # See, https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#security-context
-      # securityContext:
-      #   runAsUser: 9001
-      #   fsGroup: 0
-
-      # To specify security settings for a Container, include the securityContext field in the Container manifest
-      # Security settings that you specify for a Container apply only to the pega container,
-      # and they override settings made at the Pod level when there is overlap. Container settings
-      # do not affect the Pod's Volumes.
-      # See, https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container
-      # containerSecurityContext:
-      #   capabilities:
-      #     add: ["SYS_TIME"]
-
-      replicas: 2
-
-      volumeClaimTemplate:
-        resources:
-          requests:
-            storage: 5Gi
-
-      # Set enabled to true to include a Pod Disruption Budget for this tier.
-      # To enable this budget, specifiy either a pdb.minAvailable or pdb.maxUnavailable
-      # value and comment out the other parameter.
-      pdb:
-        enabled: false
-        minAvailable: 1
-        # maxUnavailable: "50%"
-
-      resources:
-        requests:
-          memory: "12Gi"
-          cpu: 3
-        limits:
-          memory: "12Gi"
-          cpu: 4
 
 # External services
 
@@ -455,12 +406,18 @@ dds:
   externalNodes: ""
   # TCP Port to connect to cassandra.
   port: "9042"
+  # The local Cassandra datacenter.
+  localDatacenter: ""
+  # A list of all the datacenters in the Cassandra cluster.
+  datacenters: ""
   # The username for authentication with the Cassandra cluster.
   username: "dnode_ext"
   # The password for authentication with the Cassandra cluster.
   password: "dnode_ext"
   # Whether to enable client encryption on the Cassandra connection.
   clientEncryption: false
+  # Whether to enable client certificate verification on the Cassandra connection.
+  clientAuth: false
   # If required, provide the type of Cassandra truststore and keystore that you used to hold keys and certificates for client encryption. Available store types
   # are JKS and PKCS12. Default is JKS.
   clientEncryptionStoreType: ""
@@ -553,6 +510,28 @@ pegasearch:
     authType: ""
     privateKey: ""
     external_secret_name: ""
+  srsMTLS:
+    # Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    enabled: false
+    # Provide trustStore certificate file name.
+    # When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
+    trustStore: ""
+    # If required, provide trustStorePassword value in plain text.
+    trustStorePassword: ""
+    # Provide keyStore certificate file name.
+    # When using a keyStore certificate, you must also include a Kubernetes secret name that contains the keyStore certificate
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
+    keyStore: ""
+    # If required, provide keyStorePassword value in plain text.
+    keyStorePassword: ""
+    # To avoid exposing trustStorePassword abd keyStorePassword leave the values empty for trustStorePassword and keyStorePassword and
+    # configure them using an External Secrets Manager, ensuring that you configure the keys in the secret in the following order:
+    # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
+    # Enter the external secret name below.
+    external_secret_name: ""
 
 # Pega Installer settings.
 installer:
@@ -560,6 +539,16 @@ installer:
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
+  # Specifies the system name. Default name is "pega".
+  systemName: "pega"
+  # Sets the system's production level during installation.
+  # Valid production level values (1-5):
+  # 5 = Production
+  # 4 = Preproduction
+  # 3 = Test
+  # 2 = Development (Default)
+  # 1 = Experimental
+  productionLevel: 2
   # Upgrade specific properties
   upgrade:
     # Type of upgrade
@@ -575,6 +564,11 @@ installer:
     pegaRESTUsername: ""
     pegaRESTPassword: ""
 
+    # To avoid exposing username and password, leave the installer.upgrade.pegaRESTUsername and installer.upgrade.pegaRESTPassword parameters empty (no quotes).
+    # Instead, configure pegaRESTUsername and pegaRESTPassword values in the External Secrets Manager and enter the external secret for the credentials.
+    # Ensure that the keys in the secret are PEGA_REST_USERNAME and PEGA_REST_PASSWORD respectively.
+    pega_rest_external_secret_name: ""
+
 # Hazelcast settings (applicable from Pega 8.6)
 hazelcast:
   # Hazelcast docker image for platform version 8.6 through 8.7.x
@@ -588,7 +582,9 @@ hazelcast:
 
   # Setting below to true will deploy Pega Platform using a client-server Hazelcast model for version 8.8 and later.
   clusteringServiceEnabled: false
-
+  # Set to true to enforce SSL communication between the Clustering Service and Pega Platform.
+  encryption:
+    enabled: false
   # Setting related to Hazelcast migration.
   migration:
     # Set to `true` to initiate the migration job.
@@ -609,6 +605,19 @@ hazelcast:
   # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
   # Enter the external secret for these credentials below.
   external_secret_name: ""
+
+  # Apply securityContext to clustering service pods. Example:
+  # securityContext:
+  #   runAsUser: 1000
+  #   fsGroup: 0
+
+  # Apply securityContext to clustering service containers. Example:
+  # containerSecurityContext:
+  #   allowPrivilegeEscalation: false
+  #   capabilities:
+  #     drop:
+  #     - ALL
+  #   runAsNonRoot: true
 
 # Stream (externalized Kafka service) settings.
 stream:

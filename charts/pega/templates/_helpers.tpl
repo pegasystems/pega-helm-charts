@@ -395,6 +395,14 @@ key: privateKey
 {{- end }}
 {{- end }}
 
+{{- define "tcpKeepAliveProbe" }}
+{{- if .node.tcpKeepAliveProbe }}
+sysctls:
+- name: net.ipv4.tcp_keepalive_time
+  value: "{{ .node.tcpKeepAliveProbe }}"
+{{- end }}
+{{- end }}
+
 {{- define "ingressApiVersion" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.k8s.io/v1
@@ -507,6 +515,30 @@ servicePort: use-annotation
   {{- end -}}
 {{- end -}}
 
+{{- define "isHzEncryptionEnabled" }}
+  {{- if .Values.hazelcast.encryption.enabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isHzHighlySecureCryptoModeEnabled" }}
+  {{- if and .Values.hazelcast.encryption.enabled  .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
+{{- define "isPegaHighlySecureCryptoModeEnabled" }}
+  {{- if .Values.global.highlySecureCryptoModeEnabled -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
+
 {{- define "pegaCredentialVolumeTemplate" }}
 - name: {{ template "pegaVolumeCredentials" }}
   projected:
@@ -527,7 +559,34 @@ servicePort: use-annotation
     {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
     {{ include "secretResolver" $artifactoryDict | indent 4}}
 
+    {{- $srsDict := dict "deploySecret" "deploySRSSecret" "deployNonExtsecret" "deployNonExtSRSSecret" "extSecretName" .Values.pegasearch.srsMTLS.external_secret_name "nonExtSecretName" "pega-srs-mtls-secret-name" "context" $ -}}
+    {{ include "secretResolver" $srsDict | indent 4}}
+
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}
-
+  {{- if (eq (include "isHzEncryptionEnabled" .) "true") }}
+    - secret:
+        name: hz-encryption-secrets
+        items:
+          - key: HZ_SSL_KEYSTORE_PASSWORD
+            path: HZ_SSL_KEYSTORE_PASSWORD
+          - key: HZ_SSL_TRUSTSTORE_PASSWORD
+            path: HZ_SSL_TRUSTSTORE_PASSWORD
+  {{- end}}
 {{- end}}
+
+{{- define "isPega25OrLater"}}
+  {{- if .Values.global.pegaVersion }}
+    {{- /* Check provided release if using 8.x version pattern */ -}}
+    {{- if (semverCompare "^8.25.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+      "true"
+    {{- /* Check provided release if using 25.x.x version pattern */ -}}
+    {{- else if (semverCompare ">= 25.1.0-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+      "true"
+    {{- else -}}
+      "false"
+    {{- end -}}
+  {{- else }}
+    "false"
+  {{- end }}
+{{- end }}

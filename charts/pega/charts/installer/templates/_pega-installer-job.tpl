@@ -23,6 +23,7 @@ metadata:
 {{- end }}{{- end }}
   labels:
     app: {{ .name }}
+    {{ include "generatedInstallerJobLabels" .root | indent 4 }}
 spec:
   backoffLimit: 0
   template:
@@ -67,6 +68,11 @@ spec:
           {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
           {{ include "secretResolver" $artifactoryDict | indent 10}}
 
+          {{- $extRestSecretName := "" }}
+          {{- if .root.Values.upgrade }}{{- if .root.Values.upgrade.pega_rest_external_secret_name }}{{- $extRestSecretName = .root.Values.upgrade.pega_rest_external_secret_name }}{{- end }}{{- end }}
+          {{- $pegaRestDict := dict "deploySecret" "deployPegaRESTSecret" "deployNonExtsecret" "deployNonExtPegaRESTSecret" "extSecretName" $extRestSecretName "nonExtSecretName" "pega-upgrade-rest-secret-name" "context" .root -}}
+          {{ include "secretResolver" $pegaRestDict | indent 10}}
+
           # Fix it, Below peace of code always uses secret created from hz username & password. It cannot resolve hz external secret due to helm sub chart limitations. Modify it once hazelcast deployment is isolated.
           {{- if ( eq .root.Values.upgrade.isHazelcastClientServer "true" ) }}
           - secret:
@@ -97,7 +103,7 @@ spec:
 {{- end }}
       containers:
       - name: {{ template "pegaDBInstallerContainer" }}
-        image: {{ .root.Values.image }}
+        image: {{ include "pegaInstallerImage" . }}
 {{- if .root.Values.imagePullPolicy }}
         imagePullPolicy: {{ .root.Values.imagePullPolicy  }}
 {{- end }}
@@ -109,18 +115,7 @@ spec:
 {{- end }}
         resources:
           # CPU and Memory that the containers for {{ .name }} request
-          requests:
-            cpu: "{{ .root.Values.resources.requests.cpu }}"
-            memory: "{{ .root.Values.resources.requests.memory }}"
-            {{- if .root.Values.resources.requests.ephemeralStorage }}
-            ephemeral-storage: "{{ .root.Values.resources.requests.ephemeralStorage }}"
-            {{- end }}
-          limits:
-            cpu: "{{ .root.Values.resources.limits.cpu }}"
-            memory: "{{ .root.Values.resources.limits.memory }}"
-            {{- if .root.Values.resources.limits.ephemeralStorage }}
-            ephemeral-storage: "{{ .root.Values.resources.limits.ephemeralStorage }}"
-            {{- end }}
+          {{- include "pegaInstallerResources" . | indent 10 }}
         volumeMounts:
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
@@ -160,17 +155,17 @@ spec:
         -  name: HZ_VERSION
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_VERSION
         -  name: HZ_CLUSTER_NAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root }}
               key: HZ_CLUSTER_NAME
         -  name: HZ_SERVER_HOSTNAME
            valueFrom:
             configMapKeyRef:
-              name: {{ template "pegaEnvironmentConfig" }}
+              name: {{ template "pegaEnvironmentConfig" .root}}
               key: HZ_SERVER_HOSTNAME
 {{- end }}
         envFrom:
@@ -189,5 +184,6 @@ spec:
       imagePullSecrets:
 {{- include "imagePullSecrets" .root | indent 6 }}
 {{- include "podAffinity" .root.Values | indent 6 }}
+{{- include "tolerations" .root.Values | indent 6 }}
 ---
 {{- end -}}

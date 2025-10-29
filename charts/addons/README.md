@@ -98,7 +98,7 @@ When deploying on Azure AKS, you can use an Application Gateway Ingress Controll
 
 After you create the deployment ingress controller, in the Addons Helm chart, disable Traefik (set `traefik.enabled` to `false`), enable AGIC (set `ingress-azure.enabled` to `true`) and add the AGIC gateway configuration details from your AKS deployment.
 
-To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result to the `armAuth.secretJSON` field. For details, see the comments in the addons [values.yaml](/values.yaml) or the [AKS runbook](../../docs/Deploying-Pega-on-AKS.md).
+To authenticate with the AGIC in your AKS cluster, generate a kubernetes secret from an Active Directory Service Principal that is based on your AKS subscription ID. You must encode the Service Principal with base64 and add the result to the `armAuth.secretJSON` field. For details, see the comments in the addons [values.yaml](./values.yaml) or the [AKS runbook](../../docs/Deploying-Pega-on-AKS.md).
 
 As an authentication alternative, you can configure an AAD Pod Identity to manage authentication access with the AGIC in your cluster via the Azure Resource Manager. For details, see [Set up AAD Pod Identity](https://docs.microsoft.com/en-us/azure/application-gateway/ingress-controller-install-existing#set-up-aad-pod-identity).
 
