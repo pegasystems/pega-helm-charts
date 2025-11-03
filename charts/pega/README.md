@@ -939,6 +939,8 @@ Parameter     | Tier Level Environment Variable | Description | Default value
 ---           |:---:| ---|:---:
 `externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
 `port` | N/A | TCP Port to connect to cassandra. | 9042
+`localDatacenter` | CASSANDRA_LOCAL_DATACENTER | The datacenter in the Cassandra cluster which should be treated as local. | 
+`datacenters` | CASSANDRA_DATACENTERS | A list of all the datacenters in the Cassandra cluster. | 
 `username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
 `password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
 `clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
@@ -1107,6 +1109,43 @@ pegasearch:
     scopes: "pega.search:full"
     privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
     privateKeyAlgorithm: "RS256"
+```
+To enable Mutual Transport Layer Security (MTLS) between Pega Infinity and the Search and Reporting Service (SRS), configure the `srsMTLS` section in your `values.yaml` file. The following table and example show the required parameters for setting up MTLS connectivity.
+
+| Parameter                | Description                                                                                                                                                                                                                                                                                                                                                         | Default value      |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`                | Set `pegasearch.srsMTLS.enabled` to `true` to enable mTLS between Infinity and SRS.                                                                                                                                                                                                                                                                                 | false              |
+| `trustStore`             | Specify the trustStore certificate file name in `pegasearch.srsMTLS.trustStore`. Ensure that both the Pega Platform and SRS CA Certificates are signed against the Pega Platform keystore.<br/> Note: When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the `global.certificatesSecrets parameter`. | `""`               |                                                                                   | `""`               |
+| `trustStorePassword`     | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.trustStorePassword` to the password for the trustStore certificate.                                                                                                                                                                                                | `""`               |
+| `keyStore`               | Specify the Keystore certificate file name in `pegasearch.srsMTLS.keyStore`. <br/> Note: When using a keyStore certificate, you must also include a Kubernetes secret name that contains the keyStore certificate in the `global.certificatesSecrets` parameter.                                                                                                                                             | `""`               |
+| `keyStorePassword`       | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.keyStorePassword` to the password for the keystore certificate.                                                                                                                                                                                                   | `""`               |
+| `external_secret_name`   | When not using `pegasearch.srsMTLS.trustStorePassword` and `pegasearch.srsMTLS.keyStorePassword`, specify the external secret name containing SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD for `pegasearch.srsMTLS.external_secret_name`.                                                                                                      | `""`               | . | `""`               |
+Example:Example:
+
+```yaml
+pegasearch:
+  srsMTLS:
+    #Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    enabled: false
+    # If required, provide trustStore certificate file name
+    # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
+    trustStore: "pega-srs-truststore.jks"
+    # If required provide trustStorePassword value in plain text.
+    trustStorePassword: ""
+    # If required, provide keyStore certificate file name
+    # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
+    keyStore: "pega-srs-keystore.jks"
+    # If required, provide keyStorePassword value in plain text.
+    keyStorePassword: ""
+    # To avoid exposing trustStorePassword abd keyStorePassword leave the values empty and
+    # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+    # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
+    # Enter the external secret name below.
+    external_secret_name: "pega-srsmtls-pwd-secret"
 ```
 
 ### For Pega Platform 8.5 and earlier:

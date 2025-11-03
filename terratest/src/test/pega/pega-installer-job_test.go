@@ -231,10 +231,10 @@ func TestPegaInstallerJobWithNonOverriddenImageAndResources(t *testing.T) {
     require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobObj.Spec.Template.Spec.Containers[0].Image)
 
     require.Equal(t, "1", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Cpu().String())
-    require.Equal(t, "5Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.Memory().String())
 
     require.Equal(t, "2", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Cpu().String())
-    require.Equal(t, "6Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
+    require.Equal(t, "12Gi", jobObj.Spec.Template.Spec.Containers[0].Resources.Limits.Memory().String())
 }
 
 func TestPegaInstallerJobWithAffinity(t *testing.T) {

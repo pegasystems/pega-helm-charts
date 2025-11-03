@@ -307,3 +307,5 @@ limits:
 {{- .root.Values.image }}
 {{- end }}
 {{- end }}
+
+{{- define "installerDefaultMaxHeapSize" }}-Xmx{{ .Values.installerMaxHeap | default "8g" }}{{- end }}
