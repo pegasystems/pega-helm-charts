@@ -21,7 +21,6 @@ The service deployment provisions runtime service pods along with a dependency o
             <th>Pega Infinity version</th>
             <th>SRS version</th>
             <th>Docker image</th>
-            <th>Kubernetes version</th>
             <th>Authentication</th>
             <th>Certified Elasticsearch/OpenSearch version</th>
             <th>Description</th>
@@ -34,69 +33,59 @@ The service deployment provisions runtime service pods along with a dependency o
             <td>NA</td>
             <td>NA</td>
             <td>NA</td>
-            <td>NA</td>
             <td>SRS can be used with Pega Infinity 8.6 and later.</td>
         </tr>
         <tr>
             <td rowspan=5> >= 8.6 </td>
-            <td rowspan=5>1.38.6</td>
-            <td rowspan=4> <b>search-n-reporting-service</b></td>
-            <td rowspan=2>< 1.25</td>
+            <td rowspan=5>1.38.12</td>
+            <td rowspan=3> <b>search-n-reporting-service</b></td>
+        </tr>
+        <tr>
             <td>Not enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3 & 7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
+            <td>Elasticsearch 7.17.9, 7.17.29</td>
+            <td>As a best practice, use Elasticsearch version 7.17.29. <b> Deployments without authentication are not recommended for production environments. </b> </td>
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.10.2, 7.16.3, 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
-            <td>As a best practice, use Elasticsearch version 8.18.2.</td>
+            <td>Elasticsearch 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2 & 8.18.3</td>
+            <td>As a best practice, use Elasticsearch version 8.18.3.</td>
         </tr>
         <tr>
-            <td rowspan=2>>= 1.25</td>
-            <td>Not enabled</td>
-            <td>Elasticsearch 7.17.9</td>
-            <td>As a best practice, use Elasticsearch version 7.17.9. <b> Deployments without authentication are not recommended for production environments. </b> </td>
-        </tr>
-        <tr>
-            <td>Enabled</td>
-            <td>Elasticsearch 7.17.9, 8.10.3, 8.15.1, 8.15.5 & 8.18.2</td>
-            <td>As a best practice, use Elasticsearch version 8.18.2.</td>
-        </tr>
-        <tr>
-            <td> <b>search-n-reporting-service-os</b></td>
-            <td> All versions </td>
+            <td rowspan=1> <b>search-n-reporting-service-os</b></td>
             <td>Enabled</td>
             <td><ul><li>Elasticsearch 7.10 on AWS OpenSearch service</li><li>OpenSearch 1.3 </li><li>OpenSearch 2.15</li></ul></td>
-            <td> As a best practice, use OpenSearch 2.15. </td>
+            <td> The <b>search-n-reporting-service-os</b> replaced the earlier <b>search-n-reporting-service-aws</b> image.
+The image supports all OpenSearch deployment options (cloud or self-managed).
+As a best practice, use OpenSearch 2.15. </td>
         </tr>
     </tbody>
 </table>
 
+**Note:** Elasticsearch 7.10.2 and 7.16.3 reached end of vendor support and are no longer supported. Elasticsearch 7.17.9 will reach vendor end of support on Jan 15, 2026.
+                
 **Important:** Pega supports only official Elasticsearch and OpenSearch Docker images. Custom images, for example, `bitnami/elasticsearch`, are not supported.
 
-**Note:**
-
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
-To migrate to Elasticsearch version 7.17.9, 8.10.3, 8.15.1, 8.15.5 or 8.18.2 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To update Elasticsearch version to 7.17.9 perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
     
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.  
     * Update the elasticsearch.imageTag in the Backing Services Helm chart to 7.17.9.
-3. To update Elasticsearch version to 8.10.3, 8.15.1, 8.15.5 or 8.18.2, perform the following actions:
+3. To update Elasticsearch version to 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3, perform the following actions:
     * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 8.5.1.
 
       Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.
-    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3, 8.15.1, 8.15.5 or 8.18.2.
-4. Restart the SRS pods
+    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3.
+4. Restart the SRS pods.
 
 ### If your deployment connects to an externally-managed Elasticsearch service: ###
-To migrate to Elasticsearch version 7.17.9, 8.10.3, 8.15.1, 8.15.5 or 8.18.2 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To use Elasticsearch version 7.17.9, upgrade your external Elasticsearch cluster to 7.17.9 according to your organization’s best practices. For more information, see official Elasticsearch version 7.17 documentation.
-3. To use Elasticsearch version 8.10.3, 8.15.1, 8.15.5 or 8.18.2, upgrade your external Elasticsearch cluster to 8.10.3, 8.15.1, 8.15.5 or 8.18.2 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
-4. Restart the SRS pods
+3. To use Elasticsearch version 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3, upgrade your external Elasticsearch cluster to 8.10.3, 8.15.1, 8.15.5, 8.18.2 or 8.18.3 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
+4. Restart the SRS pods.
 
 ### SRS runtime configuration
 
@@ -136,7 +125,7 @@ To configure a secure connection between the SRS cluster and internally provisio
 | `tls`                                    | Set to `true` to enable the SRS service to authenticate to your organization's available Elasticsearch service.                                                                                                                                  |
 | `srsStorage.provisionInternalESCluster`  | <b>Note: You cannot use OpenSearch for the internally provisioned cluster.</b><br><br><ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `true` to provide an internally managed and secured Elasticsearch cluster.</li><li>In the [requirements.yaml](../../requirements.yaml) file, set the `dependencies.version` parameter to the same version you configured for the `elasticsearch.imageTag` version in the Backing Services Helm chart [values.yaml](../../values.yaml) file.</li><li>From the Backing Services Helm chart directory in your environment, run the following command to create your Elasticsearch certificates and pass them to secrets: <p>`$ make es-prerequisite NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION>`</p><p>Where `NAMESPACE` references your deployment namespace of the SRS cluster and `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use in [values.yaml](../../values.yaml) and [requirements.yaml](../../requirements.yaml).</p></li></ol> |
 
-To configure a secure connection between SRS and an external Elasticsearch cluster, configure the following parameters.
+To configure a secure connection(tls) between SRS and an external Elasticsearch cluster, configure the following parameters.
 
 | Configuration                           | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 |-----------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
@@ -152,7 +141,40 @@ To configure a secure connection between SRS and an external Elasticsearch clust
 | `srsStorage.provisionInternalESCluster` | <ol><li>Set the `srsStorage.provisionInternalESCluster` parameter to `false` to disable the internally provisioned Elasticsearch cluster and connect to your available external Elasticsearch service.</li><li>To secure the connection between SRS and your external Elasticsearch service, you must provide the appropriate TLS certificates in an accessible location, for example, /home/certs.</li><li>To pass the required certificates to the cluster using a secrets file, run the following command: <p>`$ make external-es-secrets NAMESPACE=<NAMESPACE_USED_FOR_DEPLOYMENT> ELASTICSEARCH_VERSION=<ELASTICSEARCH_VERSION> PATH_TO_CERTIFICATE=<PATH_TO_CERTS>`</p><p>Where NAMESPACE references your deployment namespace of the SRS cluster, `ELASTICSEARCH_VERSION` matches the Elasticsearch version you want to use, and `PATH_TO_CERTIFICATE` points to the location where you copied the required certificates on your location machine, for example:</p><p>`$ make external-es-secrets NAMESPACE=pegabackingservices ELASTICSEARCH_VERSION=7.10.2 PATH_TO_CERTIFICATE=/home/certs/truststore.jks`</p></li><li>To update the SRS and External Elasticsearch certificates, use the following command: <p>`$ make update-external-es-secrets NAMESPACE=<NAMESPACE_OF EXISTING_DEPLOYMENT> PATH_TO_CERTIFICATE=<PATH_TO_THE_UPDATED_CERTIFICATES>`</p><p>Note: Only .p12 and .jks certificates are supported.</p></li></ol> |
 | `domain`                                | Enter the DNS entry associated with your external Elasticsearch service.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
+To configure a mutual Transport Layer Security(mTLS) between SRS and an external Elasticsearch/OpenSearch cluster, configure the following parameters.
 
+| Configuration              | Usage                                                                                                                                                                                                                                                                                                                                                                                                              |
+|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `srsStorage.mtls.enabled`  | Enable this flag if the external Elasticsearch/OpenSearch is provisioned by enforcing the mTLS.                                                                                                                                                                                                                                                                                                                    | 
+| `mtls.keystore.file`       | Enter the Elasticsearch/OpenSearch keystore file name that is signed against the CA certificate used for the Elasticsearch/OpenSearch server. When mTLS is enabled, it is mandatory to pass the keystore and truststore in order to establish a mutual handshake between SRS and Elasticsearch/OpenSearch.                                                                                                         | 
+| `mtls.keystore.password`   | Enter the keystore password, if any. Pass an empty string('') if no password is set to the keystore.                                                                                                                                                                                                                                                                                                               | 
+| `mtls.truststore.file`     | Enter the Elasticsearch/OpenSearch truststore file name that is signed against the CA certificate used for the Elasticsearch/OpenSearch server. When mTLS is enabled, it is mandatory to pass the keystore and truststore in order to establish a mutual handshake between SRS and Elasticsearch/OpenSearch.                                                                                                       | 
+| `mtls.truststore.password` | Enter the truststore password, if any. Pass an empty string('') if no password is set to the truststore.                                                                                                                                                                                                                                                                                                           |
+| `mtls.certsSecret`         | If you prefer(recommended) to pass the keystore and truststore information through a kubernetes secret, please provide the secret name containing your certificates and their respective passwords. If there is no password for the keystore/truststore, please pass empty string value('') to the passwords of keystore & truststore in the secret with keys being **keystorePassword** & **truststorePassword**. |
+
+**Note:**
+- mTLS between SRS and Elasticsearch is not supported in case of internal elasticsearch provisioning mode. It is only supported for an external Elasticsearch/OpenSearch.
+- The truststore being used for configuring an external Elasticsearch/OpenSearch server should be signed against the CA certificate used for SRS, if the CA certificate is different.
+- The keystore and truststore being passed here under the mtls section is used to establish secure mTLS connection between SRS and Elasticsearch/OpenSearch. You can either use a different keystore, truststore files or reuse the same keystore, truststore used for SRS under `srsRuntime.ssl.keystore.file` & `srsRuntime.ssl.truststore.file`, but make sure to sign the CA certificate used for Elasticsearch/OpenSearch against the SRS truststore.
+- Maintaining a different keystore, truststore files is strongly advised to ensure a higher level of security."
+
+To configure mutual Transport Layer Security with PKI Authentication (mTLS with PKI) between SRS and an external Elasticsearch/OpenSearch cluster, configure the following parameters.
+
+| Configuration                                         | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+|-------------------------------------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `srsStorage.mtlsWithPKIAuthentication.enabled`       | Enable this flag if the external Elasticsearch/OpenSearch is provisioned with PKI-based authentication. This authentication method uses only client certificates (PKI) without requiring username/password credentials.                                                                                                                                                                                                                                                                                                        |
+| `mtlsWithPKIAuthentication.keystore.file`            | Enter the Elasticsearch/OpenSearch keystore file name that contains the client certificate signed by a Certificate Authority (CA) that is trusted by the Elasticsearch/OpenSearch server for PKI authentication. When mTLS with PKI is enabled, it is mandatory to pass the keystore and truststore to establish secure communication between SRS and Elasticsearch/OpenSearch using certificate-based authentication only.                                                                                               |
+| `mtlsWithPKIAuthentication.truststore.file`          | Enter the Elasticsearch/OpenSearch truststore file name that contains the CA certificates used to verify the Elasticsearch/OpenSearch server's certificate. When mTLS with PKI is enabled, it is mandatory to pass the keystore and truststore to establish secure communication between SRS and Elasticsearch/OpenSearch.                                                                                                                                                                                                   |
+| `mtlsWithPKIAuthentication.certsSecret`              | Provide the secret name containing your certificates and their respective passwords. Use the full name of the certificate files (together with file extension, for example, "keystore.p12" or "truststore.jks") as key names in the secret. If there is no password for the keystore/truststore, pass empty string value('') to the passwords in the secret with keys being **keystorePassword** & **truststorePassword**. This is the only supported method for passing certificate credentials for PKI authentication. |
+
+**Note:**
+
+* mTLS with PKI authentication between SRS and Elasticsearch/OpenSearch is not supported for internally-provisioned Elasticsearch clusters. It is only supported for external Elasticsearch/OpenSearch clusters.
+* PKI authentication does not require username/password credentials as authentication is performed solely through client certificates.
+* Certificate credentials (keystore and truststore passwords) must be provided via Kubernetes secrets only. Plain text password configuration is not supported for PKI authentication.
+* Ensure that the client certificate in the keystore is properly signed by a Certificate Authority (CA) that is trusted by the Elasticsearch/OpenSearch server for PKI authentication.
+* The keystore must contain a client certificate that is trusted by the Elasticsearch/OpenSearch server, and the truststore must contain the CA certificates used to verify the server's certificate.
+* This method provides enhanced security by eliminating the need for shared passwords and relying entirely on certificate-based authentication.
 
 ### Enable request authentication/authorization mechanism using identity provider(IdP) between SRS and Pega Infinity
 To configure authentication/authorization mechanism using identity provider(IdP) between SRS and Pega Infinity, add the following the settings in your backingservices configuration file and then in pega chart's `values.yml` / pega helm inspected `pega.yaml`.
@@ -250,6 +272,32 @@ srs:
     requireInternetAccess: false
 
 ```
+
+To enable Transport Layer Security(TLS) or Mutual TLS(mTLS) for SRS, configure the following parameters.
+
+| Configuration            | Usage                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `srsRuntime.ssl.enabled` | Set this flag to `true` to enable either TLS or mTLS for SRS. This will enable HTTPS for SRS.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `clientAuthentication`   | To enforce mTLS between Infinity and SRS, enable `ssl.enabled` and set client-authentication to **'need'**. And for a simple TLS(Https) mode, set client-authentication to **'want'**. When mutual TLS(mTLS) is enabled, SRS expects the client(in this case Infinity) to present a valid certificate that it can verify against its trusted certificate authority before completing the TLS handshake.                                                                                                                                                                                                                                           | 
+| `keystore.file`          | Enter the keystore file name. When SSL is enabled, it is mandatory to pass the keystore and truststore in order to establish SSL for SRS.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `keystore.password`      | Enter the keystore password, if any. Pass an empty string('') if no password is set to the keystore.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | 
+| `keystore.type`          | Type refers to the type/extension of the keystore. Ex : PKCS12.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | 
+| `truststore.file`        | Enter the truststore file name. When SSL is enabled, it is mandatory to pass the keystore and truststore in order to establish SSL for SRS.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| `truststore.password`    | Enter the truststore password, if any.  Pass an empty string('') if no password is set to the truststore.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | 
+| `truststore.type`        | Type refers to the type/extension of the truststore. Ex : JKS.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | 
+| `certsSecret`            | If you prefer(recommended) to pass the keystore and truststore information through a kubernetes secret, please provide the secret name containing your certificates and their respective passwords. If there is no password for the keystore/truststore, please pass empty string value('') to the passwords of keystore & truststore in the secret with keys being **keystorePassword** & **truststorePassword**. Despite the certificates and passwords being passed through secrets, you must still configure "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type" with the type of store file it is (Ex : PKCS12, JKS) |
+
+#### Pre-requisite Step to enable mTLS for SRS
+In order to enable mTLS for SRS, you need to perform the following make command.
+  ```bash
+  make srs-mtls-prerequisite CA_CERT_PATH=<PATH_TO_THE_CA_CERT_OF_SRS> KEYSTORE_PATH=<PATH_TO_THE_KEYSTORE_OF_SRS> KEYSTORE_PASS=<PASSWORD_TO_THE_KEYSTORE_OF_SRS> NAMESPACE=<KUBERNETES_NAMESPACE_WHERE_SRS_IS_DEPLOYED>
+  ```
+- Since mTLS is enforced, we need to pass the client certificate & it's key along with the CA certificate to be able to check the health of an SRS container.
+- We need to run the above make command to make sure that required certificates are created for the readiness probe to check the health of SRS containers.
+- Here `PATH_TO_THE_CA_CERT_OF_SRS` refers to the CA certificate path which is used to create the SRS keystore(`srsRuntime.ssl.keystore.file`) and truststore(`srsRuntime.ssl.truststore.file`).
+- `PATH_TO_THE_KEYSTORE_OF_SRS` refers to the SRS keystore(`srsRuntime.ssl.keystore.file`) file path. And `PASSWORD_TO_THE_KEYSTORE_OF_SRS` refers to the keystore's password.
+- When enforcing mTLS for SRS, please make sure to pass the required keystore & truststore certificates to the infinity charts where ever it is applicable.  
+
 ### Steps to upgrade SRS (with Internal Elasticsearch) to Kubernetes Cluster Version >=1.25
 
 To support SRS on Kubernetes version >=1.25 you need to use Elasticsearch server version 7.17.9. If you are using an earlier version (7.10.2 or 7.16.3) of Elasticsearch in your deployment, to upgrade to 7.17.9, you need to perform the following steps:
