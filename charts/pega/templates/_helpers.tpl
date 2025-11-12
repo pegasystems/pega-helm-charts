@@ -159,7 +159,7 @@
 
 # list of either external or internal cassandra nodes
 {{- define "cassandraNodes" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
     {{ .Values.dds.externalNodes }}
   {{- else -}}
     {{ template "getCassandraSubchartService" . }}
@@ -168,27 +168,23 @@
 
 # whether or not cassandra is enabled at all (internally or externally)
 {{- define "cassandraEnabled" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
+    true
+  {{- else if and (.Values.cassandra) (.Values.cassandra.enabled) -}}
     true
   {{- else -}}
-    {{- if .Values.cassandra.enabled -}}
-      true
-    {{- else -}}
-      false
-    {{- end -}}
+    false
   {{- end -}}
 {{- end }}
 
 # whether we should create internal cassandra nodes
 {{- define "internalCassandraEnabled" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
     false
+  {{- else if and (.Values.cassandra) (.Values.cassandra.enabled) -}}
+    true
   {{- else -}}
-    {{- if .Values.cassandra.enabled -}}
-      true
-    {{- else -}}
-      false
-    {{- end -}}
+    false
   {{- end -}}
 {{- end }}
 
