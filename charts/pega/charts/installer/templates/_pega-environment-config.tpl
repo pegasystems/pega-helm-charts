@@ -51,7 +51,7 @@ data:
   # Enable ssl verification for jdbc driver download
   ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: {{ .Values.global.customArtifactory.enableSSLVerification | quote }}
   # Custom JVM arguments for the installer
-  CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs }}
+  CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs | quote }}
 {{- if .Values.global.fips140_3Mode }}
   FIPS_140_3_MODE: {{ .Values.global.fips140_3Mode | quote }}
 {{- end }}
