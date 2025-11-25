@@ -91,6 +91,64 @@ func runPegaInstallerJobTest(t *testing.T, externalSecretName string) {
 }
 
 
+func TestPegaInstallerJobCustomInitContainers(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			for _, depName := range deploymentNames {
+                var options = &helm.Options{
+                    ValuesFiles: []string{"data/values_init_conts.yaml"},
+                    SetValues: map[string]string{
+                        "global.deployment.name": depName,
+                        "global.provider":        vendor,
+                        "global.actions.execute": operation,
+                        "installer.upgrade.upgradeType": "zero-downtime",
+                        "installer.upgrade.pegaRESTUsername": "username",
+                        "installer.upgrade.pegaRESTPassword": "password",
+                        "installer.upgrade.pega_rest_external_secret_name": "",
+                    },
+                }
+
+                yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+                yamlSplit := strings.Split(yamlContent, "---")
+
+                count := len(yamlSplit)
+                for i := 1; i < count; i++ {
+                    assertJobCustomInitContainers(t, yamlSplit[i], options)
+                }
+            }
+        }
+    }
+}
+
+func assertJobCustomInitContainers(t *testing.T, jobYaml string, options *helm.Options) {
+    var jobObj k8sbatch.Job
+	UnmarshalK8SYaml(t, jobYaml, &jobObj)
+
+    if (len(jobObj.Name)>0) {  //filter out chunks of yaml containing comments
+        jobSpec := jobObj.Spec.Template.Spec
+
+        actualInitContainers := jobSpec.InitContainers
+        count := len(actualInitContainers)
+        var foundCustomInitContainer1 bool = false
+        var foundCustomInitContainer2 bool = false
+        for i := 0; i < count; i++ {
+            if (actualInitContainers[i].Name=="pre-deployment-action1") {
+                foundCustomInitContainer1 = true
+            }
+            if (actualInitContainers[i].Name=="pre-deployment-action2") {
+                foundCustomInitContainer2 = true
+            }
+        }
+        require.Equal(t, true, foundCustomInitContainer1)
+        require.Equal(t, true, foundCustomInitContainer2)
+    }
+}
 
 
 
