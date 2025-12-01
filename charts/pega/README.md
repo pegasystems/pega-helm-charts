@@ -1126,6 +1126,43 @@ pegasearch:
     privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
     privateKeyAlgorithm: "RS256"
 ```
+To enable Mutual Transport Layer Security (MTLS) between Pega Infinity and the Search and Reporting Service (SRS), configure the `srsMTLS` section in your `values.yaml` file. The following table and example show the required parameters for setting up MTLS connectivity.
+
+| Parameter                | Description                                                                                                                                                                                                                                                                                                                                                         | Default value      |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`                | Set `pegasearch.srsMTLS.enabled` to `true` to enable mTLS between Infinity and SRS.                                                                                                                                                                                                                                                                                 | false              |
+| `trustStore`             | Specify the trustStore certificate file name in `pegasearch.srsMTLS.trustStore`. Ensure that both the Pega Platform and SRS CA Certificates are signed against the Pega Platform keystore.<br/> Note: When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the `global.certificatesSecrets parameter`. | `""`               |                                                                                   | `""`               |
+| `trustStorePassword`     | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.trustStorePassword` to the password for the trustStore certificate.                                                                                                                                                                                                | `""`               |
+| `keyStore`               | Specify the Keystore certificate file name in `pegasearch.srsMTLS.keyStore`. <br/> Note: When using a keyStore certificate, you must also include a Kubernetes secret name that contains the keyStore certificate in the `global.certificatesSecrets` parameter.                                                                                                                                             | `""`               |
+| `keyStorePassword`       | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.keyStorePassword` to the password for the keystore certificate.                                                                                                                                                                                                   | `""`               |
+| `external_secret_name`   | When not using `pegasearch.srsMTLS.trustStorePassword` and `pegasearch.srsMTLS.keyStorePassword`, specify the external secret name containing SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD for `pegasearch.srsMTLS.external_secret_name`.                                                                                                      | `""`               | . | `""`               |
+Example:Example:
+
+```yaml
+pegasearch:
+  srsMTLS:
+    #Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    enabled: false
+    # If required, provide trustStore certificate file name
+    # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
+    trustStore: "pega-srs-truststore.jks"
+    # If required provide trustStorePassword value in plain text.
+    trustStorePassword: ""
+    # If required, provide keyStore certificate file name
+    # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
+    keyStore: "pega-srs-keystore.jks"
+    # If required, provide keyStorePassword value in plain text.
+    keyStorePassword: ""
+    # To avoid exposing trustStorePassword abd keyStorePassword leave the values empty and
+    # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+    # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
+    # Enter the external secret name below.
+    external_secret_name: "pega-srsmtls-pwd-secret"
+```
 
 ### For Pega Platform 8.5 and earlier:
 
@@ -1676,4 +1713,30 @@ tier:
          port: <port>
          targetPort: <target port>
           
+```
+
+### Specifying the PegaRULESReadOnly Datasource Connection
+
+To configure the PegaRULESReadOnly jdbc datasource, use the following parameter in the `values.yaml` file:
+
+Example:
+```yaml
+global:
+   jdbc:
+     readerurl: <JDBC_URL_FOR_READ_ONLY_DATASOURCE>
+```
+
+Additionally, you can specify the read-only database username and password for each tier using environment variables.
+Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables).
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: DB_RO_USERNAME
+          value: <DB_RO_USERNAME_VALUE>
+        - name: DB_RO_PASSWORD
+          value: <DB_RO_PASSWORD_VALUE>
 ```
