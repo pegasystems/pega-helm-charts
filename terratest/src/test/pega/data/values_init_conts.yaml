@@ -1,0 +1,7 @@
+---
+installer:
+  customInitContainers:
+  - name: "pre-deployment-action1"
+    image: "CustomImage1:latest"
+  - name: "pre-deployment-action2"
+    image: "CustomImage2:latest"
