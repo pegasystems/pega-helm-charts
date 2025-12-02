@@ -798,6 +798,22 @@ tier:
       webXML: |-
         ...
 ```
+
+Instead of specifying a complete web.xml or context.xml configuration file you may specify a snippet to be inserted into the default file.  Snippets are specified using environment variables:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: CONTEXT_XML_SNIPPET
+          value: |-
+            ...
+        - name: WEB_XML_SNIPPET
+          value: |-
+            ...
+```
+
 ### Pega compressed configuration files
 
 To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
