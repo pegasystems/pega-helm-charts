@@ -129,15 +129,17 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{- define "elasticsearch.authProvider" -}}
-{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) (not .Values.srsStorage.mtls.enabled) -}}
+{{- if and (.Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.awsIAM ) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
 {{- "basic-authentication" }}
-{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) -}}
+{{- else if and  (.Values.srsStorage.awsIAM) (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
 {{- "aws-iam"}}
-{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtls.enabled) -}}
+{{- else if and (.Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
 {{- "tls"}}
-{{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) -}}
+{{- else if and (.Values.srsStorage.mtls.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
 {{- "mtls"}}
-{{- else if and  (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled)}}
+{{- else if and (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.basicAuthentication.enabled ) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.mtls.enabled) -}}
+{{- "mtlswithpki"}}
+{{- else if and  (not .Values.srsStorage.basicAuthentication.enabled) (not .Values.srsStorage.awsIAM) (not .Values.srsStorage.tls.enabled) (not .Values.srsStorage.mtls.enabled) (not .Values.srsStorage.mtlsWithPKIAuthentication.enabled)}}
 {{- "none" }}
 {{- else if and (.Values.srsStorage.basicAuthentication.enabled) (.Values.srsStorage.tls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication.enabled" | quote  }}
@@ -145,14 +147,22 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.awsIAM" | quote  }}
 {{- else if and (.Values.srsStorage.awsIAM) (.Values.srsStorage.basicAuthentication.enabled)  -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM" | quote  }}
-{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled) -}}
-{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- else if and (.Values.srsStorage.mtls.enabled) (.Values.srsStorage.tls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled" | quote  }}
 {{- else if and (.Values.srsStorage.basicAuthentication.enabled) (.Values.srsStorage.mtls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled" | quote  }}
 {{- else if and (.Values.srsStorage.awsIAM) (.Values.srsStorage.mtls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.awsIAM" | quote  }}
+{{- else if and (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) (.Values.srsStorage.tls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtlsWithPKIAuthentication.enabled" | quote  }}
+{{- else if and (.Values.srsStorage.basicAuthentication.enabled) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtlsWithPKIAuthentication.enabled/.Values.srsStorage.basicAuthentication.enabled" | quote  }}
+{{- else if and (.Values.srsStorage.awsIAM) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtlsWithPKIAuthentication.enabled/.Values.srsStorage.awsIAM" | quote  }}
+{{- else if and (.Values.srsStorage.mtls.enabled) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.mtlsWithPKIAuthentication.enabled" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.mtls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) (.Values.srsStorage.tls.enabled) (.Values.srsStorage.mtls.enabled) -}}
@@ -161,6 +171,14 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtls.enabled/..Values.srsStorage.tls.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.tls.enabled) (.Values.srsStorage.mtls.enabled) -}}
 {{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtlsWithPKIAuthentication.enabled/.Values.srsStorage.basicAuthentication.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and (.Values.srsStorage.tls.enabled) ( .Values.srsStorage.awsIAM ) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.mtlsWithPKIAuthentication.enabled/.Values.srsStorage.tls.enabled/.Values.srsStorage.awsIAM when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and (.Values.srsStorage.mtls.enabled) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) (.Values.srsStorage.tls.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled/.Values.srsStorage.mtlsWithPKIAuthentication.enabled when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
+{{- else if and ( .Values.srsStorage.basicAuthentication.enabled ) (.Values.srsStorage.tls.enabled) (.Values.srsStorage.mtls.enabled) (.Values.srsStorage.mtlsWithPKIAuthentication.enabled) -}}
+{{- fail "Only one authentication can be enabled, please try to disable .Values.srsStorage.tls.enabled/.Values.srsStorage.mtls.enabled/.Values.srsStorage.mtlsWithPKIAuthentication.enabled/.Values.srsStorage.basicAuthentication.enabled when .Values.srsStorage.provisionInternalESCluster is false" | quote  }}
 {{- end }}
 {{- end }}
 

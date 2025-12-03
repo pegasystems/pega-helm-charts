@@ -64,10 +64,17 @@ spec:
               {{- if .Values.srsStorage.mtls.enabled }}
             - name: es-ssl-volume
               mountPath: /usr/share/ssl/es/
+              {{- else if .Values.srsStorage.mtlsWithPKIAuthentication.enabled }}
+            - name: es-pki-ssl-volume
+              mountPath: /usr/share/ssl/es/
               {{ end }}
           {{- else if .Values.srsStorage.mtls.enabled }}
           volumeMounts:
             - name: es-ssl-volume
+              mountPath: /usr/share/ssl/es/
+          {{- else if .Values.srsStorage.mtlsWithPKIAuthentication.enabled }}
+          volumeMounts:
+            - name: es-pki-ssl-volume
               mountPath: /usr/share/ssl/es/
           {{ end }}
           readinessProbe:
@@ -179,6 +186,24 @@ spec:
                   key: truststorePassword
               {{- end }}
             {{ end }}
+            {{- if eq (include "elasticsearch.authProvider" $) "mtlswithpki" }}
+            - name: PATH_TO_ES_KEYSTORE
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtlsWithPKIAuthentication.keystore.file | default "es-keystore.p12"}}"
+            - name: PATH_TO_ES_TRUSTSTORE
+              value: "/usr/share/ssl/es/{{ .Values.srsStorage.mtlsWithPKIAuthentication.truststore.file | default "es-truststore.jks"}}"
+              {{ if .Values.srsStorage.mtlsWithPKIAuthentication.certsSecret }}
+            - name: ES_KEYSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.mtlsWithPKIAuthentication.certsSecret | default "es-pki-certificates"}}"
+                  key: keystorePassword
+            - name: ES_TRUSTSTORE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: "{{ .Values.srsStorage.mtlsWithPKIAuthentication.certsSecret | default "es-pki-certificates"}}"
+                  key: truststorePassword
+              {{- end }}
+            {{ end }}
             {{- if .Values.srsRuntime.ssl.enabled }}
             - name: SSL_ENABLED
               value: "true"
@@ -254,12 +279,21 @@ spec:
       - name: es-ssl-volume
         secret:
           secretName: "{{ .Values.srsStorage.mtls.certsSecret  | default "es-ssl-certificates"}}"
+        {{- else if .Values.srsStorage.mtlsWithPKIAuthentication.enabled }}
+      - name: es-pki-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsStorage.mtlsWithPKIAuthentication.certsSecret  | default "es-pki-certificates"}}"
         {{ end }}
       {{- else if .Values.srsStorage.mtls.enabled }}
       volumes:
       - name: es-ssl-volume
         secret:
           secretName: "{{ .Values.srsStorage.mtls.certsSecret  | default "es-ssl-certificates"}}"
+      {{- else if .Values.srsStorage.mtlsWithPKIAuthentication.enabled }}
+      volumes:
+      - name: es-pki-ssl-volume
+        secret:
+          secretName: "{{ .Values.srsStorage.mtlsWithPKIAuthentication.certsSecret  | default "es-pki-certificates"}}"
       {{ end }}
       {{- if .Values.srsStorage.provisionInternalESCluster }}
       initContainers:

@@ -798,6 +798,22 @@ tier:
       webXML: |-
         ...
 ```
+
+Instead of specifying a complete web.xml or context.xml configuration file you may specify a snippet to be inserted into the default file.  Snippets are specified using environment variables:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: CONTEXT_XML_SNIPPET
+          value: |-
+            ...
+        - name: WEB_XML_SNIPPET
+          value: |-
+            ...
+```
+
 ### Pega compressed configuration files
 
 To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
@@ -1697,4 +1713,30 @@ tier:
          port: <port>
          targetPort: <target port>
           
+```
+
+### Specifying the PegaRULESReadOnly Datasource Connection
+
+To configure the PegaRULESReadOnly jdbc datasource, use the following parameter in the `values.yaml` file:
+
+Example:
+```yaml
+global:
+   jdbc:
+     readerurl: <JDBC_URL_FOR_READ_ONLY_DATASOURCE>
+```
+
+Additionally, you can specify the read-only database username and password for each tier using environment variables.
+Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables).
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: DB_RO_USERNAME
+          value: <DB_RO_USERNAME_VALUE>
+        - name: DB_RO_PASSWORD
+          value: <DB_RO_PASSWORD_VALUE>
 ```

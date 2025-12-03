@@ -112,6 +112,10 @@ shareProcessNamespace: false
 #  - name: <SIDECAR_CONTAINER_NAME>
 #    image: <SIDECAR_IMAGE>
 
+# To configure custom init containers
+# customInitContainers:
+# - [init container config ]
+
 # If a nodeSelector is required for the installer pod, it may be specified here:
 # nodeSelector:
 #   label: value

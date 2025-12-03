@@ -436,6 +436,22 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 		require.Equal(t, "truststorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
 		envIndex++
 	}
+	if strings.EqualFold("mtlswithpki", authProvider) {
+		require.Equal(t, "PATH_TO_ES_KEYSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "/usr/share/ssl/es/client-keystore.p12", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "PATH_TO_ES_TRUSTSTORE", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "/usr/share/ssl/es/client-truststore.p12", pod.Containers[0].Env[envIndex].Value)
+		envIndex++
+		require.Equal(t, "ES_KEYSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "es-mtls-pki-certssecret", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "keystorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+		require.Equal(t, "ES_TRUSTSTORE_PASS", pod.Containers[0].Env[envIndex].Name)
+		require.Equal(t, "es-mtls-pki-certssecret", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Name)
+		require.Equal(t, "truststorePassword", pod.Containers[0].Env[envIndex].ValueFrom.SecretKeyRef.Key)
+		envIndex++
+	}
 	if strings.EqualFold("SSL_ENABLED", pod.Containers[0].Env[envIndex].Name) {
 		require.Equal(t, "SSL_ENABLED", pod.Containers[0].Env[envIndex].Name)
 		require.Equal(t, "true", pod.Containers[0].Env[envIndex].Value)
@@ -482,6 +498,10 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec srsDeploy
 	}
 	if strings.EqualFold("mtls", authProvider) {
 		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "es-ssl-volume")
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/ssl/es/")
+	}
+	if strings.EqualFold("mtlswithpki", authProvider) {
+		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].Name, "es-pki-ssl-volume")
 		require.Equal(t, pod.Containers[0].VolumeMounts[volumeIndex].MountPath, "/usr/share/ssl/es/")
 	}
 	require.Equal(t, "APPLICATION_HOST", pod.Containers[0].Env[envIndex].Name)
@@ -541,4 +561,109 @@ type esDomain struct {
 	port     string
 	protocol string
 	region   string
+}
+
+func TestSRSDeploymentWithMTLSPKIAuthentication(t *testing.T) {
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                            "true",
+			"srs.deploymentName":                                     "srs-test-mtls-pki",
+			"global.imageCredentials.registry":                       "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                            "1",
+			"srs.srsRuntime.srsImage":                                "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":                         "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":                   "",
+			"srs.srsStorage.provisionInternalESCluster":              "false",
+			"srs.srsStorage.domain":                                  "es.example.com",
+			"srs.srsStorage.port":                                    "9200",
+			"srs.srsStorage.protocol":                                "https",
+			"srs.srsStorage.mtlsWithPKIAuthentication.enabled":       "true",
+			"srs.srsStorage.mtlsWithPKIAuthentication.keystore.file": "client-keystore.p12",
+			"srs.srsStorage.mtlsWithPKIAuthentication.truststore.file": "client-truststore.p12",
+			"srs.srsStorage.mtlsWithPKIAuthentication.certsSecret":   "es-mtls-pki-certssecret",
+			"srs.srsStorage.basicAuthentication.enabled":             "false",
+			"srs.srsStorage.networkPolicy.enabled":                   "true",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "srs-test-mtls-pki",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"srs-test-mtls-pki",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
+			esDomain{
+				domain:   "es.example.com",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
+}
+
+func TestSRSDeploymentSrsEsMTLSPKI(t *testing.T) {
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"srs.enabled":                                            "true",
+			"srs.deploymentName":                                     "srs-es-mtls-pki",
+			"global.imageCredentials.registry":                       "docker-registry.io",
+			"srs.srsRuntime.replicaCount":                            "1",
+			"srs.srsRuntime.srsImage":                                "platform-services/search-n-reporting-service:latest",
+			"srs.srsRuntime.env.AuthEnabled":                         "false",
+			"srs.srsRuntime.env.OAuthPublicKeyURL":                   "",
+			"srs.srsRuntime.ssl.enabled":                             "true",
+			"srs.srsRuntime.ssl.clientAuthentication":                "need",
+			"srs.srsRuntime.ssl.keystore.file":                       "srs-keystore.p12",
+			"srs.srsRuntime.ssl.keystore.password":                   "",
+			"srs.srsRuntime.ssl.keystore.type":                       "PKCS12",
+			"srs.srsRuntime.ssl.truststore.file":                     "srs-truststore.jks",
+			"srs.srsRuntime.ssl.truststore.password":                 "",
+			"srs.srsRuntime.ssl.truststore.type":                     "JKS",
+			"srs.srsRuntime.ssl.certsSecret":                         "srs-ssl-certssecrets",
+			"srs.srsStorage.provisionInternalESCluster":              "false",
+			"srs.srsStorage.domain":                                  "es.example.com",
+			"srs.srsStorage.port":                                    "9200",
+			"srs.srsStorage.protocol":                                "https",
+			"srs.srsStorage.mtlsWithPKIAuthentication.enabled":       "true",
+			"srs.srsStorage.mtlsWithPKIAuthentication.keystore.file": "client-keystore.p12",
+			"srs.srsStorage.mtlsWithPKIAuthentication.truststore.file": "client-truststore.p12",
+			"srs.srsStorage.mtlsWithPKIAuthentication.certsSecret":   "es-mtls-pki-certssecret",
+			"srs.srsStorage.basicAuthentication.enabled":             "false",
+			"srs.srsStorage.networkPolicy.enabled":                   "true",
+		},
+			[]string{"charts/srs/templates/srsservice_deployment.yaml"}),
+	)
+
+	var srsDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "srs-es-mtls-pki",
+		Kind: "Deployment",
+	}, &srsDeploymentObj)
+	VerifySRSDeployment(t, srsDeploymentObj,
+		srsDeployment{
+			"srs-es-mtls-pki",
+			"srs-service",
+			int32(1),
+			"platform-services/search-n-reporting-service:latest",
+			"false",
+			"",
+			false,
+			podResources{"1300m", "4Gi", "650m", "4Gi"},
+			esDomain{
+				domain:   "es.example.com",
+				port:     "9200",
+				protocol: "https",
+			},
+			false,
+		})
 }

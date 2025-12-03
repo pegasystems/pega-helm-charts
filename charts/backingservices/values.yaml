@@ -158,6 +158,33 @@ srs:
       #   file: "es-truststore.jks"
       # certsSecret: "es-ssl-certificates"
 
+    # The following section specifies the mTLS with PKI configuration.
+    # Set srs.srsStorage.mtlsWithPKIAuthentication.enabled: true to enable the use of mTLS-based PKI authentication to your Elasticsearch/OpenSearch service.
+    # This authentication method uses only client certificates (PKI) without requiring username/password credentials.
+    # SRS to Elasticsearch/Opensearch mTLS with PKI is supported only with external Elasticsearch/OpenSearch. mTLS with PKI is not supported for internally-provisioned ES.
+    # To enable mTLS with PKI between SRS and Elasticsearch/OpenSearch(External), enable the mtlsWithPKIAuthentication flag
+    # and configure the truststore and keystore certificates for PKI authentication.
+    # Note that PKI authentication does not require username/password credentials as authentication is performed solely through client certificates.
+    mtlsWithPKIAuthentication:
+      enabled: false
+      # When srs.srsStorage.mtlsWithPKIAuthentication.enabled is set to true, configure the required keystore and truststore certificates for PKI authentication.
+      # The below certificate details are used for establishing mTLS with PKI authentication between SRS and Elasticsearch/OpenSearch.
+      # Ensure that the client certificate in the keystore is properly signed by a Certificate Authority (CA)
+      # that is trusted by the Elasticsearch/OpenSearch server for PKI authentication.
+      # To specify keystore and truststore using a secret, uncomment the below 'srs.srsStorage.mtlsWithPKIAuthentication.certsSecret' parameter
+      # and provide the secret name containing your certificates and their respective passwords.
+      # Use the full name of the certificate files (together with file extension, for example, "keystore.p12" or "truststore.jks")
+      # as a key name in the secret. Use the respective key names
+      # to configure the "srs.srsStorage.mtlsWithPKIAuthentication.keystore.file" and "srs.srsStorage.mtlsWithPKIAuthentication.truststore.file".
+      # Specify the passwords of both keystore and truststore in the secret and use the key names
+      # "keystorePassword" for keystore password and "truststorePassword" for truststore password in the secret.
+      # If there is no password for the keystore/truststore, configure an empty string value('') to the passwords of the keystore and the truststore in the secret.
+      # keystore:
+      #   file: "es-pki-keystore.p12"
+      # truststore:
+      #   file: "es-pki-truststore.jks"
+      # certsSecret: "es-pki-certificates"
+
     # Set srs.srsStorage.basicAuthentication.enabled: true to enable the use of basic authentication to your Elasticsearch/OpenSearch service
     # for both an internally-provisioned or externalized service in your SRS cluster.
     basicAuthentication:

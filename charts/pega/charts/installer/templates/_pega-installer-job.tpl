@@ -97,6 +97,10 @@ spec:
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
+{{- if .root.Values.customInitContainers }}
+{{ toYaml .root.Values.customInitContainers | indent 6 }}
+{{- end }}
+
 {{- if .root.Values.nodeSelector }}
       nodeSelector:
 {{ toYaml .root.Values.nodeSelector | indent 8 }}
