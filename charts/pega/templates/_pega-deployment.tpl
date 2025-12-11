@@ -15,16 +15,26 @@
 kind: {{ .kind }}
 apiVersion: {{ .apiVersion }}
 metadata:
-  annotations: 
+  annotations:
+# Below are global annotations applied to all pega tiers
 {{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.annotations }}
 {{ toYaml .root.Values.global.pegaTier.annotations | indent 4 }}
 {{- end }}{{- end }}
+# Below are the annotations applied for specific tier
+{{- if .node.deploymentAnnotations }}
+{{ toYaml .node.deploymentAnnotations | indent 4 }}
+{{- end }}
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
   labels:
+# Below are global labels applied to all pega tiers
 {{- if .root.Values.global.pegaTier }}{{- if .root.Values.global.pegaTier.labels }}
 {{ toYaml .root.Values.global.pegaTier.labels | indent 4 }}
 {{- end }}{{- end }}
+# Below are the labels applied for specific tier
+{{- if .node.deploymentLabels }}
+{{ toYaml .node.deploymentLabels | indent 4 }}
+{{- end }}
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
