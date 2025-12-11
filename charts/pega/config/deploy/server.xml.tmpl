@@ -219,8 +219,7 @@
         <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
         -->
 
-        <Valve className="org.apache.catalina.valves.RemoteIpValve"
-          protocolHeader="x-forwarded-proto" />
+        {{ default .Env.REMOTEIPVALVE "<Valve className="org.apache.catalina.valves.RemoteIpValve" protocolHeader="x-forwarded-proto" />" }}
 
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html
