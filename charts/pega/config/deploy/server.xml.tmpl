@@ -225,9 +225,6 @@
                   protocolHeader="x-forwarded-proto" />
         {{ else }}
         <Valve className="org.apache.catalina.valves.RemoteIpValve"
-                  trustedProxies="{{ .Env.REM_IP_VALVE_TRUSTEDPROXIES }}"
-                  protocolHeader="x-forwarded-proto" />
-        <Valve className="org.apache.catalina.valves.RemoteIpValve"
                   protocolHeader="x-forwarded-proto" />
         {{ end }}
 
