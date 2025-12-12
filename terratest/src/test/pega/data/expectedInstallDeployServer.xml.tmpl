@@ -219,8 +219,14 @@
         <Valve className="org.apache.catalina.authenticator.SingleSignOn" />
         -->
 
+        {{ if .Env.REM_IP_VALVE_TRUSTEDPROXIES }}
         <Valve className="org.apache.catalina.valves.RemoteIpValve"
-          protocolHeader="x-forwarded-proto" />
+                  trustedProxies="{{ .Env.REM_IP_VALVE_TRUSTEDPROXIES }}"
+                  protocolHeader="x-forwarded-proto" />
+        {{ else }}
+        <Valve className="org.apache.catalina.valves.RemoteIpValve"
+                  protocolHeader="x-forwarded-proto" />
+        {{ end }}
 
         <!-- Access log processes all example.
              Documentation at: /docs/config/valve.html
