@@ -11,7 +11,7 @@ global:
         targetPort: 8080
         tls:
           enabled: false
-          external_secret_name: ""
+          external_secret_names: []
           keystore:
           keystorepassword:
           port: 443
