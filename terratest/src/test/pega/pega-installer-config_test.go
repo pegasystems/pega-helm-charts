@@ -37,9 +37,7 @@ func assertInstallerConfig(t *testing.T, configYaml string) {
 	UnmarshalK8SYaml(t, configYaml, &installConfigMap)
 	installConfigData := installConfigMap.Data
 
-	compareConfigMapData(t, installConfigData["prconfig.xml.tmpl"], "data/expectedPrconfig.xml")
 	compareConfigMapData(t, installConfigData["setupDatabase.properties.tmpl"], "data/expectedSetupdatabase.properties")
-	compareConfigMapData(t, installConfigData["prbootstrap.properties.tmpl"], "data/expectedPRbootstrap.properties")
 	compareConfigMapData(t, installConfigData["migrateSystem.properties.tmpl"], "data/expectedMigrateSystem.properties.tmpl")
 	compareConfigMapData(t, installConfigData["prlog4j2.xml"], "data/expectedPRlog4j2.xml")
 	compareConfigMapData(t, installConfigData["prpcUtils.properties.tmpl"], "data/expectedPRPCUtils.properties.tmpl")

@@ -9,10 +9,11 @@ import (
 	k8score "k8s.io/api/core/v1"
 )
 
+const customConfig = "Custom config file contents"
+
 func TestPegaInstallerCustomConfig(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"install", "install-deploy"}
-	var custom_config = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<pegarules>\n    <env name=\"custom/Prconfig\" value=\"prconfig.xml\" />\n</pegarules>"
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -20,9 +21,9 @@ func TestPegaInstallerCustomConfig(t *testing.T) {
 		for _, operation := range supportedOperations {
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"installer.custom.configurations.prconfig": custom_config,
+					"global.provider":                        vendor,
+					"global.actions.execute":                 operation,
+					"installer.custom.configurations.custom": customConfig,
 				},
 			}
 
@@ -36,5 +37,5 @@ func assertInstallerCustomConfig(t *testing.T, configYaml string) {
 	var installConfigMap k8score.ConfigMap
 	UnmarshalK8SYaml(t, configYaml, &installConfigMap)
 	installConfigData := installConfigMap.Data
-	compareConfigMapData(t, installConfigData["prconfig"], "data/expectedInstallCustomPrconfig.xml")
+	require.Equal(t, installConfigData["custom"], customConfig)
 }

@@ -815,6 +815,22 @@ tier:
       webXML: |-
         ...
 ```
+
+Instead of specifying a complete web.xml or context.xml configuration file you may specify a snippet to be inserted into the default file.  Snippets are specified using environment variables:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: CONTEXT_XML_SNIPPET
+          value: |-
+            ...
+        - name: WEB_XML_SNIPPET
+          value: |-
+            ...
+```
+
 ### Pega compressed configuration files
 
 To use [Pega configuration files](https://github.com/pegasystems/pega-helm-charts/blob/master/charts/pega/README.md#pega-configuration-files) in compressed format when deploying Pega Platform, replace each file with its compressed format file by completing the following steps:
@@ -832,6 +848,29 @@ cat "pega-helm-charts/charts/pega/config/deploy/prconfig.xml" | gzip -c | base64
 ```yaml
   compressedConfigurations: true
 ```
+
+### Pega RASP (Runtime Application Self-Protection)
+
+Starting with Pega Platform version 25, the Runtime Application Self-Protection (RASP) feature is enabled by default to enhance security. RASP detects and blocks security violations by taking advantage of information from inside the running software.
+
+You can configure RASP action in values.yaml: 
+```yaml
+  rasp:
+    action: ""
+```
+You can control how security violations are handled and whether RASP is enabled by adjusting the 'rasp.action' setting in the values.yaml file:
+- To disable RASP, set it to 'DISABLE'.
+- To use the default behavior, leave it as an empty string (""), as shown above. This will let RASP automatically configure the default behavior internally.
+- To override the default action, set it to one of the following allowed values:
+
+Action value   | Description   
+---         | ---           
+`IGNORE`  | the violation is ignored.
+`WARN` | a warning will be logged, but the violation will be ignored
+`BLOCK` | the violation will be blocked by throwing an exception. An error will be logged.
+`ERROR` | the violation will be blocked by throwing an error, which will terminate the JVM unless caught. A fatal error will be logged.
+`EXIT`   | the JVM will exit immediately. A fatal error will be loggged.
+
 
 ### Pega diagnostic user
 
@@ -929,25 +968,28 @@ To use an existing Cassandra deployment, set `cassandra.enabled` to `false` and 
 
 Use the following parameters to configure the connection to your external Cassandra cluster
 
-Parameter     | Tier Level Environment Variable | Description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Default value
----           |:---:|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---:
-`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     | Empty
-`port` | N/A | TCP Port to connect to cassandra.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | 9042
-`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`.                                                                                                                            | dnode_ext
-`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.                                                                                                                            | dnode_ext
-`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | false
+Parameter     | Tier Level Environment Variable | Description | Default value
+---           |:---:| ---|:---:
+`externalNodes` | N/A | A comma separated list of hosts in the Cassandra cluster. | Empty
+`port` | N/A | TCP Port to connect to cassandra. | 9042
+`localDatacenter` | CASSANDRA_LOCAL_DATACENTER | The datacenter in the Cassandra cluster which should be treated as local. | 
+`datacenters` | CASSANDRA_DATACENTERS | A list of all the datacenters in the Cassandra cluster. | 
+`username` | N/A | The plain text username for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the username supplied by your Cassandra cluster provider. For better security, avoid plain text usernames and leave this parameter blank; then include the username in an external secrets manager with the key CASSANDRA_USERNAME. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default username `dnode_ext`. | dnode_ext
+`password` | N/A | The plain text password for authentication with the Cassandra cluster.<br/>Change the value in your helm chart to the password supplied by your Cassandra cluster provider. For better security, avoid plain text passwords and leave this parameter blank; then include the password in an external secrets manager with the key CASSANDRA_PASSWORD. <br/>If you make no change, Pega attempts to authenticate with the Cassandra cluster using the default password `dnode_ext`.| dnode_ext
+`clientEncryption` | N/A | Enable (true) or disable (false) client encryption on the Cassandra connection. | false
+`clientAuth` | N/A | Enable (true) or disable (false) client certificate verification on the Cassandra connection.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 | false
 `clientEncryptionStoreType` | N/A | If required specify the type of Cassandra truststore and keystore that hold keys and certificates for client encryption. Available store types are JKS and PKCS12.                                                                                                                                                                                                                                                                                                                                                                                                                                            |Empty
-`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format.                                                                                                                                                                                                                                                                             | Empty
-`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD.                                                                                                                                                                                                                                                                                                                                                                                                | Empty
-`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format.                                                                                                                                                                                                                                                                                     | Empty
-`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD.                                                                                                                                                                                                                                                                                                                                                                                                    | Empty
-`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations.                                                                                                                                                                                                                                                                                                                                                                                                                                                     | false
-`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Empty
-`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner.                                                                                                                                                                                                                                                                                                                      | false
-`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average).                                                                                                                                                                                                                                                                                                                                                                                                                                                   | false
-`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that time out. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once.                                                                                                                                        | false
-`customRetryPolicyEnabled` | CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries using the `customRetryPolicyCount` property.                                                                                                                                                                                                                                                                                                                                                                                                                                                | false
-`customRetryPolicyCount` | CASSANDRA_CUSTOM_RETRY_POLICY_COUNT | Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount.                                                                                                                                                                                                                                                                                                                                                                                                | 1
+`trustStore` | N/A | If required, provide the trustStore certificate file name.<br/>When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support trustStores that use the Java Key Store (.jks) format. | Empty
+`trustStorePassword` | N/A | If required provide trustStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_TRUSTSTORE_PASSWORD. | Empty
+`keyStore` | N/A | If required, provide the keystore certificate file name.<br/>When using a keystore certificate, you must also include a Kubernetes secret name that contains the keystore certificate in the global.certificatesSecrets parameter.<br/>Pega deployments only support keystores that use the Java Key Store (.jks) format. | Empty
+`keyStorePassword` | N/A | If required provide keyStorePassword value in plain text. For better security leave this parameter blank and include the password in an external secrets manager with the key CASSANDRA_KEYSTORE_PASSWORD. | Empty
+`asyncProcessingEnabled` | CASSANDRA_ASYNC_PROCESSING_ENABLED | Enable asynchronous processing of records in DDS Dataset save operation. Failures to store individual records will not interrupt Dataset save operations. | false
+`keyspacesPrefix` | N/A | Specify a prefix to use when creating Pega-managed keyspaces in Cassandra. | Empty
+`extendedTokenAwarePolicy` | CASSANDRA_EXTENDED_TOKEN_AWARE_POLICY | Enable an extended token aware policy for use when a Cassandra range query runs. When enabled this policy selects a token from the token range to determine which Cassandra node to send the request. Before you can enable this policy, you must configure the token range partitioner. | false
+`latencyAwarePolicy` | CASSANDRA_LATENCY_AWARE_POLICY | Enable a latency awareness policy, which collects the latencies of the queries for each Cassandra node and maintains a per-node latency score (an average). | false
+`customRetryPolicy` | CASSANDRA_CUSTOM_RETRY_POLICY | Enable the use of a customized retry policy for your Pega Platform deployment for Pega Platform ’23 and earlier releases. After you enable this policy in your deployment configuration, the deployment retries Cassandra queries that time out. Configure the number of retries using the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. The default is 1, so if you do not specify a retry count, timed out queries are retried once.| false
+`customRetryPolicyEnabled` | CASSANDRA_CUSTOM_RETRY_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `customRetryPolicy`. Configure the number of retries using the `customRetryPolicyCount` property.| false
+`customRetryPolicyCount` | CASSANDRA_CUSTOM_RETRY_POLICY_COUNT | Specify the number of retry attempts when `customRetryPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_custom_retry_policy/retryCount. | 1
 `speculativeExecutionPolicy` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY | Enable the speculative execution policy for retrieving data from your Cassandra service for Pega Platform '23 and earlier releases. When enabled, Pega Platform sends a query to multiple nodes in your Cassandra service and processes the first response. This provides lower perceived latencies for your deployment, but puts greater load on your Cassandra service. Configure the speculative execution delay and max executions using the following dynamic system settings (DSS): dnode/cassandra_speculative_execution_policy/delay and dnode/cassandra_speculative_execution_policy/max_executions. | false
 `speculativeExecutionPolicyEnabled` | CASSANDRA_SPECULATIVE_EXECUTION_POLICY_ENABLED | Use this parameter in Pega Platform '24 and later instead of `speculativeExecutionPolicy`. Configure the speculative execution delay and max executions using the `speculativeExecutionPolicyDelay` and `speculativeExecutionPolicyMaxExecutions` properties.                                                                                                                                                                                                                                                                                                                                                 | false
 `speculativeExecutionPolicyDelay` | CASSANDRA_SPECULATIVE_EXECUTION_DELAY | Specify the delay in milliseconds before speculative executions are made when `speculativeExecutionPolicyEnabled` is true. For Pega Platform '23 and earlier releases use the dynamic system setting (DSS): dnode/cassandra_speculative_execution_policy/delay.                                                                                                                                                                                                                                                                                                                                               | 100
@@ -1100,6 +1142,43 @@ pegasearch:
     scopes: "pega.search:full"
     privateKey: "LS0tLS1CRUdJTiBSU0Eg...<truncated>"
     privateKeyAlgorithm: "RS256"
+```
+To enable Mutual Transport Layer Security (MTLS) between Pega Infinity and the Search and Reporting Service (SRS), configure the `srsMTLS` section in your `values.yaml` file. The following table and example show the required parameters for setting up MTLS connectivity.
+
+| Parameter                | Description                                                                                                                                                                                                                                                                                                                                                         | Default value      |
+|--------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------|
+| `enabled`                | Set `pegasearch.srsMTLS.enabled` to `true` to enable mTLS between Infinity and SRS.                                                                                                                                                                                                                                                                                 | false              |
+| `trustStore`             | Specify the trustStore certificate file name in `pegasearch.srsMTLS.trustStore`. Ensure that both the Pega Platform and SRS CA Certificates are signed against the Pega Platform keystore.<br/> Note: When using a trustStore certificate, you must also include a Kubernetes secret name that contains the trustStore certificate in the `global.certificatesSecrets parameter`. | `""`               |                                                                                   | `""`               |
+| `trustStorePassword`     | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.trustStorePassword` to the password for the trustStore certificate.                                                                                                                                                                                                | `""`               |
+| `keyStore`               | Specify the Keystore certificate file name in `pegasearch.srsMTLS.keyStore`. <br/> Note: When using a keyStore certificate, you must also include a Kubernetes secret name that contains the keyStore certificate in the `global.certificatesSecrets` parameter.                                                                                                                                             | `""`               |
+| `keyStorePassword`       | When not using `pegasearch.srsMTLS.external_secret_name`, set `pegasearch.srsMTLS.keyStorePassword` to the password for the keystore certificate.                                                                                                                                                                                                   | `""`               |
+| `external_secret_name`   | When not using `pegasearch.srsMTLS.trustStorePassword` and `pegasearch.srsMTLS.keyStorePassword`, specify the external secret name containing SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD for `pegasearch.srsMTLS.external_secret_name`.                                                                                                      | `""`               | . | `""`               |
+Example:Example:
+
+```yaml
+pegasearch:
+  srsMTLS:
+    #Set srsMTLS.enabled to 'true' to enable Mutual Transport Layer Security(MTLS) between Pega Platform and Search and Reporting Service(SRS). The default value is 'false'.
+    enabled: false
+    # If required, provide trustStore certificate file name
+    # When using a trustStore certificate, you must also include a Kubernetes secret name, that contains the trustStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support trustStores using the Java Key Store (.jks)/.p12 format.
+    trustStore: "pega-srs-truststore.jks"
+    # If required provide trustStorePassword value in plain text.
+    trustStorePassword: ""
+    # If required, provide keyStore certificate file name
+    # When using a keyStore certificate, you must also include a Kubernetes secret name, that contains the keyStore certificate,
+    # in the global.certificatesSecrets parameter.
+    # Pega deployments only support keyStores using the Java Key Store (.jks)/.p12 format.
+    keyStore: "pega-srs-keystore.jks"
+    # If required, provide keyStorePassword value in plain text.
+    keyStorePassword: ""
+    # To avoid exposing trustStorePassword abd keyStorePassword leave the values empty and
+    # configure them using an External Secrets Manager, making sure you configure the keys in the secret in the order:
+    # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
+    # Enter the external secret name below.
+    external_secret_name: "pega-srsmtls-pwd-secret"
 ```
 
 ### For Pega Platform 8.5 and earlier:
@@ -1478,7 +1557,7 @@ Parameter   | Description   | Default value
 `service.tls.traefik.insecureSkipVerify` | Set to `true` to skip verifying the certificate; do this in cases where you do not need a valid root/CA certificate but want to encrypt load balancer traffic. Leave the setting to `false` to both verify the certificate and encrypt load balancer traffic. | `false`
 
 ##### Important Points to note
-- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty. The default keystore and CA certificate expire on 25/12/2025.
+- By default, Pega provides a self-signed keystore and a custom root/CA certificate in Helm chart version `2.2.0`. To use the default keystore and CA certificate, leave the parameters service.tls.keystore, service.tls.keystorepassword and service.tls.cacertificate empty. The default keystore and CA certificate expire on 2031-06-18.
 - To enable SSL, you must either provide a keystore with a keystorepassword or certificate, certificatekey and cacertificate files in PEM format. If you do not provide either, the deployment implements SSL by passing a Pega-provided default self-signed keystore and a custom root/CA certificate to the Pega web nodes.
 - The CA certificate can be issued by any valid Certificate Authorities or you can also use a self-created CA certificate with proper chaining.
 - To avoid exposing your certificates, you can use external secrets to manage your certificates. Pega also supports specifying the certificate files using the certificate parameters in the Pega values.yaml. To pass the files using these parameters, you must encode the certificate files using base64 and then enter the string output into the appropriate certificate parameter.
@@ -1651,4 +1730,30 @@ tier:
          port: <port>
          targetPort: <target port>
           
+```
+
+### Specifying the PegaRULESReadOnly Datasource Connection
+
+To configure the PegaRULESReadOnly jdbc datasource, use the following parameter in the `values.yaml` file:
+
+Example:
+```yaml
+global:
+   jdbc:
+     readerurl: <JDBC_URL_FOR_READ_ONLY_DATASOURCE>
+```
+
+Additionally, you can specify the read-only database username and password for each tier using environment variables.
+Set DB_RO_USERNAME and DB_RO_PASSWORD in the `env` section of the corresponding tier. For more information, see [Environment Variables section](#environment-variables).
+
+Example:
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      env:
+        - name: DB_RO_USERNAME
+          value: <DB_RO_USERNAME_VALUE>
+        - name: DB_RO_PASSWORD
+          value: <DB_RO_PASSWORD_VALUE>
 ```

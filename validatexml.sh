@@ -39,10 +39,3 @@ else
   echo "installer prlog4j2.xml formatting is incorrect"
   exit 1
 fi
-
-if xmllint --noout charts/pega/charts/installer/config/prconfig.xml.tmpl >/dev/null 2>&1; then
-  echo "installer prconfig.xml.tmpl validation passed"
-else
-  echo "installer prconfig.xml.tmpl formatting is incorrect"
-  exit 1
-fi

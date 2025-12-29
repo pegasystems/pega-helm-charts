@@ -213,6 +213,47 @@ func TestPegaTierDeploymentWithFSGroup(t *testing.T) {
 	}
 }
 
+func TestPegaTierDeploymentWithoutHPA(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					ValuesFiles: []string{"data/values-hpa-disabled.yaml"},
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"global.deployment.name":        depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName":       "storage-class",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")[1:2]
+
+				for _, value := range yamlSplit {
+					var deploymentObj appsv1.Deployment
+					UnmarshalK8SYaml(t, value, &deploymentObj)
+					require.NotNil(t, deploymentObj.Spec.Replicas)
+					require.Equal(t, int32(1), *deploymentObj.Spec.Replicas, "With HPA disabled replicas should be set to 1.")
+				}
+			}
+		}
+	}
+}
+
 /*func assertStream(t *testing.T, streamYaml string, options *helm.Options) {
 	var statefulsetObj appsv1beta2.StatefulSet
 	UnmarshalK8SYaml(t, streamYaml, &statefulsetObj)
@@ -264,7 +305,7 @@ func VerifyPegaStatefulSet(t *testing.T, statefulsetObj *appsv1beta2.StatefulSet
 // VerifyPegaDeployment - Performs specific Pega deployment assertions with the values as provided in default values.yaml
 func VerifyPegaDeployment(t *testing.T, deploymentObj *appsv1.Deployment,
 	expectedDeployment pegaDeployment, options *helm.Options, hazelcastSSL bool) {
-	require.Equal(t, int32(1), *deploymentObj.Spec.Replicas)
+	require.Nil(t, deploymentObj.Spec.Replicas, "By default HPA is enabled so Pega deployment replicas should be unset")
 	require.Equal(t, int32(2147483647), *deploymentObj.Spec.ProgressDeadlineSeconds)
 	require.Equal(t, expectedDeployment.name, deploymentObj.Spec.Selector.MatchLabels["app"])
 	require.Equal(t, intstr.FromInt(1), *deploymentObj.Spec.Strategy.RollingUpdate.MaxSurge)

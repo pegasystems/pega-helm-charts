@@ -20,6 +20,8 @@ spec:
     ports:
     - protocol: TCP
       port: 8080
+    - protocol: TCP
+      port: 8443
   - from:
     - podSelector:
         matchLabels:
@@ -27,6 +29,8 @@ spec:
     ports:
     - protocol: TCP
       port: 8080
+    - protocol: TCP
+      port: 8443
   egress:
   - to:
     - podSelector:

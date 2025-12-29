@@ -159,7 +159,7 @@
 
 # list of either external or internal cassandra nodes
 {{- define "cassandraNodes" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
     {{ .Values.dds.externalNodes }}
   {{- else -}}
     {{ template "getCassandraSubchartService" . }}
@@ -168,27 +168,23 @@
 
 # whether or not cassandra is enabled at all (internally or externally)
 {{- define "cassandraEnabled" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
+    true
+  {{- else if and (.Values.cassandra) (.Values.cassandra.enabled) -}}
     true
   {{- else -}}
-    {{- if .Values.cassandra.enabled -}}
-      true
-    {{- else -}}
-      false
-    {{- end -}}
+    false
   {{- end -}}
 {{- end }}
 
 # whether we should create internal cassandra nodes
 {{- define "internalCassandraEnabled" }}
-  {{- if .Values.dds.externalNodes -}}
+  {{- if and (.Values.dds) (.Values.dds.externalNodes) -}}
     false
+  {{- else if and (.Values.cassandra) (.Values.cassandra.enabled) -}}
+    true
   {{- else -}}
-    {{- if .Values.cassandra.enabled -}}
-      true
-    {{- else -}}
-      false
-    {{- end -}}
+    false
   {{- end -}}
 {{- end }}
 
@@ -558,6 +554,9 @@ servicePort: use-annotation
 
     {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
     {{ include "secretResolver" $artifactoryDict | indent 4}}
+
+    {{- $srsDict := dict "deploySecret" "deploySRSSecret" "deployNonExtsecret" "deployNonExtSRSSecret" "extSecretName" .Values.pegasearch.srsMTLS.external_secret_name "nonExtSecretName" "pega-srs-mtls-secret-name" "context" $ -}}
+    {{ include "secretResolver" $srsDict | indent 4}}
 
     - secret:
         name: {{ include "pega-diagnostic-secret-name" $}}

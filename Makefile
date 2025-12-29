@@ -1,8 +1,8 @@
 dependencies:
 	helm repo add incubator https://charts.helm.sh/incubator
 	helm repo add stable https://charts.helm.sh/stable
-	helm repo add kiwigrid https://kiwigrid.github.io
 	helm repo add elastic https://helm.elastic.co
+	helm repo add kokuwa https://kokuwaio.github.io/helm-charts
 	helm repo list	
 	helm dependency update ./charts/pega/
 	helm dependency update ./charts/addons/

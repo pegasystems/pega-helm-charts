@@ -66,8 +66,10 @@ run.ruleset.cleanup={{ .Env.RUN_RULESET_CLEANUP }}
 # CUSTOM CONFIGURATION PROPERTIES FILE
 # The congfiguration files are dockerized using .tmpl files and are stored in opt/pega/config
 # inside the container. 
+{{ if not (isTrue (default .Env.CONFIG_FILES_IN_TEMP_DIR "false")) }}
 pegarules.config=/opt/pega/kit/scripts/prconfig.xml
 prbootstrap.config=/opt/pega/kit/scripts/prbootstrap.properties
+{{ end }}
 prlogging.config=/opt/pega/kit/scripts/prlog4j2.xml
 
 # Create schema if absent flag - Only from Docker related deployments
@@ -86,7 +88,7 @@ bypass.load.assembled.classes={{ .Env.BYPASS_LOAD_ASSEMBLED_CLASSES }}
 # Enable adminstrator user after upgrade by default.
 upgrade.enable.admin=true
 
-custom.jvm.args=-Xmx4g {{ .Env.CUSTOM_JVM_ARGS }}
+custom.jvm.args={{ .Env.DEFAULT_MAX_HEAP_SIZE }} {{ .Env.CUSTOM_JVM_ARGS }}
 
 # Enable the automatic resume parameter to support resuming rules_upgrade from point of failure.
 automatic.resume={{ .Env.AUTOMATIC_RESUME_ENABLED }}

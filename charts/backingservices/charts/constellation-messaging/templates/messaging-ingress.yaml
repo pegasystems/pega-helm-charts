@@ -6,6 +6,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ $depName }}
+{{- if .Values.ingress.labels }}
+  labels:
+{{ toYaml .Values.ingress.labels | indent 4 }}
+{{- end }}
 {{- if .Values.ingress.annotations }}
   annotations:
 {{ toYaml .Values.ingress.annotations | indent 4 }}

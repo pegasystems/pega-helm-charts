@@ -5,6 +5,10 @@ kind: Ingress
 metadata:
   name: {{ .name }}
   namespace: {{ .root.Release.Namespace }}
+{{- if .node.ingress.labels }}
+  labels:
+{{ toYaml .node.ingress.labels | indent 4 }}
+{{- end }}
   annotations:
 {{- if not (.node.ingress.ingressClassName) }}
     # Ingress class used is 'alb'
@@ -30,6 +34,7 @@ metadata:
 {{- if .node.ingress.annotations }}
 {{ toYaml .node.ingress.annotations | indent 4 }}
 {{- else }}
+    alb.ingress.kubernetes.io/healthcheck-path: /healthz.html
     # override the default scheme internal as ALB should be internet-facing
     alb.ingress.kubernetes.io/scheme: internet-facing
     # set to ip mode to route traffic directly to the pods ip

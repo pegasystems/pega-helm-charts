@@ -11,10 +11,8 @@ data:
 
 {{ if eq $arg "installer-config" }}
 
-{{- $prconfigTemplatePath := "config/prconfig.xml.tmpl" }}
 {{- $setupDatabasePath := "config/setupDatabase.properties" }}
 {{- $setupDatabasetemplatePath := "config/setupDatabase.properties.tmpl" }}
-{{- $prbootstraptemplatePath := "config/prbootstrap.properties.tmpl" }}
 {{- $prpcUtilsPropertiestemplatePath := "config/prpcUtils.properties.tmpl" }}
 {{- $migrateSystempropertiestemplatePath := "config/migrateSystem.properties.tmpl" }}
 {{- $custom_config := .root.Values.custom }}
@@ -22,12 +20,6 @@ data:
 {{- if $custom_config.configurations }}
 {{ $custom_config.configurations  | toYaml | nindent 2 -}}
 {{ else }}
-
-{{ if $prconfigTemplate := .root.Files.Glob $prconfigTemplatePath }}
-  # prconfigTemplate to be used by {{ .name }}
-  prconfig.xml.tmpl: |-
-{{ .root.Files.Get $prconfigTemplatePath | indent 6 }}
-{{- end }}
 
 {{ if $setupDatabase := .root.Files.Glob $setupDatabasePath }}
   # setupDatabase to be used by {{ .name }}
@@ -39,12 +31,6 @@ data:
   # setupDatabasetemplate to be used by {{ .name }}
   setupDatabase.properties.tmpl: |-
 {{ .root.Files.Get $setupDatabasetemplatePath | indent 6 }}
-{{- end }}
-
-{{ if $prbootstraptemplate := .root.Files.Glob $prbootstraptemplatePath }}
-  # prbootstraptemplate to be used by {{ .name }}
-  prbootstrap.properties.tmpl: |-
-{{ .root.Files.Get $prbootstraptemplatePath | indent 6 }}
 {{- end }}
 
 {{ if $prpcUtilsPropertiestemplate := .root.Files.Glob $prpcUtilsPropertiestemplatePath }}
