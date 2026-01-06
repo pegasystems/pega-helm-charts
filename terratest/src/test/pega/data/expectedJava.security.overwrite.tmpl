@@ -2,7 +2,7 @@
 networkaddress.cache.ttl=30
 
 {{ if .Env.FIPS_140_3_MODE }}
-security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider C:HYBRID;ENABLE{ALL};
+security.provider.1=org.bouncycastle.jcajce.provider.BouncyCastleFipsProvider
 security.provider.2=org.bouncycastle.jsse.provider.BouncyCastleJsseProvider fips:BCFIPS
 security.provider.3=org.bouncycastle.entropy.provider.BouncyCastleEntropyProvider
 security.provider.4=SUN
