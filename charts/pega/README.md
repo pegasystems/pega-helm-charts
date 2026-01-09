@@ -644,7 +644,7 @@ Parameter             | Description    | Default value
 
 ### Volume claim template
 
-A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
+A `volumeClaimTemplate` may be configured for embedded search or stream tiers to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates or for runtime tiers (e.g. web or batch).
 
 ### Deployment strategy
 
