@@ -41,7 +41,9 @@ spec:
 {{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
-{{- if .root.Values.serviceAccountName }}
+{{- if .root.Values.serviceAccount.name }}
+      serviceAccountName: {{ .root.Values.serviceAccount.name }}
+{{- else if .root.Values.serviceAccountName }}
       serviceAccountName: {{ .root.Values.serviceAccountName }}
 {{- end }}
       volumes:
