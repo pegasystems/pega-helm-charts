@@ -667,7 +667,20 @@ tier:
 
 ### Service Account
 
-If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), and the service account also needs to be provisioned, you can specify a custom `serviceAccount` section for your deployment tier.
+
+Example:
+
+```yaml
+tier:
+  - name: my-tier
+    custom:
+      serviceAccount:
+        create: true
+        name: MY_SERVICE_ACCOUNT_NAME
+```
+
+If the pod only needs to be run with a specific service account, you can just specify a custom `serviceAccountName` for your deployment tier.
 
 Example:
 
@@ -677,6 +690,8 @@ tier:
     custom:
       serviceAccountName: MY_SERVICE_ACCOUNT_NAME
 ```
+
+Specifying serviceAccount.name takes precedence over serviceAccountName.
 
 ### Custom volumes
 

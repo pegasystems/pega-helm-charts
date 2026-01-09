@@ -1,0 +1,9 @@
+{{ if (eq (include "performDeployment" $) "true") }}
+{{ $salist := list }}
+{{ range $dep := .Values.global.tier  }}
+{{ if and ($dep.custom.serviceAccount.create) (not (has $dep.custom.serviceAccount.name $salist)) }}
+{{ $salist = append $salist $dep.custom.serviceAccount.name }}
+{{ template "pega.serviceaccount" dict "root" $ "sa" $dep.custom.serviceAccount }}
+{{ end }}
+{{ end }}
+{{ end }}
