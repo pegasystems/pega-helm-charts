@@ -23,6 +23,9 @@ spec:
         - name: {{ . }}
         {{- end -}}
         {{ end }}
+{{- if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- end }}
 {{- if .Values.srsRuntime.securityContext }}
       securityContext:
 {{ toYaml .Values.srsRuntime.securityContext | indent 8 }}

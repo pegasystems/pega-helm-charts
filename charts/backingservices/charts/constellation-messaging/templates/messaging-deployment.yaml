@@ -23,6 +23,9 @@ spec:
         {{ toYaml .Values.podLabels | nindent 8 }}
         {{- end }}
     spec:
+{{- if .Values.serviceAccount.name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- end }}
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "constellation-messaging" ) }}
       {{ if .Values.docker.imagePullSecretNames }}
