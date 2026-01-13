@@ -46,6 +46,7 @@ action: "deploy"
 ## NIST SP 800-53 and NIST SP 800-131
 
 Set the `highlySecureCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
+**Deprecated: Do not set highlySecureCryptoModeEnabled to true unless FIPS has already been enabled using this flag.**
 
 For example:
 ```yaml
