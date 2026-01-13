@@ -35,6 +35,7 @@ global:
   kerberos: {}
 
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  # Deprecated: Do not set highlySecureCryptoModeEnabled to true unless FIPS has already been enabled using this flag.
   highlySecureCryptoModeEnabled: false
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
