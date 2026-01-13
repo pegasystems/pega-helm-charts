@@ -45,6 +45,10 @@ action: "deploy"
 
 ## NIST SP 800-53 and NIST SP 800-131
 
+**Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**
+Please reference this article for more information:
+https://docs.pega.com/bundle/platform/page/platform/security/enabling-fips-140-3.html
+
 Set the `highlySecureCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
 
 For example:
