@@ -115,7 +115,7 @@ To deploy Pega Platform with the SRS backing service, the SRS helm chart require
 | `k8sProvider`                           | Specify your Kubernetes provider name. Supported values are [`eks`, `aks`, `minikube`, `gke`, `openshift`, `pks`].
 | `enableSecureCryptoMode`                | Set to true if you require a highly secured connection that complies with NIST SP 800-53 and NIST SP 800-131. Otherwise, set to false.
 | `javaOpts`                              | Use this parameter to configure values for Java options.
-| `serviceAccount`                            | Specify the serviceAccount for the deployment. Using serviceAccount.name a service account can be specified. Setting serviceAccount.create to true will also provision the named service account. |
+| `serviceAccount`                            | Specify the serviceAccount for the deployment. Using `serviceAccount.name` a service account can be specified. Setting `serviceAccount.create` to `true` will also provision the named service account. |
 
 
 ### Enabling security between SRS and Elasticsearch

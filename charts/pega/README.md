@@ -1401,7 +1401,7 @@ Example:
 installer:
   serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 ```
-If you require the helm charts also to provision thec service account, you can use the section `serviceAccountName` for your job.
+If you require the helm charts also to provision the service account, you can use the section `serviceAccount` for your job.
 
 Example:
 
@@ -1509,7 +1509,7 @@ Parameter   | Description                                                       
 `hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically. | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).                                                                                                 | `""`
 `hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).                                                                                                                                    | `""`
-| `hazelcast.serviceAccount` | Specify the serviceAccount for the deployment. Using serviceAccount.name a service account can be specified. Setting serviceAccount.create to true will also provision the named service account. | `""`
+| `hazelcast.serviceAccount` | Specify the serviceAccount for the deployment. Using `serviceAccount.name` a service account can be specified. Setting `serviceAccount.create` to `true` will also provision the named service account. | `""`
 
 
 #### Example
