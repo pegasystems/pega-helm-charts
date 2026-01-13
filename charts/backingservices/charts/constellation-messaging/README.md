@@ -39,6 +39,7 @@ Complete information on the design of the service including architecture, scalab
 | `ingress.tls.secretName`                        | Specify the Kubernetes secret you created in which you store your SSL certificate for your deployment.                                                                                                                                                                                                                                               |
 | `ingress.annotations`                        | Specify additional annotations to add to the ingress.                                                                                                                                                                                                           |
 | `ingress.domain`                        | Specify your custom domain.                                                                                                                                                                                                                                                                                         |
+| `serviceAccount`                            | Specify the serviceAccount for the deployment. Using serviceAccount.name a service account can be specified. Setting serviceAccount.create to true will also provision the named service account. |
 
 ```yaml
 enabled: true

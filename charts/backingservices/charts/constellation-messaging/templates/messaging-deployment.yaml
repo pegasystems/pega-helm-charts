@@ -23,7 +23,7 @@ spec:
         {{ toYaml .Values.podLabels | nindent 8 }}
         {{- end }}
     spec:
-{{- if .Values.serviceAccount.name }}
+{{- if (.Values.serviceAccount).name }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
 {{- end }}
       imagePullSecrets:

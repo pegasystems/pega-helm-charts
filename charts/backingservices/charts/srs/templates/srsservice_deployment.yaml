@@ -23,7 +23,7 @@ spec:
         - name: {{ . }}
         {{- end -}}
         {{ end }}
-{{- if .Values.serviceAccount.name }}
+{{- if (.Values.serviceAccount).name }}
       serviceAccountName: {{ .Values.serviceAccount.name }}
 {{- end }}
 {{- if .Values.srsRuntime.securityContext }}
