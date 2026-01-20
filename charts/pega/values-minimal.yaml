@@ -26,6 +26,9 @@ global:
   kerberos: {}
 
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  # Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.
+  # Please reference this article for more information:
+  # https://docs.pega.com/bundle/platform/page/platform/security/enabling-fips-140-3.html
   highlySecureCryptoModeEnabled: false
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
