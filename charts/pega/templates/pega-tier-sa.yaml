@@ -1,9 +1,15 @@
 {{ if (eq (include "performDeployment" $) "true") }}
 {{ $salist := list }}
 {{ range $dep := .Values.global.tier  }}
-{{ if and (($dep.custom.serviceAccount).create) (not (has $dep.custom.serviceAccount.name $salist)) }}
-{{ $salist = append $salist $dep.custom.serviceAccount.name }}
-{{ template "pega.serviceaccount" dict "root" $ "sa" $dep.custom.serviceAccount }}
+{{ $saname := "" }}
+{{ if ($dep.custom.serviceAccount).name }}
+{{ $saname = $dep.custom.serviceAccount.name }}
+{{ else }}
+{{ $saname = $dep.custom.serviceAccountName }}
+{{ end }}
+{{ if and (($dep.custom.serviceAccount).create) $saname (not (has $saname $salist)) }}
+{{ $salist = append $salist $saname }}
+{{ template "pega.serviceaccount" dict "root" $ "name" $saname }}
 {{ end }}
 {{ end }}
 {{ end }}
