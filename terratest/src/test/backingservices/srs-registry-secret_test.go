@@ -1,15 +1,17 @@
 package backingservices
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	corev1 "k8s.io/api/core/v1"
-	"testing"
 )
-func TestSRSRegistrySecretDefaultName(t *testing.T){
+
+func TestSRSRegistrySecretDefaultName(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "true",
-			"srs.deploymentName": "test-srs",
+			"srs.enabled":                "true",
+			"srs.deployment.name":        "test-srs",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/registrysecret.yaml"}),
@@ -25,15 +27,15 @@ func TestSRSRegistrySecretDefaultName(t *testing.T){
 	require.Contains(t, string(registryData[".dockerconfigjson"]), "WU9VUl9ET0NLRVJfUkVHSVNUUllfVVNFUk5BTUU6WU9VUl9ET0NLRVJfUkVHSVNUUllfUEFTU1dPUkQ=")
 }
 
-func TestSRSRegistrySecretCustomName(t *testing.T){
+func TestSRSRegistrySecretCustomName(t *testing.T) {
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "true",
-			"srs.deploymentName": "custom-srs",
+			"srs.enabled":                      "true",
+			"srs.deployment.name":              "custom-srs",
 			"global.imageCredentials.registry": "docker-repo.acme.io",
 			"global.imageCredentials.username": "acmeuser",
 			"global.imageCredentials.password": "thisisapwd",
-			"srs.srsStorage.tls.enabled": "false",
+			"srs.srsStorage.tls.enabled":       "false",
 		},
 			[]string{"charts/srs/templates/registrysecret.yaml"}),
 	)
