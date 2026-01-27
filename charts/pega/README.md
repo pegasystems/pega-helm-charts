@@ -1475,6 +1475,7 @@ here: [Additional Parameters](charts/hazelcast/README.md)
 
 Parameter   | Description                                                                                                                                                                                                                                                                                                  | Default value
 ---         |--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------| ---
+`hazelcast.deployment.name` | Name used for the hazelcast deployment. | `pega-hazelcast`
 `hazelcast.image` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.                                                                                                                                                             | `YOUR_HAZELCAST_IMAGE:TAG`
 `hazelcast.clusteringServiceImage` | Reference the `platform/clustering-service` Docker image that you downloaded and pushed to your Docker registry that your deployment can access.                                                                                                                                                             | `YOUR_CLUSTERING_SERVICE_IMAGE:TAG`
 `hazelcast.enabled` | Set to `true` if client-server deployment of Pega Platform is required; otherwise leave set to `false`. Note: To avoid an installation failure, you must set this value to `false` for Pega platform deployments using versions before 8.6.                                                                  | `true`
@@ -1492,6 +1493,8 @@ Parameter   | Description                                                       
 #### Example
 ```yaml
 hazelcast:
+  deployment:
+    name: "pega-hazelcast"
   image: "YOUR_HAZELCAST_IMAGE:TAG"
   clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
   enabled: true
