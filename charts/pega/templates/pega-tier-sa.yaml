@@ -2,12 +2,12 @@
 {{ $salist := list }}
 {{ range $dep := .Values.global.tier  }}
 {{ $saname := "" }}
-{{ if ($dep.custom.serviceAccount).name }}
+{{ if (($dep.custom).serviceAccount).name }}
 {{ $saname = $dep.custom.serviceAccount.name }}
-{{ else }}
+{{ else if ($dep.custom).serviceAccountName }}
 {{ $saname = $dep.custom.serviceAccountName }}
 {{ end }}
-{{ if and (($dep.custom.serviceAccount).create) $saname (not (has $saname $salist)) }}
+{{ if and ((($dep.custom).serviceAccount).create) $saname (not (has $saname $salist)) }}
 {{ $salist = append $salist $saname }}
 {{ template "pega.serviceaccount" dict "root" $ "name" $saname }}
 {{ end }}
