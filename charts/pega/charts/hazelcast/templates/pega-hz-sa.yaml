@@ -1,0 +1,8 @@
+{{- if and (eq (include "isHazelcastEnabled" .) "true") (.Values.serviceAccount).create (.Values.serviceAccount).name -}}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.serviceAccount.name | quote }}
+  namespace: {{ .Release.Namespace }}
+---
+{{- end -}}

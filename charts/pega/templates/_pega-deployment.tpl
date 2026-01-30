@@ -73,7 +73,9 @@ spec:
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
 {{- if .custom }}
-{{- if .custom.serviceAccountName }}
+{{- if (.custom.serviceAccount).name }}
+      serviceAccountName: {{ .custom.serviceAccount.name }}
+{{- else if .custom.serviceAccountName }}
       serviceAccountName: {{ .custom.serviceAccountName }}
 {{- end }}
 {{- end }}
