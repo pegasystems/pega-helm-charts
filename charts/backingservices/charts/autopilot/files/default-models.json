@@ -1,0 +1,1920 @@
+[
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-5-Chat",
+        "model_mapping_id": "gpt-5-chat-2025-08-07",
+        "name": "gpt-5-chat-2025-08-07",
+        "input_tokens": 128000,
+        "output_tokens": 16384,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-5-Chat/2025-08-07",
+        "default_model": false,
+        "version": "2025-08-07",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 16384,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 5 Chat",
+        "model_path": [
+            "/openai/deployments/gpt-5-chat/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-5-Mini",
+        "model_mapping_id": "gpt-5-mini-2025-08-07",
+        "name": "gpt-5-mini-2025-08-07",
+        "input_tokens": 400000,
+        "output_tokens": 128000,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-5-Mini/2025-08-07",
+        "default_model": false,
+        "version": "2025-08-07",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 128000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 5 Mini",
+        "model_path": [
+            "/openai/deployments/gpt-5-mini/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "amazon",
+        "model_name": "Nova-Micro",
+        "model_mapping_id": "nova-micro-v1",
+        "name": "nova-micro-v1",
+        "input_tokens": 128000,
+        "output_tokens": 10000,
+        "type": "chat_completion",
+        "model_id": "bedrock/amazon/Nova-Micro/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 10000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Nova Micro",
+        "model_path": [
+            "/amazon/deployments/nova-micro-v1/converse",
+            "/amazon/deployments/nova-micro-v1/converse-stream"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "amazon",
+        "model_name": "Nova-Pro",
+        "model_mapping_id": "nova-pro-v1",
+        "name": "nova-pro-v1",
+        "input_tokens": 300000,
+        "output_tokens": 10000,
+        "type": "chat_completion",
+        "model_id": "bedrock/amazon/Nova-Pro/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "application/pdf",
+                "application/docx",
+                "application/doc",
+                "text/csv",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown",
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "image/gif",
+                "image/webp",
+                "video/mp4",
+                "video/mov",
+                "video/mkv",
+                "video/webm",
+                "video/flv",
+                "video/mpeg",
+                "video/mpg",
+                "video/wmv",
+                "video/3gp"
+            ],
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 10000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Nova Pro",
+        "model_path": [
+            "/amazon/deployments/nova-pro-v1/converse",
+            "/amazon/deployments/nova-pro-v1/converse-stream"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "amazon",
+        "model_name": "Nova-Premier",
+        "model_mapping_id": "nova-premier-v1",
+        "name": "nova-premier-v1",
+        "input_tokens": 1000000,
+        "output_tokens": 10000,
+        "type": "chat_completion",
+        "model_id": "bedrock/amazon/Nova-Premier/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "application/pdf",
+                "application/docx",
+                "application/doc",
+                "text/csv",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown",
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "image/gif",
+                "image/webp",
+                "video/mp4",
+                "video/mov",
+                "video/mkv",
+                "video/webm",
+                "video/flv",
+                "video/mpeg",
+                "video/mpg",
+                "video/wmv",
+                "video/3gp"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 10000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Nova Premier",
+        "model_path": [
+            "/amazon/deployments/nova-premier-v1/converse-stream",
+            "/amazon/deployments/nova-premier-v1/converse"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Imagen-3.0",
+        "model_mapping_id": "imagen-3.0-generate-001",
+        "name": "imagen-3-deprecated",
+        "input_tokens": 480,
+        "type": "image",
+        "model_id": "vertex/google/Imagen-3.0/generate-001",
+        "default_model": false,
+        "version": "generate-001",
+        "deprecation_info": {
+            "is_deprecated": true
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Imagen 3",
+        "model_path": [
+            "/google/deployments/imagen-3-deprecated/images/generations"
+        ],
+        "lifecycle": "Deprecated",
+        "fallback_model": "imagen-3.0-generate-002"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "DALLE-3",
+        "model_mapping_id": "dall-e-3-3.0",
+        "name": "dall-e-3-3.0",
+        "type": "image",
+        "model_id": "azure/openai/DALLE-3/3.0",
+        "default_model": false,
+        "version": "3.0",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-10-31"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Dall\u00b7e 3",
+        "model_path": [
+            "/openai/deployments/dall-e-3/images/generations"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-10-31"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Imagen-3.0",
+        "model_mapping_id": "imagen-3.0-generate-002",
+        "name": "imagen-3",
+        "input_tokens": 480,
+        "type": "image",
+        "model_id": "vertex/google/Imagen-3.0/generate-002",
+        "default_model": false,
+        "version": "generate-002",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Imagen 3",
+        "model_path": [
+            "/google/deployments/imagen-3/images/generations"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-4o-Mini",
+        "model_mapping_id": "gpt-4o-mini-2024-07-18",
+        "name": "gpt-4o-mini-2024-07-18",
+        "input_tokens": 128000,
+        "output_tokens": 16000,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-4o-Mini/2024-07-18",
+        "default_model": false,
+        "version": "2024-07-18",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-09-15"
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 16000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 4o Mini",
+        "model_path": [
+            "/openai/deployments/gpt-4o-mini/chat/completions"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-09-15"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "Text-Embedding-Ada-002",
+        "model_mapping_id": "text-embedding-ada-002-2",
+        "name": "text-embedding-ada-002-2",
+        "input_tokens": 2046,
+        "type": "embedding",
+        "model_id": "azure/openai/Text-Embedding-Ada-002/2",
+        "default_model": false,
+        "version": "2",
+        "deprecation_info": {
+            "is_deprecated": false,
+            "scheduled_deprecation_date": "2026-04-30"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Text Embedding Ada 002",
+        "model_path": [
+            "/openai/deployments/text-embedding-ada-002/embeddings"
+        ],
+        "lifecycle": "Generally Available",
+        "deprecation_date": "2026-04-30",
+        "fallback_model": "text-embedding-3-large"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-5-Nano",
+        "model_mapping_id": "gpt-5-nano-2025-08-07",
+        "name": "gpt-5-nano-2025-08-07",
+        "input_tokens": 400000,
+        "output_tokens": 128000,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-5-Nano/2025-08-07",
+        "default_model": false,
+        "version": "2025-08-07",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 128000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 5 Nano",
+        "model_path": [
+            "/openai/deployments/gpt-5-nano/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Gemini-Flash",
+        "model_mapping_id": "gemini-1.5-flash",
+        "name": "gemini-1.5-flash",
+        "input_tokens": 1048576,
+        "output_tokens": 8192,
+        "type": "chat_completion",
+        "model_id": "vertex/google/Gemini-Flash/1.5-flash",
+        "default_model": false,
+        "version": "1.5-flash",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-09-24"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 8192,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": 0.95,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gemini 1.5 Flash",
+        "model_path": [
+            "/google/deployments/gemini-1.5-flash/chat/completions"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-09-24",
+        "fallback_model": "gemini-2.0-flash"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Gemini-Flash",
+        "model_mapping_id": "gemini-2.0-flash",
+        "name": "gemini-2.0-flash",
+        "input_tokens": 1048576,
+        "output_tokens": 8192,
+        "type": "chat_completion",
+        "model_id": "vertex/google/Gemini-Flash/2.0-flash",
+        "default_model": false,
+        "version": "2.0-flash",
+        "deprecation_info": {
+            "is_deprecated": false,
+            "scheduled_deprecation_date": "2026-02-05"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": [
+                "application/pdf",
+                "text/csv",
+                "text/plain",
+                "text/markdown",
+                "text/html",
+                "text/xml",
+                "audio/wav",
+                "audio/mp3",
+                "audio/aiff",
+                "audio/aac",
+                "audio/ogg",
+                "audio/flac",
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/heic",
+                "image/heif",
+                "video/mp4",
+                "video/mpeg",
+                "video/mov",
+                "video/avi",
+                "video/x-flv",
+                "video/mpg",
+                "video/webm",
+                "video/wmv",
+                "video/3gpp"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 8192,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": 0.95,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gemini 2.0 Flash",
+        "model_path": [
+            "/google/deployments/gemini-2.0-flash/chat/completions"
+        ],
+        "lifecycle": "Nearing Deprecation",
+        "deprecation_date": "2026-02-05"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-4o",
+        "model_mapping_id": "gpt-4o-2024-05-13",
+        "name": "gpt-4o-2024-05-13",
+        "input_tokens": 128000,
+        "output_tokens": 16384,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-4o/2024-05-13",
+        "default_model": false,
+        "version": "2024-05-13",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-09-15"
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": null,
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 16384,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 4o",
+        "model_path": [
+            "/openai/deployments/gpt-4o/chat/completions"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-09-15",
+        "fallback_model": "gpt-4o-2024-11-20"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-5",
+        "model_mapping_id": "gpt-5-2025-08-07",
+        "name": "gpt-5-2025-08-07",
+        "input_tokens": 400000,
+        "output_tokens": 128000,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-5/2025-08-07",
+        "default_model": false,
+        "version": "2025-08-07",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 128000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 5",
+        "model_path": [
+            "/openai/deployments/gpt-5/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "Text-Embedding-3-Small",
+        "model_mapping_id": "text-embedding-3-small-1",
+        "name": "text-embedding-3-small-1",
+        "type": "embedding",
+        "model_id": "azure/openai/Text-Embedding-3-Small/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false,
+            "scheduled_deprecation_date": "2026-04-30"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Text Embedding 3 Small",
+        "model_path": [
+            "/openai/deployments/text-embedding-3-small/embeddings"
+        ],
+        "lifecycle": "Generally Available",
+        "deprecation_date": "2026-04-30"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Gemini-Pro",
+        "model_mapping_id": "gemini-2.5-pro",
+        "name": "gemini-2.5-pro",
+        "input_tokens": 1048576,
+        "output_tokens": 65535,
+        "type": "chat_completion",
+        "model_id": "vertex/google/Gemini-Pro/2.5-pro",
+        "default_model": false,
+        "version": "2.5-pro",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": [
+                "application/pdf",
+                "text/csv",
+                "text/plain",
+                "text/markdown",
+                "text/html",
+                "text/xml",
+                "audio/wav",
+                "audio/mp3",
+                "audio/aiff",
+                "audio/aac",
+                "audio/ogg",
+                "audio/flac",
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/heic",
+                "image/heif",
+                "video/mp4",
+                "video/mpeg",
+                "video/mov",
+                "video/avi",
+                "video/x-flv",
+                "video/mpg",
+                "video/webm",
+                "video/wmv",
+                "video/3gpp"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 65535,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "array",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "thinking_budget": {
+                "default": null,
+                "description": "Allows control over hov much model thinks during its responses",
+                "maximum": 32768,
+                "minimum": 128,
+                "title": "Thinking Budget",
+                "type": "integer",
+                "required": false
+            },
+            "top_p": {
+                "default": 0.95,
+                "description": "Nucleus sampling parameter controlling diversity of the output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gemini 2.5 Pro",
+        "model_path": [
+            "/google/deployments/gemini-2.5-pro/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "anthropic",
+        "model_name": "Claude-3-Haiku",
+        "model_mapping_id": "claude-3-haiku",
+        "name": "claude-3-haiku",
+        "input_tokens": 200000,
+        "output_tokens": 4096,
+        "type": "chat_completion",
+        "model_id": "bedrock/anthropic/Claude-3-Haiku/3",
+        "default_model": false,
+        "version": "3",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+                "application/pdf",
+                "application/docx",
+                "text/csv",
+                "application/doc",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": 4096,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 4096,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": 0.7,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": 1,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Claude 3 Haiku",
+        "model_path": [
+            "/anthropic/deployments/claude-3-haiku/converse",
+            "/anthropic/deployments/claude-3-haiku/converse-stream"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Text-Multilingual-Embedding",
+        "model_mapping_id": "text-multilingual-embedding-002",
+        "name": "text-multilingual-embedding-002",
+        "type": "embedding",
+        "model_id": "vertex/google/Text-Multilingual-Embedding/002",
+        "default_model": false,
+        "version": "002",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Text Multilingual Embedding",
+        "model_path": [
+            "/google/deployments/text-multilingual-embedding-002/embeddings"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "Text-Embedding-3-Large",
+        "model_mapping_id": "text-embedding-3-large-1",
+        "name": "text-embedding-3-large-1",
+        "input_tokens": 8191,
+        "type": "embedding",
+        "model_id": "azure/openai/Text-Embedding-3-Large/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false,
+            "scheduled_deprecation_date": "2026-04-30"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Text Embedding 3 Large",
+        "model_path": [
+            "/openai/deployments/text-embedding-3-large/embeddings"
+        ],
+        "lifecycle": "Generally Available",
+        "deprecation_date": "2026-04-30"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "amazon",
+        "model_name": "Titan-Embed-Text",
+        "model_mapping_id": "titan-embed-text-v2",
+        "name": "titan-embed-text",
+        "input_tokens": 8192,
+        "type": "embedding",
+        "model_id": "bedrock/amazon/Titan-Embed-Text/2",
+        "default_model": false,
+        "version": "2",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {},
+        "model_label": "Titan Embed Text",
+        "model_path": [
+            "/amazon/deployments/titan-embed-text/invoke"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "anthropic",
+        "model_name": "Claude-37-Sonnet",
+        "model_mapping_id": "claude-3-7-sonnet",
+        "name": "claude-3-7-sonnet",
+        "input_tokens": 200000,
+        "output_tokens": 128000,
+        "type": "chat_completion",
+        "model_id": "bedrock/anthropic/Claude-37-Sonnet/3",
+        "default_model": false,
+        "version": "3",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+                "application/pdf",
+                "application/docx",
+                "text/csv",
+                "application/doc",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": 128000,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 128000,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Claude 3.7 Sonnet",
+        "model_path": [
+            "/anthropic/deployments/claude-3-7-sonnet/converse",
+            "/anthropic/deployments/claude-3-7-sonnet/converse-stream"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Gemini-Pro",
+        "model_mapping_id": "gemini-1.5-pro",
+        "name": "gemini-1.5-pro",
+        "input_tokens": 1048576,
+        "output_tokens": 8192,
+        "type": "chat_completion",
+        "model_id": "vertex/google/Gemini-Pro/1.5-pro",
+        "default_model": false,
+        "version": "1.5-pro",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-09-24"
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": [
+                "application/pdf",
+                "text/csv",
+                "text/plain",
+                "text/markdown",
+                "text/html",
+                "text/xml",
+                "audio/wav",
+                "audio/mp3",
+                "audio/aiff",
+                "audio/aac",
+                "audio/ogg",
+                "audio/flac",
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/heic",
+                "image/heif",
+                "video/mp4",
+                "video/mpeg",
+                "video/mov",
+                "video/avi",
+                "video/x-flv",
+                "video/mpg",
+                "video/webm",
+                "video/wmv",
+                "video/3gpp"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 8192,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": 0.95,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gemini 1.5 Pro",
+        "model_path": [
+            "/google/deployments/gemini-1.5-pro/chat/completions"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-09-24",
+        "fallback_model": "gemini-2.0-flash"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Gemini-Flash",
+        "model_mapping_id": "gemini-2.5-flash",
+        "name": "gemini-2.5-flash",
+        "input_tokens": 1048576,
+        "output_tokens": 65535,
+        "type": "chat_completion",
+        "model_id": "vertex/google/Gemini-Flash/2.5-flash",
+        "default_model": false,
+        "version": "2.5-flash",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": [
+                "application/pdf",
+                "text/csv",
+                "text/plain",
+                "text/markdown",
+                "text/html",
+                "text/xml",
+                "audio/wav",
+                "audio/mp3",
+                "audio/aiff",
+                "audio/aac",
+                "audio/ogg",
+                "audio/flac",
+                "image/png",
+                "image/jpeg",
+                "image/webp",
+                "image/heic",
+                "image/heif",
+                "video/mp4",
+                "video/mpeg",
+                "video/mov",
+                "video/avi",
+                "video/x-flv",
+                "video/mpg",
+                "video/webm",
+                "video/wmv",
+                "video/3gpp"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 65535,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "array",
+                "required": false
+            },
+            "temperature": {
+                "default": 1,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "thinking_budget": {
+                "default": null,
+                "description": "Allows control over hov much model thinks during its responses",
+                "maximum": 24576,
+                "minimum": 1,
+                "title": "Thinking Budget",
+                "type": "integer",
+                "required": false
+            },
+            "top_p": {
+                "default": 0.95,
+                "description": "Nucleus sampling parameter controlling diversity of the output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gemini 2.5 Flash",
+        "model_path": [
+            "/google/deployments/gemini-2.5-flash/chat/completions"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "vertex",
+        "creator": "google",
+        "model_name": "Imagen-3.0-Fast",
+        "model_mapping_id": "imagen-3.0-fast-generate-001",
+        "name": "imagen-3-fast",
+        "input_tokens": 480,
+        "type": "image",
+        "model_id": "vertex/google/Imagen-3.0-Fast/generate-001",
+        "default_model": false,
+        "version": "generate-001",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": null,
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": false
+        },
+        "parameters": {
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output",
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Imagen 3 Fast",
+        "model_path": [
+            "/google/deployments/imagen-3-fast/images/generations"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "anthropic",
+        "model_name": "Claude-35-Sonnet",
+        "model_mapping_id": "claude-3-5-sonnet",
+        "name": "claude-3-5-sonnet",
+        "input_tokens": 200000,
+        "output_tokens": 8192,
+        "type": "chat_completion",
+        "model_id": "bedrock/anthropic/Claude-35-Sonnet/3",
+        "default_model": false,
+        "version": "3",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": false,
+            "multimodal": [
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+                "application/pdf",
+                "application/docx",
+                "text/csv",
+                "application/doc",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown"
+            ],
+            "functions": true,
+            "parallel_function_calling": false,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": 8192,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 8192,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": 0.7,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Claude 3.5 Sonnet",
+        "model_path": [
+            "/anthropic/deployments/claude-3-5-sonnet/converse"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "bedrock",
+        "creator": "amazon",
+        "model_name": "Nova-Lite",
+        "model_mapping_id": "nova-lite-v1",
+        "name": "nova-lite-v1",
+        "input_tokens": 300000,
+        "output_tokens": 10000,
+        "type": "chat_completion",
+        "model_id": "bedrock/amazon/Nova-Lite/1",
+        "default_model": false,
+        "version": "1",
+        "deprecation_info": {
+            "is_deprecated": false
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "application/pdf",
+                "application/docx",
+                "application/doc",
+                "text/csv",
+                "application/xls",
+                "application/xlsx",
+                "text/html",
+                "text/plain",
+                "text/markdown",
+                "image/png",
+                "image/jpeg",
+                "image/jpg",
+                "image/gif",
+                "image/webp",
+                "video/mp4",
+                "video/mov",
+                "video/mkv",
+                "video/webm",
+                "video/flv",
+                "video/mpeg",
+                "video/mpg",
+                "video/wmv",
+                "video/3gp"
+            ],
+            "functions": false,
+            "parallel_function_calling": false,
+            "json_mode": false,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 10000,
+                "title": "Max output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Nova Lite",
+        "model_path": [
+            "/amazon/deployments/nova-lite-v1/converse",
+            "/amazon/deployments/nova-lite-v1/converse-stream"
+        ],
+        "lifecycle": "Generally Available"
+    },
+    {
+        "provider": "azure",
+        "creator": "openai",
+        "model_name": "GPT-4o",
+        "model_mapping_id": "gpt-4o-2024-08-06",
+        "name": "gpt-4o-2024-08-06",
+        "input_tokens": 128000,
+        "output_tokens": 16384,
+        "type": "chat_completion",
+        "model_id": "azure/openai/GPT-4o/2024-08-06",
+        "default_model": false,
+        "version": "2024-08-06",
+        "deprecation_info": {
+            "is_deprecated": true,
+            "scheduled_deprecation_date": "2025-10-15"
+        },
+        "supported_capabilities": {
+            "streaming": true,
+            "multimodal": [
+                "image/png",
+                "image/jpeg",
+                "image/gif",
+                "image/webp",
+                "text/x-c",
+                "text/x-csharp",
+                "text/x-c++",
+                "application/msword",
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "text/html",
+                "text/x-java",
+                "application/json",
+                "text/markdown",
+                "application/pdf",
+                "text/x-php",
+                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+                "text/x-python",
+                "text/x-script.python",
+                "text/x-ruby",
+                "text/x-tex",
+                "text/plain",
+                "text/css",
+                "text/javascript",
+                "application/x-sh",
+                "application/typescript"
+            ],
+            "functions": true,
+            "parallel_function_calling": true,
+            "json_mode": true,
+            "is_multimodal": true
+        },
+        "parameters": {
+            "max_tokens": {
+                "default": null,
+                "description": "Maximum number of tokens to generate",
+                "maximum": 16384,
+                "title": "Max Output Tokens",
+                "type": "integer",
+                "required": false
+            },
+            "stop": {
+                "default": null,
+                "description": "Allows to define sequences causing model to terminate generation",
+                "title": "Stop Sequences",
+                "type": "string",
+                "required": false
+            },
+            "temperature": {
+                "default": null,
+                "description": "Controls randomness of the generated output",
+                "maximum": 2,
+                "minimum": 0,
+                "title": "Temperature",
+                "type": "float",
+                "required": false
+            },
+            "top_p": {
+                "default": null,
+                "description": "Nucleus sampling parameter controlling diversity of the output.",
+                "maximum": 1,
+                "minimum": 0,
+                "title": "Top P",
+                "type": "float",
+                "required": false
+            }
+        },
+        "model_label": "Gpt 4o",
+        "model_path": [
+            "/openai/deployments/gpt-4o/chat/completions"
+        ],
+        "lifecycle": "Deprecated",
+        "deprecation_date": "2025-10-15",
+        "fallback_model": "gpt-4o-2024-11-20"
+    }
+]

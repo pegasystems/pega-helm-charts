@@ -1,0 +1,169 @@
+---
+# Enable the Autopilot Service deployment as a backing service.
+enabled: false
+
+deployment:
+  name: "autopilot"
+
+# -------------------------------------------------------------------
+# Docker image
+# -------------------------------------------------------------------
+docker:
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  registry:
+    url: YOUR_DOCKER_REGISTRY_URL
+    username: YOUR_DOCKER_REGISTRY_USERNAME
+    password: YOUR_DOCKER_REGISTRY_PASSWORD
+  # List pre-existing secrets to be used for pulling docker images.
+  imagePullSecretNames: []
+  autopilot:
+    image: YOUR_AUTOPILOT_SERVICE_IMAGE:TAG
+    imagePullPolicy: Always
+
+# -------------------------------------------------------------------
+# Replicas & Resources
+# -------------------------------------------------------------------
+replicas: 2
+
+resources:
+  requests:
+    cpu: 500m
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+
+# -------------------------------------------------------------------
+# Service
+# -------------------------------------------------------------------
+service:
+  port: 8080
+  targetPort: 8080
+  serviceType: ClusterIP
+
+# -------------------------------------------------------------------
+# Pod security context
+# -------------------------------------------------------------------
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+# -------------------------------------------------------------------
+# Health probes
+# -------------------------------------------------------------------
+livenessProbe:
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  failureThreshold: 3
+
+# -------------------------------------------------------------------
+# Autopilot service configuration
+# -------------------------------------------------------------------
+
+# Set to false for on-prem (direct provider connectivity).
+# Set to true when using Pega GenAI Hub gateway.
+enableGenaiHub: false
+
+# Disable internal auth for on-prem deployments.
+authEnabled: false
+isInternalDeployment: false
+
+# -------------------------------------------------------------------
+# Custom models file
+# -------------------------------------------------------------------
+# Option 1: Use the default models file bundled with this chart (files/default-models.json).
+#   Set deployModelsConfigMap: true. To customize, edit files/default-models.json before helm install.
+#
+# Option 2: Provide a pre-existing ConfigMap name containing models.json
+#   customModels:
+#     existingConfigMap: "my-models-configmap"
+#
+# Option 3: Inline the JSON content directly (created as a ConfigMap)
+#   customModels:
+#     inline: |
+#       [{"provider":"azure","creator":"openai","model_name":"GPT-5",...}]
+#
+# If none of the above are set, the service uses its built-in model list
+# and filters by available provider credentials.
+# -------------------------------------------------------------------
+deployModelsConfigMap: true
+customModels:
+  existingConfigMap: ""
+  inline: ""
+
+# -------------------------------------------------------------------
+# Provider selection
+# -------------------------------------------------------------------
+
+# Comma-separated list of providers to enable (e.g., "Azure,Vertex,Bedrock").
+# If empty, auto-detection based on available credentials is used.
+modelProviders: ""
+
+# AWS Bedrock region
+awsRegion: "us-east-1"
+
+# -------------------------------------------------------------------
+# Provider credentials
+# -------------------------------------------------------------------
+# Option 1: Inline credentials (auto-creates a Kubernetes Secret)
+# Option 2: Use a pre-existing secret (set providerCredentialsSecret)
+# Option 3: Use IAM roles (IRSA for AWS, Workload Identity for GCP)
+#            - no credentials needed, just set the serviceAccountName
+# -------------------------------------------------------------------
+
+# Pre-existing secret name containing provider credentials.
+# If set, inline credentials below are ignored.
+# The secret should contain keys matching the env var names
+# (e.g., AWS_ACCESS_KEY_ID, AZURE_ENDPOINT, AZURE_OPENAI_KEY, etc.)
+providerCredentialsSecret: ""
+
+# --- Azure OpenAI credentials ---
+azure:
+  endpoint: ""           # e.g., https://my-openai.openai.azure.com/
+  apiKey: ""             # Azure OpenAI API key
+  apiVersion: "2024-10-21"
+
+# --- AWS Bedrock credentials (leave empty if using IRSA/IAM roles) ---
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  sessionToken: ""       # Optional, for temporary credentials
+
+# --- Google Vertex AI credentials (leave empty if using Workload Identity) ---
+vertex:
+  credentials: ""        # Base64-encoded service account JSON key
+  applicationCredentialsFile: ""  # Or path to credentials file mounted in container
+  project: ""
+  location: "us-central1"
+
+# -------------------------------------------------------------------
+# IAM role-based authentication (recommended for production)
+# -------------------------------------------------------------------
+
+# Kubernetes service account name for IAM role binding.
+# For AWS IRSA: annotate the SA with eks.amazonaws.com/role-arn
+# For GCP Workload Identity: annotate the SA with iam.gke.io/gcp-service-account
+serviceAccountName: ""
+
+# -------------------------------------------------------------------
+# Ingress (optional)
+# -------------------------------------------------------------------
+ingress:
+  enabled: false
+  domain: ""
+  ingressClassName: ""
+  annotations: {}
+  labels: {}
+  tls:
+    enabled: false
+    secretName: ""
