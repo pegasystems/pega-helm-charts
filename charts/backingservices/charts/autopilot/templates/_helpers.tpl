@@ -53,6 +53,20 @@ tolerations:
 {{ end }}
 
 {{/*
+Validates and returns the OAuth public key URL when auth is enabled.
+Fails render if authEnabled is true but oauthPublicKeyURL is not set.
+*/}}
+{{- define "autopilot.oauthPublicKeyUrl" -}}
+{{- if .Values.authEnabled }}
+    {{- if .Values.oauthPublicKeyURL }}
+    {{- .Values.oauthPublicKeyURL | quote }}
+    {{- else }}
+    {{- fail "A valid entry is required for oauthPublicKeyURL when authEnabled is true. Set oauthPublicKeyURL to the IdP public key endpoint so the Autopilot service can validate incoming tokens from Pega Infinity." | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
 Autopilot secret name - uses pre-existing secret or auto-generated one
 */}}
 {{- define "autopilot.credentialsSecretName" -}}

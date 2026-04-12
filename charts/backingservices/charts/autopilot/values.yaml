@@ -37,7 +37,7 @@ resources:
 # Service
 # -------------------------------------------------------------------
 service:
-  port: 8080
+  port: 80
   targetPort: 8080
   serviceType: ClusterIP
 
@@ -77,6 +77,11 @@ enableGenaiHub: false
 # Disable internal auth for on-prem deployments.
 authEnabled: false
 isInternalDeployment: false
+
+# When authEnabled is true, set the URL of the Identity Provider (IdP) public key endpoint
+# so the Autopilot service can validate incoming OAuth Bearer tokens from Pega Infinity.
+# Example: "https://your-idp-host/oauth2/v1/keys"
+oauthPublicKeyURL: ""
 
 # -------------------------------------------------------------------
 # Custom models file

@@ -90,6 +90,10 @@ spec:
           value: {{ .Values.isInternalDeployment | quote }}
         - name: BLOCK_UNAUTH_REQUESTS
           value: {{ .Values.authEnabled | quote }}
+        {{- if .Values.authEnabled }}
+        - name: SAX_JWKS_URL
+          value: {{ include "autopilot.oauthPublicKeyUrl" . }}
+        {{- end }}
         {{- if .Values.modelProviders }}
         - name: MODEL_PROVIDERS
           value: {{ .Values.modelProviders | quote }}

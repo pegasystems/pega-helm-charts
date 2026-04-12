@@ -536,6 +536,31 @@ pegasearch:
     # Enter the external secret name below.
     external_secret_name: ""
 
+# Autopilot GenAI service settings.
+# Configure OAuth authentication between Pega Infinity and the on-premise Autopilot backing service.
+# The Autopilot service URL is configured separately via a Dynamic System Setting (DSS) in Pega Infinity.
+autopilot:
+  autopilotAuth:
+    # Set enabled to true to enable OAuth authentication between Pega Infinity and the Autopilot service.
+    enabled: false
+    # URL of the OAuth service endpoint to get the token for the Autopilot service.
+    url: ""
+    # Client ID used in the OAuth service.
+    clientId: ""
+    # Authentication type: only "private_key_jwt" is supported.
+    authType: "private_key_jwt"
+    # OAuth private PKCS8 key (Base64-encoded) used to get an authorization token.
+    # Required when external_secret_name is not set.
+    privateKey: ""
+    # Algorithm used to generate the private key. Allowed values: RS256, RS384, RS512, ES256, ES384, ES512.
+    privateKeyAlgorithm: ""
+    # Scopes set in the OAuth service required to grant access to the Autopilot service.
+    scopes: ""
+    # Name of a pre-existing Kubernetes Secret containing the private key or client secret.
+    # When set, the chart does not create a new secret and ignores the privateKey value above.
+    # The secret must contain the key "AUTOPILOT_OAUTH_PRIVATE_KEY".
+    external_secret_name: ""
+
 # Pega Installer settings.
 installer:
   image: "YOUR_INSTALLER_IMAGE:TAG"

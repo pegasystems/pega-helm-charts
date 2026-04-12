@@ -309,9 +309,9 @@ ingress:
 
 ## Connecting Pega Infinity with Autopilot Service
 
-After deploying the Autopilot Service, configure your Pega Infinity environment to connect to it by creating a Dynamic System Setting (DSS).
+After deploying the Autopilot Service, configure your Pega Infinity environment to connect to it. There are two ways to do this.
 
-### Steps
+### Option 1: Dynamic System Setting (DSS)
 
 1. Log in to Pega Infinity as an administrator.
 2. Navigate to **Records > SysAdmin > Dynamic System Settings** and create a new DSS with the following details:
@@ -320,18 +320,154 @@ After deploying the Autopilot Service, configure your Pega Infinity environment 
 |---|---|
 | **Owning Ruleset** | `Pega-Engine` |
 | **Setting Purpose** | `prconfig/services/genai/autopilot/servicebaseurl/default` |
-| **Value** | `http://<servicename>.<namespace>.svc.cluster.local:8080/` |
+| **Value** | `http://<servicename>.<namespace>.svc.cluster.local/` |
 
 3. Replace `<servicename>` with the Autopilot Service name (default: `autopilot`) and `<namespace>` with the Kubernetes namespace where the service is deployed.
-4. Save the DSS and restart the Pega nodes for the setting to take effect.
+4. Save the DSS.
 
-**Example:** If the Autopilot Service is deployed with the default name `autopilot` in the `mypega` namespace:
+**Example:** If the Autopilot Service is deployed with the default name `autopilot` in the `autopilot` namespace:
 
 ```
-http://autopilot.mypega.svc.cluster.local:8080/
+http://autopilot.autopilot.svc.cluster.local/
 ```
 
-**Note:** The service URL uses Kubernetes internal DNS resolution (`svc.cluster.local`), which ensures that traffic between Pega Infinity and the Autopilot Service stays within the cluster network. If Pega Infinity is running outside the cluster, use the ingress URL instead.
+5. **A restart of Pega Infinity nodes is required for the DSS change to take effect.**
+
+### Option 2: prconfig.xml
+
+Add the Autopilot service URL directly to `charts/pega/config/deploy/prconfig.xml` in the Pega Helm charts repository:
+
+```xml
+<env name="services/genai/autopilot/servicebaseurl" value="http://<servicename>.<namespace>.svc.cluster.local/"/>
+```
+
+**Example:**
+
+```xml
+<env name="services/genai/autopilot/servicebaseurl" value="http://autopilot.autopilot.svc.cluster.local/"/>
+```
+
+After editing `prconfig.xml`, apply the change with a `helm upgrade` followed by a rollout restart:
+
+```bash
+helm upgrade pega <pega-chart-path> -f my-values.yaml -n <pega-namespace>
+kubectl rollout restart statefulset/<pega-deployment-name> -n <pega-namespace>
+```
+
+**A restart of Pega Infinity is required whenever the prconfig.xml entry is added or changed.**
+
+### Precedence
+
+If the Autopilot service URL is configured by both methods, **`prconfig.xml` takes precedence over the DSS**.
+
+## OAuth authentication between Pega Infinity and the Autopilot service
+
+You can enable OAuth authentication to secure requests between Pega Infinity and the Autopilot service using an Identity Provider (IdP). The Autopilot service only supports the `private_key_jwt` authentication type.
+
+### How it works
+
+- Pega Infinity obtains a Bearer token from your IdP using an OAuth 2.0 `client_credentials` grant.
+- The token is attached as an `Authorization: Bearer <token>` header on every request to the Autopilot service.
+- The Autopilot service validates incoming tokens against the IdP public key endpoint (`oauthPublicKeyURL`).
+
+### Scopes
+
+The Autopilot service does not require any OAuth scopes. Leave `autopilot.autopilotAuth.scopes` empty (or omit it entirely) when configuring the Pega chart.
+
+### Shared credentials with SRS and token-minting precedence
+
+Pega Infinity uses a single set of `SERV_AUTH_*` environment variables to mint Bearer tokens for backing services. When both SRS auth (`pegasearch.srsAuth`) and Autopilot auth (`autopilot.autopilotAuth`) are enabled at the same time, **the SRS credentials take precedence** and are used to mint tokens sent to both SRS and the Autopilot service.
+
+This means:
+
+- Both SRS and Autopilot can share the same IdP client application and credentials.
+- You do not need separate client registrations for each backing service if both are pointed at the same IdP authorization server.
+- If only `autopilot.autopilotAuth` is enabled (SRS auth is disabled), the Autopilot credentials are used to mint tokens.
+- If both are enabled and credentials differ, the SRS credentials win — the Autopilot-specific credentials are not used for token minting.
+
+In practice, configure both backing services to trust the same IdP public key endpoint and issue tokens from the same client application. The recommended setup when both services are deployed together:
+
+```yaml
+# pega chart values
+pegasearch:
+  srsAuth:
+    enabled: true
+    url: "https://your-idp-host/oauth2/v1/token"
+    clientId: "your-shared-client-id"
+    authType: "private_key_jwt"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<base64-encoded-PKCS8-key>"
+
+autopilot:
+  autopilotAuth:
+    enabled: true
+    url: "https://your-idp-host/oauth2/v1/token"
+    clientId: "your-shared-client-id"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<base64-encoded-PKCS8-key>"
+    scopes: ""   # Autopilot requires no scopes
+```
+
+Because SRS takes precedence, the token sent to Autopilot is minted using the SRS credentials above. Both services must therefore trust tokens issued for the same client.
+
+### Autopilot service configuration (backingservices chart)
+
+Enable auth on the Autopilot service and set the IdP public key URL so it can validate incoming tokens:
+
+| Parameter | Description | Default |
+|---|---|---|
+| `authEnabled` | Enables token validation on incoming requests to the Autopilot service. | `false` |
+| `oauthPublicKeyURL` | URL of the IdP public key endpoint used to verify Bearer tokens. Required when `authEnabled` is `true`. | `""` |
+
+```yaml
+autopilot:
+  enabled: true
+  authEnabled: true
+  oauthPublicKeyURL: "https://your-idp-host/oauth2/v1/keys"
+```
+
+### Pega Infinity configuration (pega chart)
+
+Configure the Pega chart to mint tokens and attach them to Autopilot requests. The Autopilot service URL itself is configured via a DSS in Pega Infinity (see "Connecting Pega Infinity with Autopilot Service" above) — no URL parameter is needed in the pega chart.
+
+| Parameter | Description | Default |
+|---|---|---|
+| `autopilot.autopilotAuth.enabled` | Enables OAuth token minting on the Pega Infinity side. | `false` |
+| `autopilot.autopilotAuth.url` | URL of the OAuth service endpoint to obtain a token. | `""` |
+| `autopilot.autopilotAuth.clientId` | OAuth client ID. | `""` |
+| `autopilot.autopilotAuth.authType` | Authentication type. Only `private_key_jwt` is supported. | `"private_key_jwt"` |
+| `autopilot.autopilotAuth.privateKey` | Base64-encoded PKCS8 private key. | `""` |
+| `autopilot.autopilotAuth.privateKeyAlgorithm` | Algorithm for the private key. Allowed values: `RS256`, `RS384`, `RS512`, `ES256`, `ES384`, `ES512`. Defaults to `RS256` if not set. | `""` |
+| `autopilot.autopilotAuth.scopes` | OAuth scopes to request. The Autopilot service does not require any scopes — leave this empty. | `""` |
+| `autopilot.autopilotAuth.external_secret_name` | Name of a pre-existing Kubernetes Secret containing the key (key: `AUTOPILOT_OAUTH_PRIVATE_KEY`). When set, `privateKey` is ignored and no secret is created by the chart. | `""` |
+
+```yaml
+autopilot:
+  autopilotAuth:
+    enabled: true
+    url: "https://your-idp-host/oauth2/v1/token"
+    clientId: "your-client-id"
+    privateKey: "LS0tLS1CRUdJTiBSU0Eg...<base64-encoded-PKCS8-key>"
+    privateKeyAlgorithm: "RS256"
+    scopes: ""   # no scopes required for Autopilot
+```
+
+### Using a pre-existing secret
+
+To avoid placing the private key directly in `values.yaml`, create a Kubernetes Secret beforehand and reference it:
+
+```bash
+kubectl create secret generic my-autopilot-auth-secret \
+  --namespace <pega-namespace> \
+  --from-literal=AUTOPILOT_OAUTH_PRIVATE_KEY="<base64-encoded-PKCS8-key>"
+```
+
+Then set in the pega chart values:
+
+```yaml
+autopilot:
+  autopilotAuth:
+    enabled: true
+    external_secret_name: "my-autopilot-auth-secret"
+```
 
 ## Example: Full deployment configuration
 

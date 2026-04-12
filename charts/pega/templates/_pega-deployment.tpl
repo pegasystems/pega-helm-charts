@@ -232,6 +232,11 @@ spec:
 {{- else }}
   {{- fail "pegasearch.srsAuth.authType must be either private_key_jwt or client_secret_basic." }}
 {{- end }}
+{{- else if (.root.Values.autopilot.autopilotAuth).enabled }}
+        - name: SERV_AUTH_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+{{- include "autopilotAuthEnvSecretFrom"  .root | indent 14 }}
 {{- end }}
         envFrom:
         - configMapRef:
