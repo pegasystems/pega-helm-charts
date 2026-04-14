@@ -26,32 +26,6 @@ spec:
         {{ toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
-      {{- if .Values.serviceAccountName }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
-      {{- end }}
-      imagePullSecrets:
-      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "autopilot" ) }}
-      {{- if .Values.docker.imagePullSecretNames }}
-      {{- range .Values.docker.imagePullSecretNames }}
-      - name: {{ . }}
-      {{- end }}
-      {{- end }}
-      {{- if or (include "autopilot.hasCustomModels" .) .Values.vertex.applicationCredentialsFile }}
-      volumes:
-      {{- if (include "autopilot.hasCustomModels" .) }}
-      - name: custom-models
-        configMap:
-          name: {{ include "autopilot.modelsConfigMapName" . }}
-      {{- end }}
-      {{- if .Values.vertex.applicationCredentialsFile }}
-      - name: gcp-credentials
-        secret:
-          secretName: {{ include "autopilot.credentialsSecretName" . }}
-          items:
-          - key: GOOGLE_APPLICATION_CREDENTIALS_JSON
-            path: gcp-sa-key.json
-      {{- end }}
-      {{- end }}
       containers:
       - name: autopilot
         image: {{ .Values.docker.autopilot.image }}
@@ -66,19 +40,12 @@ spec:
           {{- if .Values.securityContext }}
           {{ toYaml .Values.securityContext | nindent 10 }}
           {{- end }}
-        {{- if or (include "autopilot.hasCustomModels" .) .Values.vertex.applicationCredentialsFile }}
-        volumeMounts:
         {{- if (include "autopilot.hasCustomModels" .) }}
+        volumeMounts:
         - name: custom-models
           mountPath: /config/models.json
           subPath: models.json
           readOnly: true
-        {{- end }}
-        {{- if .Values.vertex.applicationCredentialsFile }}
-        - name: gcp-credentials
-          mountPath: /config/gcp
-          readOnly: true
-        {{- end }}
         {{- end }}
         env:
         # Core service configuration
@@ -151,11 +118,7 @@ spec:
         {{- end }}
         {{- end }}
         # Google Vertex AI
-        {{- if or .Values.vertex.credentials .Values.vertex.applicationCredentialsFile .Values.providerCredentialsSecret }}
-        {{- if .Values.vertex.applicationCredentialsFile }}
-        - name: GOOGLE_APPLICATION_CREDENTIALS
-          value: "/config/gcp/gcp-sa-key.json"
-        {{- else }}
+        {{- if or .Values.vertex.credentials .Values.providerCredentialsSecret }}
         - name: vertex_auth
           valueFrom:
             secretKeyRef:
@@ -163,13 +126,8 @@ spec:
               key: VERTEX_AUTH
               optional: true
         {{- end }}
-        {{- end }}
-        {{- if .Values.vertex.project }}
-        - name: GOOGLE_CLOUD_PROJECT
-          value: {{ .Values.vertex.project | quote }}
-        {{- end }}
         {{- if .Values.vertex.location }}
-        - name: GOOGLE_CLOUD_LOCATION
+        - name: VERTEX_LOCATION
           value: {{ .Values.vertex.location | quote }}
         {{- end }}
         livenessProbe:

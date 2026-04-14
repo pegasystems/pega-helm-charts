@@ -18,7 +18,7 @@ docker:
   imagePullSecretNames: []
   autopilot:
     image: YOUR_AUTOPILOT_SERVICE_IMAGE:TAG
-    imagePullPolicy: Always
+    imagePullPolicy: IfNotPresent
 
 # -------------------------------------------------------------------
 # Replicas & Resources
@@ -122,8 +122,6 @@ awsRegion: "us-east-1"
 # -------------------------------------------------------------------
 # Option 1: Inline credentials (auto-creates a Kubernetes Secret)
 # Option 2: Use a pre-existing secret (set providerCredentialsSecret)
-# Option 3: Use IAM roles (IRSA for AWS, Workload Identity for GCP)
-#            - no credentials needed, just set the serviceAccountName
 # -------------------------------------------------------------------
 
 # Pre-existing secret name containing provider credentials.
@@ -138,27 +136,16 @@ azure:
   apiKey: ""             # Azure OpenAI API key
   apiVersion: "2024-10-21"
 
-# --- AWS Bedrock credentials (leave empty if using IRSA/IAM roles) ---
+# --- AWS Bedrock credentials ---
 aws:
   accessKeyId: ""
   secretAccessKey: ""
   sessionToken: ""       # Optional, for temporary credentials
 
-# --- Google Vertex AI credentials (leave empty if using Workload Identity) ---
+# --- Google Vertex AI credentials ---
 vertex:
-  credentials: ""        # Base64-encoded service account JSON key
-  applicationCredentialsFile: ""  # Or path to credentials file mounted in container
-  project: ""
+  credentials: ""        # Base64-encoded service account JSON key (project_id is auto-extracted)
   location: "us-central1"
-
-# -------------------------------------------------------------------
-# IAM role-based authentication (recommended for production)
-# -------------------------------------------------------------------
-
-# Kubernetes service account name for IAM role binding.
-# For AWS IRSA: annotate the SA with eks.amazonaws.com/role-arn
-# For GCP Workload Identity: annotate the SA with iam.gke.io/gcp-service-account
-serviceAccountName: ""
 
 # -------------------------------------------------------------------
 # Ingress (optional)

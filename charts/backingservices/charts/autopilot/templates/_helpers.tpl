@@ -82,7 +82,7 @@ Autopilot secret name - uses pre-existing secret or auto-generated one
 Check if any inline credentials are provided
 */}}
 {{- define "autopilot.hasInlineCredentials" -}}
-{{- if or .Values.azure.endpoint .Values.azure.apiKey .Values.aws.accessKeyId .Values.vertex.credentials .Values.vertex.applicationCredentialsFile -}}
+{{- if or .Values.azure.endpoint .Values.azure.apiKey .Values.aws.accessKeyId .Values.vertex.credentials -}}
 true
 {{- end -}}
 {{- end -}}

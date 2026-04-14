@@ -11,8 +11,8 @@ You can provision the Autopilot Service into your `pega` environment namespace, 
 | Provider | Authentication Methods |
 |---|---|
 | Azure OpenAI | API Key, Pre-existing Secret |
-| AWS Bedrock | Access Key/Secret, IAM Roles (IRSA) |
-| Google Vertex AI | Service Account JSON Key, Workload Identity |
+| AWS Bedrock | Access Key/Secret, Pre-existing Secret |
+| Google Vertex AI | Service Account JSON (base64-encoded), Pre-existing Secret |
 
 ## Configuration settings
 
@@ -33,15 +33,14 @@ You can provision the Autopilot Service into your `pega` environment namespace, 
 | `enableGenaiHub` | Set to `false` for on-prem deployments with direct provider connectivity. Default is `false`. |
 | `authEnabled` | Enable or disable authentication for the service. Default is `false`. |
 | `isInternalDeployment` | Set to `false` for on-prem deployments. Default is `false`. |
-| `modelProviders` | Comma-separated list of providers to enable (e.g., `"Azure,Vertex,Bedrock"`). If empty, auto-detection based on available credentials is used. |
+| `modelProviders` | Comma-separated list of providers to enable (e.g., `"Azure,Vertex,Bedrock"`). Filters the model list to only include models from the specified providers. If empty, all models from the model list are returned. |
 | `awsRegion` | AWS region for Bedrock. Default is `us-east-1`. |
-| `serviceAccountName` | Kubernetes service account name for IAM role binding (IRSA or Workload Identity). |
 | `affinity` | Define pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. |
 | `tolerations` | Define pod tolerations so that it is allowed to run on node(s) with particular taints. |
 
 ## Provider credentials
 
-The Autopilot Service supports three methods for providing LLM provider credentials.
+The Autopilot Service supports two methods for providing LLM provider credentials.
 
 ### Option 1: Inline credentials (auto-creates Kubernetes Secret)
 
@@ -55,9 +54,7 @@ Specify provider credentials directly in your values file. The chart automatical
 | `aws.accessKeyId` | AWS access key ID for Bedrock. |
 | `aws.secretAccessKey` | AWS secret access key for Bedrock. |
 | `aws.sessionToken` | Optional AWS session token for temporary credentials. |
-| `vertex.credentials` | Base64-encoded Google service account JSON key. |
-| `vertex.applicationCredentialsFile` | Path to credentials file mounted in container. |
-| `vertex.project` | Google Cloud project ID. |
+| `vertex.credentials` | Base64-encoded Google service account JSON key. The `project_id` is automatically extracted from the JSON. |
 | `vertex.location` | Vertex AI location. Default is `us-central1`. |
 
 ```yaml
@@ -71,7 +68,6 @@ autopilot:
     secretAccessKey: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
   vertex:
     credentials: "base64-encoded-service-account-json"
-    project: "my-gcp-project"
     location: "us-central1"
 ```
 
@@ -83,15 +79,16 @@ Use a secret that you create and manage outside of this chart. Set `providerCred
 |---|---|
 | `providerCredentialsSecret` | Name of an existing Kubernetes Secret containing provider credentials. When set, inline credentials are ignored. |
 
-The secret should contain the applicable keys:
+The secret can contain credentials for all providers in a single secret. Only the keys relevant to the providers you are using need to be present — all keys are mounted as `optional: true` so missing keys are silently ignored.
 
-| Key | Description |
-|---|---|
-| `AZURE_ENDPOINT` | Azure OpenAI endpoint URL |
-| `AZURE_OPENAI_KEY` | Azure OpenAI API key |
-| `AWS_ACCESS_KEY_ID` | AWS access key ID |
-| `AWS_SECRET_ACCESS_KEY` | AWS secret access key |
-| `AWS_SESSION_TOKEN` | AWS session token (optional) |
+| Key | Provider | Description |
+|---|---|---|
+| `AZURE_ENDPOINT` | Azure OpenAI | Azure OpenAI endpoint URL (e.g. `https://my-openai.openai.azure.com/`) |
+| `AZURE_OPENAI_KEY` | Azure OpenAI | Azure OpenAI API key |
+| `AWS_ACCESS_KEY_ID` | AWS Bedrock | AWS access key ID |
+| `AWS_SECRET_ACCESS_KEY` | AWS Bedrock | AWS secret access key |
+| `AWS_SESSION_TOKEN` | AWS Bedrock | AWS session token (optional, for temporary credentials) |
+| `VERTEX_AUTH` | Google Vertex AI | Base64-encoded Google service account JSON. The Autopilot service base64-decodes this value itself, so the secret must hold the base64 string — not the raw JSON. |
 
 ```yaml
 autopilot:
@@ -99,63 +96,49 @@ autopilot:
   providerCredentialsSecret: "my-provider-credentials"
 ```
 
-Create the secret manually:
+Create the secret with credentials for all providers you intend to use. For `VERTEX_AUTH`, pass the base64-encoded JSON using `$(base64 -w0 ...)` so the pod receives the encoded string the service expects:
 
 ```bash
 kubectl create secret generic my-provider-credentials \
   --namespace <NAMESPACE> \
   --from-literal=AZURE_ENDPOINT="https://my-openai.openai.azure.com/" \
-  --from-literal=AZURE_OPENAI_KEY="your-api-key" \
+  --from-literal=AZURE_OPENAI_KEY="your-azure-api-key" \
   --from-literal=AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE" \
-  --from-literal=AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  --from-literal=AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" \
+  --from-literal=AWS_SESSION_TOKEN="your-session-token" \
+  --from-literal=VERTEX_AUTH="$(base64 -w0 /path/to/gcp-service-account.json)"
 ```
 
-### Option 3: IAM role-based authentication (recommended for production)
-
-Use cloud-native IAM roles with no static credentials. For AWS, use IRSA (IAM Roles for Service Accounts). For GCP, use Workload Identity.
-
-| Configuration | Usage |
-|---|---|
-| `serviceAccountName` | Name of the Kubernetes service account annotated with the IAM role. |
-
-**AWS IRSA example:**
+You can also create the secret from a YAML manifest to manage it in source control. For `VERTEX_AUTH`, put the base64-encoded JSON string directly in `stringData`:
 
 ```yaml
-autopilot:
-  enabled: true
-  serviceAccountName: "autopilot-sa"
-```
-
-Annotate the service account with the IAM role:
-
-```bash
-kubectl annotate serviceaccount autopilot-sa \
-  --namespace <NAMESPACE> \
-  eks.amazonaws.com/role-arn=arn:aws:iam::123456789012:role/autopilot-bedrock-role
-```
-
-**GCP Workload Identity example:**
-
-```yaml
-autopilot:
-  enabled: true
-  serviceAccountName: "autopilot-sa"
-  vertex:
-    project: "my-gcp-project"
-    location: "us-central1"
-```
-
-Annotate the service account:
-
-```bash
-kubectl annotate serviceaccount autopilot-sa \
-  --namespace <NAMESPACE> \
-  iam.gke.io/gcp-service-account=autopilot@my-gcp-project.iam.gserviceaccount.com
+apiVersion: v1
+kind: Secret
+metadata:
+  name: my-provider-credentials
+  namespace: <NAMESPACE>
+type: Opaque
+stringData:
+  AZURE_ENDPOINT: "https://my-openai.openai.azure.com/"
+  AZURE_OPENAI_KEY: "your-azure-api-key"
+  AWS_ACCESS_KEY_ID: "AKIAIOSFODNN7EXAMPLE"
+  AWS_SECRET_ACCESS_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  AWS_SESSION_TOKEN: "your-session-token"   # omit if not using temporary credentials
+  VERTEX_AUTH: "<base64-encoded-gcp-service-account-json>"  # base64 encode the JSON file: base64 -w0 gcp-service-account.json
 ```
 
 ## Custom models configuration
 
 The Autopilot Service uses a model list to determine which LLM models are available. Each model entry follows the format used by the `model_id` field: `provider/creator/model_name/version` (e.g., `azure/openai/GPT-5/2025-08-07`). The service routes requests to the appropriate provider endpoint based on this model metadata.
+
+### Default fast and smart models
+
+The service automatically assigns default `fast` and `smart` models from the model list:
+- **1st model** in the list -> `fast`
+- **2nd model** in the list -> `smart`
+- If only one model is available, it is used for both.
+
+To control which models are assigned as defaults, order your models file accordingly — the first two entries will be picked as `fast` and `smart` respectively.
 
 ### Option 1: Use the default models file bundled with the chart (recommended)
 
@@ -259,9 +242,9 @@ The Autopilot Service uses liveness and readiness probes on the `/v1/health` end
 
 Parameter             | Description    | Default `livenessProbe` | Default `readinessProbe`
 ---                   | ---            | ---                     | ---
-`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `10` | `5`
-`timeoutSeconds`      | Number of seconds after which the probe times out. | `5` | `5`
-`periodSeconds`       | How often (in seconds) to perform the probe. | `30` | `10`
+`initialDelaySeconds` | Number of seconds after the container has started before probes are initiated. | `10` | `10`
+`timeoutSeconds`      | Number of seconds after which the probe times out. | `10` | `10`
+`periodSeconds`       | How often (in seconds) to perform the probe. | `10` | `10`
 `successThreshold`    | Minimum consecutive successes for the probe to be considered successful after it determines a failure. | `1` | `1`
 `failureThreshold`    | The number of consecutive failures for the pod to be terminated by Kubernetes. | `3` | `3`
 
@@ -270,13 +253,13 @@ Example:
 ```yaml
 livenessProbe:
   initialDelaySeconds: 10
-  timeoutSeconds: 5
-  periodSeconds: 30
+  timeoutSeconds: 10
+  periodSeconds: 10
   successThreshold: 1
   failureThreshold: 3
 readinessProbe:
-  initialDelaySeconds: 5
-  timeoutSeconds: 5
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
   periodSeconds: 10
   successThreshold: 1
   failureThreshold: 3
@@ -501,14 +484,13 @@ autopilot:
 
   vertex:
     credentials: "base64-encoded-service-account-json"
-    project: "my-gcp-project"
     location: "us-central1"
 
   resources:
     requests:
       cpu: 500m
-      memory: "2Gi"
+      memory: "1Gi"
     limits:
-      cpu: 2000m
-      memory: "4Gi"
+      cpu: "1"
+      memory: "2Gi"
 ```
