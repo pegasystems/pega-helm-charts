@@ -1,10 +1,19 @@
 # Autopilot Service Helm chart
 
-The Pega `Autopilot Service` backing service provides AI-powered capabilities for Pega Infinity Platform by connecting directly to LLM providers (Azure OpenAI, AWS Bedrock, Google Vertex AI). This chart deploys the Autopilot Service for on-premise environments.
+The Pega `Autopilot Service` backing service provides GenAI-powered capabilities for Pega Infinity Platform by connecting directly to LLM providers (Azure OpenAI, AWS Bedrock, Google Vertex AI). This chart deploys the Autopilot Service for on-premise environments.
+
+## Pega GenaAI Features Support Matrix
+
+| Pega Version | GenAI Connect | GenAI Coach | GenAI Agent |
+|---|:---:|:---:|:---:|
+| 24.2 | Yes | | |
+| 24.2.4 | Yes | Yes | |
+| 25.1.1 *(requires HFIX-C4307)* | Yes | Yes | Yes |
+| 25.1.2 | Yes | Yes | Yes |
 
 ## Configuring a backing service with your pega environment
 
-You can provision the Autopilot Service into your `pega` environment namespace, with the service endpoint configured for your Pega Infinity environment. When you include the Autopilot Service in your namespace, the service endpoint is included within your Pega Infinity environment network to ensure isolation of your application data.
+You can provision the Autopilot Service into your `pega` environment namespace or any namesapce, with the autopilot service endpoint configured for your Pega Infinity environment.
 
 ## Supported LLM Providers
 
@@ -27,7 +36,7 @@ You can provision the Autopilot Service into your `pega` environment namespace, 
 | `docker.autopilot.image` | Specify the Autopilot Service Docker image and tag. |
 | `docker.autopilot.imagePullPolicy` | Specify the image pull policy. Default is `Always`. |
 | `replicas` | Number of pod replicas to provision. Default is `2`. |
-| `service.port` | Defines the port used by the Service. Default is `8080`. |
+| `service.port` | Defines the port used by the Service. Default is `80`. |
 | `service.targetPort` | Defines the port used by the Pod and Container. Default is `8080`. |
 | `service.serviceType` | The [type of service](https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types) you wish to expose. Default is `ClusterIP`. |
 | `enableGenaiHub` | Set to `false` for on-prem deployments with direct provider connectivity. Default is `false`. |
@@ -129,16 +138,19 @@ stringData:
 
 ## Custom models configuration
 
-The Autopilot Service uses a model list to determine which LLM models are available. Each model entry follows the format used by the `model_id` field: `provider/creator/model_name/version` (e.g., `azure/openai/GPT-5/2025-08-07`). The service routes requests to the appropriate provider endpoint based on this model metadata.
+The Autopilot Service uses a model list to determine which LLM models are available. The service routes requests to the appropriate provider endpoint based on the model metadata in each entry. The `model_id` field format differs by provider — see [Building model list](#building-model-list) below for the rules per provider.
 
-### Default fast and smart models
+## Building model list
 
-The service automatically assigns default `fast` and `smart` models from the model list:
-- **1st model** in the list -> `fast`
-- **2nd model** in the list -> `smart`
-- If only one model is available, it is used for both.
+### For Azure OpenAI and Vertex AI
 
-To control which models are assigned as defaults, order your models file accordingly — the first two entries will be picked as `fast` and `smart` respectively.
+- **`name`** — Must match the deployment name as it appears in the LLM provider console (e.g., the Azure OpenAI Studio deployment name, or the Vertex AI model ID shown in Model Garden). This value is used as the display name and routing key.
+- **`model_path`** — Must be provided as an array of API endpoint paths relative to the provider base URL. For Azure OpenAI the path embeds the Azure portal deployment name (e.g., `["/openai/deployments/gpt-5/chat/completions"]`). For Vertex AI it embeds the model identifier (e.g., `["/google/deployments/gemini-2.5-pro/chat/completions"]`).
+
+### For AWS Bedrock
+
+- **`model_id`** — Must be the **exact model ID as shown in the AWS Bedrock console**, including the cross-region inference prefix and version suffix (e.g., `us.anthropic.claude-3-7-sonnet-20250219-v1:0`, `us.amazon.nova-pro-v1:0`, `amazon.titan-embed-text-v2:0`).
+
 
 ### Option 1: Use the default models file bundled with the chart (recommended)
 
@@ -201,12 +213,12 @@ autopilot:
           "model_name": "GPT-5",
           "model_mapping_id": "gpt-5-2025-08-07",
           "name": "gpt-5-2025-08-07",
-          "model_id": "azure/openai/GPT-5/2025-08-07",
+          "model_id": "gpt-5-2025-08-07",
           "input_tokens": 400000,
           "output_tokens": 128000,
           "type": "chat_completion",
           "version": "2025-08-07",
-          "model_path": ["/openai/deployments/gpt-5/chat/completions"],
+          "model_path": ["/openai/deployments/gpt-5-2025-08-07/chat/completions"],
           "supported_capabilities": {
             "streaming": true,
             "functions": true,
@@ -224,17 +236,26 @@ Each model entry in the models file requires the following fields:
 |---|---|---|
 | `provider` | Yes | Cloud provider (`azure`, `bedrock`, `vertex`). |
 | `creator` | Yes | Model creator (e.g., `openai`, `anthropic`, `google`, `amazon`). |
-| `model_name` | Yes | Display name of the model (e.g., `GPT-5`, `Claude-37-Sonnet`). |
-| `name` | Yes | Unique model identifier used internally by the service. |
-| `model_id` | Yes | Model identifier in `provider/creator/model_name/version` format. |
-| `model_mapping_id` | Yes | Provider-specific deployment name used for API routing. |
-| `model_path` | Yes | Array of API endpoint paths for the model. |
+| `model_name` | Yes | Model identifer name. |
+| `name` | Yes | **For Azure OpenAI and Vertex AI:** must match the deployment name as shown in the LLM provider console. Used as the display name and routing key. |
+| `model_id` | Yes | The provider-native model identifier. **For Azure OpenAI and Vertex AI:** the deployment name exactly as shown in the provider console — same value as `model_mapping_id` (e.g., `gpt-5-2025-08-07`, `gemini-2.5-pro`). **For Bedrock:** the exact model ID from the AWS Bedrock console, including cross-region prefix and version suffix (e.g., `us.anthropic.claude-3-7-sonnet-20250219-v1:0`, `us.amazon.nova-pro-v1:0`, `amazon.titan-embed-text-v2:0`). |
+| `model_mapping_id` | Yes | Provider-specific deployment name used for API routing and for constructing `model_path` entries. |
+| `model_path` | Yes | Array of API endpoint paths for the model, embedding the `model_mapping_id` value. **Azure OpenAI:** `["/openai/deployments/<model_mapping_id>/chat/completions"]`. **Vertex AI:** `["/google/deployments/<model_mapping_id>/chat/completions"]`. **Bedrock:** `["/anthropic/deployments/<model_mapping_id>/converse", "/anthropic/deployments/<model_mapping_id>/converse-stream"]` (adjust creator prefix to match). |
 | `type` | Yes | Model type: `chat_completion`, `embedding`, or `image`. |
 | `version` | Yes | Model version string. |
 | `input_tokens` | No | Maximum input token count. |
 | `output_tokens` | No | Maximum output token count. |
 | `supported_capabilities` | No | Object describing model capabilities (streaming, functions, multimodal, etc.). |
 | `parameters` | No | Object describing tunable parameters (temperature, top_p, max_tokens, etc.). |
+
+## Default fast and smart models
+
+The service automatically assigns default `fast` and `smart` models from the model list:
+- **1st model** in the list -> `fast`
+- **2nd model** in the list -> `smart`
+- If only one model is available, it is used for both.
+
+To control which models are assigned as defaults, order your models file accordingly — the first two entries will be picked as `fast` and `smart` respectively.
 
 ### Liveness and readiness probes
 
