@@ -586,3 +586,60 @@ servicePort: use-annotation
     "false"
   {{- end }}
 {{- end }}
+
+
+{{- define "jdbcLibVolume" }}
+{{- if .Values.global.jdbc }}
+{{- if .Values.global.jdbc.downloadContainer}}
+{{- if .Values.global.jdbc.downloadContainer.image }}
+- name: jdbc-lib-volume
+  emptyDir:
+    sizeLimit: 5Mi
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "jdbcLibVolumeMount" }}
+{{- if .Values.global.jdbc }}
+{{- if .Values.global.jdbc.downloadContainer}}
+{{- if .Values.global.jdbc.downloadContainer.image }}
+- name: jdbc-lib-volume
+  mountPath: /opt/pega/lib
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "jdbc-downloader-init-container" }}
+{{- if .Values.global.jdbc }}
+{{- if .Values.global.jdbc.downloadContainer}}
+{{- if .Values.global.jdbc.downloadContainer.image }}
+- name: jdbc-lib-downloader
+  image: {{ .Values.global.jdbc.downloadContainer.image }}
+  imagePullPolicy: {{ .Values.global.jdbc.downloadContainer.imagePullPolicy }}
+  command: ['sh', '-c', 'curl -o /opt/pega/lib/driver.jar {{ .Values.global.jdbc.driverUri }}']
+  env:
+  - name: JDBC_DRIVER_URI
+    value: {{ .Values.global.jdbc.driverUri }}
+  - name: ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION
+    value: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
+  volumeMounts:
+  - name: jdbc-lib-volume
+    mountPath: /opt/pega/lib
+  - name: {{ template "pegaVolumeCredentials" }}
+    mountPath: "/opt/pega/secrets"
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
+{{- if .Values.global.customArtifactory }}
+{{- if .Values.global.customArtifactory.certificate }}
+  - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
+    mountPath: "/opt/pega/artifactory/cert"
+{{- end }}
+{{- end }}
+{{- end }}
+
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}
+
