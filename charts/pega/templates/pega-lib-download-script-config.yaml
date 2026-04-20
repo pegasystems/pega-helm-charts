@@ -9,7 +9,7 @@ metadata:
   name: {{ template "pegaLibDownloadScriptConfig" $ }}
   namespace: {{ .Release.Namespace }}
 data:
-  download-jdbc.sh: |
+  download-jdbc-lib.sh: |
     #!/bin/sh
     pega_root="/opt/pega"
     lib_root="/opt/pega/lib"

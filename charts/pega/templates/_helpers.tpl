@@ -613,7 +613,7 @@ servicePort: use-annotation
 - name: download-script-volume
   configMap:
     name: {{ template "pegaLibDownloadScriptConfig" $ }}
-    defaultMode: 550
+    defaultMode: 0550
 {{- end }}
 {{- end }}
 {{- end }}
@@ -634,8 +634,7 @@ servicePort: use-annotation
   - name: jdbc-lib-volume
     mountPath: /opt/pega/lib
   - name: download-script-volume
-    mountPath: /opt/pega/scripts/download-jdbc-lib.sh
-    subPath: download-jdbc-lib.sh
+    mountPath: /opt/pega/scripts
   - name: {{ template "pegaVolumeCredentials" }}
     mountPath: "/opt/pega/secrets"
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
