@@ -76,11 +76,12 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
-  # downloadContainer:
+  downloadContainer:
     # Specify a container containing curl utility which can be used to download JDBC Driver.  If specified, this container will be used as
     # an init container in installer job to download the JDBC driver and copy to shared volume. This functionality is provided in preparation
     # for removing curl from the installer and runtime images.
     # image: "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG"
+    # imagePullPolicy: "IfNotPresent"
 
   customArtifactory:
     # If you use a secured custom artifactory to manager your JDBC driver,

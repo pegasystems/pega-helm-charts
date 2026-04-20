@@ -86,6 +86,8 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- include "jdbcLibVolume" .root | indent 6 }}
+{{- include "downloadScriptVolume" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
       - name: hz-encryption-secrets
         secret:
@@ -114,6 +116,7 @@ spec:
 {{- end }}
 {{- end }}
       initContainers:
+{{- include "jdbc-downloader-init-container" .root | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
@@ -284,6 +287,7 @@ spec:
         - name: {{ .name }}
           mountPath: "/opt/pega/kafkadata"
 {{- end }}
+{{- include "jdbcLibVolumeMount" .root | indent 8 }}
 {{- if .custom }}
 {{- if .custom.volumeMounts }}
         # Additional custom mounts

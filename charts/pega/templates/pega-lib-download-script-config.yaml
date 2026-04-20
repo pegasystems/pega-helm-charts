@@ -1,24 +1,19 @@
-
-{{- if .Values.global.jdbc }}
-{{- if .Values.global.jdbc.downloadContainer}}
-{{- if .Values.global.jdbc.downloadContainer.image }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
 ---
 # This template contains the script to download the JDBC driver from the specified location and copy it to the shared
 # volume. This script will be executed by the init container before starting the Pega application container.
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: pega-lib-download-script-config
+  name: {{ template "pegaLibDownloadScriptConfig" $ }}
   namespace: {{ .Release.Namespace }}
 data:
-  download-jdbc.sh: |-
+  download-jdbc.sh: |
     #!/bin/sh
-
     pega_root="/opt/pega"
     lib_root="/opt/pega/lib"
     secret_root="/opt/pega/secret"
-
-
     declare -a secrets_list=("CUSTOM_ARTIFACTORY_USERNAME" "CUSTOM_ARTIFACTORY_PASSWORD" "CUSTOM_ARTIFACTORY_APIKEY_HEADER" "CUSTOM_ARTIFACTORY_APIKEY" )
     for secret in "${secret_root}"/*
     do
@@ -26,7 +21,6 @@ data:
       temp_file="${secret_root}/${basename}"
       export SECRET_"${basename}"="$(<"${temp_file}")"
     done
-
     for secret in "${secrets_list[@]}"
     do
        temp="SECRET_${secret}"
@@ -35,8 +29,6 @@ data:
          export SECRET_"${secret}"="${!secret}"
        fi
     done
-
-
     custom_artifactory_auth=""
     if [ "$SECRET_CUSTOM_ARTIFACTORY_USERNAME" != "" ] || [ "$SECRET_CUSTOM_ARTIFACTORY_PASSWORD" != "" ]; then
         if [ "$SECRET_CUSTOM_ARTIFACTORY_USERNAME" == "" ] || [ "$SECRET_CUSTOM_ARTIFACTORY_PASSWORD" == "" ]; then
@@ -47,7 +39,6 @@ data:
             custom_artifactory_auth="-u "$SECRET_CUSTOM_ARTIFACTORY_USERNAME":"$SECRET_CUSTOM_ARTIFACTORY_PASSWORD
         fi
     fi
-
     if [[ "$custom_artifactory_auth" == "" && ( "$SECRET_CUSTOM_ARTIFACTORY_APIKEY_HEADER" != "" || "$SECRET_CUSTOM_ARTIFACTORY_APIKEY" != "" ) ]]; then
         if [ "$SECRET_CUSTOM_ARTIFACTORY_APIKEY_HEADER" == "" ] || [ "$SECRET_CUSTOM_ARTIFACTORY_APIKEY" == "" ]; then
             echo "SECRET_CUSTOM_ARTIFACTORY_APIKEY_HEADER & SECRET_CUSTOM_ARTIFACTORY_APIKEY must be specified for authentication using api key for custom artifactory."
@@ -57,9 +48,6 @@ data:
             custom_artifactory_auth="-H "$SECRET_CUSTOM_ARTIFACTORY_APIKEY_HEADER":"$SECRET_CUSTOM_ARTIFACTORY_APIKEY
         fi
     fi
-
-
-
     custom_artifactory_certificate=''
     if [ "$(ls -A "${pega_root}/artifactory/cert"/*)" ]; then
          if [ "$(ls "${pega_root}/artifactory/cert"/* | wc -l)" == 1 ]; then
@@ -84,7 +72,6 @@ data:
            exit 1
          fi
     fi
-
     if [ "$JDBC_DRIVER_URI" != "" ]; then
       curl_cmd_options=''
       if [ "$ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION" == true ]; then
@@ -94,7 +81,6 @@ data:
         echo "Establishing an insecure connection to download driver."
         curl_cmd_options="-ksSL $custom_artifactory_auth"
       fi
-
       urls=$(echo "$JDBC_DRIVER_URI" | tr "," "\n")
       for url in $urls
         do
@@ -112,7 +98,5 @@ data:
         done
     fi
 
-
-{{- end }}
 {{- end }}
 {{- end }}

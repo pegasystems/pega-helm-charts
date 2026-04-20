@@ -589,36 +589,42 @@ servicePort: use-annotation
 
 
 {{- define "jdbcLibVolume" }}
-{{- if .Values.global.jdbc }}
-{{- if .Values.global.jdbc.downloadContainer}}
-{{- if .Values.global.jdbc.downloadContainer.image }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
 - name: jdbc-lib-volume
   emptyDir:
     sizeLimit: 5Mi
 {{- end }}
 {{- end }}
 {{- end }}
-{{- end }}
 
 {{- define "jdbcLibVolumeMount" }}
-{{- if .Values.global.jdbc }}
-{{- if .Values.global.jdbc.downloadContainer}}
-{{- if .Values.global.jdbc.downloadContainer.image }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
 - name: jdbc-lib-volume
   mountPath: /opt/pega/lib
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{- define "downloadScriptVolume" }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
+- name: download-script-volume
+  configMap:
+    name: {{ template "pegaLibDownloadScriptConfig" $ }}
+    defaultMode: 550
+{{- end }}
+{{- end }}
 {{- end }}
 
 {{- define "jdbc-downloader-init-container" }}
-{{- if .Values.global.jdbc }}
-{{- if .Values.global.jdbc.downloadContainer}}
-{{- if .Values.global.jdbc.downloadContainer.image }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
 - name: jdbc-lib-downloader
-  image: {{ .Values.global.jdbc.downloadContainer.image }}
-  imagePullPolicy: {{ .Values.global.jdbc.downloadContainer.imagePullPolicy }}
-  command: ['sh', '-c', 'curl -o /opt/pega/lib/driver.jar {{ .Values.global.jdbc.driverUri }}']
+  image: {{ .Values.global.downloadContainer.image }}
+  imagePullPolicy: {{ .Values.global.downloadContainer.imagePullPolicy }}
+  command: ['sh', '-c', '/opt/pega/scripts/download-jdbc-lib.sh']
   env:
   - name: JDBC_DRIVER_URI
     value: {{ .Values.global.jdbc.driverUri }}
@@ -627,6 +633,9 @@ servicePort: use-annotation
   volumeMounts:
   - name: jdbc-lib-volume
     mountPath: /opt/pega/lib
+  - name: download-script-volume
+    mountPath: /opt/pega/scripts/download-jdbc-lib.sh
+    subPath: download-jdbc-lib.sh
   - name: {{ template "pegaVolumeCredentials" }}
     mountPath: "/opt/pega/secrets"
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
@@ -637,9 +646,11 @@ servicePort: use-annotation
 {{- end }}
 {{- end }}
 {{- end }}
-
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
 
+{{- define "pegaLibDownloadScriptConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-lib-download-script-config
+{{- end }}
