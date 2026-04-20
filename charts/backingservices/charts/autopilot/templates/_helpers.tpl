@@ -84,6 +84,12 @@ Check if any inline credentials are provided
 {{- define "autopilot.hasInlineCredentials" -}}
 {{- if or .Values.azure.endpoint .Values.azure.apiKey .Values.aws.accessKeyId .Values.vertex.credentials -}}
 true
+{{- else if .Values.customOpenAI.providers -}}
+{{- range .Values.customOpenAI.providers -}}
+{{- if .apiKey -}}
+true
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 
@@ -119,4 +125,38 @@ Resolve the models ConfigMap name
 {{- $depName := include "deploymentName" (dict "root" .Values "defaultname" "autopilot") -}}
 {{- printf "%s-models" $depName -}}
 {{- end -}}
+{{- end -}}
+
+{{/*
+Check if any custom OpenAI providers are configured.
+Returns "true" when the providers list is non-empty.
+*/}}
+{{- define "autopilot.hasCustomOpenAI" -}}
+{{- if .Values.customOpenAI.providers -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Resolve the Secret name that holds custom OpenAI API keys.
+Uses customOpenAI.existingSecret when set; otherwise falls back to the
+shared provider-credentials Secret (same Secret as Azure/AWS/Vertex keys).
+*/}}
+{{- define "autopilot.customOpenAISecretName" -}}
+{{- if .Values.customOpenAI.existingSecret -}}
+{{- .Values.customOpenAI.existingSecret -}}
+{{- else -}}
+{{- include "autopilot.credentialsSecretName" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Convert a custom OpenAI creator alias to the upper-snake-case env var suffix.
+e.g.  "openrouter"    → "OPENROUTER"
+      "my-llm-server" → "MY_LLM_SERVER"
+      "together.ai"   → "TOGETHER_AI"
+Usage: {{ include "autopilot.creatorEnvSuffix" "openrouter" }}
+*/}}
+{{- define "autopilot.creatorEnvSuffix" -}}
+{{- . | upper | replace "-" "_" | replace "." "_" -}}
 {{- end -}}

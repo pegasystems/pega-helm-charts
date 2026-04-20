@@ -148,6 +148,50 @@ vertex:
   location: "us-central1"
 
 # -------------------------------------------------------------------
+# Custom OpenAI-compatible providers (model override / custom-openai)
+# -------------------------------------------------------------------
+# Use this section to configure any number of OpenAI-compatible upstream
+# endpoints (e.g. OpenRouter, a private LLM server, Together AI, etc.).
+# All models served by these providers will have provider: "custom-openai"
+# in the model list — matching the label used by the Pega GenAI Hub gateway.
+#
+# Each entry in 'providers' must have:
+#   creator  - must exactly match the 'creator' field in the model list JSON.
+#              This value is used to derive the env var names:
+#              CUSTOM_OPENAI_<CREATOR_UPPER>_BASE_URL
+#              CUSTOM_OPENAI_<CREATOR_UPPER>_API_KEY
+#              (<CREATOR_UPPER> = creator uppercased, hyphens/dots → underscores)
+#   baseUrl  - base URL of the OpenAI-compatible endpoint (non-sensitive).
+#   apiKey   - API key for the endpoint (stored in a K8s Secret).
+#
+# Secret options:
+#   Option 1 (default): Inline apiKey values → chart auto-creates Secret entries
+#     in the same provider-credentials Secret as Azure/AWS/Vertex.
+#   Option 2: Pre-existing Secret → set existingSecret to the Secret name.
+#     The Secret must contain keys: CUSTOM_OPENAI_<CREATOR_UPPER>_API_KEY
+#     Inline apiKey values are ignored when existingSecret is set.
+#
+# Example:
+#   customOpenAI:
+#     providers:
+#       - creator: openrouter
+#         baseUrl: "https://openrouter.ai/api/v1"
+#         apiKey: "sk-or-v3-xxxx"
+#       - creator: my-llm-server
+#         baseUrl: "https://llm.internal.company.com"
+#         apiKey: "secret"
+# -------------------------------------------------------------------
+customOpenAI:
+  existingSecret: ""   # pre-existing Secret name for API keys (optional)
+  providers: []
+  # - creator: openrouter
+  #   baseUrl: "https://openrouter.ai/api/v1"
+  #   apiKey: ""
+  # - creator: my-llm-server
+  #   baseUrl: "https://llm.internal.company.com"
+  #   apiKey: ""
+
+# -------------------------------------------------------------------
 # Ingress (optional)
 # -------------------------------------------------------------------
 ingress:

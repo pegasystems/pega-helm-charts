@@ -22,6 +22,7 @@ You can provision the Autopilot Service into your `pega` environment namespace o
 | Azure OpenAI | API Key, Pre-existing Secret |
 | AWS Bedrock | Access Key/Secret, Pre-existing Secret |
 | Google Vertex AI | Service Account JSON (base64-encoded), Pre-existing Secret |
+| Custom OpenAI-compatible | API Key (inline or pre-existing Secret) |
 
 ## Configuration settings
 
@@ -42,7 +43,7 @@ You can provision the Autopilot Service into your `pega` environment namespace o
 | `enableGenaiHub` | Set to `false` for on-prem deployments with direct provider connectivity. Default is `false`. |
 | `authEnabled` | Enable or disable authentication for the service. Default is `false`. |
 | `isInternalDeployment` | Set to `false` for on-prem deployments. Default is `false`. |
-| `modelProviders` | Comma-separated list of providers to enable (e.g., `"Azure,Vertex,Bedrock"`). Filters the model list to only include models from the specified providers. If empty, all models from the model list are returned. |
+| `modelProviders` | All models from the model list are displayed regardless of provider. For PCFG or Fedramp set the Bedrock as provider. |
 | `awsRegion` | AWS region for Bedrock. Default is `us-east-1`. |
 | `affinity` | Define pod affinity so that it is restricted to run on particular node(s), or to prefer to run on particular nodes. |
 | `tolerations` | Define pod tolerations so that it is allowed to run on node(s) with particular taints. |
@@ -79,6 +80,19 @@ autopilot:
     credentials: "base64-encoded-service-account-json"
     location: "us-central1"
 ```
+
+#### Updating credentials after deployment (Option 1)
+
+When credentials change, run `helm upgrade` with the updated values file. The chart will re-encode and replace the Kubernetes Secret automatically:
+
+```bash
+helm upgrade <RELEASE-NAME> <CHART-PATH> \
+  --namespace <NAMESPACE> \
+  -f <VALUES-FILE> \
+  --wait --timeout 5m
+```
+
+> **Do not manually patch the Secret when using inline credentials.** The chart uses `b64enc` to encode values into the Secret. Patching the Secret directly will cause double base64 encoding and result in invalid credentials.
 
 ### Option 2: Pre-existing Kubernetes Secret
 
@@ -136,6 +150,27 @@ stringData:
   VERTEX_AUTH: "<base64-encoded-gcp-service-account-json>"  # base64 encode the JSON file: base64 -w0 gcp-service-account.json
 ```
 
+#### Updating credentials after deployment (Option 2)
+
+When credentials change, patch the existing Secret directly and restart the pod to pick up the new values:
+
+```bash
+# Replace the secret with updated values
+kubectl create secret generic my-provider-credentials \
+  --namespace <NAMESPACE> \
+  --from-literal=AZURE_ENDPOINT="https://my-openai.openai.azure.com/" \
+  --from-literal=AZURE_OPENAI_KEY="your-azure-api-key" \
+  --from-literal=AWS_ACCESS_KEY_ID="AKIAIOSFODNN7EXAMPLE" \
+  --from-literal=AWS_SECRET_ACCESS_KEY="wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY" \
+  --from-literal=AWS_SESSION_TOKEN="your-session-token" \
+  --from-literal=VERTEX_AUTH="$(base64 -w0 /path/to/gcp-service-account.json)" \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Restart the pod to pick up the updated secret
+kubectl rollout restart deployment/<DEPLOYMENT-NAME> -n <NAMESPACE>
+kubectl rollout status deployment/<DEPLOYMENT-NAME> -n <NAMESPACE> --timeout=120s
+```
+
 ## Custom models configuration
 
 The Autopilot Service uses a model list to determine which LLM models are available. The service routes requests to the appropriate provider endpoint based on the model metadata in each entry. The `model_id` field format differs by provider — see [Building model list](#building-model-list) below for the rules per provider.
@@ -168,6 +203,22 @@ autopilot:
 
 To customize the default model list before deployment, edit `files/default-models.json` in the chart directory.
 
+#### Updating the model list after deployment (Option 1)
+
+After editing `files/default-models.json`, apply the changes to the running deployment without a full `helm upgrade`:
+
+```bash
+# Update the ConfigMap from the bundled file
+kubectl create configmap autopilot-models \
+  --namespace <NAMESPACE> \
+  --from-file=models.json=./files/default-models.json \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Restart the pod to pick up the new ConfigMap
+kubectl rollout restart deployment/<DEPLOYMENT-NAME> -n <NAMESPACE>
+kubectl rollout status deployment/<DEPLOYMENT-NAME> -n <NAMESPACE> --timeout=120s
+```
+
 ### Option 2: Provide a pre-existing ConfigMap
 
 Use a ConfigMap that you create and manage outside of this chart. The ConfigMap must contain a key named `models.json` with the model list as JSON content.
@@ -190,6 +241,22 @@ Create the ConfigMap:
 kubectl create configmap my-models-configmap \
   --namespace <NAMESPACE> \
   --from-file=models.json=./my-models.json
+```
+
+#### Updating the model list after deployment (Option 2)
+
+When the contents of your external ConfigMap change, re-apply it and restart the pod:
+
+```bash
+# Re-apply the updated ConfigMap
+kubectl create configmap my-models-configmap \
+  --namespace <NAMESPACE> \
+  --from-file=models.json=./my-models.json \
+  --dry-run=client -o yaml | kubectl apply -f -
+
+# Restart the pod to pick up the new ConfigMap
+kubectl rollout restart deployment/<DEPLOYMENT-NAME> -n <NAMESPACE>
+kubectl rollout status deployment/<DEPLOYMENT-NAME> -n <NAMESPACE> --timeout=120s
 ```
 
 ### Option 3: Inline model list in values
@@ -250,12 +317,29 @@ Each model entry in the models file requires the following fields:
 
 ## Default fast and smart models
 
-The service automatically assigns default `fast` and `smart` models from the model list:
-- **1st model** in the list -> `fast`
-- **2nd model** in the list -> `smart`
-- If only one model is available, it is used for both.
+The `fast` and `smart` default models are now defined explicitly in a dedicated `default_models` section at the top level of the models JSON file.
 
-To control which models are assigned as defaults, order your models file accordingly — the first two entries will be picked as `fast` and `smart` respectively.
+The `default_models` section contains two keys — `fast` and `smart` — each holding the full model object of the intended default:
+
+```json
+{
+  "models": [ ... ],
+  "default_models": {
+    "fast": {
+      "provider": "azure",
+      "model_id": "gpt-5-chat-2025-08-07",
+      ...
+    },
+    "smart": {
+      "provider": "azure",
+      "model_id": "gpt-5-mini-2025-08-07",
+      ...
+    }
+  }
+}
+```
+
+To change which models serve as defaults, update the `default_models.fast` and `default_models.smart` entries in your models JSON file to the desired model objects. The model referenced must also be present in the `models` array.
 
 ### Liveness and readiness probes
 
@@ -473,6 +557,129 @@ autopilot:
     external_secret_name: "my-autopilot-auth-secret"
 ```
 
+## Custom OpenAI-compatible providers
+
+The Autopilot Service supports any OpenAI-compatible LLM provider (such as OpenRouter, private LLM servers, or other hosted endpoints) through the `customOpenAI` configuration. Each provider is identified by a `creator` name that maps to environment variables and to the `creator` field in the model JSON.
+
+### Configuration settings
+
+| Configuration | Usage |
+|---|---|
+| `customOpenAI.providers` | List of custom OpenAI-compatible provider configurations. |
+| `customOpenAI.providers[].creator` | Unique identifier for the provider (e.g., `openrouter`, `my-llm-server`). Used to derive env var names and must match the `creator` field in model entries. |
+| `customOpenAI.providers[].baseUrl` | Base URL of the provider's OpenAI-compatible API (e.g., `https://openrouter.ai/api/v1`). |
+| `customOpenAI.providers[].apiKey` | API key for the provider. Stored in a Kubernetes Secret. |
+| `customOpenAI.existingSecret` | Name of a pre-existing Kubernetes Secret containing API keys. When set, `apiKey` fields are not required. |
+
+### How it works
+
+For each entry in `customOpenAI.providers`, the chart injects three environment variables into the pod:
+
+- `CUSTOM_OPENAI_PROVIDERS` — comma-separated list of all configured creator names (e.g., `openrouter,my-llm-server`)
+- `CUSTOM_OPENAI_<CREATOR>_BASE_URL` — the provider base URL (plain env var)
+- `CUSTOM_OPENAI_<CREATOR>_API_KEY` — the API key (read from a Kubernetes Secret)
+
+`<CREATOR>` is the `creator` value uppercased with hyphens and dots replaced by underscores. For example, `creator: openrouter` → `CUSTOM_OPENAI_OPENROUTER_BASE_URL` / `CUSTOM_OPENAI_OPENROUTER_API_KEY`.
+
+### Option 1: Inline API key (auto-creates Kubernetes Secret)
+
+Provide credentials directly in your values file. The chart automatically creates a Kubernetes Secret.
+
+```yaml
+customOpenAI:
+  providers:
+    - creator: openrouter
+      baseUrl: https://openrouter.ai/api/v1
+      apiKey: "sk-or-v1-..."
+```
+
+Multiple providers can be configured at once:
+
+```yaml
+customOpenAI:
+  providers:
+    - creator: openrouter
+      baseUrl: https://openrouter.ai/api/v1
+      apiKey: "sk-or-v1-..."
+    - creator: my-llm-server
+      baseUrl: https://my-llm.internal/v1
+      apiKey: "my-internal-key"
+```
+
+### Option 2: Pre-existing Kubernetes Secret
+
+Create a secret manually and reference it via `existingSecret`. The secret must contain keys in the format `CUSTOM_OPENAI_<CREATOR>_API_KEY`.
+
+```yaml
+customOpenAI:
+  existingSecret: "my-custom-openai-secret"
+  providers:
+    - creator: openrouter
+      baseUrl: https://openrouter.ai/api/v1
+      # apiKey omitted — read from existingSecret
+```
+
+Create the secret:
+
+```bash
+kubectl create secret generic my-custom-openai-secret \
+  --namespace <NAMESPACE> \
+  --from-literal=CUSTOM_OPENAI_OPENROUTER_API_KEY="sk-or-v1-..."
+```
+
+### Adding custom OpenAI models to the model list
+
+Models for custom OpenAI-compatible providers use `provider: custom-openai` in the model JSON. The `creator` field must match the `creator` value configured in `customOpenAI.providers`. The `name` field is the model identifier sent to the provider API.
+
+> **Important:** `model_name` must not contain slashes. Use `name` for the actual API model identifier when it contains slashes (e.g., `openrouter/free`).
+
+Example model entry for OpenRouter:
+
+```json
+{
+  "provider": "custom-openai",
+  "creator": "openrouter",
+  "model_name": "Free",
+  "model_mapping_id": "openrouter-free",
+  "name": "openrouter/free",
+  "input_tokens": 200000,
+  "output_tokens": 8192,
+  "type": "chat_completion",
+  "model_id": "custom-openai/openrouter/Free/1",
+  "version": "1",
+  "model_path": ["/chat/completions"],
+  "supported_capabilities": {
+    "streaming": true,
+    "functions": true,
+    "json_mode": true,
+    "is_multimodal": false
+  }
+}
+```
+
+To use this model as the default fast and smart model, set it in the `default_models` section of your models JSON:
+
+```json
+{
+  "models": [ ... ],
+  "default_models": {
+    "fast": { "provider": "custom-openai", "creator": "openrouter", "model_id": "custom-openai/openrouter/Free/1", ... },
+    "smart": { "provider": "custom-openai", "creator": "openrouter", "model_id": "custom-openai/openrouter/Free/1", ... }
+  }
+}
+```
+
+### Model JSON fields for custom-openai provider
+
+| Field | Description |
+|---|---|
+| `provider` | Must be `custom-openai`. |
+| `creator` | Must match the `creator` value in `customOpenAI.providers`. Used to look up `CUSTOM_OPENAI_<CREATOR>_BASE_URL` and `CUSTOM_OPENAI_<CREATOR>_API_KEY`. |
+| `model_name` | Display name for the model. Must not contain slashes. |
+| `name` | Actual model identifier sent to the provider API as the `model=` parameter (e.g., `openrouter/free`, `openai/gpt-4o`). |
+| `model_path` | Array with the API path suffix appended to `baseUrl` (e.g., `["/chat/completions"]`). |
+| `model_id` | Must follow the format `custom-openai/<creator>/<model_name>/<version>` (no slashes in `model_name`). |
+
 ## Example: Full deployment configuration
 
 ```yaml
@@ -506,6 +713,12 @@ autopilot:
   vertex:
     credentials: "base64-encoded-service-account-json"
     location: "us-central1"
+
+  customOpenAI:
+    providers:
+      - creator: openrouter
+        baseUrl: https://openrouter.ai/api/v1
+        apiKey: "sk-or-v1-..."
 
   resources:
     requests:

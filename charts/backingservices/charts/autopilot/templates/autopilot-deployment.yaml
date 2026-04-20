@@ -26,6 +26,11 @@ spec:
         {{ toYaml .Values.podAnnotations | nindent 8 }}
       {{- end }}
     spec:
+      imagePullSecrets:
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "autopilot" ) }}
+      {{- range .Values.docker.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
       containers:
       - name: autopilot
         image: {{ .Values.docker.autopilot.image }}
@@ -130,6 +135,25 @@ spec:
         - name: VERTEX_LOCATION
           value: {{ .Values.vertex.location | quote }}
         {{- end }}
+        # Custom OpenAI-compatible providers
+        {{- if (include "autopilot.hasCustomOpenAI" .) }}
+        {{- $creators := list }}
+        {{- range .Values.customOpenAI.providers }}
+        {{- $creators = append $creators .creator }}
+        {{- end }}
+        - name: CUSTOM_OPENAI_PROVIDERS
+          value: {{ join "," $creators | quote }}
+        {{- range .Values.customOpenAI.providers }}
+        - name: {{ printf "CUSTOM_OPENAI_%s_BASE_URL" (include "autopilot.creatorEnvSuffix" .creator) }}
+          value: {{ .baseUrl | quote }}
+        - name: {{ printf "CUSTOM_OPENAI_%s_API_KEY" (include "autopilot.creatorEnvSuffix" .creator) }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "autopilot.customOpenAISecretName" $ }}
+              key: {{ printf "CUSTOM_OPENAI_%s_API_KEY" (include "autopilot.creatorEnvSuffix" .creator) }}
+              optional: true
+        {{- end }}
+        {{- end }}
         livenessProbe:
           initialDelaySeconds: {{ .Values.livenessProbe.initialDelaySeconds }}
           timeoutSeconds: {{ .Values.livenessProbe.timeoutSeconds }}
@@ -150,4 +174,10 @@ spec:
             port: {{ .Values.service.targetPort }}
 {{- include "podAffinity" .Values | indent 6 }}
 {{- include "tolerations" .Values | indent 6 }}
+      {{- if (include "autopilot.hasCustomModels" .) }}
+      volumes:
+      - name: custom-models
+        configMap:
+          name: {{ include "autopilot.modelsConfigMapName" . }}
+      {{- end }}
 {{ end }}
