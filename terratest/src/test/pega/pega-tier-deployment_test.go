@@ -437,3 +437,154 @@ type pegaDeployment struct {
 	nodeType           string
 	passivationTimeout string
 }
+
+
+func TestPegaTierDeploymentNoICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"global.deployment.name":        depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName":       "storage-class",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")
+				assertICDownloadComponentsNone(t, yamlSplit[1], options)
+				assertICDownloadComponentsNone(t, yamlSplit[2], options)
+			}
+		}
+	}
+}
+
+
+func TestPegaTierDeploymentICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"global.deployment.name":        depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName":       "storage-class",
+						"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				yamlSplit := strings.Split(yamlContent, "---")
+				assertICDownloadComponents(t, yamlSplit[1], options)
+				assertICDownloadComponents(t, yamlSplit[2], options)
+			}
+		}
+	}
+}
+
+func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
+    var deploymentObj appsv1.Deployment
+	UnmarshalK8SYaml(t, yaml, &deploymentObj)
+	var podSpec = deploymentObj.Spec.Template.Spec
+	var actualInitContainers = podSpec.InitContainers
+	var volumes = podSpec.Volumes
+	var volumeMounts = podSpec.Containers[0].VolumeMounts
+
+	var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader")
+	require.NotNil(t, ic)
+    require.Equal(t, "IC_DOWNLOAD_CONTAINER:1.0", ic.Image)
+    require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
+    require.Equal(t, "/opt/pega/lib", ic.VolumeMounts[0].MountPath)
+    require.Equal(t, "download-script-volume", ic.VolumeMounts[1].Name)
+    require.Equal(t, "/opt/pega/scripts", ic.VolumeMounts[1].MountPath)
+
+    var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolume)
+    require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+
+    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.NotNil(t, scriptVolume)
+    require.Equal(t, int32(0550), *scriptVolume.ConfigMap.DefaultMode)
+
+    var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolumeMount)
+    require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+}
+
+func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Options) {
+    var deploymentObj appsv1.Deployment
+	UnmarshalK8SYaml(t, yaml, &deploymentObj)
+	var podSpec = deploymentObj.Spec.Template.Spec
+	var actualInitContainers = podSpec.InitContainers
+	var volumes = podSpec.Volumes
+	var volumeMounts = podSpec.Containers[0].VolumeMounts
+
+    var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader")
+    require.Equal(t, (*k8score.Container)(nil), ic)
+
+	var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+	require.Equal(t, (*k8score.Volume)(nil), jdbcLibVolume)
+
+	var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.Equal(t, (*k8score.Volume)(nil), scriptVolume)
+
+	var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.Equal(t, (*k8score.VolumeMount)(nil), jdbcLibVolumeMount)
+}
+
+func findNamedInitContainer(initContainers []k8score.Container, name string) *k8score.Container {
+    for _, container := range initContainers {
+        fmt.Println("Init container name: ", container.Name)
+        if container.Name == name {
+            return &container
+        }
+    }
+    return nil
+}
+
+func findNamedVolume(volumes []k8score.Volume, name string) *k8score.Volume {
+    for _, volume := range volumes {
+        if volume.Name == name {
+            return &volume
+        }
+    }
+    return nil
+}
+
+func findNamedVolumeMount(volumeMounts []k8score.VolumeMount, name string) *k8score.VolumeMount {
+    for _, volumeMount := range volumeMounts {
+        if volumeMount.Name == name {
+            return &volumeMount
+        }
+    }
+    return nil
+}

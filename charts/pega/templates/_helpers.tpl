@@ -623,7 +623,7 @@ servicePort: use-annotation
 {{- if .Values.global.downloadContainer.image }}
 - name: jdbc-lib-downloader
   image: {{ .Values.global.downloadContainer.image }}
-  imagePullPolicy: {{ .Values.global.downloadContainer.imagePullPolicy }}
+  imagePullPolicy: {{ default "Always" .Values.global.downloadContainer.imagePullPolicy }}
   command: ['sh', '-c', '/opt/pega/scripts/download-jdbc-lib.sh']
   env:
   - name: JDBC_DRIVER_URI
@@ -652,4 +652,14 @@ servicePort: use-annotation
 {{- define "pegaLibDownloadScriptConfig" }}
 {{- $depName := printf "%s" (include "deploymentName" $) -}}
 {{- $depName -}}-lib-download-script-config
+{{- end }}
+
+{{- define "usesICDownload" }}
+{{- $usesICDownload := "false" -}}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
+{{- $usesICDownload = "true" }}
+{{- end }}
+{{- end }}
+{{- $usesICDownload -}}
 {{- end }}
