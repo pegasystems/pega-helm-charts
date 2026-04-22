@@ -426,4 +426,84 @@ func TestPegaInstallerJobResourcesWithNoEphemeralStorage(t *testing.T) {
 }
 
 
+func TestPegaInstallerJobNoICDownload(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":    "pega",
+			"global.provider":           "k8s",
+			"global.actions.execute":    "install",
+			"installer.imagePullPolicy": "Always",
+		},
+	}
 
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var job k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &job)
+
+    var volumes = job.Spec.Template.Spec.Volumes
+    var volumeMounts = job.Spec.Template.Spec.Containers[0].VolumeMounts
+    var initContainers = job.Spec.Template.Spec.InitContainers
+
+    var ic = findNamedInitContainer(initContainers, "jdbc-lib-downloader0")
+    require.Equal(t, (*k8score.Container)(nil), ic)
+
+    var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+    require.Equal(t, (*k8score.Volume)(nil), jdbcLibVolume)
+
+    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.Equal(t, (*k8score.Volume)(nil), scriptVolume)
+
+    var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.Equal(t, (*k8score.VolumeMount)(nil), jdbcLibVolumeMount)
+}
+
+func TestPegaInstallerJobWithICDownload(t *testing.T) {
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.deployment.name":    "pega",
+			"global.provider":           "k8s",
+			"global.actions.execute":    "install",
+			"installer.imagePullPolicy": "Always",
+			"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+		},
+	}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	var job k8sbatch.Job
+	UnmarshalK8SYaml(t, yamlSplit[1], &job)
+
+    assertJobICDownloadComponents(t, yamlSplit[1], options)
+}
+
+func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
+    var job k8sbatch.Job
+	UnmarshalK8SYaml(t, yaml, &job)
+	var jobSpec = job.Spec.Template.Spec
+	var actualInitContainers = jobSpec.InitContainers
+	var volumes = jobSpec.Volumes
+	var volumeMounts = jobSpec.Containers[0].VolumeMounts
+
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader0"), "http://driverhost/drivers/driver1.jar")
+    assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader1"), "http://driverhost/drivers/driver2.jar")
+
+    var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolume)
+    require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+
+    var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolumeMount)
+    require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+}
