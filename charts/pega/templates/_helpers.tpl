@@ -716,14 +716,14 @@ servicePort: use-annotation
 
   {{- $curlOptions := "" }}
   {{- if eq $enableSSLVerification "true" }}
-    {{- $curlOptions = printf "-sSL %s %s" $customArtifactoryAuth $customArtifactoryCert -}}
+    {{- $curlOptions = printf "-sSL --fail-with-body %s %s" $customArtifactoryAuth $customArtifactoryCert -}}
   {{- else }}
-    {{- $curlOptions = printf "-ksSL %s" $customArtifactoryAuth -}}
+    {{- $curlOptions = printf "-ksSL --fail-with-body %s" $customArtifactoryAuth -}}
   {{- end }}
 
   {{- $url := .url -}}
   {{- $filename := base $url -}}
 
-  {{- $curlCmd := printf "curl %s -o /opt/pega/lib/%s \"%s\"" $curlOptions $filename $url }}
+  {{- $curlCmd := printf "curl %s -o /opt/pega/lib/%s \"%s\" 2>&1 || exit $?" $curlOptions $filename $url }}
   {{- $curlCmd -}}
 {{- end }}
