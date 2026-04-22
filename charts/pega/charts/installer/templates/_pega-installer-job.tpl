@@ -45,6 +45,7 @@ spec:
       serviceAccountName: {{ .root.Values.serviceAccountName }}
 {{- end }}
       volumes:
+{{- include "jdbcLibVolume" .root | indent 6 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
       - name: {{ template "pegaInstallerMountVolume" }}
         persistentVolumeClaim:
@@ -94,6 +95,7 @@ spec:
 {{- end }}
 {{- end }}
       initContainers:
+{{- include "jdbc-downloader-init-container" .root | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
@@ -121,6 +123,7 @@ spec:
           # CPU and Memory that the containers for {{ .name }} request
           {{- include "pegaInstallerResources" . | indent 10 }}
         volumeMounts:
+{{- include "jdbcLibVolumeMount" .root | indent 8 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
           mountPath: "/opt/pega/mount/installer"
