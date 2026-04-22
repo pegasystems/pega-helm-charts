@@ -87,7 +87,6 @@ spec:
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
 {{- include "jdbcLibVolume" .root | indent 6 }}
-{{- include "downloadScriptVolume" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
       - name: hz-encryption-secrets
         secret:

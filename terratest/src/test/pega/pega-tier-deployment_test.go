@@ -483,6 +483,9 @@ func TestPegaTierDeploymentICDownload(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
 	for _, vendor := range supportedVendors {
 
 		for _, operation := range supportedOperations {
@@ -502,7 +505,7 @@ func TestPegaTierDeploymentICDownload(t *testing.T) {
 					},
 				}
 
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
 				yamlSplit := strings.Split(yamlContent, "---")
 				assertICDownloadComponents(t, yamlSplit[1], options)
 				assertICDownloadComponents(t, yamlSplit[2], options)
@@ -519,25 +522,26 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
 	var volumes = podSpec.Volumes
 	var volumeMounts = podSpec.Containers[0].VolumeMounts
 
-	var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader")
-	require.NotNil(t, ic)
-    require.Equal(t, "IC_DOWNLOAD_CONTAINER:1.0", ic.Image)
-    require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
-    require.Equal(t, "/opt/pega/lib", ic.VolumeMounts[0].MountPath)
-    require.Equal(t, "download-script-volume", ic.VolumeMounts[1].Name)
-    require.Equal(t, "/opt/pega/scripts", ic.VolumeMounts[1].MountPath)
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader0"), "http://driverhost/drivers/driver1.jar")
+    assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader1"), "http://driverhost/drivers/driver2.jar")
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)
     require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
 
-    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
-    require.NotNil(t, scriptVolume)
-    require.Equal(t, int32(0550), *scriptVolume.ConfigMap.DefaultMode)
-
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
     require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+}
+
+func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string) {
+    	require.NotNil(t, ic)
+        require.Equal(t, "IC_DOWNLOAD_CONTAINER:1.0", ic.Image)
+        require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
+        require.Equal(t, "/opt/pega/lib", ic.VolumeMounts[0].MountPath)
+
+        require.Equal(t, "JDBC_DRIVER_URI", ic.Env[0].Name)
+        require.Equal(t, expectedURL, ic.Env[0].Value)
 }
 
 func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Options) {
@@ -548,7 +552,7 @@ func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Opt
 	var volumes = podSpec.Volumes
 	var volumeMounts = podSpec.Containers[0].VolumeMounts
 
-    var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader")
+    var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader0")
     require.Equal(t, (*k8score.Container)(nil), ic)
 
 	var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
@@ -563,7 +567,6 @@ func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Opt
 
 func findNamedInitContainer(initContainers []k8score.Container, name string) *k8score.Container {
     for _, container := range initContainers {
-        fmt.Println("Init container name: ", container.Name)
         if container.Name == name {
             return &container
         }
