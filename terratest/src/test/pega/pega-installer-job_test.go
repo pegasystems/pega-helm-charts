@@ -427,27 +427,48 @@ func TestPegaInstallerJobResourcesWithNoEphemeralStorage(t *testing.T) {
 
 
 func TestPegaInstallerJobNoICDownload(t *testing.T) {
-	var options = &helm.Options{
-		SetValues: map[string]string{
-			"global.deployment.name":    "pega",
-			"global.provider":           "k8s",
-			"global.actions.execute":    "install",
-			"installer.imagePullPolicy": "Always",
-		},
-	}
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-	require.NoError(t, err)
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
 
-	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
-	yamlSplit := strings.Split(yamlContent, "---")
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
 
-	var job k8sbatch.Job
-	UnmarshalK8SYaml(t, yamlSplit[1], &job)
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                },
+            }
 
-    var volumes = job.Spec.Template.Spec.Volumes
-    var volumeMounts = job.Spec.Template.Spec.Containers[0].VolumeMounts
-    var initContainers = job.Spec.Template.Spec.InitContainers
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
+
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !strings.HasPrefix(trimmedYaml, "#")) { //filter out empty chunks of yaml and comments
+                    assertJobNoICDownloader(t, yaml, options)
+                }
+            }
+        }
+    }
+}
+
+func assertJobNoICDownloader(t *testing.T, yaml string, options *helm.Options) {
+    var job k8sbatch.Job
+    UnmarshalK8SYaml(t, yaml, &job)
+
+    var jobObj = job.Spec.Template.Spec
+    var initContainers = jobObj.InitContainers
+    var volumes = jobObj.Volumes
+    var volumeMounts = jobObj.Containers[0].VolumeMounts
 
     var ic = findNamedInitContainer(initContainers, "jdbc-lib-downloader0")
     require.Equal(t, (*k8score.Container)(nil), ic)
@@ -463,34 +484,45 @@ func TestPegaInstallerJobNoICDownload(t *testing.T) {
 }
 
 func TestPegaInstallerJobWithICDownload(t *testing.T) {
-	var options = &helm.Options{
-		SetValues: map[string]string{
-			"global.deployment.name":    "pega",
-			"global.provider":           "k8s",
-			"global.actions.execute":    "install",
-			"installer.imagePullPolicy": "Always",
-			"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
-		},
-	}
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
 
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-	require.NoError(t, err)
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
 
     testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
     require.NoError(t, err)
 
-	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
-	yamlSplit := strings.Split(yamlContent, "---")
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                },
+            }
 
-	var job k8sbatch.Job
-	UnmarshalK8SYaml(t, yamlSplit[1], &job)
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
 
-    assertJobICDownloadComponents(t, yamlSplit[1], options)
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !strings.HasPrefix(trimmedYaml, "#")) { //filter out empty chunks of yaml and comments
+                    assertJobICDownloadComponents(t, yaml, options)
+                }
+            }
+        }
+    }
 }
 
 func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
     var job k8sbatch.Job
 	UnmarshalK8SYaml(t, yaml, &job)
+
 	var jobSpec = job.Spec.Template.Spec
 	var actualInitContainers = jobSpec.InitContainers
 	var volumes = jobSpec.Volumes
