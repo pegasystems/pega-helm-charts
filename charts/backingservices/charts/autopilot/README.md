@@ -565,19 +565,21 @@ The Autopilot Service supports any OpenAI-compatible LLM provider (such as OpenR
 
 | Configuration | Usage |
 |---|---|
-| `customOpenAI.providers` | List of custom OpenAI-compatible provider configurations. |
-| `customOpenAI.providers[].creator` | Unique identifier for the provider (e.g., `openrouter`, `my-llm-server`). Used to derive env var names and must match the `creator` field in model entries. |
+| `customOpenAI.providers` | List of custom OpenAI-compatible provider configurations. Each entry produces a set of env vars in the pod automatically. |
+| `customOpenAI.providers[].creator` | Unique identifier for the provider (e.g., `openrouter`, `my-llm-server`). Must match the `creator` field in model entries. The chart derives env var names from this value. |
 | `customOpenAI.providers[].baseUrl` | Base URL of the provider's OpenAI-compatible API (e.g., `https://openrouter.ai/api/v1`). |
-| `customOpenAI.providers[].apiKey` | API key for the provider. Stored in a Kubernetes Secret. |
+| `customOpenAI.providers[].apiKey` | API key for the provider. Stored in a Kubernetes Secret by the chart. |
 | `customOpenAI.existingSecret` | Name of a pre-existing Kubernetes Secret containing API keys. When set, `apiKey` fields are not required. |
 
 ### How it works
 
-For each entry in `customOpenAI.providers`, the chart injects three environment variables into the pod:
+All environment variables are **constructed automatically by the Helm chart** from `customOpenAI.providers` — you do not set any of these manually.
 
-- `CUSTOM_OPENAI_PROVIDERS` — comma-separated list of all configured creator names (e.g., `openrouter,my-llm-server`)
-- `CUSTOM_OPENAI_<CREATOR>_BASE_URL` — the provider base URL (plain env var)
-- `CUSTOM_OPENAI_<CREATOR>_API_KEY` — the API key (read from a Kubernetes Secret)
+For each entry in `customOpenAI.providers`, the chart injects into the pod:
+
+- `CUSTOM_OPENAI_PROVIDERS` — comma-separated list of all `creator` values, assembled by the chart (e.g., `openrouter,my-llm-server`)
+- `CUSTOM_OPENAI_<CREATOR>_BASE_URL` — the `baseUrl` value for that provider (plain env var)
+- `CUSTOM_OPENAI_<CREATOR>_API_KEY` — the `apiKey` for that provider (read from a Kubernetes Secret)
 
 `<CREATOR>` is the `creator` value uppercased with hyphens and dots replaced by underscores. For example, `creator: openrouter` → `CUSTOM_OPENAI_OPENROUTER_BASE_URL` / `CUSTOM_OPENAI_OPENROUTER_API_KEY`.
 
