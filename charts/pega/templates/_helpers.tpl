@@ -341,6 +341,10 @@ true
 {{- define "generatedPodLabels" }}
 {{- end }}
 
+#Override this template to generate additional deployment labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedDeploymentLabels" }}
+{{- end }}
+
 #Kerberos config map
 {{- define "pegaKerberosVolumeTemplate" }}
 # Volume used to mount config files.
