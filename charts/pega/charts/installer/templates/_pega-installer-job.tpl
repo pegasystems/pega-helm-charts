@@ -46,6 +46,7 @@ spec:
 {{- end }}
       volumes:
 {{- include "jdbcLibVolume" .root | indent 6 }}
+{{- include "downloadScriptVolume" (merge (dict "chartType" "installer") .root) | indent 6 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
       - name: {{ template "pegaInstallerMountVolume" }}
         persistentVolumeClaim:

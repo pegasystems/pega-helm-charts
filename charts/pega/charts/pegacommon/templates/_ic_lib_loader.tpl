@@ -1,3 +1,8 @@
+{{- define "pegaLibDownloadScriptConfig" }}
+{{- $depName := printf "%s" (include "deploymentName" $) -}}
+{{- $depName -}}-{{- .chartType -}}-lib-download-script-config
+{{- end }}
+
 {{- define "jdbcLibVolume" }}
 {{- if .Values.global.downloadContainer }}
 {{- if .Values.global.downloadContainer.image }}
@@ -17,33 +22,41 @@
 {{- end }}
 {{- end }}
 
+{{- define "downloadScriptVolume" }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
+- name: download-script-volume
+  configMap:
+    name: {{ template "pegaLibDownloadScriptConfig" $ }}
+    defaultMode: 0550
+{{- end }}
+{{- end }}
+{{- end }}
+
 {{- define "jdbc-downloader-init-container" }}
 {{- if .Values.global.downloadContainer }}
 {{- if .Values.global.downloadContainer.image }}
-{{- $root := . }}
-
-{{- $urls := regexFindAll "[^,]+" .Values.global.jdbc.driverUri -1 }}
-{{- range $i, $url := $urls }}
-- name: jdbc-lib-downloader{{ $i }}
-  image: {{ $root.Values.global.downloadContainer.image }}
-  imagePullPolicy: {{ default "IfNotPresent" $root.Values.global.downloadContainer.imagePullPolicy }}
-  command: ['sh', '-c', '{{- template "jdbcDownloadCmd" (dict "url" $url "root" $root) }}']
+- name: jdbc-lib-downloader
+  image: {{ .Values.global.downloadContainer.image }}
+  imagePullPolicy: {{ default "IfNotPresent" .Values.global.downloadContainer.imagePullPolicy }}
+  command: ['sh', '-c', 'download-jdbc-lib.sh']
   env:
   - name: JDBC_DRIVER_URI
-    value: {{ $url | quote }}
+    value: {{ .Values.global.jdbc.driverUri | quote }}
   - name: ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION
-    value: "{{ $root.Values.global.customArtifactory.enableSSLVerification }}"
+    value: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
   volumeMounts:
   - name: jdbc-lib-volume
     mountPath: /opt/pega/lib
+  - name: download-script-volume
+    mountPath: /opt/pega/scripts
   - name: {{ template "pegaVolumeCredentials" }}
     mountPath: "/opt/pega/secrets"
-{{ if (eq (include "customArtifactorySSLVerificationEnabled" $root.root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .Values.global.customArtifactory }}
 {{- if .Values.global.customArtifactory.certificate }}
   - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
     mountPath: "/opt/pega/artifactory/cert"
-{{- end }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -61,78 +74,102 @@
 {{- $usesICDownload -}}
 {{- end }}
 
-{{- define "jdbcDownloadCmd" }}
-  {{- $enableSSLVerification := "false" -}}
-  {{- $customArtifactoryCert := "" }}
-  {{- $customArtifactoryAuth := "" }}
+{{- define "downloadScriptConfigMap" }}
+{{- if .Values.global.downloadContainer }}
+{{- if .Values.global.downloadContainer.image }}
+{{- $depName := printf "%s" (include "deploymentName" $) }}
+---
+# This template contains the script to download the JDBC driver from the specified location and copy it to the shared
+# volume. This script will be executed by the init container before starting the Pega application container.
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: {{ template "pegaLibDownloadScriptConfig" . }}
+  namespace: {{ .Release.Namespace }}
+data:
+  download-jdbc-lib.sh: |
+    #/bin/sh
 
-  {{- $caAuthBasicName := "" -}}
-  {{- $caAuthBasicPw := "" -}}
-  {{- $caAuthApiHeaderName := "" -}}
-  {{- $caAuthApiKey := "" -}}
+    pega_root=/opt/pega
+    lib_root=$pega_root/lib
+    art_root=$pega_root/artifactory
+    secret_root = $pega_root/secrets
 
-  {{- if .root.Values.global.customArtifactory -}}
-    {{- if .root.Values.global.customArtifactory.authentication -}}
-      {{- if .root.Values.global.customArtifactory.authentication.basic -}}
-        {{- $caAuthBasicName = .root.Values.global.customArtifactory.authentication.basic.username -}}
-        {{- $caAuthBasicPw = .root.Values.global.customArtifactory.authentication.basic.password -}}
-      {{- end -}}
-      {{- if .root.Values.global.customArtifactory.authentication.apiKey -}}
-        {{- $caAuthApiHeaderName = .root.Values.global.customArtifactory.authentication.apiKey.headerName -}}
-        {{- $caAuthApiKey = .root.Values.global.customArtifactory.authentication.apiKey.value -}}
-      {{- end -}}
-    {{- end -}}
+    export CAU="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_USERNAME)"
+    export CAP="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_PASSWORD)"
+    export CAAH="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_APIKEY_HEADER)"
+    export CAAK="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_APIKEY)"
 
-    {{- if .root.Values.global.customArtifactory.enableSSLVerification }}
-      {{- $enableSSLVerification = "true" -}}
-    {{- end }}
+    ca_auth=""
+    if [ "$CAU" != "" ] || [ "$CAP" != "" ]; then
+      if [ "$CAU" == "" ] || [ "$CAP" == "" ]; then
+        echo "CUSTOM_ARTIFACTORY_USERNAME & CUSTOM_ARTIFACTORY_PASSWORD must be specified for artifactory basic auth."
+        exit 1
+      else
+        echo "Using basic authentication for custom artifactory to download JDBC driver."
+        ca_auth="-u "$CAU":"$CAP
+      fi
+    fi
 
-    {{- if or (ne $caAuthBasicName "") (ne $caAuthBasicPw "") -}}
-      {{- if or (eq $caAuthBasicName "") (eq $caAuthBasicPw "") -}}
-        {{- fail "Both username and password must be provided for basic authentication in global.customArtifactory.authentication.basic" | quote }}
-      {{- else -}}
-        {{- $customArtifactoryAuth := printf "-u %s:%s" $caAuthBasicName $caAuthBasicPw -}}
-      {{- end -}}
-    {{- end -}}
-    {{- if eq $customArtifactoryAuth "" -}}
-      {{- if or (ne $caAuthApiHeaderName "") (ne $caAuthApiKey "") -}}
-        {{- if or (eq $caAuthApiHeaderName "") (eq $caAuthApiKey "") -}}
-          {{- fail "Both header name and API key must be provided for API key authentication in global.customArtifactory.authentication.apiKey" | quote }}
-        {{- else -}}
-          {{- $customArtifactoryAuth = printf "-H \"%s:%s\"" $caAuthApiHeaderName $caAuthApiKey -}}
-        {{- end -}}
-      {{- end }}
-    {{- end -}}
+    if [ "$ca_auth" == "" ]; then
+      if [[ "$CAAH" != "" || "$CAAK" != "" ]]; then
+        if [ "$CAAH" == "" ] || [ "$CAAK" == "" ]; then
+          echo "CUSTOM_ARTIFACTORY_APIKEY_HEADER & CUSTOM_ARTIFACTORY_APIKEY must be specified for authentication using api key for custom artifactory."
+          exit 1
+        else
+          echo "Using API key for artifactory authentication."
+          ca_auth="-H $CAAH:$CAAK"
+        fi
+      fi
+    fi
 
-    {{- if .root.Values.global.customArtifactory.certificate }}
-      {{- $certs := fromYaml .root.Values.global.customArtifactory.certificate -}}
-      {{- $certName := "" }}
-      {{- $certCount := 0 }}
-      {{- range $key, $value := $certs }}
-        {{- $certName = $key -}}
-        {{- $certCount = add $certCount 1 -}}
-      {{- end }}
-      {{- if eq $certCount 1 }}
-        {{- if regexMatch "^.+\\.(cer|pem|crt|der|cert|jks|p7b|p7c|key)$" $certName }}
-          {{- $customArtifactoryCert = printf "--cacert /opt/pega/artifactory/cert/%s" $certName -}}
-        {{- else -}}
-          {{- fail "The certificate file provided in global.customArtifactory.certificate must have a valid certificate file extension such as .cer, .pem, .crt, .der, .cert, .jks, .p7b, .p7c or .key" | quote }}
-        {{- end }}
-      {{- end }}
+    ca_cert=""
+    if [ "$(ls -A $art_root/cert/*)" ]; then
+      if [ "$(ls $art_root/cert/* | wc -l)" ]; then
+        echo "Certificate is provided for custom artifactory's domain ssl verification."
+        certfilename="$(ls $art_root/cert)"
+        ext="${certfilename##*.}"
+        regex="^(cer|pem|crt|der|cert|jks|p7b|p7c|key)$"
+        if [[ "$ext" =~ $regex ]]; then
+          echo "Using $certfilename"
+          ca_cert="--cacert $art_root/cert/$certfilename"
+        else
+          echo "curl needs valid format certificate file for ssl verification."
+          exit 1
+        fi
+      else
+        echo "Provide one certificate file. The file may contain multiple CA certificates."
+        exit 1
+      fi
+    fi
 
-    {{- end }}
-  {{- end }}
+    if [ "$JDBC_DRIVER_URI" != "" ]; then
+      curl_cmd_options=""
+      if [ "$ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION" == true ]; then
+        echo "Establishing a secure connection to download driver."
+        curl_cmd_options="-sSL $custom_artifactory_auth $custom_artifactory_certificate"
+      else
+        echo "Establishing an insecure connection to download driver."
+        curl_cmd_options="-ksSL $custom_artifactory_auth"
+      fi
+      urls=$(echo "$JDBC_DRIVER_URI" | tr "," "\n")
+        for url in $urls
+        do
+         echo "Downloading database driver: ${url}";
+         # jarabsurl="$(cut -d'?' -f1 <<<"$url")"
+         jarabsurl="$(echo "$url" | cut -d'?' -f1)"
+         echo "$jarabsurl"
+         filename=$(basename "$jarabsurl")
+         if curl $curl_cmd_options --output /dev/null --silent --fail -r 0-0 "$url"
+         then
+           curl $curl_cmd_options -o $lib_root/$filename "${url}"
+         else
+           echo "Could not download jar from ${url}"
+           exit 1
+         fi
+        done
+    fi
 
-  {{- $curlOptions := "" }}
-  {{- if eq $enableSSLVerification "true" }}
-    {{- $curlOptions = printf "-sSL --fail-with-body %s %s" $customArtifactoryAuth $customArtifactoryCert -}}
-  {{- else }}
-    {{- $curlOptions = printf "-ksSL --fail-with-body %s" $customArtifactoryAuth -}}
-  {{- end }}
-
-  {{- $url := .url -}}
-  {{- $filename := base $url -}}
-
-  {{- $curlCmd := printf "curl %s -o /opt/pega/lib/%s \"%s\" 2>&1 || exit $?" $curlOptions $filename $url }}
-  {{- $curlCmd -}}
+{{- end }}
+{{- end }}
 {{- end }}

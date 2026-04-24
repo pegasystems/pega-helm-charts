@@ -511,12 +511,23 @@ func TestPegaInstallerJobWithICDownload(t *testing.T) {
 
             for _, yaml := range yamlSplit {
                 trimmedYaml := strings.TrimSpace(yaml)
-                if (len(trimmedYaml) > 0 && !strings.HasPrefix(trimmedYaml, "#")) { //filter out empty chunks of yaml and comments
+                if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
                     assertJobICDownloadComponents(t, yaml, options)
                 }
             }
         }
     }
+}
+
+func isOnlyYamlComments(s string) bool {
+    lines := strings.Split(s, "\n")
+    for _, line := range lines {
+        trimmed := strings.TrimSpace(line)
+        if len(trimmed) > 0 && !strings.HasPrefix(trimmed, "#") {
+            return false
+        }
+    }
+    return true
 }
 
 func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
@@ -528,12 +539,15 @@ func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Opti
 	var volumes = jobSpec.Volumes
 	var volumeMounts = jobSpec.Containers[0].VolumeMounts
 
-	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader0"), "http://driverhost/drivers/driver1.jar")
-    assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader1"), "http://driverhost/drivers/driver2.jar")
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)
     require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+
+    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.NotNil(t, scriptVolume)
+    require.Equal(t, int32(0550), *scriptVolume.ConfigMap.DefaultMode)
 
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
