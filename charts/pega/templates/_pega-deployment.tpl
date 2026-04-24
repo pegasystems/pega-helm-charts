@@ -87,7 +87,7 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
-{{- include "jdbcLibVolume" (merge (dict "chartType" "runtime") .root) | indent 6 }}
+{{- include "jdbcLibVolume" (merge .root (dict "chartType" "runtime")) | indent 6 }}
 {{- include "downloadScriptVolume" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
       - name: hz-encryption-secrets
