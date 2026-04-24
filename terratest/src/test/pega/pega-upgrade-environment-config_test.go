@@ -186,3 +186,73 @@ func assertUpgradeEnvironmentConfigWithCustomJVMArgs(t *testing.T, configYaml st
     envConfigData := envConfigMap.Data
     require.Equal(t, envConfigData["CUSTOM_JVM_ARGS"], "-Da=1")
 }
+
+func TestPegaUpgradeEnvironmentConfigNoICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"upgrade-deploy"}
+	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "http://pega-web:80/prweb/PRRestService", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                     vendor,
+					"global.actions.execute":              operation,
+					"installer.upgrade.upgradeType":       "zero-downtime",
+					"installer.upgrade.pegaRESTServerURL": "",
+					"installer.upgrade.pegaRESTUsername":  expectedValues["PEGA_REST_USERNAME"],
+					"installer.upgrade.pegaRESTPassword":  expectedValues["PEGA_REST_PASSWORD"],
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+			assertUpgradeEnvironmentConfigJdbcUri(t, yamlContent, options, "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
+		}
+	}
+}
+
+
+func TestPegaUpgradeEnvironmentConfigWithICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"upgrade-deploy"}
+	var expectedValues = map[string]string{"PEGA_REST_SERVER_URL": "http://pega-web:80/prweb/PRRestService", "PEGA_REST_USERNAME": "username", "PEGA_REST_PASSWORD": "password"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                     vendor,
+					"global.actions.execute":              operation,
+					"installer.upgrade.upgradeType":       "zero-downtime",
+					"installer.upgrade.pegaRESTServerURL": "",
+					"installer.upgrade.pegaRESTUsername":  expectedValues["PEGA_REST_USERNAME"],
+					"installer.upgrade.pegaRESTPassword":  expectedValues["PEGA_REST_PASSWORD"],
+					"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-upgrade-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+			assertUpgradeEnvironmentConfigJdbcUri(t, yamlContent, options, "")
+		}
+	}
+}
+
+func assertUpgradeEnvironmentConfigJdbcUri(t *testing.T, configYaml string, options *helm.Options, expectedDriverUri string) {
+	var upgradeEnvConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, configYaml, &upgradeEnvConfigMap)
+	upgradeEnvConfigData := upgradeEnvConfigMap.Data
+
+	require.Equal(t, expectedDriverUri, upgradeEnvConfigData["JDBC_DRIVER_URI"])
+}

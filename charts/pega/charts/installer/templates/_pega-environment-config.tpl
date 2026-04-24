@@ -8,7 +8,7 @@ data:
   JDBC_URL: {{ .Values.global.jdbc.url }}
   # Class name of the DB's JDBC driver
   JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
-{{- if .Values.global.jdbc.driverUri }}
+{{- if and .Values.global.jdbc.driverUri (eq (include "usesICDownload" .) "false")}}
   # URI that the JDBC driver can be downloaded from
   JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
 {{- end }}
