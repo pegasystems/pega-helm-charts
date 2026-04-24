@@ -20,7 +20,7 @@ func TestPegaLibDownloadScriptConfig(t *testing.T) {
             "global.downloadContainer.image": "ICDOWNLOAD_IMAGE:1.0",
         },
     }
-    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-lib-download-script-config.yaml"})
+    yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-lib-download-script-config.yaml"})
 
     var envConfigMap k8score.ConfigMap
     UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
