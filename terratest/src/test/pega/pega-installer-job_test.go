@@ -552,4 +552,8 @@ func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Opti
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
     require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+
+    var installerCredVolumeMount = findNamedVolumeMount(volumeMounts, "pega-installer-credentials-volume")
+    require.NotNil(t, installerCredVolumeMount)
+    require.Equal(t, "/opt/pega/secrets", installerCredVolumeMount.MountPath)
 }

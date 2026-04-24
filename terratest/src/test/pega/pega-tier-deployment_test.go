@@ -535,6 +535,10 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
     require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+
+    var credVolumeMount = findNamedVolumeMount(volumeMounts, "pega-volume-credentials")
+    require.NotNil(t, credVolumeMount)
+    require.Equal(t, "/opt/pega/secrets", credVolumeMount.MountPath)
 }
 
 func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string) {

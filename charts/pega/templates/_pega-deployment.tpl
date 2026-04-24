@@ -117,7 +117,9 @@ spec:
 {{- end }}
 {{- end }}
       initContainers:
-{{- include "jdbc-downloader-init-container" .root | indent 6 }}
+{{- $credVolumeName := include "pegaVolumeCredentials" .root }}
+{{- $artifactoryCertVolumeName := include "pegaCustomArtifactoryCertificateTemplate" .root }}
+{{- include "jdbc-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}

@@ -50,7 +50,7 @@
     mountPath: /opt/pega/lib
   - name: download-script-volume
     mountPath: /opt/pega/scripts
-  - name: {{ template "pegaVolumeCredentials" }}
+  - name: {{ .credVolumeName }}
     mountPath: "/opt/pega/secrets"
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
 {{- if .Values.global.customArtifactory }}
