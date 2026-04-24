@@ -35,6 +35,7 @@ metadata:
 {{- if .node.deploymentLabels }}
 {{ toYaml .node.deploymentLabels | indent 4 }}
 {{- end }}
+{{- include "generatedDeploymentLabels" .root | indent 4 }}
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
