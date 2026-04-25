@@ -61,6 +61,26 @@ srsRuntime:
     # Even though the system uses secrets to read the certificates and passwords, you must still configure
     # "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type" with the type of store file it is (for example, PKCS12 or JKS).
     # certsSecret: srs-ssl-certificates
+    # Vault configuration for SRS SSL/mTLS certificates and passwords.
+    # When vault.enabled is set to 'true', the SRS application fetches the mTLS certificates and passwords
+    # directly from HashiCorp Vault. The existing K8s secrets flow (certsSecret, keystore, truststore passwords)
+    # is skipped for SRS SSL — only keystore.type and truststore.type are still needed.
+    vault:
+      # Set to 'true' to use HashiCorp Vault as the provider for SRS SSL certificates and passwords.
+      enabled: false
+      # HashiCorp Vault server URL (e.g., https://vault.example.com).
+      url: ""
+      # Vault Kubernetes authentication role.
+      role: ""
+      # Path in Vault where the SSL secrets (certificates and passwords) are stored.
+      secretPath: ""
+      # Vault namespace (optional, required for Vault Enterprise with namespaces).
+      namespace: ""
+      # Name of the Kubernetes secret that contains the Vault token.
+      # Create this secret before deploying: kubectl create secret generic <name> --from-literal=<tokenSecretKey>=<vault-token>
+      tokenSecret: ""
+      # Key within the Kubernetes secret that holds the Vault token value. Default is 'token'.
+      tokenSecretKey: "token"
 
   # Use this parameter to configure values for Java options.
   javaOpts: ""

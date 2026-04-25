@@ -46,21 +46,34 @@ spec:
             - name: srs-certificates
               mountPath: /usr/share/
               {{- if .Values.srsRuntime.ssl.enabled }}
+              {{- if not (and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled)) }}
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
                 {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
             - name: srs-readiness-volume
               mountPath: /usr/share/ssl/srs/readiness/
                 {{ end }}
+              {{- end }}
+              {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+            - name: srs-vault-token-volume
+              mountPath: /opt/srs/secrets/vault
+              readOnly: true
+              {{- end }}
               {{ end }}
           {{- else if .Values.srsRuntime.ssl.enabled }}
           volumeMounts:
+              {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+            - name: srs-vault-token-volume
+              mountPath: /opt/srs/secrets/vault
+              readOnly: true
+              {{- else }}
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
               {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
             - name: srs-readiness-volume
               mountPath: /usr/share/ssl/srs/readiness/
               {{ end }}
+              {{- end }}
               {{- if .Values.srsStorage.mtls.enabled }}
             - name: es-ssl-volume
               mountPath: /usr/share/ssl/es/
@@ -209,6 +222,22 @@ spec:
               value: "true"
             - name: SRS_TLS_CLIENT_AUTHENTICATION
               value: "{{ .Values.srsRuntime.ssl.clientAuthentication | default "want"}}"
+            {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+            - name: SRS_VAULT_SSL_ENABLED
+              value: "true"
+            - name: SRS_VAULT_URL
+              value: {{ .Values.srsRuntime.ssl.vault.url | quote }}
+            - name: SRS_VAULT_ROLE
+              value: {{ .Values.srsRuntime.ssl.vault.role | quote }}
+            - name: SRS_VAULT_SECRET_PATH
+              value: {{ .Values.srsRuntime.ssl.vault.secretPath | quote }}
+            - name: SRS_VAULT_TOKEN_PATH
+              value: "/opt/srs/secrets/vault/{{ .Values.srsRuntime.ssl.vault.tokenSecretKey | default "token" }}"
+            {{- if (.Values.srsRuntime.ssl.vault).namespace }}
+            - name: SRS_VAULT_NAMESPACE
+              value: {{ .Values.srsRuntime.ssl.vault.namespace | quote }}
+            {{- end }}
+            {{- else }}
             - name: PATH_TO_SRS_KEYSTORE
               value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.keystore.file | default "srs-keystore.p12"}}"
             - name: SRS_KEYSTORE_TYPE
@@ -228,6 +257,7 @@ spec:
                 secretKeyRef:
                   name: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
                   key: truststorePassword
+            {{- end }}
             {{- end }}
             {{- end }}
             - name: APPLICATION_HOST
@@ -256,6 +286,7 @@ spec:
         secret:
           secretName: "{{ .Values.srsStorage.certsSecret | default "srs-certificates"}}"
         {{- if .Values.srsRuntime.ssl.enabled }}
+        {{- if not (and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled)) }}
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
@@ -264,9 +295,28 @@ spec:
         secret:
           secretName: "srs-readiness-certs"
           {{ end }}
+        {{- end }}
+        {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+      - name: srs-vault-token-volume
+        secret:
+          secretName: {{ .Values.srsRuntime.ssl.vault.tokenSecret }}
+          defaultMode: 420
+          items:
+            - key: {{ .Values.srsRuntime.ssl.vault.tokenSecretKey | default "token" }}
+              path: {{ .Values.srsRuntime.ssl.vault.tokenSecretKey | default "token" }}
+        {{- end }}
         {{ end }}
       {{- else if .Values.srsRuntime.ssl.enabled }}
       volumes:
+        {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+      - name: srs-vault-token-volume
+        secret:
+          secretName: {{ .Values.srsRuntime.ssl.vault.tokenSecret }}
+          defaultMode: 420
+          items:
+            - key: {{ .Values.srsRuntime.ssl.vault.tokenSecretKey | default "token" }}
+              path: {{ .Values.srsRuntime.ssl.vault.tokenSecretKey | default "token" }}
+        {{- else }}
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
@@ -275,6 +325,7 @@ spec:
         secret:
           secretName: "srs-readiness-certs"
         {{ end }}
+        {{- end }}
         {{- if .Values.srsStorage.mtls.enabled }}
       - name: es-ssl-volume
         secret:

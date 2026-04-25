@@ -87,6 +87,18 @@ srs:
       # Even though the system uses secrets to read the certificates and passwords, you must still configure
       # "srs.srsRuntime.ssl.keystore.type" and "srs.srsRuntime.ssl.truststore.type" with the type of store file it is (for example, PKCS12 or JKS).
       # certsSecret: srs-ssl-certificates
+      # Vault configuration for SRS SSL/mTLS certificates and passwords.
+      # When vault.enabled is set to 'true', the SRS application fetches the mTLS certificates and passwords
+      # directly from HashiCorp Vault. The existing K8s secrets flow (certsSecret, keystore, truststore passwords)
+      # is skipped for SRS SSL.
+      # vault:
+      #   enabled: false
+      #   url: ""
+      #   role: ""
+      #   secretPath: ""
+      #   namespace: ""
+      #   tokenSecret: ""
+      #   tokenSecretKey: "token"
 
   # This section specifies the elasticsearch cluster configuration.
   srsStorage:
