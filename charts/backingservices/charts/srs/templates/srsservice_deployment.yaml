@@ -40,6 +40,11 @@ spec:
             - name: srs-https-port
               containerPort: 8443
               protocol: TCP
+            {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+            - name: srs-health-port
+              containerPort: 8082
+              protocol: TCP
+            {{- end }}
             {{ end }}
           {{- if .Values.srsStorage.tls.enabled }}
           volumeMounts:
@@ -92,6 +97,12 @@ spec:
           {{ end }}
           readinessProbe:
               {{- if .Values.srsRuntime.ssl.enabled }}
+              {{- if and (.Values.srsRuntime.ssl.vault) (.Values.srsRuntime.ssl.vault.enabled) }}
+            httpGet:
+              path: /health
+              port: 8082
+              scheme: HTTP
+              {{- else }}
             exec:
               command:
                 - wget
@@ -104,6 +115,7 @@ spec:
                 - --no-verbose
                 - --spider
                 - https://localhost:8443/health
+              {{- end }}
               {{- else }}
             httpGet:
               path: /health
@@ -237,6 +249,10 @@ spec:
             - name: SRS_VAULT_NAMESPACE
               value: {{ .Values.srsRuntime.ssl.vault.namespace | quote }}
             {{- end }}
+            - name: SRS_HEALTH_HTTP_ENABLED
+              value: "true"
+            - name: SRS_HEALTH_HTTP_PORT
+              value: "8082"
             {{- else }}
             - name: PATH_TO_SRS_KEYSTORE
               value: "file:///usr/share/ssl/srs/{{ .Values.srsRuntime.ssl.keystore.file | default "srs-keystore.p12"}}"
