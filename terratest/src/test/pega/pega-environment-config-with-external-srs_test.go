@@ -206,3 +206,58 @@ func VerifyEnvConfigDataWithAuthVariables(t *testing.T, envConfigData map[string
 	_, hasClientPrivateKey := envConfigData["SERV_AUTH_CLIENT_SECRET"]
 	require.False(t, hasClientPrivateKey)
 }
+
+func TestPegaConfigWithSRSmTLSVaultEnabled(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			fmt.Println(vendor + "-" + operation)
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":                         vendor,
+					"global.actions.execute":                  operation,
+					"pegasearch.externalSearchService":        "true",
+					"pegasearch.externalURL":                  "https://srs:9200",
+					"pegasearch.srsMTLS.enabled":              "true",
+					"pegasearch.srsMTLS.vault.enabled":        "true",
+					"pegasearch.srsMTLS.vault.url":            "https://vault.example.com",
+					"pegasearch.srsMTLS.vault.role":           "pega-role",
+					"pegasearch.srsMTLS.vault.secretPath":     "secret/data/pega/mtls",
+					"pegasearch.srsMTLS.vault.namespace":      "pega-ns",
+					"pegasearch.srsMTLS.vault.tokenSecret":    "vault-token-secret",
+					"pegasearch.srsMTLS.vault.tokenSecretKey": "token",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+			VerifyPegaWithSRSmTLSVaultEnvironmentConfig(t, yamlContent)
+		}
+	}
+}
+
+func VerifyPegaWithSRSmTLSVaultEnvironmentConfig(t *testing.T, yamlContent string) {
+	var envConfigMap k8score.ConfigMap
+	statefulSlice := strings.Split(yamlContent, "---")
+	for index, statefulInfo := range statefulSlice {
+		if index >= 1 {
+			UnmarshalK8SYaml(t, statefulInfo, &envConfigMap)
+			envConfigData := envConfigMap.Data
+			require.Equal(t, "true", envConfigData["SRS_MTLS_ENABLED"])
+			require.Equal(t, "true", envConfigData["SRS_MTLS_VAULT_ENABLED"])
+			require.Equal(t, "https://vault.example.com", envConfigData["SRS_MTLS_VAULT_URL"])
+			require.Equal(t, "pega-role", envConfigData["SRS_MTLS_VAULT_ROLE"])
+			require.Equal(t, "secret/data/pega/mtls", envConfigData["SRS_MTLS_VAULT_SECRET_PATH"])
+			require.Equal(t, "/opt/pega/secrets/vault/token", envConfigData["SRS_MTLS_VAULT_TOKEN_PATH"])
+			require.Equal(t, "pega-ns", envConfigData["SRS_MTLS_VAULT_NAMESPACE"])
+			// Should NOT have truststore/keystore paths when vault is enabled
+			require.Empty(t, envConfigData["SRS_TRUSTSTORE_PATH"])
+			require.Empty(t, envConfigData["SRS_KEYSTORE_PATH"])
+		}
+	}
+}

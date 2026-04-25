@@ -535,6 +535,26 @@ pegasearch:
     # SRS_TRUSTSTORE_PASSWORD and SRS_KEYSTORE_PASSWORD.
     # Enter the external secret name below.
     external_secret_name: ""
+    # Vault configuration for SRS mTLS certificates and passwords.
+    # When vault.enabled is set to 'true', the platform fetches the mTLS certificates and passwords
+    # directly from HashiCorp Vault. The existing K8s secrets flow (trustStore, keyStore, passwords,
+    # certificatesSecrets, external_secret_name) is skipped entirely.
+    vault:
+      # Set to 'true' to use HashiCorp Vault as the provider for SRS mTLS certificates and passwords.
+      enabled: false
+      # HashiCorp Vault server URL (e.g., https://vault.example.com).
+      url: ""
+      # Vault Kubernetes authentication role.
+      role: ""
+      # Path in Vault where the mTLS secrets (certificates and passwords) are stored.
+      secretPath: ""
+      # Vault namespace (optional, required for Vault Enterprise with namespaces).
+      namespace: ""
+      # Name of the Kubernetes secret that contains the Vault token.
+      # Create this secret before deploying: kubectl create secret generic <name> --from-literal=<tokenSecretKey>=<vault-token>
+      tokenSecret: ""
+      # Key within the Kubernetes secret that holds the Vault token value. Default is 'token'.
+      tokenSecretKey: "token"
 
 # Pega Installer settings.
 installer:

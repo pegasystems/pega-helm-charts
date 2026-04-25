@@ -87,6 +87,7 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- include "pegaVaultTokenVolumeTemplate" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
       - name: hz-encryption-secrets
         secret:
@@ -293,6 +294,7 @@ spec:
 {{- end }}
         - name: {{ template "pegaVolumeCredentials" }}
           mountPath: "/opt/pega/secrets"
+{{- include "pegaVaultTokenVolumeMountTemplate" .root | indent 8 }}
         #mount custom certificates
 {{ if or (.root.Values.global.certificates) (.root.Values.global.certificatesSecrets) }}
         - name: {{ template "pegaVolumeImportCertificates" }}

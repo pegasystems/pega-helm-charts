@@ -575,6 +575,28 @@ servicePort: use-annotation
   {{- end}}
 {{- end}}
 
+{{- define "pegaVaultTokenVolumeName" -}}pega-vault-token-volume{{- end -}}
+
+{{- define "pegaVaultTokenVolumeTemplate" }}
+{{- if (eq (include "isSRSMTLSVaultEnabled" .) "true") }}
+- name: {{ template "pegaVaultTokenVolumeName" }}
+  secret:
+    secretName: {{ .Values.pegasearch.srsMTLS.vault.tokenSecret }}
+    defaultMode: 420
+    items:
+      - key: {{ .Values.pegasearch.srsMTLS.vault.tokenSecretKey | default "token" }}
+        path: {{ .Values.pegasearch.srsMTLS.vault.tokenSecretKey | default "token" }}
+{{- end }}
+{{- end }}
+
+{{- define "pegaVaultTokenVolumeMountTemplate" }}
+{{- if (eq (include "isSRSMTLSVaultEnabled" .) "true") }}
+- name: {{ template "pegaVaultTokenVolumeName" }}
+  mountPath: "/opt/pega/secrets/vault"
+  readOnly: true
+{{- end }}
+{{- end }}
+
 {{- define "isPega25OrLater"}}
   {{- if .Values.global.pegaVersion }}
     {{- /* Check provided release if using 8.x version pattern */ -}}

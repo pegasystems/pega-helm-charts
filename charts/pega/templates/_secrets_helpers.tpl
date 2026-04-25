@@ -39,8 +39,16 @@ false
 {{- end -}}
 {{- end -}}
 
+{{- define "isSRSMTLSVaultEnabled" }}
+{{- if and ((.Values.pegasearch.srsMTLS).enabled) ((.Values.pegasearch.srsMTLS).vault) ((.Values.pegasearch.srsMTLS.vault).enabled) -}}
+true
+{{- else -}}
+false
+{{- end -}}
+{{- end -}}
+
 {{- define "deploySRSSecret" }}
-{{- if and (eq (include "performDeployment" .) "true") ((.Values.pegasearch.srsMTLS).enabled) -}}
+{{- if and (eq (include "performDeployment" .) "true") ((.Values.pegasearch.srsMTLS).enabled) (ne (include "isSRSMTLSVaultEnabled" .) "true") -}}
 true
 {{- else -}}
 false
