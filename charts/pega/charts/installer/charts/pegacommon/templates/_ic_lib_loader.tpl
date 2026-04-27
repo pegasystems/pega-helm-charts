@@ -118,7 +118,7 @@ data:
           exit 1
         else
           echo "Using API key for artifactory authentication."
-          ca_auth="-H $CAAH:$CAAK"
+          ca_auth="-H \"$CAAH:$CAAK\""
         fi
       fi
     fi
