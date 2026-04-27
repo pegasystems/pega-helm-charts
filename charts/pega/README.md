@@ -45,6 +45,10 @@ action: "deploy"
 
 ## NIST SP 800-53 and NIST SP 800-131
 
+**Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**
+Please reference this article for more information:
+https://docs.pega.com/bundle/platform/page/platform/security/enabling-fips-140-3.html
+
 Set the `highlySecureCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
 
 For example:
@@ -644,7 +648,7 @@ Parameter             | Description    | Default value
 
 ### Volume claim template
 
-A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
+A `volumeClaimTemplate` may be configured for embedded search or stream tiers to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates or for runtime tiers (e.g. web or batch).
 
 ### Deployment strategy
 
