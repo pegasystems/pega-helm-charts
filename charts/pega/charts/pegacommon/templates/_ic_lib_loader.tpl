@@ -28,7 +28,7 @@
 - name: download-script-volume
   configMap:
     name: {{ template "pegaLibDownloadScriptConfig" $ }}
-    defaultMode: 0550
+    defaultMode: 0555
 {{- end }}
 {{- end }}
 {{- end }}
@@ -90,10 +90,10 @@ data:
   download-jdbc-lib.sh: |
     #/bin/sh
 
-    pega_root=/opt/pega
-    lib_root=$pega_root/lib
-    art_root=$pega_root/artifactory
-    secret_root = $pega_root/secrets
+    pega_root="/opt/pega"
+    lib_root="$pega_root/lib"
+    art_root="$pega_root/artifactory"
+    secret_root="$pega_root/secrets"
 
     export CAU="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_USERNAME)"
     export CAP="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_PASSWORD)"
