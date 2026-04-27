@@ -530,7 +530,7 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
 
     var scriptVolume = findNamedVolume(volumes, "download-script-volume")
     require.NotNil(t, scriptVolume)
-    require.Equal(t, int32(0550), *scriptVolume.ConfigMap.DefaultMode)
+    require.Equal(t, int32(0555), *scriptVolume.ConfigMap.DefaultMode)
 
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)

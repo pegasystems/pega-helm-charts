@@ -1,10 +1,28 @@
 ---
-apiVersion: v1
+apiVersion: v2
 name: pega
 version: "4.5.2"
+type: application
 description: Pega installation on kubernetes
 keywords:
 - pega
 - prpc
 - kubernetes
 home: http://www.pega.com
+
+# Pega does NOT actively update this Cassandra dependency. To leverage Cassandra, you should:
+# * Update the cassandra 'version' value, or
+# * Disable deploying cassandra by setting 'cassandra.enabled' to false.
+dependencies:
+  - name: cassandra
+    version: "0.13.3"
+    repository: https://charts.helm.sh/incubator
+    condition: cassandra.enabled
+  - name: constellation
+    version: "0.0.1"
+  - name: hazelcast
+    version: "1.0.0"
+  - name: installer
+    version: "1.2.0"
+  - name: pegasearch
+    version: "1.2.0"
