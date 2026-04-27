@@ -547,7 +547,7 @@ func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string)
     require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
     require.Equal(t, "/opt/pega/lib", ic.VolumeMounts[0].MountPath)
     require.Equal(t, "download-script-volume", ic.VolumeMounts[1].Name)
-    require.Equal(t, "/opt/pega/scripts", ic.VolumeMounts[1].MountPath)
+    require.Equal(t, "/opt/pega/dlscripts", ic.VolumeMounts[1].MountPath)
     require.Equal(t, "JDBC_DRIVER_URI", ic.Env[0].Name)
     require.Equal(t, expectedURL, ic.Env[0].Value)
 }

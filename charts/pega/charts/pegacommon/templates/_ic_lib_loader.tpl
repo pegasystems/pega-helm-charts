@@ -39,7 +39,7 @@
 - name: jdbc-lib-downloader
   image: {{ .Values.global.downloadContainer.image }}
   imagePullPolicy: {{ default "IfNotPresent" .Values.global.downloadContainer.imagePullPolicy }}
-  command: ['sh', '-c', '/opt/pega/scripts/download-jdbc-lib.sh']
+  command: ['sh', '-c', '/opt/pega/dlscripts/download-jdbc-lib.sh']
   env:
   - name: JDBC_DRIVER_URI
     value: {{ .Values.global.jdbc.driverUri | quote }}
@@ -49,7 +49,7 @@
   - name: jdbc-lib-volume
     mountPath: /opt/pega/lib
   - name: download-script-volume
-    mountPath: /opt/pega/scripts
+    mountPath: /opt/pega/dlscripts
   - name: {{ .credVolumeName }}
     mountPath: "/opt/pega/secrets"
 {{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
