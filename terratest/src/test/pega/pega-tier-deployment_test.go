@@ -507,14 +507,14 @@ func TestPegaTierDeploymentWithICDownload(t *testing.T) {
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
 				yamlSplit := strings.Split(yamlContent, "---")
-				assertICDownloadComponents(t, yamlSplit[1], options)
-				assertICDownloadComponents(t, yamlSplit[2], options)
+				assertICDownloadComponents(t, yamlSplit[1], options, false)
+				assertICDownloadComponents(t, yamlSplit[2], options, false)
 			}
 		}
 	}
 }
 
-func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
+func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options, shouldHaveCert bool) {
     var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, yaml, &deploymentObj)
 	var podSpec = deploymentObj.Spec.Template.Spec
@@ -522,7 +522,7 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
 	var volumes = podSpec.Volumes
 	var volumeMounts = podSpec.Containers[0].VolumeMounts
 
-	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar", shouldHaveCert)
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)
@@ -531,6 +531,11 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
     var scriptVolume = findNamedVolume(volumes, "download-script-volume")
     require.NotNil(t, scriptVolume)
     require.Equal(t, int32(0555), *scriptVolume.ConfigMap.DefaultMode)
+
+    if (shouldHaveCert) {
+        var certVolume = findNamedVolume(volumes, "pega-volume-custom-artifactory-certificate")
+        require.NotNil(t, certVolume)
+    }
 
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
@@ -541,7 +546,7 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
     require.Equal(t, "/opt/pega/secrets", credVolumeMount.MountPath)
 }
 
-func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string) {
+func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string, shouldHaveCert bool) {
     require.NotNil(t, ic)
     require.Equal(t, "IC_DOWNLOAD_CONTAINER:1.0", ic.Image)
     require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
@@ -550,6 +555,11 @@ func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string)
     require.Equal(t, "/opt/pega/dlscripts", ic.VolumeMounts[1].MountPath)
     require.Equal(t, "JDBC_DRIVER_URI", ic.Env[0].Name)
     require.Equal(t, expectedURL, ic.Env[0].Value)
+    if (shouldHaveCert) {
+        var certMount = findNamedVolumeMount(ic.VolumeMounts, "pega-volume-custom-artifactory-certificate")
+        require.NotNil(t, certMount)
+        require.Equal(t, "/opt/pega/artifactory/cert", certMount.MountPath)
+    }
 }
 
 func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Options) {
@@ -573,3 +583,41 @@ func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Opt
     require.Equal(t, (*k8score.VolumeMount)(nil), jdbcLibVolumeMount)
 }
 
+func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
+	var deploymentNames = []string{"pega", "myapp-dev"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			for _, depName := range deploymentNames {
+
+				fmt.Println(vendor + "-" + operation)
+
+				var options = &helm.Options{
+					SetValues: map[string]string{
+						"global.provider":               vendor,
+						"global.actions.execute":        operation,
+						"global.deployment.name":        depName,
+						"installer.upgrade.upgradeType": "zero-downtime",
+						"global.storageClassName":       "storage-class",
+						"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+					},
+				}
+
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml")
+				yamlSplit := strings.Split(yamlContent, "---")
+				assertICDownloadComponents(t, yamlSplit[1], options, true)
+				assertICDownloadComponents(t, yamlSplit[2], options, true)
+			}
+		}
+	}
+}

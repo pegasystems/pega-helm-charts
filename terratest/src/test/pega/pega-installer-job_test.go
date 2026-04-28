@@ -512,7 +512,43 @@ func TestPegaInstallerJobWithICDownload(t *testing.T) {
             for _, yaml := range yamlSplit {
                 trimmedYaml := strings.TrimSpace(yaml)
                 if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
-                    assertJobICDownloadComponents(t, yaml, options)
+                    assertJobICDownloadComponents(t, yaml, options, false)
+                }
+            }
+        }
+    }
+}
+
+func TestPegaInstallerJobWithICDownloadWithCert(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
+
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
+
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
+                    assertJobICDownloadComponents(t, yaml, options, true)
                 }
             }
         }
@@ -530,7 +566,7 @@ func isOnlyYamlComments(s string) bool {
     return true
 }
 
-func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options) {
+func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options,  shouldHaveCert bool) {
     var job k8sbatch.Job
 	UnmarshalK8SYaml(t, yaml, &job)
 
@@ -539,7 +575,7 @@ func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Opti
 	var volumes = jobSpec.Volumes
 	var volumeMounts = jobSpec.Containers[0].VolumeMounts
 
-	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar", shouldHaveCert)
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)

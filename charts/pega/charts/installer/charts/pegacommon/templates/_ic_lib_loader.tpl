@@ -52,7 +52,7 @@
     mountPath: /opt/pega/dlscripts
   - name: {{ .credVolumeName }}
     mountPath: "/opt/pega/secrets"
-{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
+{{ if (eq (include "customArtifactorySSLVerificationEnabled" .) "true") }}
 {{- if .Values.global.customArtifactory }}
 {{- if .Values.global.customArtifactory.certificate }}
   - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
