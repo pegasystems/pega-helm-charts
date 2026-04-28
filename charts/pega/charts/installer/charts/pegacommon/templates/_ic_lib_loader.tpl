@@ -95,10 +95,10 @@ data:
     art_root="$pega_root/artifactory"
     secret_root="$pega_root/secrets"
 
-    export CAU="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_USERNAME)"
-    export CAP="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_PASSWORD)"
-    export CAAH="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_APIKEY_HEADER)"
-    export CAAK="$(base64 -d $secret_root/CUSTOM_ARTIFACTORY_APIKEY)"
+    export CAU="$(cat $secret_root/CUSTOM_ARTIFACTORY_USERNAME)"
+    export CAP="$(cat $secret_root/CUSTOM_ARTIFACTORY_PASSWORD)"
+    export CAAH="$(cat $secret_root/CUSTOM_ARTIFACTORY_APIKEY_HEADER)"
+    export CAAK="$(cat $secret_root/CUSTOM_ARTIFACTORY_APIKEY)"
 
     ca_auth=""
     if [ "$CAU" != "" ] || [ "$CAP" != "" ]; then
@@ -107,7 +107,7 @@ data:
         exit 1
       else
         echo "Using basic authentication for custom artifactory to download JDBC driver."
-        ca_auth="-u "$CAU":"$CAP
+        ca_auth="-u $CAU:$CAP"
       fi
     fi
 
@@ -118,7 +118,7 @@ data:
           exit 1
         else
           echo "Using API key for artifactory authentication."
-          ca_auth="-H \"$CAAH:$CAAK\""
+          ca_auth="-H $CAAH:$CAAK"
         fi
       fi
     fi
@@ -147,18 +147,16 @@ data:
       curl_cmd_options=""
       if [ "$ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION" == true ]; then
         echo "Establishing a secure connection to download driver."
-        curl_cmd_options="-sSL $custom_artifactory_auth $custom_artifactory_certificate"
+        curl_cmd_options="-sSL $ca_auth $custom_artifactory_certificate"
       else
         echo "Establishing an insecure connection to download driver."
-        curl_cmd_options="-ksSL $custom_artifactory_auth"
+        curl_cmd_options="-ksSL $ca_auth"
       fi
       urls=$(echo "$JDBC_DRIVER_URI" | tr "," "\n")
         for url in $urls
         do
          echo "Downloading database driver: ${url}";
-         # jarabsurl="$(cut -d'?' -f1 <<<"$url")"
          jarabsurl="$(echo "$url" | cut -d'?' -f1)"
-         echo "$jarabsurl"
          filename=$(basename "$jarabsurl")
          if curl $curl_cmd_options --output /dev/null --silent --fail -r 0-0 "$url"
          then
