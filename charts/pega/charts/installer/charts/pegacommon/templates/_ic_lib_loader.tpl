@@ -147,11 +147,12 @@ data:
       curl_cmd_options=""
       if [ "$ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION" == true ]; then
         echo "Establishing a secure connection to download driver."
-        curl_cmd_options="-sSL $ca_auth $custom_artifactory_certificate"
+        curl_cmd_options="-sSL $ca_auth $ca_cert"
       else
         echo "Establishing an insecure connection to download driver."
         curl_cmd_options="-ksSL $ca_auth"
       fi
+      echo "Using curl options: $curl_cmd_options"
       urls=$(echo "$JDBC_DRIVER_URI" | tr "," "\n")
         for url in $urls
         do
