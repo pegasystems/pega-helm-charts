@@ -246,6 +246,8 @@ global:
         imagePullPolicy: "IfNotPresent"
         sharedVolumeSize: "10Mi"
 ```
+The requirements for the image is that it contains cURL on the path and is capable of running a POSIX compliant shell script.
+
 The Pega Platform images still contain the cURL utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The cURL utility will eventually be removed from the main Pega images.
 
 ## Deployment Name (Optional)
