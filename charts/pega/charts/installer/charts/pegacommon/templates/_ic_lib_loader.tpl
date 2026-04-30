@@ -139,14 +139,14 @@ data:
         certfilename="$(ls $art_root/cert)"
         ext="${certfilename##*.}"
 
-        echo "false" > cert_type_is_valid.txt
+        echo "false" > ${lib_root}/cert_type_is_valid.txt
         echo "$cert_type_list" | while IFS= read -r line; do
           if [ "$ext" = "$line" ]; then
-           echo "true" > cert_type_is_valid.txt
+           echo "true" > ${lib_root}/cert_type_is_valid.txt
           fi
         done
-        isValid="$(cat cert_type_is_valid.txt)"
-        rm cert_type_is_valid.txt
+        isValid="$(cat ${lib_root}/cert_type_is_valid.txt)"
+        rm ${lib_root}/cert_type_is_valid.txt
         if [ "$isValid" = "true" ]; then
           echo "Using $certfilename"
           ca_cert="--cacert $art_root/cert/$certfilename"
