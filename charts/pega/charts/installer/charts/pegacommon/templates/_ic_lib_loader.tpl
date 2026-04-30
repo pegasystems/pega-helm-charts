@@ -8,7 +8,7 @@
 {{- if .Values.global.downloadContainer.image }}
 - name: jdbc-lib-volume
   emptyDir:
-    sizeLimit: 5Mi
+    sizeLimit: {{ default "10Mi" .Values.global.downloadContainer.sharedVolumeSize }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -124,7 +124,7 @@ data:
     fi
 
     ca_cert=""
-    if [ "$(ls -A $art_root/cert/*)" ]; then
+    if [ "$(ls -A $art_root/cert/*)" = "1" ]; then
       if [ "$(ls $art_root/cert/* | wc -l)" ]; then
         echo "Certificate is provided for custom artifactory's domain ssl verification."
         certfilename="$(ls $art_root/cert)"

@@ -8,8 +8,8 @@ global:
     #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
     driverUri: "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar"
 
-  enableSSLVerification: true
   customArtifactory:
+    enableSSLVerification: true
     certificate:
       mycert.pem: |
         -----BEGIN CERTIFICATE-----

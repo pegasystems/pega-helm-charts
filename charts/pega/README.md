@@ -244,6 +244,7 @@ global:
    downloadContainer: 
         image: "curlimages/curl:8.19.0"
         imagePullPolicy: "IfNotPresent"
+        sharedVolumeSize: "10Mi"
 ```
 The Pega Platform images still contain the cURL utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The cURL utility will eventually be removed from the main Pega images.
 

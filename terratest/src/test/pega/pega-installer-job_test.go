@@ -470,7 +470,7 @@ func assertJobNoICDownloader(t *testing.T, yaml string, options *helm.Options) {
     var volumes = jobObj.Volumes
     var volumeMounts = jobObj.Containers[0].VolumeMounts
 
-    var ic = findNamedInitContainer(initContainers, "jdbc-lib-downloader0")
+    var ic = findNamedInitContainer(initContainers, "jdbc-lib-downloader")
     require.Equal(t, (*k8score.Container)(nil), ic)
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
@@ -512,7 +512,7 @@ func TestPegaInstallerJobWithICDownload(t *testing.T) {
             for _, yaml := range yamlSplit {
                 trimmedYaml := strings.TrimSpace(yaml)
                 if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
-                    assertJobICDownloadComponents(t, yaml, options, false)
+                    assertJobICDownloadComponents(t, yaml, options, false, "10Mi")
                 }
             }
         }
@@ -539,6 +539,7 @@ func TestPegaInstallerJobWithICDownloadWithCert(t *testing.T) {
                     "installer.imagePullPolicy": "Always",
                     "installer.upgrade.upgradeType":  "zero-downtime",
                     "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                    "global.downloadContainer.sharedVolumeSize": "50Mi",
                 },
             }
 
@@ -548,7 +549,7 @@ func TestPegaInstallerJobWithICDownloadWithCert(t *testing.T) {
             for _, yaml := range yamlSplit {
                 trimmedYaml := strings.TrimSpace(yaml)
                 if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
-                    assertJobICDownloadComponents(t, yaml, options, true)
+                    assertJobICDownloadComponents(t, yaml, options, true, "50Mi")
                 }
             }
         }
@@ -566,7 +567,7 @@ func isOnlyYamlComments(s string) bool {
     return true
 }
 
-func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options,  shouldHaveCert bool) {
+func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options,  shouldHaveCert bool, volSize string) {
     var job k8sbatch.Job
 	UnmarshalK8SYaml(t, yaml, &job)
 
@@ -579,7 +580,7 @@ func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Opti
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)
-    require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+    require.Equal(t, volSize, jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
 
     var scriptVolume = findNamedVolume(volumes, "download-script-volume")
     require.NotNil(t, scriptVolume)

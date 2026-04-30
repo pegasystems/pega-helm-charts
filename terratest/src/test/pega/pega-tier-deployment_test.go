@@ -507,14 +507,14 @@ func TestPegaTierDeploymentWithICDownload(t *testing.T) {
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
 				yamlSplit := strings.Split(yamlContent, "---")
-				assertICDownloadComponents(t, yamlSplit[1], options, false)
-				assertICDownloadComponents(t, yamlSplit[2], options, false)
+				assertICDownloadComponents(t, yamlSplit[1], options, false, "10Mi")
+				assertICDownloadComponents(t, yamlSplit[2], options, false, "10Mi")
 			}
 		}
 	}
 }
 
-func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options, shouldHaveCert bool) {
+func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options, shouldHaveCert bool, volSize string) {
     var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, yaml, &deploymentObj)
 	var podSpec = deploymentObj.Spec.Template.Spec
@@ -526,7 +526,7 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
 
     var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolume)
-    require.Equal(t, "5Mi", jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+    require.Equal(t, volSize, jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
 
     var scriptVolume = findNamedVolume(volumes, "download-script-volume")
     require.NotNil(t, scriptVolume)
@@ -594,12 +594,12 @@ func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
     testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
     require.NoError(t, err)
 
+
+
+
 	for _, vendor := range supportedVendors {
-
 		for _, operation := range supportedOperations {
-
 			for _, depName := range deploymentNames {
-
 				fmt.Println(vendor + "-" + operation)
 
 				var options = &helm.Options{
@@ -610,13 +610,14 @@ func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.storageClassName":       "storage-class",
 						"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+						"global.downloadContainer.sharedVolumeSize": "50Mi",
 					},
 				}
 
 				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml")
 				yamlSplit := strings.Split(yamlContent, "---")
-				assertICDownloadComponents(t, yamlSplit[1], options, true)
-				assertICDownloadComponents(t, yamlSplit[2], options, true)
+				assertICDownloadComponents(t, yamlSplit[1], options, true, "50Mi")
+				assertICDownloadComponents(t, yamlSplit[2], options, true, "50Mi")
 			}
 		}
 	}
