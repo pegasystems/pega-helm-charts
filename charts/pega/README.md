@@ -230,25 +230,25 @@ utilityImages:
     imagePullPolicy: "IfNotPresent"
 ```
 
-## Running Pega without cURL utility
-Pega pods use the cURL utility to download JDBC drivers at pod startup time.  The cURL utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the cURL utility via an init container.
+## Running Pega without curl utility
+Pega pods use the cURL utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
 
-This improves the general security posture related to the cURL utility:
-* Allows the use of a more up-to-date version of cURL (rather than waiting for downstream repositories to provide patches).
+This improves the general security posture related to the curl utility:
+* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
 * The init container runs briefly before there is inbound access to the pod.
 
-To use the cURL utility via an init container, set the following:
+To use the curl utility via an init container, set the following:
 
 ```yaml
 global:
    downloadContainer: 
-        image: "curlimages/curl:8.19.0"
+        image: "curlimages/curl:<version>"
         imagePullPolicy: "IfNotPresent"
         sharedVolumeSize: "10Mi"
 ```
-The requirements for the image is that it contains cURL on the path and is capable of running a POSIX compliant shell script.
+The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
 
-The Pega Platform images still contain the cURL utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The cURL utility will eventually be removed from the main Pega images.
+The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
 
 ## Deployment Name (Optional)
 
