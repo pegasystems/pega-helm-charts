@@ -1,0 +1,3 @@
+{{ if (eq (include "performDeployment" .) "true") }}
+{{ template "downloadScriptConfigMap" merge (dict "chartType" "runtime") . }}
+{{- end}}
