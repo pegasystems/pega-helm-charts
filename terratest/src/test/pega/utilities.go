@@ -128,3 +128,30 @@ func getUpgradeTypeForUpgradeAction(action string) string {
 		return "out-of-place"
 	}
 }
+
+func findNamedInitContainer(initContainers []k8score.Container, name string) *k8score.Container {
+    for _, container := range initContainers {
+        if container.Name == name {
+            return &container
+        }
+    }
+    return nil
+}
+
+func findNamedVolume(volumes []k8score.Volume, name string) *k8score.Volume {
+    for _, volume := range volumes {
+        if volume.Name == name {
+            return &volume
+        }
+    }
+    return nil
+}
+
+func findNamedVolumeMount(volumeMounts []k8score.VolumeMount, name string) *k8score.VolumeMount {
+    for _, volumeMount := range volumeMounts {
+        if volumeMount.Name == name {
+            return &volumeMount
+        }
+    }
+    return nil
+}
