@@ -231,7 +231,7 @@ utilityImages:
 ```
 
 ## Running Pega without curl utility
-Pega pods use the cURL utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
+Pega pods use the curl utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
 
 This improves the general security posture related to the curl utility:
 * Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
