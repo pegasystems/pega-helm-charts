@@ -1,0 +1,20 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "autopilot" )) }}
+{{- if .Values.enabled }}
+{{- if not (and .Values.customModels .Values.customModels.existingConfigMap) }}
+{{- if (include "autopilot.hasModelsConfig" .) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $depName }}-models
+  namespace: {{ .Release.Namespace }}
+data:
+  {{- if and .Values.customModels .Values.customModels.inline }}
+  models.json: |-
+{{ .Values.customModels.inline | indent 4 }}
+  {{- else }}
+  models.json: |-
+{{ .Files.Get "files/default-models.json" | indent 4 }}
+  {{- end }}
+{{- end }}
+{{ end }}
+{{ end }}

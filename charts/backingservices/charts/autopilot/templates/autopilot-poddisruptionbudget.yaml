@@ -1,0 +1,17 @@
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "autopilot" )) }}
+{{- if .Values.enabled }}
+{{- if (semverCompare ">= 1.21.0-0" (trimPrefix "v" .Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: policy/v1
+{{- else }}
+apiVersion: policy/v1beta1
+{{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $depName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  minAvailable: 1
+  selector:
+    matchLabels:
+      app: {{ $depName }}
+{{ end }}

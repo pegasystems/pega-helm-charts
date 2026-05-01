@@ -1,0 +1,205 @@
+---
+# Enable the Autopilot Service deployment as a backing service.
+enabled: false
+
+deployment:
+  name: "autopilot"
+
+# -------------------------------------------------------------------
+# Docker image
+# -------------------------------------------------------------------
+docker:
+  # If using a custom Docker registry, supply the credentials here to pull Docker images.
+  registry:
+    url: YOUR_DOCKER_REGISTRY_URL
+    username: YOUR_DOCKER_REGISTRY_USERNAME
+    password: YOUR_DOCKER_REGISTRY_PASSWORD
+  # List pre-existing secrets to be used for pulling docker images.
+  imagePullSecretNames: []
+  autopilot:
+    image: YOUR_AUTOPILOT_SERVICE_IMAGE:TAG
+    imagePullPolicy: IfNotPresent
+
+# -------------------------------------------------------------------
+# Replicas & Resources
+# -------------------------------------------------------------------
+replicas: 2
+
+resources:
+  requests:
+    cpu: 500m
+    memory: "1Gi"
+  limits:
+    cpu: "1"
+    memory: "2Gi"
+
+# -------------------------------------------------------------------
+# Service
+# -------------------------------------------------------------------
+service:
+  port: 80
+  targetPort: 8080
+  serviceType: ClusterIP
+
+# -------------------------------------------------------------------
+# Pod security context
+# -------------------------------------------------------------------
+securityContext:
+  seccompProfile:
+    type: RuntimeDefault
+  readOnlyRootFilesystem: false
+  allowPrivilegeEscalation: false
+
+# -------------------------------------------------------------------
+# Health probes
+# -------------------------------------------------------------------
+livenessProbe:
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  failureThreshold: 3
+readinessProbe:
+  initialDelaySeconds: 10
+  timeoutSeconds: 10
+  periodSeconds: 10
+  successThreshold: 1
+  failureThreshold: 3
+
+# -------------------------------------------------------------------
+# Autopilot service configuration
+# -------------------------------------------------------------------
+
+# Set to false for on-prem (direct provider connectivity).
+# Set to true when using Pega GenAI Hub gateway.
+enableGenaiHub: false
+
+# Disable internal auth for on-prem deployments.
+authEnabled: false
+isInternalDeployment: false
+
+# When authEnabled is true, set the URL of the Identity Provider (IdP) public key endpoint
+# so the Autopilot service can validate incoming OAuth Bearer tokens from Pega Infinity.
+# Example: "https://your-idp-host/oauth2/v1/keys"
+oauthPublicKeyURL: ""
+
+# -------------------------------------------------------------------
+# Custom models file
+# -------------------------------------------------------------------
+# Option 1: Use the default models file bundled with this chart (files/default-models.json).
+#   Set deployModelsConfigMap: true. To customize, edit files/default-models.json before helm install.
+#
+# Option 2: Provide a pre-existing ConfigMap name containing models.json
+#   customModels:
+#     existingConfigMap: "my-models-configmap"
+#
+# Option 3: Inline the JSON content directly (created as a ConfigMap)
+#   customModels:
+#     inline: |
+#       [{"provider":"azure","creator":"openai","model_name":"GPT-5",...}]
+#
+# If none of the above are set, the service uses its built-in model list
+# and filters by available provider credentials.
+# -------------------------------------------------------------------
+deployModelsConfigMap: true
+customModels:
+  existingConfigMap: ""
+  inline: ""
+
+# -------------------------------------------------------------------
+# Provider selection
+# -------------------------------------------------------------------
+
+# Comma-separated list of providers to enable (e.g., "Azure,Vertex,Bedrock").
+# If empty, auto-detection based on available credentials is used.
+modelProviders: ""
+
+# AWS Bedrock region
+awsRegion: "us-east-1"
+
+# -------------------------------------------------------------------
+# Provider credentials
+# -------------------------------------------------------------------
+# Option 1: Inline credentials (auto-creates a Kubernetes Secret)
+# Option 2: Use a pre-existing secret (set providerCredentialsSecret)
+# -------------------------------------------------------------------
+
+# Pre-existing secret name containing provider credentials.
+# If set, inline credentials below are ignored.
+# The secret should contain keys matching the env var names
+# (e.g., AWS_ACCESS_KEY_ID, AZURE_ENDPOINT, AZURE_OPENAI_KEY, etc.)
+providerCredentialsSecret: ""
+
+# --- Azure OpenAI credentials ---
+azure:
+  endpoint: ""           # e.g., https://my-openai.openai.azure.com/
+  apiKey: ""             # Azure OpenAI API key
+  apiVersion: "2024-10-21"
+
+# --- AWS Bedrock credentials ---
+aws:
+  accessKeyId: ""
+  secretAccessKey: ""
+  sessionToken: ""       # Optional, for temporary credentials
+
+# --- Google Vertex AI credentials ---
+vertex:
+  credentials: ""        # Base64-encoded service account JSON key (project_id is auto-extracted)
+  location: "us-central1"
+
+# -------------------------------------------------------------------
+# Custom OpenAI-compatible providers (model override / custom-openai)
+# -------------------------------------------------------------------
+# Use this section to configure any number of OpenAI-compatible upstream
+# endpoints (e.g. OpenRouter, a private LLM server, Together AI, etc.).
+# All models served by these providers will have provider: "custom-openai"
+# in the model list — matching the label used by the Pega GenAI Hub gateway.
+#
+# Each entry in 'providers' must have:
+#   creator  - must exactly match the 'creator' field in the model list JSON.
+#              This value is used to derive the env var names:
+#              CUSTOM_OPENAI_<CREATOR_UPPER>_BASE_URL
+#              CUSTOM_OPENAI_<CREATOR_UPPER>_API_KEY
+#              (<CREATOR_UPPER> = creator uppercased, hyphens/dots → underscores)
+#   baseUrl  - base URL of the OpenAI-compatible endpoint (non-sensitive).
+#   apiKey   - API key for the endpoint (stored in a K8s Secret).
+#
+# Secret options:
+#   Option 1 (default): Inline apiKey values → chart auto-creates Secret entries
+#     in the same provider-credentials Secret as Azure/AWS/Vertex.
+#   Option 2: Pre-existing Secret → set existingSecret to the Secret name.
+#     The Secret must contain keys: CUSTOM_OPENAI_<CREATOR_UPPER>_API_KEY
+#     Inline apiKey values are ignored when existingSecret is set.
+#
+# Example:
+#   customOpenAI:
+#     providers:
+#       - creator: openrouter
+#         baseUrl: "https://openrouter.ai/api/v1"
+#         apiKey: "sk-or-v3-xxxx"
+#       - creator: my-llm-server
+#         baseUrl: "https://llm.internal.company.com"
+#         apiKey: "secret"
+# -------------------------------------------------------------------
+customOpenAI:
+  existingSecret: ""   # pre-existing Secret name for API keys (optional)
+  providers: []
+  # - creator: openrouter
+  #   baseUrl: "https://openrouter.ai/api/v1"
+  #   apiKey: ""
+  # - creator: my-llm-server
+  #   baseUrl: "https://llm.internal.company.com"
+  #   apiKey: ""
+
+# -------------------------------------------------------------------
+# Ingress (optional)
+# -------------------------------------------------------------------
+ingress:
+  enabled: false
+  domain: ""
+  ingressClassName: ""
+  annotations: {}
+  labels: {}
+  tls:
+    enabled: false
+    secretName: ""
