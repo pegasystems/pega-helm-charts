@@ -45,6 +45,10 @@ action: "deploy"
 
 ## NIST SP 800-53 and NIST SP 800-131
 
+**Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**
+Please reference this article for more information:
+https://docs.pega.com/bundle/platform/page/platform/security/enabling-fips-140-3.html
+
 Set the `highlySecureCryptoModeEnabled` flag to `true` to comply with NIST SP 800-53 and NIST SP 800-131.
 
 For example:
@@ -225,6 +229,26 @@ utilityImages:
     image: "pegasystems/k8s-wait-for"
     imagePullPolicy: "IfNotPresent"
 ```
+
+## Running Pega without curl utility
+Pega pods use the curl utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
+
+This improves the general security posture related to the curl utility:
+* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
+* The init container runs briefly before there is inbound access to the pod.
+
+To use the curl utility via an init container, set the following:
+
+```yaml
+global:
+   downloadContainer: 
+        image: "curlimages/curl:<version>"
+        imagePullPolicy: "IfNotPresent"
+        sharedVolumeSize: "10Mi"
+```
+The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
+
+The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
 
 ## Deployment Name (Optional)
 
@@ -644,7 +668,7 @@ Parameter             | Description    | Default value
 
 ### Volume claim template
 
-A `volumeClaimTemplate` may be configured for any tier to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates.
+A `volumeClaimTemplate` may be configured for embedded search or stream tiers to allow for persistent storage. This allows for stateful tiers such as `stream` to be run as a StatefulSet rather than a Deployment.  Specifying a `volumeClaimTemplate` should never be used with a custom deployment strategy for rolling updates or for runtime tiers (e.g. web or batch).
 
 ### Deployment strategy
 

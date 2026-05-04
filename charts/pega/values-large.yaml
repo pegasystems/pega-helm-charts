@@ -35,6 +35,9 @@ global:
   kerberos: {}
 
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
+  # Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.
+  # Please reference this article for more information:
+  # https://docs.pega.com/bundle/platform/page/platform/security/enabling-fips-140-3.html
   highlySecureCryptoModeEnabled: false
 
   # If a storage class to be passed to the VolumeClaimTemplates in search and stream pods, it can be specified here:
@@ -78,6 +81,16 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
+
+  # Specify a container containing curl utility which can be used to download JDBC Driver.  If specified, this container will be used as
+  # an init container in installer job to download the JDBC driver and copy to shared volume. This functionality is provided in preparation
+  # for removing curl from the installer and runtime images. The sharedVolumeSize parameter specifies the size of the shared volume to be used
+  # between the the init container and the main Pega pod. The default value is 10Mi. This value can be increased if required to accommodate
+  # larger JDBC driver files.
+  # downloadContainer:
+  #   image: "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG"
+  #   imagePullPolicy: "IfNotPresent"
+  #   sharedVolumeSize: "10Mi"
 
   customArtifactory:
     # If you use a secured custom artifactory to manager your JDBC driver,
