@@ -631,7 +631,7 @@ kubectl create secret generic my-custom-openai-secret \
 
 ### Adding custom OpenAI models to the model list
 
-Models for custom OpenAI-compatible providers use `provider: custom-openai` in the model JSON. The `creator` field must match the `creator` value configured in `customOpenAI.providers`. The `name` field is the model identifier sent to the provider API.
+Models for custom OpenAI-compatible providers use `provider: custom` in the model JSON. The `creator` field must match the `creator` value configured in `customOpenAI.providers`. The `name` field is the model identifier sent to the provider API.
 
 > **Important:** `model_name` must not contain slashes. Use `name` for the actual API model identifier when it contains slashes (e.g., `openrouter/free`).
 
@@ -639,7 +639,7 @@ Example model entry for OpenRouter:
 
 ```json
 {
-  "provider": "custom-openai",
+  "provider": "custom",
   "creator": "openrouter",
   "model_name": "Free",
   "model_mapping_id": "openrouter-free",
@@ -647,7 +647,7 @@ Example model entry for OpenRouter:
   "input_tokens": 200000,
   "output_tokens": 8192,
   "type": "chat_completion",
-  "model_id": "custom-openai/openrouter/Free/1",
+  "model_id": "custom/openrouter/Free/1",
   "version": "1",
   "model_path": ["/chat/completions"],
   "supported_capabilities": {
@@ -665,22 +665,22 @@ To use this model as the default fast and smart model, set it in the `default_mo
 {
   "models": [ ... ],
   "default_models": {
-    "fast": { "provider": "custom-openai", "creator": "openrouter", "model_id": "custom-openai/openrouter/Free/1", ... },
-    "smart": { "provider": "custom-openai", "creator": "openrouter", "model_id": "custom-openai/openrouter/Free/1", ... }
+    "fast": { "provider": "custom", "creator": "openrouter", "model_id": "custom/openrouter/Free/1", ... },
+    "smart": { "provider": "custom", "creator": "openrouter", "model_id": "custom/openrouter/Free/1", ... }
   }
 }
 ```
 
-### Model JSON fields for custom-openai provider
+### Model JSON fields for custom provider
 
 | Field | Description |
 |---|---|
-| `provider` | Must be `custom-openai`. |
+| `provider` | Must be `custom`. |
 | `creator` | Must match the `creator` value in `customOpenAI.providers`. Used to look up `CUSTOM_OPENAI_<CREATOR>_BASE_URL` and `CUSTOM_OPENAI_<CREATOR>_API_KEY`. |
 | `model_name` | Display name for the model. Must not contain slashes. |
 | `name` | Actual model identifier sent to the provider API as the `model=` parameter (e.g., `openrouter/free`, `openai/gpt-4o`). |
 | `model_path` | Array with the API path suffix appended to `baseUrl` (e.g., `["/chat/completions"]`). |
-| `model_id` | Must follow the format `custom-openai/<creator>/<model_name>/<version>` (no slashes in `model_name`). |
+| `model_id` | Must follow the format `custom/<creator>/<model_name>/<version>` (no slashes in `model_name`). |
 
 ## Example: Full deployment configuration
 

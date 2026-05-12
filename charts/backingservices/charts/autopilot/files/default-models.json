@@ -3086,174 +3086,232 @@
     ],
     "lifecycle": "Deprecated",
     "deprecation_date": "2025-09-24"
+  },
+  {
+    "provider": "custom",
+    "creator": "openrouter",
+    "model_name": "openrouter/free",
+    "name": "openrouter/free",
+    "model_id": "openrouter/free",
+    "input_tokens": 128000,
+    "output_tokens": 16384,
+    "type": "chat_completion",
+    "version": "1",
+    "description": "OpenAI free served via OpenRouter.",
+    "deprecation_info": {
+      "is_deprecated": false
+    },
+    "supported_capabilities": {
+      "streaming": true,
+      "multimodal": [],
+      "functions": true,
+      "parallel_function_calling": true,
+      "json_mode": true,
+      "is_multimodal": false
+    },
+    "parameters": {
+      "max_tokens": {
+        "default": null,
+        "description": "Maximum number of tokens to generate",
+        "maximum": 16384,
+        "title": "Max Output Tokens",
+        "type": "integer",
+        "required": false
+      },
+      "temperature": {
+        "default": 1,
+        "description": "Controls randomness of the generated output",
+        "maximum": 2,
+        "minimum": 0,
+        "title": "Temperature",
+        "type": "float",
+        "required": false
+      },
+      "top_p": {
+        "default": null,
+        "description": "Nucleus sampling parameter controlling diversity of the output.",
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Top P",
+        "type": "float",
+        "required": false
+      }
+    },
+    "model_label": "openrouter/free (OpenRouter)",
+    "model_path": [
+      "/chat/completions"
+    ],
+    "lifecycle": "Generally Available"
+  },
+  {
+    "provider": "custom",
+    "creator": "azure-custom",
+    "model_name": "gpt-5",
+    "name": "gpt-5",
+    "model_id": "gpt-5",
+    "input_tokens": 128000,
+    "output_tokens": 16384,
+    "type": "chat_completion",
+    "version": "1",
+    "description": "OpenAI free served via OpenRouter.",
+    "deprecation_info": {
+      "is_deprecated": false
+    },
+    "supported_capabilities": {
+      "streaming": true,
+      "multimodal": [],
+      "functions": true,
+      "parallel_function_calling": true,
+      "json_mode": true,
+      "is_multimodal": false
+    },
+    "parameters": {
+      "max_tokens": {
+        "default": null,
+        "description": "Maximum number of tokens to generate",
+        "maximum": 16384,
+        "title": "Max Output Tokens",
+        "type": "integer",
+        "required": false
+      },
+      "temperature": {
+        "default": 1,
+        "description": "Controls randomness of the generated output",
+        "maximum": 2,
+        "minimum": 0,
+        "title": "Temperature",
+        "type": "float",
+        "required": false
+      },
+      "top_p": {
+        "default": null,
+        "description": "Nucleus sampling parameter controlling diversity of the output.",
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Top P",
+        "type": "float",
+        "required": false
+      }
+    },
+    "model_label": "azure-custom (openai-67)",
+    "model_path": [
+      "/openai/deployments/gpt-5/chat/completions?api-version=2025-01-01-preview"
+    ],
+    "lifecycle": "Generally Available"
   }
 ],
 "default_models": {
     "fast": {
-        "provider": "azure",
-        "creator": "openai",
-        "model_name": "GPT-5-Chat",
-        "model_mapping_id": "gpt-5-chat-2025-08-07",
-        "name": "gpt-5-chat-2025-08-07",
-        "input_tokens": 128000,
-        "output_tokens": 16384,
-        "type": "chat_completion",
-        "model_id": "gpt-5-chat-2025-08-07",
-        "default_model": false,
-        "version": "2025-08-07",
-        "deprecation_info": {
-            "is_deprecated": false
-        },
-        "supported_capabilities": {
-            "streaming": true,
-            "multimodal": [
-                "image/png",
-                "image/jpeg",
-                "image/gif",
-                "image/webp",
-                "text/x-c",
-                "text/x-csharp",
-                "text/x-c++",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "text/html",
-                "text/x-java",
-                "application/json",
-                "text/markdown",
-                "application/pdf",
-                "text/x-php",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "text/x-python",
-                "text/x-script.python",
-                "text/x-ruby",
-                "text/x-tex",
-                "text/plain",
-                "text/css",
-                "text/javascript",
-                "application/x-sh",
-                "application/typescript"
-            ],
-            "functions": true,
-            "parallel_function_calling": true,
-            "json_mode": true,
-            "is_multimodal": true
-        },
-        "parameters": {
-            "max_tokens": {
-                "default": null,
-                "description": "Maximum number of tokens to generate",
-                "maximum": 16384,
-                "title": "Max Output Tokens",
-                "type": "integer",
-                "required": false
-            },
-            "temperature": {
-                "default": 1,
-                "description": "Controls randomness of the generated output",
-                "maximum": 2,
-                "minimum": 0,
-                "title": "Temperature",
-                "type": "float",
-                "required": false
-            },
-            "top_p": {
-                "default": null,
-                "description": "Nucleus sampling parameter controlling diversity of the output.",
-                "maximum": 1,
-                "minimum": 0,
-                "title": "Top P",
-                "type": "float",
-                "required": false
-            }
-        },
-        "model_label": "Gpt 5 Chat",
-        "model_path": [
-            "/openai/deployments/gpt-5-chat/chat/completions"
-        ],
-        "lifecycle": "Generally Available"
+    "provider": "custom",
+    "creator": "openrouter",
+    "model_name": "openrouter/free",
+    "name": "openrouter/free",
+    "model_id": "openrouter/free",
+    "input_tokens": 128000,
+    "output_tokens": 16384,
+    "type": "chat_completion",
+    "version": "1",
+    "description": "OpenAI free served via OpenRouter.",
+    "deprecation_info": {
+      "is_deprecated": false
     },
+    "supported_capabilities": {
+      "streaming": true,
+      "multimodal": [],
+      "functions": true,
+      "parallel_function_calling": true,
+      "json_mode": true,
+      "is_multimodal": false
+    },
+    "parameters": {
+      "max_tokens": {
+        "default": null,
+        "description": "Maximum number of tokens to generate",
+        "maximum": 16384,
+        "title": "Max Output Tokens",
+        "type": "integer",
+        "required": false
+      },
+      "temperature": {
+        "default": 1,
+        "description": "Controls randomness of the generated output",
+        "maximum": 2,
+        "minimum": 0,
+        "title": "Temperature",
+        "type": "float",
+        "required": false
+      },
+      "top_p": {
+        "default": null,
+        "description": "Nucleus sampling parameter controlling diversity of the output.",
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Top P",
+        "type": "float",
+        "required": false
+      }
+    },
+    "model_label": "openrouter/free (OpenRouter)",
+    "model_path": [
+      "/chat/completions"
+    ],
+    "lifecycle": "Generally Available"
+  },
     "smart": {
-        "provider": "azure",
-        "creator": "openai",
-        "model_name": "GPT-5-Mini",
-        "model_mapping_id": "gpt-5-mini-2025-08-07",
-        "name": "gpt-5-mini-2025-08-07",
-        "input_tokens": 400000,
-        "output_tokens": 128000,
-        "type": "chat_completion",
-        "model_id": "gpt-5-mini-2025-08-07",
-        "default_model": false,
-        "version": "2025-08-07",
-        "deprecation_info": {
-            "is_deprecated": false
-        },
-        "supported_capabilities": {
-            "streaming": true,
-            "multimodal": [
-                "image/png",
-                "image/jpeg",
-                "image/gif",
-                "image/webp",
-                "text/x-c",
-                "text/x-csharp",
-                "text/x-c++",
-                "application/msword",
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "text/html",
-                "text/x-java",
-                "application/json",
-                "text/markdown",
-                "application/pdf",
-                "text/x-php",
-                "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-                "text/x-python",
-                "text/x-script.python",
-                "text/x-ruby",
-                "text/x-tex",
-                "text/plain",
-                "text/css",
-                "text/javascript",
-                "application/x-sh",
-                "application/typescript"
-            ],
-            "functions": true,
-            "parallel_function_calling": true,
-            "json_mode": true,
-            "is_multimodal": true
-        },
-        "parameters": {
-            "max_tokens": {
-                "default": null,
-                "description": "Maximum number of tokens to generate",
-                "maximum": 128000,
-                "title": "Max Output Tokens",
-                "type": "integer",
-                "required": false
-            },
-            "temperature": {
-                "default": 1,
-                "description": "Controls randomness of the generated output",
-                "maximum": 2,
-                "minimum": 0,
-                "title": "Temperature",
-                "type": "float",
-                "required": false
-            },
-            "top_p": {
-                "default": null,
-                "description": "Nucleus sampling parameter controlling diversity of the output.",
-                "maximum": 1,
-                "minimum": 0,
-                "title": "Top P",
-                "type": "float",
-                "required": false
-            }
-        },
-        "model_label": "Gpt 5 Mini",
-        "model_path": [
-            "/openai/deployments/gpt-5-mini/chat/completions"
-        ],
-        "lifecycle": "Generally Available"
-    }
+    "provider": "custom",
+    "creator": "openrouter",
+    "model_name": "openrouter/free",
+    "name": "openrouter/free",
+    "model_id": "openrouter/free",
+    "input_tokens": 128000,
+    "output_tokens": 16384,
+    "type": "chat_completion",
+    "version": "1",
+    "description": "OpenAI free served via OpenRouter.",
+    "deprecation_info": {
+      "is_deprecated": false
+    },
+    "supported_capabilities": {
+      "streaming": true,
+      "multimodal": [],
+      "functions": true,
+      "parallel_function_calling": true,
+      "json_mode": true,
+      "is_multimodal": false
+    },
+    "parameters": {
+      "max_tokens": {
+        "default": null,
+        "description": "Maximum number of tokens to generate",
+        "maximum": 16384,
+        "title": "Max Output Tokens",
+        "type": "integer",
+        "required": false
+      },
+      "temperature": {
+        "default": 1,
+        "description": "Controls randomness of the generated output",
+        "maximum": 2,
+        "minimum": 0,
+        "title": "Temperature",
+        "type": "float",
+        "required": false
+      },
+      "top_p": {
+        "default": null,
+        "description": "Nucleus sampling parameter controlling diversity of the output.",
+        "maximum": 1,
+        "minimum": 0,
+        "title": "Top P",
+        "type": "float",
+        "required": false
+      }
+    },
+    "model_label": "openrouter/free (OpenRouter)",
+    "model_path": [
+      "/chat/completions"
+    ],
+    "lifecycle": "Generally Available"
+  }
 }
 }

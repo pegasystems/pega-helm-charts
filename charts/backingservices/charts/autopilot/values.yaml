@@ -148,11 +148,11 @@ vertex:
   location: "us-central1"
 
 # -------------------------------------------------------------------
-# Custom OpenAI-compatible providers (model override / custom-openai)
+# Custom OpenAI-compatible providers (model override / custom)
 # -------------------------------------------------------------------
 # Use this section to configure any number of OpenAI-compatible upstream
 # endpoints (e.g. OpenRouter, a private LLM server, Together AI, etc.).
-# All models served by these providers will have provider: "custom-openai"
+# All models served by these providers will have provider: "custom"
 # in the model list — matching the label used by the Pega GenAI Hub gateway.
 #
 # Each entry in 'providers' must have:
