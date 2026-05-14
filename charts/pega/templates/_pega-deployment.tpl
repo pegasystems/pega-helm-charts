@@ -308,12 +308,6 @@ spec:
         - name: {{ template "pegaVolumeTomcatKeystore" }}
           mountPath: "/opt/pega/tomcatcertsmount"
 {{ end }}
-{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
-{{- if .root.Values.global.customArtifactory.certificate }}
-        - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-          mountPath: "/opt/pega/artifactory/cert"
-{{- end }}
-{{- end }}
 {{- if .root.Values.global.kerberos }}
         - name: {{ template "pegaKerberosConfig" }}-config
           mountPath: "/opt/pega/kerberos"
