@@ -230,6 +230,26 @@ utilityImages:
     imagePullPolicy: "IfNotPresent"
 ```
 
+## Running Pega without curl utility
+Pega pods use the curl utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
+
+This improves the general security posture related to the curl utility:
+* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
+* The init container runs briefly before there is inbound access to the pod.
+
+To use the curl utility via an init container, set the following:
+
+```yaml
+global:
+   downloadContainer: 
+        image: "curlimages/curl:<version>"
+        imagePullPolicy: "IfNotPresent"
+        sharedVolumeSize: "10Mi"
+```
+The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
+
+The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
+
 ## Deployment Name (Optional)
 
 Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.

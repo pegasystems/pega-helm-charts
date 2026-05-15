@@ -141,3 +141,65 @@ func assertNoDupesInConfigMap(t *testing.T, configYaml string, cm *k8score.Confi
        require.Equal(t, 1, strings.Count(configYaml, " " + key + ": "))
     }
 }
+
+
+func TestPegaInstallEnvironmentConfigNoICDownload(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+			assertInstallerEnvironmentConfigJdbcUri(t, yamlContent, options, "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
+		}
+	}
+}
+
+func TestPegaInstallEnvironmentConfigWithICDownload(t *testing.T) {
+
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+		for _, operation := range supportedOperations {
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":        vendor,
+					"global.actions.execute": operation,
+					"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+			assertInstallerEnvironmentConfigJdbcUri(t, yamlContent, options, "")
+		}
+	}
+}
+
+func assertInstallerEnvironmentConfigJdbcUri(t *testing.T, configYaml string, options *helm.Options, expectedDriverUri string) {
+	var installEnvConfigMap k8score.ConfigMap
+	UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
+	installEnvConfigData := installEnvConfigMap.Data
+
+	require.Equal(t, expectedDriverUri, installEnvConfigData["JDBC_DRIVER_URI"])
+}
