@@ -39,7 +39,7 @@ func TestPegaUpgradeJob(t *testing.T) {
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
 
-						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "upgrade"}, options)
+						assertUpgradeJob(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{"jdbc-lib-downloader"}, "pega-upgrade-environment-config", "pega-installer", "upgrade"}, options)
 
 					}
 				}
@@ -54,17 +54,19 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 
 	jobSpec := jobObj.Spec.Template.Spec
 	jobContainers := jobObj.Spec.Template.Spec.Containers
-
+    var volumes = jobSpec.Volumes
+    var volumeMounts = jobSpec.Containers[0].VolumeMounts
 	var containerPort int32 = 8080
 
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
-	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
+	var pegaInstallerCredentialVolume = findNamedVolume(volumes, "pega-installer-credentials-volume")
+    require.NotNil(t, pegaInstallerCredentialVolume)
+	require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
+	require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.DefaultMode, volDefaultModePointer)
 
-	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
-
-	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
+	var pegaVolumeInstaller = findNamedVolume(volumes, "pega-volume-installer")
+	require.NotNil(t, pegaVolumeInstaller)
+	require.Equal(t, pegaVolumeInstaller.VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
+	require.Equal(t, pegaVolumeInstaller.VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
 	if jobContainers[0].Name == "pega-db-upgrade-rules-migration" || jobContainers[0].Name == "pega-db-upgrade-rules-upgrade" || jobContainers[0].Name == "pega-db-upgrade-data-upgrade" {
 		require.Equal(t, jobContainers[0].Name, "pega-installer")
@@ -72,10 +74,15 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-volume-installer")
-	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
+
+	var pegaVolumeInstallerMount = findNamedVolumeMount(volumeMounts, "pega-volume-installer")
+    require.NotNil(t, pegaVolumeInstallerMount)
+	require.Equal(t, "/opt/pega/config", pegaVolumeInstallerMount.MountPath)
+
+	var pegaInstallerCredentialsVolumeMount = findNamedVolumeMount(volumeMounts, "pega-installer-credentials-volume")
+    require.NotNil(t, pegaInstallerCredentialsVolumeMount)
+	require.Equal(t, "/opt/pega/secrets", pegaInstallerCredentialsVolumeMount.MountPath)
+
 	require.Equal(t, jobContainers[0].Env[0].Name, "ACTION")
 	require.Equal(t, jobContainers[0].Env[0].Value, expectedJob.action)
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
@@ -92,5 +99,5 @@ func assertUpgradeJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, optio
 	}
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
-	VerifyInitContainerData(t, actualInitContainers, options)
+	VerifyInitContainerData(t, actualInitContainers, options, "job")
 }

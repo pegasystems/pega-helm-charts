@@ -77,9 +77,9 @@ func runPegaInstallerJobTest(t *testing.T, externalSecretName string) {
 						}
 					} else {
 						if operation == "install" || operation == "install-deploy" {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, externalSecretName)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{"jdbc-lib-downloader"}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, externalSecretName)
 						} else {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, externalSecretName)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{"jdbc-lib-downloader"}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, externalSecretName)
 						}
 					}
 
@@ -158,40 +158,49 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 
 	jobSpec := jobObj.Spec.Template.Spec
 	jobContainers := jobObj.Spec.Template.Spec.Containers
+	var volumes = jobSpec.Volumes
+	var volumeMounts = jobSpec.Containers[0].VolumeMounts
 
 	var containerPort int32 = 8080
 
 	require.Empty(t, jobSpec.Affinity)
 	require.Empty(t, jobSpec.Tolerations)
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[1].Secret.Name, customArtifactorySecret)
+	var pegaInstallerCredentialVolume = findNamedVolume(volumes, "pega-installer-credentials-volume")
+	require.NotNil(t, pegaInstallerCredentialVolume)
+	require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
 
 	if externalSecretName == "" {
-	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, getObjName(options, "-upgrade-rest-secret"))
+	    require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.Sources[1].Secret.Name, getObjName(options, "-upgrade-rest-secret"))
 	} else {
-	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, externalSecretName)
+	    require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.Sources[1].Secret.Name, externalSecretName)
 	}
 
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
-	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
-	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-install-config" {
-		require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-install-config")
+	require.Equal(t, pegaInstallerCredentialVolume.VolumeSource.Projected.DefaultMode, volDefaultModePointer)
+
+	var pegaVolumeInstaller = findNamedVolume(volumes, "pega-volume-installer")
+	require.NotNil(t, pegaVolumeInstaller)
+	if pegaVolumeInstaller.VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-install-config" {
+		require.Equal(t, pegaVolumeInstaller.VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-install-config")
 	}
-	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-upgrade-config" {
-		require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
+	if pegaVolumeInstaller.VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-upgrade-config" {
+		require.Equal(t, pegaVolumeInstaller.VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
 	}
-	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
+	require.Equal(t, pegaVolumeInstaller.VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
 	require.Equal(t, string(jobContainers[0].ImagePullPolicy), pullPolicy)
 
 	require.Equal(t, jobContainers[0].Name, expectedJob.containerName)
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-volume-installer")
-	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
+
+	var pegaVolumeInstallerMount = findNamedVolumeMount(volumeMounts, "pega-volume-installer")
+    require.NotNil(t, pegaVolumeInstallerMount)
+	require.Equal(t, pegaVolumeInstallerMount.MountPath, "/opt/pega/config")
+
+    var pegaInstallerCredentialVolumeMount = findNamedVolumeMount(volumeMounts, "pega-installer-credentials-volume")
+    require.NotNil(t, pegaInstallerCredentialVolumeMount)
+	require.Equal(t, pegaInstallerCredentialVolumeMount.MountPath, "/opt/pega/secrets")
+
 	require.Equal(t, jobContainers[0].Env[0].Name, "ACTION")
 	require.Equal(t, jobContainers[0].Env[0].Value, expectedJob.action)
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
@@ -208,7 +217,7 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 	}
 
 	require.Equal(t, expectedJob.initContainers, actualInitContainerNames)
-	VerifyInitContainerData(t, actualInitContainers, options)
+	VerifyInitContainerData(t, actualInitContainers, options, "job")
 }
 
 func TestPegaInstallerJobWithNodeSelector(t *testing.T) {
@@ -589,8 +598,4 @@ func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Opti
     var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
     require.NotNil(t, jdbcLibVolumeMount)
     require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
-
-    var installerCredVolumeMount = findNamedVolumeMount(volumeMounts, "pega-installer-credentials-volume")
-    require.NotNil(t, installerCredVolumeMount)
-    require.Equal(t, "/opt/pega/secrets", installerCredVolumeMount.MountPath)
 }

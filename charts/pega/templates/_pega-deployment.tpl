@@ -87,6 +87,7 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- include "pegaCustomArtifactoryCredVolume" .root | indent 6 }}
 {{- include "jdbcLibVolume" (merge .root (dict "chartType" "runtime")) | indent 6 }}
 {{- include "downloadScriptVolume" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
@@ -117,7 +118,7 @@ spec:
 {{- end }}
 {{- end }}
       initContainers:
-{{- $credVolumeName := include "pegaVolumeCredentials" .root }}
+{{- $credVolumeName := include "pegaCustomArtifactoryCredVolumeName" .root }}
 {{- $artifactoryCertVolumeName := include "pegaCustomArtifactoryCertificateTemplate" .root }}
 {{- include "jdbc-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
 {{- range $i, $val := .initContainers }}

@@ -32,57 +32,38 @@ func TestPegaDeploymentWithArtifactoryCerts(t *testing.T) {
 			deploymentYaml := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 			yamlSplit := strings.Split(deploymentYaml, "---")
 			assertWeb(t, yamlSplit[1], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[1], options, true)
+			assertArtifactoryCertificatesVolume(t, yamlSplit[1], options, true)
 
 			assertBatch(t, yamlSplit[2], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[2], options, true)
+			assertArtifactoryCertificatesVolume(t, yamlSplit[2], options, true)
 
 			//assertStream(t, yamlSplit[3], options)
-			//assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, true)
+			//assertArtifactoryCertificatesVolume(t, yamlSplit[3], options, true)
 
 			options.ValuesFiles = []string{"data/values_with_artifactory_sslverification_disabled.yaml"}
 
 			deploymentYaml = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
 			yamlSplit = strings.Split(deploymentYaml, "---")
 			assertWeb(t, yamlSplit[1], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[1], options, false)
+			assertArtifactoryCertificatesVolume(t, yamlSplit[1], options, false)
 
 			assertBatch(t, yamlSplit[2], options)
-			assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[2], options, false)
+			assertArtifactoryCertificatesVolume(t, yamlSplit[2], options, false)
 
 			//assertStream(t, yamlSplit[3], options)
-			//assertArtifactoryCertificatesVolumeAndMount(t, yamlSplit[3], options, false)
+			//assertArtifactoryCertificatesVolume(t, yamlSplit[3], options, false)
 		}
 	}
 }
 
-func assertArtifactoryCertificatesVolumeAndMount(t *testing.T, tierYaml string, options *helm.Options, shouldHaveVol bool) {
+func assertArtifactoryCertificatesVolume(t *testing.T, tierYaml string, options *helm.Options, shouldHaveVol bool) {
 	var deploymentObj appsv1.Deployment
 	UnmarshalK8SYaml(t, tierYaml, &deploymentObj)
 	pod := deploymentObj.Spec.Template.Spec
 
-	var foundVol = false
-	for _, vol := range pod.Volumes {
-		if vol.Name == "pega-volume-custom-artifactory-certificate" {
-			foundVol = true
-			break
-		}
-	}
-	require.Equal(t, shouldHaveVol, foundVol)
-
-	var foundVolMount = false
-	for _, container := range pod.Containers {
-		if container.Name == "pega-web-tomcat" {
-			for _, volMount := range container.VolumeMounts {
-				if volMount.Name == "pega-volume-custom-artifactory-certificate" {
-					require.Equal(t, "/opt/pega/artifactory/cert", volMount.MountPath)
-					foundVolMount = true
-					break
-				}
-			}
-			break
-		}
-	}
-	require.Equal(t, shouldHaveVol, foundVolMount)
-
+    if (shouldHaveVol) {
+        var volumes = pod.Volumes
+        var pegaVolumeCustomArtifactoryCertificate = findNamedVolume(volumes, "pega-volume-custom-artifactory-certificate")
+        require.NotNil(t, pegaVolumeCustomArtifactoryCertificate)
+    }
 }

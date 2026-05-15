@@ -556,9 +556,6 @@ servicePort: use-annotation
     {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
     {{ include "secretResolver" $ddsDict | indent 4}}
 
-    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
-    {{ include "secretResolver" $artifactoryDict | indent 4}}
-
     {{- $srsDict := dict "deploySecret" "deploySRSSecret" "deployNonExtsecret" "deployNonExtSRSSecret" "extSecretName" .Values.pegasearch.srsMTLS.external_secret_name "nonExtSecretName" "pega-srs-mtls-secret-name" "context" $ -}}
     {{ include "secretResolver" $srsDict | indent 4}}
 
@@ -574,6 +571,15 @@ servicePort: use-annotation
             path: HZ_SSL_TRUSTSTORE_PASSWORD
   {{- end}}
 {{- end}}
+
+{{- define "pegaCustomArtifactoryCredVolume" }}
+- name: {{ template "pegaCustomArtifactoryCredVolumeName" }}
+  projected:
+    defaultMode: 420
+    sources:
+    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
+    {{ include "secretResolver" $artifactoryDict | indent 4}}
+{{- end }}
 
 {{- define "isPega25OrLater"}}
   {{- if .Values.global.pegaVersion }}

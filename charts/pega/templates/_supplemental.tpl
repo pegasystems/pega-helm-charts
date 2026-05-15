@@ -22,6 +22,8 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 
+{{- define "pegaCustomArtifactoryCredVolumeName" }}pega-volume-custom-art-creds{{- end }}
+
 {{- define "initContainerResources" }}
   resources:
     # Resources requests/limits for initContainers

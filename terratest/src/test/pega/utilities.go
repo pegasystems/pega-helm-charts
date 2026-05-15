@@ -44,7 +44,7 @@ func VerifyInitContainerResources(t *testing.T, container k8score.Container) {
 }
 
 // VerifyInitContainerData - Verifies any possible initContainer that can occur in pega helm chart deployments
-func VerifyInitContainerData(t *testing.T, containers []k8score.Container, options *helm.Options) {
+func VerifyInitContainerData(t *testing.T, containers []k8score.Container, options *helm.Options, podSourceType string) {
 	var depName = getDeploymentName(options)
 
 	if len(containers) == 0 {
@@ -84,7 +84,24 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/" + depName + "-web --namespace default && kubectl rollout status deployment/" + depName + "-batch --namespace default && kubectl rollout status statefulset/" + depName + "-stream --namespace default"}, container.Command)
 			VerifyInitContainerResources(t, container)
-		} else {
+		} else if name == "jdbc-lib-downloader" {
+            require.Equal(t, "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG", container.Image)
+          	require.Equal(t, []string{"sh", "-c", "/opt/pega/dlscripts/download-jdbc-lib.sh"}, container.Command)
+          	var jdbcLibVolumeMount = findNamedVolumeMount(container.VolumeMounts, "jdbc-lib-volume")
+          	require.NotNil(t, jdbcLibVolumeMount)
+            require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+
+            var customArtCredVolumeMount = findNamedVolumeMount(container.VolumeMounts, "pega-volume-custom-art-creds")
+            if (podSourceType == "job") {
+                customArtCredVolumeMount = findNamedVolumeMount(container.VolumeMounts, "pega-installer-art-cred-volume")
+            }
+            require.NotNil(t, customArtCredVolumeMount)
+            require.Equal(t, "/opt/pega/secrets", customArtCredVolumeMount.MountPath)
+
+            var dlScriptVolumeMount = findNamedVolumeMount(container.VolumeMounts, "download-script-volume")
+            require.NotNil(t, dlScriptVolumeMount)
+            require.Equal(t, "/opt/pega/dlscripts", dlScriptVolumeMount.MountPath)
+         } else {
 			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()
 		}

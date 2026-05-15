@@ -267,6 +267,7 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 
 {{- define "pegaInstallerCredentialsVolume" }}pega-installer-credentials-volume{{- end }}
 
+{{- define "pegaInstallerCustomArtifactoryCredVolume" }}pega-installer-art-cred-volume{{- end }}
 
 {{- define "pegaInstallerResources" }}
 {{- $overriddenResources := dict }}

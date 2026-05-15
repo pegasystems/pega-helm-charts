@@ -14,7 +14,7 @@ import (
 	intstr "k8s.io/apimachinery/pkg/util/intstr"
 )
 
-var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra"}
+var initContainers = []string{"wait-for-pegasearch", "wait-for-cassandra", "jdbc-lib-downloader"}
 
 func TestPegaTierDeployment(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
@@ -334,7 +334,7 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 		actualInitContainerNames[i] = actualInitContainers[i].Name
 	}
 	//require.Equal(t, expectedSpec.initContainers, actualInitContainerNames) NEED TO CHANGE FOR "install-deploy"
-	VerifyInitContainerData(t, actualInitContainers, options)
+	VerifyInitContainerData(t, actualInitContainers, options, "deployment")
 	require.Equal(t, "pega-web-tomcat", pod.Containers[0].Name)
 	require.Equal(t, "pegasystems/pega", pod.Containers[0].Image)
 	require.Equal(t, "pega-web-port", pod.Containers[0].Ports[0].Name)
@@ -438,43 +438,6 @@ type pegaDeployment struct {
 	passivationTimeout string
 }
 
-
-func TestPegaTierDeploymentNoICDownload(t *testing.T) {
-	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
-	var deploymentNames = []string{"pega", "myapp-dev"}
-
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-	require.NoError(t, err)
-
-	for _, vendor := range supportedVendors {
-
-		for _, operation := range supportedOperations {
-
-			for _, depName := range deploymentNames {
-
-				fmt.Println(vendor + "-" + operation)
-
-				var options = &helm.Options{
-					SetValues: map[string]string{
-						"global.provider":               vendor,
-						"global.actions.execute":        operation,
-						"global.deployment.name":        depName,
-						"installer.upgrade.upgradeType": "zero-downtime",
-						"global.storageClassName":       "storage-class",
-					},
-				}
-
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
-				yamlSplit := strings.Split(yamlContent, "---")
-				assertICDownloadComponentsNone(t, yamlSplit[1], options)
-				assertICDownloadComponentsNone(t, yamlSplit[2], options)
-			}
-		}
-	}
-}
-
-
 func TestPegaTierDeploymentWithICDownload(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
@@ -562,27 +525,6 @@ func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string,
     }
 }
 
-func assertICDownloadComponentsNone(t *testing.T, yaml string, options *helm.Options) {
-    var deploymentObj appsv1.Deployment
-	UnmarshalK8SYaml(t, yaml, &deploymentObj)
-	var podSpec = deploymentObj.Spec.Template.Spec
-	var actualInitContainers = podSpec.InitContainers
-	var volumes = podSpec.Volumes
-	var volumeMounts = podSpec.Containers[0].VolumeMounts
-
-    var ic = findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader")
-    require.Equal(t, (*k8score.Container)(nil), ic)
-
-	var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
-	require.Equal(t, (*k8score.Volume)(nil), jdbcLibVolume)
-
-	var scriptVolume = findNamedVolume(volumes, "download-script-volume")
-    require.Equal(t, (*k8score.Volume)(nil), scriptVolume)
-
-	var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
-    require.Equal(t, (*k8score.VolumeMount)(nil), jdbcLibVolumeMount)
-}
-
 func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy", "upgrade-deploy"}
@@ -593,9 +535,6 @@ func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
 
     testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
     require.NoError(t, err)
-
-
-
 
 	for _, vendor := range supportedVendors {
 		for _, operation := range supportedOperations {
@@ -614,7 +553,7 @@ func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
 					},
 				}
 
-				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml")
+				yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml", "--debug")
 				yamlSplit := strings.Split(yamlContent, "---")
 				assertICDownloadComponents(t, yamlSplit[1], options, true, "50Mi")
 				assertICDownloadComponents(t, yamlSplit[2], options, true, "50Mi")
