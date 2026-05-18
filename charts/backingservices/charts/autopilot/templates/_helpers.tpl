@@ -1,0 +1,162 @@
+{{- /*
+imagePullSecret
+backingservicesRegistrySecret
+deploymentName
+tlssecretsnippet
+backingservices.gke.backendConfig
+podAffinity
+tolerations
+are copied from backingservices/templates/_supplemental.tpl because helm lint requires
+charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
+*/}}
+
+{{- define "imagePullSecret" }}
+{{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.docker.registry.url (printf "%s:%s" .Values.docker.registry.username .Values.docker.registry.password | b64enc) | b64enc }}
+{{- end }}
+
+{{- define "backingservicesRegistrySecret" }}
+{{- $depName := printf "%s" (include "deploymentName" (dict "root" .root "defaultname" .defaultname )) -}}
+{{- $depName -}}-registry-secret
+{{- end }}
+
+{{- define "deploymentName" }}{{ $deploymentNamePrefix := .defaultname }}{{ if (.root.deployment) }}{{ if (.root.deployment.name) }}{{ $deploymentNamePrefix = .root.deployment.name }}{{ end }}{{ end }}{{ if (.root.name) }}{{ $deploymentNamePrefix = .root.name }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
+{{- define "tlssecretsnippet" -}}
+tls:
+- hosts:
+  - {{ include "domainName" (dict "node" .node) }}
+  secretName: {{ .node.ingress.tls.secretName }}
+{{- end -}}
+
+{{- define "domainName" }}
+  {{- if .node.ingress -}}
+  {{- if .node.ingress.domain -}}
+    {{ .node.ingress.domain }}
+  {{- end -}}
+  {{- else if .node.service.domain -}}
+    {{ .node.service.domain }}
+  {{- end -}}
+{{- end }}
+
+{{- define "podAffinity" }}
+{{- if .affinity }}
+affinity:
+{{- toYaml .affinity | nindent 2 }}
+{{- end }}
+{{ end }}
+
+{{- define "tolerations" }}
+{{- if .tolerations }}
+tolerations:
+{{- toYaml .tolerations | nindent 2 }}
+{{- end }}
+{{ end }}
+
+{{/*
+Validates and returns the OAuth public key URL when auth is enabled.
+Fails render if authEnabled is true but oauthPublicKeyURL is not set.
+*/}}
+{{- define "autopilot.oauthPublicKeyUrl" -}}
+{{- if .Values.authEnabled }}
+    {{- if .Values.oauthPublicKeyURL }}
+    {{- .Values.oauthPublicKeyURL | quote }}
+    {{- else }}
+    {{- fail "A valid entry is required for oauthPublicKeyURL when authEnabled is true. Set oauthPublicKeyURL to the IdP public key endpoint so the Autopilot service can validate incoming tokens from Pega Infinity." | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}
+
+{{/*
+Autopilot secret name - uses pre-existing secret or auto-generated one
+*/}}
+{{- define "autopilot.credentialsSecretName" -}}
+{{- if .Values.providerCredentialsSecret -}}
+{{- .Values.providerCredentialsSecret -}}
+{{- else -}}
+{{- $depName := include "deploymentName" (dict "root" .Values "defaultname" "autopilot") -}}
+{{- printf "%s-provider-credentials" $depName -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Check if any inline credentials are provided
+*/}}
+{{- define "autopilot.hasInlineCredentials" -}}
+{{- if or .Values.azure.endpoint .Values.azure.apiKey .Values.aws.accessKeyId .Values.vertex.credentials -}}
+true
+{{- else if .Values.customOpenAI.providers -}}
+{{- range .Values.customOpenAI.providers -}}
+{{- if .apiKey -}}
+true
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Check if any models config is provided (inline, existing configmap, or use default bundled file)
+*/}}
+{{- define "autopilot.hasCustomModels" -}}
+{{- if and .Values.customModels (or .Values.customModels.existingConfigMap .Values.customModels.inline) -}}
+true
+{{- else if .Values.deployModelsConfigMap -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Check if we need to create a ConfigMap (inline or default file, but NOT existing configmap)
+*/}}
+{{- define "autopilot.hasModelsConfig" -}}
+{{- if and .Values.customModels .Values.customModels.inline -}}
+true
+{{- else if .Values.deployModelsConfigMap -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Resolve the models ConfigMap name
+*/}}
+{{- define "autopilot.modelsConfigMapName" -}}
+{{- if and .Values.customModels .Values.customModels.existingConfigMap -}}
+{{- .Values.customModels.existingConfigMap -}}
+{{- else -}}
+{{- $depName := include "deploymentName" (dict "root" .Values "defaultname" "autopilot") -}}
+{{- printf "%s-models" $depName -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Check if any custom OpenAI providers are configured.
+Returns "true" when the providers list is non-empty.
+*/}}
+{{- define "autopilot.hasCustomOpenAI" -}}
+{{- if .Values.customOpenAI.providers -}}
+true
+{{- end -}}
+{{- end -}}
+
+{{/*
+Resolve the Secret name that holds custom OpenAI API keys.
+Uses customOpenAI.existingSecret when set; otherwise falls back to the
+shared provider-credentials Secret (same Secret as Azure/AWS/Vertex keys).
+*/}}
+{{- define "autopilot.customOpenAISecretName" -}}
+{{- if .Values.customOpenAI.existingSecret -}}
+{{- .Values.customOpenAI.existingSecret -}}
+{{- else -}}
+{{- include "autopilot.credentialsSecretName" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Convert a custom OpenAI creator alias to the upper-snake-case env var suffix.
+e.g.  "openrouter"    → "OPENROUTER"
+      "my-llm-server" → "MY_LLM_SERVER"
+      "together.ai"   → "TOGETHER_AI"
+Usage: {{ include "autopilot.creatorEnvSuffix" "openrouter" }}
+*/}}
+{{- define "autopilot.creatorEnvSuffix" -}}
+{{- . | upper | replace "-" "_" | replace "." "_" -}}
+{{- end -}}
