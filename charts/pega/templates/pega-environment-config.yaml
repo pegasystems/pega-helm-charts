@@ -80,6 +80,7 @@ data:
   # URL to connect to Search and Reporting service
   SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
   # URL of the OAuth endpoint to get the token for Search and Reporting service
+  # Note: SRS OAuth takes precedence over Autopilot OAuth when both are enabled.
   SERV_AUTH_URL: "{{ .Values.pegasearch.srsAuth.url }}"
   # OAuth scopes to grant permissions for Pega Infinity in Search and Reporting service
   # The required value is "pega.search:full"
@@ -101,6 +102,20 @@ data:
   SRS_TRUSTSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.trustStore }}"
   # Path to a mounted key store file for MTLS connection to SRS
   SRS_KEYSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.keyStore }}"
+{{- end }}
+{{- if and (.Values.autopilot.autopilotAuth).enabled (not (and .Values.pegasearch.externalSearchService (.Values.pegasearch.srsAuth).enabled)) }}
+  # URL of the OAuth endpoint to get the token for the Autopilot service
+  SERV_AUTH_URL: "{{ .Values.autopilot.autopilotAuth.url }}"
+  # OAuth scopes to grant permissions for Pega Infinity in the Autopilot service
+  {{- if .Values.autopilot.autopilotAuth.scopes }}
+  SERV_AUTH_SCOPES: {{ .Values.autopilot.autopilotAuth.scopes | quote }}
+  {{- end }}
+  # OAuth Client ID
+  SERV_AUTH_CLIENT_ID: "{{ .Values.autopilot.autopilotAuth.clientId }}"
+  # Algorithm used to generate a private key used by OAuth client
+  # Allowed values: RS256, RS384, RS512, ES256, ES384, ES512
+  # Default value: RS256
+  SERV_AUTH_PRIVATE_KEY_ALGORITHM: {{ .Values.autopilot.autopilotAuth.privateKeyAlgorithm | default "RS256" | quote }}
 {{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled".
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"
