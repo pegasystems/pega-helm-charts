@@ -53,6 +53,14 @@ spec:
           readOnly: true
         {{- end }}
         env:
+        # RSA private key used by the service to sign JWTs sent to Pega
+        # Infinity. Stored in a Secret managed by this chart (or supplied
+        # via pegaAuth.existingSecret) so all replicas share one key.
+        - name: AUTOPILOT_PEGA_PRIVATE_KEY_PEM
+          valueFrom:
+            secretKeyRef:
+              name: {{ include "autopilot.pegaAuthSecretName" . }}
+              key: AUTOPILOT_PEGA_PRIVATE_KEY_PEM
         # Core service configuration
         - name: ENABLE_GENAI_HUB
           value: {{ .Values.enableGenaiHub | quote }}
