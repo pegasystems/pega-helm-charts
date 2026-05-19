@@ -14,7 +14,7 @@ docker:
     url: YOUR_DOCKER_REGISTRY_URL
     username: YOUR_DOCKER_REGISTRY_USERNAME
     password: YOUR_DOCKER_REGISTRY_PASSWORD
-  # List pre-existing secrets to be used for pulling docker images.
+  # List existing secrets to use for pulling Docker images.
   imagePullSecretNames: []
   autopilot:
     image: YOUR_AUTOPILOT_SERVICE_IMAGE:TAG
@@ -67,19 +67,20 @@ readinessProbe:
   failureThreshold: 3
 
 # -------------------------------------------------------------------
-# Autopilot service configuration
+# Autopilot Service configuration
 # -------------------------------------------------------------------
 
-# Set to false for on-prem (direct provider connectivity).
-# Set to true when using Pega GenAI Hub gateway.
+# Leave this parameter as false for client-managed cloud or on-premises deployments
+# that connect directly to LLM providers.
+# Set this parameter to true only when requests must be routed through the Pega GenAI Hub gateway.
 enableGenaiHub: false
 
-# Disable internal auth for on-prem deployments.
+# For client-managed cloud or on-premises deployments, leave both values as false.
 authEnabled: false
 isInternalDeployment: false
 
 # When authEnabled is true, set the URL of the Identity Provider (IdP) public key endpoint
-# so the Autopilot service can validate incoming OAuth Bearer tokens from Pega Infinity.
+# so the Autopilot Service can validate incoming OAuth Bearer tokens from Pega Platform.
 # Example: "https://your-idp-host/oauth2/v1/keys"
 oauthPublicKeyURL: ""
 
@@ -89,7 +90,7 @@ oauthPublicKeyURL: ""
 # Option 1: Use the default models file bundled with this chart (files/default-models.json).
 #   Set deployModelsConfigMap: true. To customize, edit files/default-models.json before helm install.
 #
-# Option 2: Provide a pre-existing ConfigMap name containing models.json
+# Option 2: Provide an existing ConfigMap name containing models.json
 #   customModels:
 #     existingConfigMap: "my-models-configmap"
 #
@@ -121,13 +122,13 @@ awsRegion: "us-east-1"
 # Provider credentials
 # -------------------------------------------------------------------
 # Option 1: Inline credentials (auto-creates a Kubernetes Secret)
-# Option 2: Use a pre-existing secret (set providerCredentialsSecret)
+# Option 2: Use an existing Secret (set providerCredentialsSecret)
 # -------------------------------------------------------------------
 
-# Pre-existing secret name containing provider credentials.
-# If set, inline credentials below are ignored.
-# The secret should contain keys matching the env var names
-# (e.g., AWS_ACCESS_KEY_ID, AZURE_ENDPOINT, AZURE_OPENAI_KEY, etc.)
+# Name of an existing Kubernetes Secret that stores provider credentials.
+# If set, the chart does not create a new Secret and ignores the inline credential values below.
+# Include only the keys for the providers that you use, for example AWS_ACCESS_KEY_ID,
+# AZURE_ENDPOINT, AZURE_OPENAI_KEY, or VERTEX_AUTH.
 providerCredentialsSecret: ""
 
 # --- Azure OpenAI credentials ---
@@ -167,7 +168,7 @@ vertex:
 # Secret options:
 #   Option 1 (default): Inline apiKey values → chart auto-creates Secret entries
 #     in the same provider-credentials Secret as Azure/AWS/Vertex.
-#   Option 2: Pre-existing Secret → set existingSecret to the Secret name.
+#   Option 2: Existing Secret → set existingSecret to the Secret name.
 #     The Secret must contain keys: CUSTOM_OPENAI_<CREATOR_UPPER>_API_KEY
 #     Inline apiKey values are ignored when existingSecret is set.
 #
@@ -182,7 +183,7 @@ vertex:
 #         apiKey: "secret"
 # -------------------------------------------------------------------
 customOpenAI:
-  existingSecret: ""   # pre-existing Secret name for API keys (optional)
+  existingSecret: ""   # existing Secret name for API keys (optional)
   providers: []
   # - creator: openrouter
   #   baseUrl: "https://openrouter.ai/api/v1"
