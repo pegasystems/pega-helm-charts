@@ -1,32 +1,32 @@
-# Pega does NOT actively update these dependencies. For each dependency, you should:
-# * Update the dependency's 'version' value, or
-# * Disable the dependency by setting its condition value (for example, 'traefik.enabled') to false in values.yaml.
+# Pega does not maintain these dependencies. If you use these addon charts in your deployment, you must
+# update the dependency's 'version' value and add parameters for the dependency in values.yaml.
+# These addon charts are disabled by default in values.yaml.
 dependencies:
 - name: traefik
-  version: "10.9.0"
+  #version: # Replace with your version of Traefik
   repository: https://helm.traefik.io/traefik
   condition: traefik.enabled
 - name: aws-load-balancer-controller
-  version: "1.4.5"
+  #version: # Replace with your version of aws-load-balancer-controller
   repository: https://aws.github.io/eks-charts
   condition: aws-load-balancer-controller.enabled
 - name: elasticsearch
-  version: "7.17.3"
+  #version: # Replace with your version of elasticsearch
   repository: https://helm.elastic.co/
   condition: elasticsearch.enabled
 - name: fluentd-elasticsearch
-  version: "15.0.0"
+  #version: # Replace with your version of fluentd-elasticsearch
   repository: https://kokuwaio.github.io/helm-charts
   condition: fluentd-elasticsearch.enabled
 - name: kibana
-  version: "7.17.3"
+  #version: # Replace with your version of kibana
   repository: https://helm.elastic.co/
   condition: kibana.enabled
 - name: metrics-server
-  version: "3.7.0"
+  #version: # Replace with your version of metrics-server
   repository: https://kubernetes-sigs.github.io/metrics-server/
   condition: metrics-server.enabled
 - name: ingress-azure
-  version: "1.7.5"
+  #version: # Replace with your version of ingress-azure
   repository: oci://mcr.microsoft.com/azure-application-gateway/charts
   condition: ingress-azure.enabled
