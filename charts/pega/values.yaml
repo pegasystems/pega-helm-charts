@@ -28,6 +28,11 @@ global:
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
   kerberos: {}
 
+  # Logging configuration
+  logging:
+    # Set to true to include traceId in log4j2 log patterns for distributed tracing correlation
+    traceIdEnabled: false
+
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
   # Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.
   # Please reference this article for more information:
