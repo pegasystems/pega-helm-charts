@@ -33,12 +33,12 @@ data:
 {{ .root.Files.Get "config/deploy/prconfig.xml" | indent 6 }}
 {{- end }}
 
-  # Pega deployment prlog4j2.xml file
-  prlog4j2.xml: |-
+  # Pega deployment prlog4j2.xml template file
+  prlog4j2.xml.tmpl: |-
 {{- if $custom_config.prlog4j2 }}
 {{ $custom_config.prlog4j2 | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/prlog4j2.xml" | indent 6 }}
+{{ .root.Files.Get "config/deploy/prlog4j2.xml.tmpl" | indent 6 }}
 {{- end }}
 
   # Pega deployment contextXML template file
