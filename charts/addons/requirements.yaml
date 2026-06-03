@@ -3,30 +3,30 @@
 # These addon charts are disabled by default in values.yaml.
 dependencies:
 - name: traefik
-  #version: # Replace with your version of Traefik
+  version: "*" # Replace with your version of Traefik
   repository: https://helm.traefik.io/traefik
   condition: traefik.enabled
 - name: aws-load-balancer-controller
-  #version: # Replace with your version of aws-load-balancer-controller
+  version: "*" # Replace with your version of aws-load-balancer-controller
   repository: https://aws.github.io/eks-charts
   condition: aws-load-balancer-controller.enabled
 - name: elasticsearch
-  #version: # Replace with your version of elasticsearch
+  version: "*" # Replace with your version of elasticsearch
   repository: https://helm.elastic.co/
   condition: elasticsearch.enabled
 - name: fluentd-elasticsearch
-  #version: # Replace with your version of fluentd-elasticsearch
+  version: "*" # Replace with your version of fluentd-elasticsearch
   repository: https://kokuwaio.github.io/helm-charts
   condition: fluentd-elasticsearch.enabled
 - name: kibana
-  #version: # Replace with your version of kibana
+  version: "*" # Replace with your version of kibana
   repository: https://helm.elastic.co/
   condition: kibana.enabled
 - name: metrics-server
-  #version: # Replace with your version of metrics-server
+  version: "*" # Replace with your version of metrics-server
   repository: https://kubernetes-sigs.github.io/metrics-server/
   condition: metrics-server.enabled
 - name: ingress-azure
-  #version: # Replace with your version of ingress-azure
+  version: "*" # Replace with your version of ingress-azure
   repository: oci://mcr.microsoft.com/azure-application-gateway/charts
   condition: ingress-azure.enabled
