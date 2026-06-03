@@ -424,3 +424,173 @@ func TestPegaInstallerJobResourcesWithNoEphemeralStorage(t *testing.T) {
 	require.Equal(t, "0", jobObj.Spec.Template.Spec.Containers[0].Resources.Requests.StorageEphemeral().String())
 
 }
+
+
+func TestPegaInstallerJobNoICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
+
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
+
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !strings.HasPrefix(trimmedYaml, "#")) { //filter out empty chunks of yaml and comments
+                    assertJobNoICDownloader(t, yaml, options)
+                }
+            }
+        }
+    }
+}
+
+func assertJobNoICDownloader(t *testing.T, yaml string, options *helm.Options) {
+    var job k8sbatch.Job
+    UnmarshalK8SYaml(t, yaml, &job)
+
+    var jobObj = job.Spec.Template.Spec
+    var initContainers = jobObj.InitContainers
+    var volumes = jobObj.Volumes
+    var volumeMounts = jobObj.Containers[0].VolumeMounts
+
+    var ic = findNamedInitContainer(initContainers, "jdbc-lib-downloader")
+    require.Equal(t, (*k8score.Container)(nil), ic)
+
+    var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+    require.Equal(t, (*k8score.Volume)(nil), jdbcLibVolume)
+
+    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.Equal(t, (*k8score.Volume)(nil), scriptVolume)
+
+    var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.Equal(t, (*k8score.VolumeMount)(nil), jdbcLibVolumeMount)
+}
+
+func TestPegaInstallerJobWithICDownload(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
+
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
+
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
+                    assertJobICDownloadComponents(t, yaml, options, false, "10Mi")
+                }
+            }
+        }
+    }
+}
+
+func TestPegaInstallerJobWithICDownloadWithCert(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"install", "install-deploy", "upgrade-deploy"}
+
+    helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+    require.NoError(t, err)
+
+    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
+    require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+    	for _, operation := range supportedOperations {
+            var options = &helm.Options{
+                SetValues: map[string]string{
+                    "global.deployment.name":    "pega",
+                    "global.provider":           vendor,
+                    "global.actions.execute":    operation,
+                    "installer.imagePullPolicy": "Always",
+                    "installer.upgrade.upgradeType":  "zero-downtime",
+                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                    "global.downloadContainer.sharedVolumeSize": "50Mi",
+                },
+            }
+
+            yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"}, "--values", testsPath + "/data/values_multidriver-with-cert.yaml")
+            yamlSplit := strings.Split(yamlContent, "---")
+
+            for _, yaml := range yamlSplit {
+                trimmedYaml := strings.TrimSpace(yaml)
+                if (len(trimmedYaml) > 0 && !isOnlyYamlComments(trimmedYaml)) { //filter out empty chunks of yaml and comments
+                    assertJobICDownloadComponents(t, yaml, options, true, "50Mi")
+                }
+            }
+        }
+    }
+}
+
+func isOnlyYamlComments(s string) bool {
+    lines := strings.Split(s, "\n")
+    for _, line := range lines {
+        trimmed := strings.TrimSpace(line)
+        if len(trimmed) > 0 && !strings.HasPrefix(trimmed, "#") {
+            return false
+        }
+    }
+    return true
+}
+
+func assertJobICDownloadComponents(t *testing.T, yaml string, options *helm.Options,  shouldHaveCert bool, volSize string) {
+    var job k8sbatch.Job
+	UnmarshalK8SYaml(t, yaml, &job)
+
+	var jobSpec = job.Spec.Template.Spec
+	var actualInitContainers = jobSpec.InitContainers
+	var volumes = jobSpec.Volumes
+	var volumeMounts = jobSpec.Containers[0].VolumeMounts
+
+	assertDownloaderIC(t, findNamedInitContainer(actualInitContainers, "jdbc-lib-downloader"), "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar", shouldHaveCert)
+
+    var jdbcLibVolume = findNamedVolume(volumes, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolume)
+    require.Equal(t, volSize, jdbcLibVolume.VolumeSource.EmptyDir.SizeLimit.String())
+
+    var scriptVolume = findNamedVolume(volumes, "download-script-volume")
+    require.NotNil(t, scriptVolume)
+    require.Equal(t, int32(0555), *scriptVolume.ConfigMap.DefaultMode)
+
+    var jdbcLibVolumeMount = findNamedVolumeMount(volumeMounts, "jdbc-lib-volume")
+    require.NotNil(t, jdbcLibVolumeMount)
+    require.Equal(t, "/opt/pega/lib", jdbcLibVolumeMount.MountPath)
+
+    var installerCredVolumeMount = findNamedVolumeMount(volumeMounts, "pega-installer-credentials-volume")
+    require.NotNil(t, installerCredVolumeMount)
+    require.Equal(t, "/opt/pega/secrets", installerCredVolumeMount.MountPath)
+}
