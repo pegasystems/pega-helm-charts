@@ -95,7 +95,7 @@
                        maxHeaderCount="100"
                        maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8443_MAXTHREADS 200 }}" >
                        <SSLHostConfig certificateVerification="none" sslProtocol="TLS"
-                                   ciphers="TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384,TLS_AES_256_GCM_SHA384,TLS_AES_128_GCM_SHA256,TLS_CHACHA20_POLY1305_SHA256">
+                                   ciphers="TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384,TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384">
                            {{ if ( and (exists .Env.TOMCAT_KEYSTORE_CONTENT) .Env.TOMCAT_KEYSTORE_PASSWORD ) }}
 
                            {{ if .Env.FIPS_140_3_MODE }}
