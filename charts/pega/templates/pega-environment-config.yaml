@@ -80,7 +80,8 @@ data:
   # URL to connect to Search and Reporting service
   SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
   # URL of the OAuth endpoint to get the token for Search and Reporting service
-  # Note: SRS OAuth takes precedence over Autopilot OAuth when both are enabled.
+  # When both Search and Reporting service and Autopilot Service use OAuth,
+  # the Search and Reporting service OAuth settings are used.
   SERV_AUTH_URL: "{{ .Values.pegasearch.srsAuth.url }}"
   # OAuth scopes to grant permissions for Pega Infinity in Search and Reporting service
   # The required value is "pega.search:full"
@@ -104,9 +105,9 @@ data:
   SRS_KEYSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.keyStore }}"
 {{- end }}
 {{- if and (.Values.autopilot.autopilotAuth).enabled (not (and .Values.pegasearch.externalSearchService (.Values.pegasearch.srsAuth).enabled)) }}
-  # URL of the OAuth endpoint to get the token for the Autopilot service
+  # URL of the OAuth endpoint to get the token for the Autopilot Service
   SERV_AUTH_URL: "{{ .Values.autopilot.autopilotAuth.url }}"
-  # OAuth scopes to grant permissions for Pega Infinity in the Autopilot service
+  # OAuth scopes to grant permissions for Pega Platform in the Autopilot Service
   {{- if .Values.autopilot.autopilotAuth.scopes }}
   SERV_AUTH_SCOPES: {{ .Values.autopilot.autopilotAuth.scopes | quote }}
   {{- end }}
