@@ -341,6 +341,10 @@ true
 {{- define "generatedPodLabels" }}
 {{- end }}
 
+#Override this template to generate additional deployment labels that are dynamically composed during helm deployment (do not indent labels)
+{{- define "generatedDeploymentLabels" }}
+{{- end }}
+
 #Kerberos config map
 {{- define "pegaKerberosVolumeTemplate" }}
 # Volume used to mount config files.
@@ -387,6 +391,26 @@ name: {{ .Values.pegasearch.srsAuth.external_secret_name }}
 key: SRS_OAUTH_PRIVATE_KEY
 {{- else }}
 name: pega-srs-auth-secret
+key: privateKey
+{{- end }}
+{{- end }}
+
+{{- define "autopilotAuthPrivateKey" -}}
+{{- if (.Values.autopilot.autopilotAuth).enabled }}
+    {{- if (.Values.autopilot.autopilotAuth).privateKey }}
+        {{- .Values.autopilot.autopilotAuth.privateKey | b64enc }}
+    {{- else }}
+        {{- fail "A valid entry is required for autopilot.autopilotAuth.privateKey or autopilot.autopilotAuth.external_secret_name, when OAuth authentication is enabled between Autopilot and Pega Infinity i.e. autopilot.autopilotAuth.enabled is true." | quote }}
+    {{- end }}
+{{- end }}
+{{- end }}
+
+{{- define "autopilotAuthEnvSecretFrom" }}
+{{- if .Values.autopilot.autopilotAuth.external_secret_name }}
+name: {{ .Values.autopilot.autopilotAuth.external_secret_name }}
+key: AUTOPILOT_OAUTH_PRIVATE_KEY
+{{- else }}
+name: pega-autopilot-auth-secret
 key: privateKey
 {{- end }}
 {{- end }}

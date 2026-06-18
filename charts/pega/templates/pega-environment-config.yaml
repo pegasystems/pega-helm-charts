@@ -18,7 +18,7 @@ data:
 {{- end }}
   # Class name of the DB's JDBC driver
   JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
-{{- if .Values.global.jdbc.driverUri }}
+{{- if and .Values.global.jdbc.driverUri (eq (include "usesICDownload" .) "false")}}
   # URI that the JDBC driver can be downloaded from
   JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
 {{- end }}
@@ -80,6 +80,8 @@ data:
   # URL to connect to Search and Reporting service
   SEARCH_AND_REPORTING_SERVICE_URL: {{ include "pegaSearchURL" $ }}
   # URL of the OAuth endpoint to get the token for Search and Reporting service
+  # When both Search and Reporting service and Autopilot Service use OAuth,
+  # the Search and Reporting service OAuth settings are used.
   SERV_AUTH_URL: "{{ .Values.pegasearch.srsAuth.url }}"
   # OAuth scopes to grant permissions for Pega Infinity in Search and Reporting service
   # The required value is "pega.search:full"
@@ -101,6 +103,20 @@ data:
   SRS_TRUSTSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.trustStore }}"
   # Path to a mounted key store file for MTLS connection to SRS
   SRS_KEYSTORE_PATH: "/opt/pega/certs/{{ .Values.pegasearch.srsMTLS.keyStore }}"
+{{- end }}
+{{- if and (.Values.autopilot.autopilotAuth).enabled (not (and .Values.pegasearch.externalSearchService (.Values.pegasearch.srsAuth).enabled)) }}
+  # URL of the OAuth endpoint to get the token for the Autopilot Service
+  SERV_AUTH_URL: "{{ .Values.autopilot.autopilotAuth.url }}"
+  # OAuth scopes to grant permissions for Pega Platform in the Autopilot Service
+  {{- if .Values.autopilot.autopilotAuth.scopes }}
+  SERV_AUTH_SCOPES: {{ .Values.autopilot.autopilotAuth.scopes | quote }}
+  {{- end }}
+  # OAuth Client ID
+  SERV_AUTH_CLIENT_ID: "{{ .Values.autopilot.autopilotAuth.clientId }}"
+  # Algorithm used to generate a private key used by OAuth client
+  # Allowed values: RS256, RS384, RS512, ES256, ES384, ES512
+  # Default value: RS256
+  SERV_AUTH_PRIVATE_KEY_ALGORITHM: {{ .Values.autopilot.autopilotAuth.privateKeyAlgorithm | default "RS256" | quote }}
 {{- end }}
   # Whether to enable connecting to a cassandra cluster.  "true" for enabled, "false for disabled".
   CASSANDRA_CLUSTER: "{{ include "cassandraEnabled" . }}"

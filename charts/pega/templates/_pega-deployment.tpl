@@ -35,6 +35,7 @@ metadata:
 {{- if .node.deploymentLabels }}
 {{ toYaml .node.deploymentLabels | indent 4 }}
 {{- end }}
+{{- include "generatedDeploymentLabels" .root | indent 4 }}
     app: {{ .name }} {{/* This is intentionally always the web name because that's what we call our "app" */}}
     component: Pega
 spec:
@@ -86,6 +87,8 @@ spec:
           # Used to specify permissions on files within the volume.
           defaultMode: 420
 {{- include "pegaCredentialVolumeTemplate" .root | indent 6 }}
+{{- include "jdbcLibVolume" (merge .root (dict "chartType" "runtime")) | indent 6 }}
+{{- include "downloadScriptVolume" .root | indent 6 }}
 {{- if (.root.Values.hazelcast.encryption.enabled) }}
       - name: hz-encryption-secrets
         secret:
@@ -114,6 +117,9 @@ spec:
 {{- end }}
 {{- end }}
       initContainers:
+{{- $credVolumeName := include "pegaVolumeCredentials" .root }}
+{{- $artifactoryCertVolumeName := include "pegaCustomArtifactoryCertificateTemplate" .root }}
+{{- include "jdbc-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
@@ -232,6 +238,11 @@ spec:
 {{- else }}
   {{- fail "pegasearch.srsAuth.authType must be either private_key_jwt or client_secret_basic." }}
 {{- end }}
+{{- else if (.root.Values.autopilot.autopilotAuth).enabled }}
+        - name: SERV_AUTH_PRIVATE_KEY
+          valueFrom:
+            secretKeyRef:
+{{- include "autopilotAuthEnvSecretFrom"  .root | indent 14 }}
 {{- end }}
         envFrom:
         - configMapRef:
@@ -284,6 +295,7 @@ spec:
         - name: {{ .name }}
           mountPath: "/opt/pega/kafkadata"
 {{- end }}
+{{- include "jdbcLibVolumeMount" .root | indent 8 }}
 {{- if .custom }}
 {{- if .custom.volumeMounts }}
         # Additional custom mounts

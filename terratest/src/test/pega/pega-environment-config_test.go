@@ -286,3 +286,34 @@ func TestPegaRASPEnvironmentConfig(t *testing.T) {
 
 	VerifyEnvValue(t, yamlContent, "RASP_ACTION", "WARN")
 }
+
+
+func TestPegaEnvironmentConfigJDBCDriverNoICDownload(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":        "k8s",
+			"global.actions.execute": "deploy",
+			"global.jdbc.driverUri": "http://mydriverdownload.com/driver.jar",
+		},
+	}
+	var yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvValue(t, yamlContent, "JDBC_DRIVER_URI", "http://mydriverdownload.com/driver.jar")
+}
+
+
+func TestPegaEnvironmentConfigJDBCDriverWithICDownload(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+	var options = &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":        "k8s",
+			"global.actions.execute": "deploy",
+			"global.jdbc.driverUri": "http://mydriverdownload.com/driver.jar",
+			"global.downloadContainer.image": "ICDOWNLOAD_IMAGE:1.0",
+		},
+	}
+	var yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
+	VerifyEnvNotPresent(t, yamlContent, "JDBC_DRIVER_URI")
+}
