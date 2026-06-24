@@ -160,3 +160,19 @@ Usage: {{ include "autopilot.creatorEnvSuffix" "openrouter" }}
 {{- define "autopilot.creatorEnvSuffix" -}}
 {{- . | upper | replace "-" "_" | replace "." "_" -}}
 {{- end -}}
+
+{{/*
+Resolve the Secret name that holds the RSA private key the Autopilot
+service uses to sign JWTs sent to Pega Infinity.
+
+When pegaAuth.existingSecret is set, that name is used (operator-managed
+secret). Otherwise the chart auto-creates "<deployment>-pega-auth".
+*/}}
+{{- define "autopilot.pegaAuthSecretName" -}}
+{{- if .Values.pegaAuth.existingSecret -}}
+{{- .Values.pegaAuth.existingSecret -}}
+{{- else -}}
+{{- $depName := include "deploymentName" (dict "root" .Values "defaultname" "autopilot") -}}
+{{- printf "%s-pega-auth" $depName -}}
+{{- end -}}
+{{- end -}}
