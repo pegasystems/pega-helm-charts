@@ -3,7 +3,6 @@ deploymentName
 pegaRegistrySecret
 imagePullSecrets
 pegaVolumeCredentials
-customArtifactorySSLVerificationEnabled
 performDeployment
 performInstallAndDeployment
 performUpgradeAndDeployment
@@ -31,18 +30,6 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
     limits:
       cpu: 50m
       memory: 64Mi
-{{- end }}
-
-{{- define "customArtifactorySSLVerificationEnabled" }}
-{{- if (.Values.global.customArtifactory) }}
-{{- if (.Values.global.customArtifactory.enableSSLVerification) }}
-{{- if (eq .Values.global.customArtifactory.enableSSLVerification true) -}}
-true
-{{- else -}}
-false
-{{- end }}
-{{- end }}
-{{- end }}
 {{- end }}
 
 {{- define "pegaRegistrySecret" }}

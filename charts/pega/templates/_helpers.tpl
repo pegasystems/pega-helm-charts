@@ -32,23 +32,6 @@
   {{ end }}
 {{- end}}
 
-{{- define "pegaCustomArtifactoryCertificateConfig" }}
-{{- $depName := printf "%s" (include "deploymentName" $) -}}
-{{- $depName -}}-custom-artifactory-certificate-config
-{{- end }}
-
-{{- define "pegaVolumeCustomArtifactoryCertificate" }}pega-volume-custom-artifactory-certificate{{- end }}
-
-{{- define "pegaCustomArtifactoryCertificateTemplate" }}
-- name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-  configMap:
-    # This name will be referred in the volume mounts kind.
-    name: {{ template "pegaCustomArtifactoryCertificateConfig" $ }}
-    # Used to specify permissions on files within the volume.
-    defaultMode: 420
-{{- end}}
-
-
 {{- define "pegaTomcatKeystoreSecret" }}
 {{- $depName := printf "%s" (include "deploymentName" .root) -}}
 {{- $depName -}}-tomcat-keystore-secret
@@ -91,38 +74,10 @@
   {{- end -}}
 {{- end }}
 
-{{- define "useBasicAuthForCustomArtifactory" }}
-  {{- if (.Values.global.customArtifactory) }}
-    {{- if (.Values.global.customArtifactory.authentication) }}
-      {{- if (.Values.global.customArtifactory.authentication.basic) }}
-        {{- if and (.Values.global.customArtifactory.authentication.basic.username) (.Values.global.customArtifactory.authentication.basic.password) -}}
-          true
-        {{- else -}}
-          false
-        {{- end -}}
-      {{- end -}}
-    {{- end }}
-  {{- end }}
-{{- end }}
-
 {{- define "imagePullSecret" }}
 {{- if .Values.global.docker.registry }}
 {{- printf "{\"auths\": {\"%s\": {\"auth\": \"%s\"}}}" .Values.global.docker.registry.url (printf "%s:%s" .Values.global.docker.registry.username .Values.global.docker.registry.password | b64enc) | b64enc }}
 {{- end }}
-{{- end }}
-
-{{- define "useApiKeyForCustomArtifactory" }}
-  {{- if (.Values.global.customArtifactory) }}
-    {{- if (.Values.global.customArtifactory.authentication) }}
-      {{- if (.Values.global.customArtifactory.authentication.apiKey) }}
-        {{- if and (.Values.global.customArtifactory.authentication.apiKey.headerName) (.Values.global.customArtifactory.authentication.apiKey.value) -}}
-          true
-        {{- else -}}
-          false
-        {{- end -}}
-      {{- end }}
-    {{- end }}
-  {{- end -}}
 {{- end }}
 
 {{- define "tlssecretsnippet" }}
@@ -575,9 +530,6 @@ servicePort: use-annotation
 
     {{- $ddsDict := dict "deploySecret" "deployDDSSecret" "deployNonExtsecret" "deployNonExtDDSSecret" "extSecretName" .Values.dds.external_secret_name "nonExtSecretName" "pega-dds-secret-name" "context" $ -}}
     {{ include "secretResolver" $ddsDict | indent 4}}
-
-    {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" $ -}}
-    {{ include "secretResolver" $artifactoryDict | indent 4}}
 
     {{- $srsDict := dict "deploySecret" "deploySRSSecret" "deployNonExtsecret" "deployNonExtSRSSecret" "extSecretName" .Values.pegasearch.srsMTLS.external_secret_name "nonExtSecretName" "pega-srs-mtls-secret-name" "context" $ -}}
     {{ include "secretResolver" $srsDict | indent 4}}

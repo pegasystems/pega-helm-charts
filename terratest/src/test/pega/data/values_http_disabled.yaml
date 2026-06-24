@@ -43,8 +43,6 @@ global:
     driverClass: "YOUR_JDBC_DRIVER_CLASS"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
     dbType: "YOUR_DATABASE_TYPE"
-    #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # To avoid exposing username & password, leave the jdbc.password & jdbc.username parameters empty (no quotes),
@@ -58,28 +56,6 @@ global:
     rulesSchema: "YOUR_RULES_SCHEMA"
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
-
-  customArtifactory:
-    # If you use a secured custom artifactory to manager your JDBC driver,
-    # provide the authentication details below by filling in the appropriate authentication section,
-    # either basic or apiKey.
-    authentication:
-      # Provide the basic authentication credentials or the API key authentication details to satisfy your custom artifactory authentication mechanism.
-      basic:
-        username: ""
-        password: ""
-      apiKey:
-        headerName: ""
-        value: ""
-      # To avoid exposing basic.username,basic.password,apiKey.headerName,apiKey.value parameters, configure the
-      # basic.username,basic.password,apiKey.headerName,apiKey.value parameters in External Secrets Manager, and enter the external secret for the credentials
-      # make sure the keys in the secret should be CUSTOM_ARTIFACTORY_USERNAME , CUSTOM_ARTIFACTORY_PASSWORD , CUSTOM_ARTIFACTORY_APIKEY_HEADER , CUSTOM_ARTIFACTORY_APIKEY
-      external_secret_name: ""
-    # Leave customArtifactory.enableSSLVerification enabled to ensure secure access to your custom artifactory;
-    # when customArtifactory.enableSSLVerification is false, SSL verification is skipped and establishes an insecure connection.
-    enableSSLVerification: true
-    # Provide a required domain certificate for your custom artifactory; if none is required, leave this field blank.
-    certificate:
 
   docker:
     # If using a custom Docker registry, supply the credentials here to pull Docker images.

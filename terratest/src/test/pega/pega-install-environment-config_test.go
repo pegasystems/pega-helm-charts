@@ -111,7 +111,6 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, installEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, installEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
-	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
 	require.Equal(t, installEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, installEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
@@ -130,8 +129,6 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DB2ZOS_UDF_WLM"], "")
 	require.Equal(t, installEnvConfigData["DISTRIBUTION_KIT_URL"], "")
 	require.Equal(t, "", installEnvConfigData["DISTRIBUTION_KIT_URL"])
-    require.Equal(t, installEnvConfigData["ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION"], "true")
-    require.Equal(t, installEnvConfigData["CUSTOM_JVM_ARGS"], "")
 
     assertNoDupesInConfigMap(t, configYaml, &installEnvConfigMap)
 }
@@ -140,66 +137,4 @@ func assertNoDupesInConfigMap(t *testing.T, configYaml string, cm *k8score.Confi
     for key := range cm.Data {
        require.Equal(t, 1, strings.Count(configYaml, " " + key + ": "))
     }
-}
-
-
-func TestPegaInstallEnvironmentConfigNoICDownload(t *testing.T) {
-
-	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy"}
-
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-	require.NoError(t, err)
-
-    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
-    require.NoError(t, err)
-
-	for _, vendor := range supportedVendors {
-		for _, operation := range supportedOperations {
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-				},
-			}
-
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
-			assertInstallerEnvironmentConfigJdbcUri(t, yamlContent, options, "http://driverhost/drivers/driver1.jar,http://driverhost/drivers/driver2.jar")
-		}
-	}
-}
-
-func TestPegaInstallEnvironmentConfigWithICDownload(t *testing.T) {
-
-	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
-	var supportedOperations = []string{"install", "install-deploy"}
-
-	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
-	require.NoError(t, err)
-
-    testsPath,err := filepath.Abs(PegaHelmChartTestsPath)
-    require.NoError(t, err)
-
-	for _, vendor := range supportedVendors {
-		for _, operation := range supportedOperations {
-			var options = &helm.Options{
-				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
-				},
-			}
-
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-install-environment-config.yaml"}, "--values", testsPath + "/data/values_multidriver.yaml")
-			assertInstallerEnvironmentConfigJdbcUri(t, yamlContent, options, "")
-		}
-	}
-}
-
-func assertInstallerEnvironmentConfigJdbcUri(t *testing.T, configYaml string, options *helm.Options, expectedDriverUri string) {
-	var installEnvConfigMap k8score.ConfigMap
-	UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
-	installEnvConfigData := installEnvConfigMap.Data
-
-	require.Equal(t, expectedDriverUri, installEnvConfigData["JDBC_DRIVER_URI"])
 }
