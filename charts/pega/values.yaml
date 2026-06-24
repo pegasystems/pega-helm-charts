@@ -546,14 +546,15 @@ pegasearch:
     # Enter the external secret name below.
     external_secret_name: ""
 
-# Autopilot GenAI service settings.
-# Configure OAuth authentication between Pega Infinity and the on-premise Autopilot backing service.
-# The Autopilot service URL is configured separately via a Dynamic System Setting (DSS) in Pega Infinity.
+# Autopilot Service settings.
+# Configure OAuth authentication between Pega Platform and the Autopilot Service
+# in client-managed cloud or on-premises deployments.
+# In Pega Platform, you can also configure the Autopilot Service URL separately by using a Dynamic System Setting (DSS).
 autopilot:
   autopilotAuth:
-    # Set enabled to true to enable OAuth authentication between Pega Infinity and the Autopilot service.
+    # Set enabled to true to enable OAuth authentication between Pega Platform and the Autopilot Service.
     enabled: false
-    # URL of the OAuth service endpoint to get the token for the Autopilot service.
+    # URL of the OAuth service endpoint to get the token for the Autopilot Service.
     url: ""
     # Client ID used in the OAuth service.
     clientId: ""
@@ -564,11 +565,11 @@ autopilot:
     privateKey: ""
     # Algorithm used to generate the private key. Allowed values: RS256, RS384, RS512, ES256, ES384, ES512.
     privateKeyAlgorithm: ""
-    # Scopes set in the OAuth service required to grant access to the Autopilot service.
+    # OAuth scopes to request from the identity provider. Leave empty unless your identity provider requires scopes.
     scopes: ""
-    # Name of a pre-existing Kubernetes Secret containing the private key or client secret.
-    # When set, the chart does not create a new secret and ignores the privateKey value above.
-    # The secret must contain the key "AUTOPILOT_OAUTH_PRIVATE_KEY".
+    # Name of an existing Kubernetes Secret that contains the private key.
+    # When set, the chart does not create a new Secret and ignores the privateKey value above.
+    # The Secret must contain the key "AUTOPILOT_OAUTH_PRIVATE_KEY".
     external_secret_name: ""
 
 # Pega Installer settings.
