@@ -1,9 +1,10 @@
-{{- define "hazelcastName" -}} pega-hazelcast {{- end -}}
-{{- define "hazelcastEnvironmentConfig" -}} pega-hz-env-config {{- end -}}
+{{- define "hazelcastDeploymentName" }}{{ $hazelcastDeploymentName := .defaultname }}{{ if (.root.deployment) }}{{ if (.root.deployment.name) }}{{ $hazelcastDeploymentName = .root.deployment.name }}{{ end }}{{ end }}{{ $hazelcastDeploymentName }}{{- end -}}
 
-{{- define "clusteringServiceName" -}} clusteringservice {{- end -}}
-{{- define "clusteringServiceEnvironmentConfig" -}} clusteringservice-env-config {{- end -}}
+{{- define "hazelcastName" -}}{{ include "hazelcastDeploymentName" (dict "root" .Values "defaultname" "pega-hazelcast" )}}{{- end -}}
+{{- define "hazelcastEnvironmentConfig" -}}{{include "hazelcastName" .}}-env-config {{- end -}}
 
+{{- define "clusteringServiceName" -}}{{ include "hazelcastDeploymentName" (dict "root" .Values "defaultname" "clusteringservice" )}}{{- end -}}
+{{- define "clusteringServiceEnvironmentConfig" -}}{{include "clusteringServiceName" .}}-env-config {{- end -}}
 
 {{- define "isHazelcastEnabled" }}
  {{- if .Values.enabled -}}

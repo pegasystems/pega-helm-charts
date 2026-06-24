@@ -65,6 +65,47 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 	}
 }
 
+func TestHazelcastDeploymentName(t *testing.T) {
+	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
+	var supportedOperations = []string{"deploy", "install-deploy"}
+
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, vendor := range supportedVendors {
+
+		for _, operation := range supportedOperations {
+
+			var options = &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":           vendor,
+					"global.actions.execute":    operation,
+					"hazelcast.enabled":         "true",
+					"hazelcast.deployment.name": "hz-test",
+				},
+			}
+
+			yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/hazelcast/templates/pega-hz-deployment.yaml"})
+			VerifyHazelcastDeploymentName(t, yamlContent)
+
+		}
+	}
+}
+
+func VerifyHazelcastDeploymentName(t *testing.T, yamlContent string) {
+	var statefulsetObj appsv1beta2.StatefulSet
+	statefulSlice := strings.Split(yamlContent, "---")
+	for index, statefulInfo := range statefulSlice {
+		if index >= 1 {
+			UnmarshalK8SYaml(t, statefulInfo, &statefulsetObj)
+			require.Equal(t, statefulsetObj.Name, "hz-test")
+			require.Equal(t, statefulsetObj.Spec.ServiceName, "hz-test-service")
+			statefulsetSpec := statefulsetObj.Spec.Template.Spec
+			require.Equal(t, statefulsetSpec.Volumes[1].Projected.Sources[0].Secret.Name, "pega-hz-secret")
+		}
+	}
+}
+
 func TestHazelcastDeploymentWithPodAffinity(t *testing.T) {
 	var supportedVendors = []string{"k8s", "openshift", "eks", "gke", "aks", "pks"}
 	var supportedOperations = []string{"deploy", "install-deploy"}
