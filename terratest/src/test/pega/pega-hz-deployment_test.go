@@ -24,9 +24,10 @@ func TestHazelcastDeployment(t *testing.T) {
 
 			var options = &helm.Options{
 				SetValues: map[string]string{
-					"global.provider":        vendor,
-					"global.actions.execute": operation,
-					"hazelcast.enabled":      "true",
+					"global.provider":          vendor,
+					"global.actions.execute":   operation,
+					"hazelcast.enabled":        "true",
+					"hazelcast.podLabels.key1": "value1",
 				},
 			}
 
@@ -43,6 +44,8 @@ func VerifyHazelcastDeployment(t *testing.T, yamlContent string) {
 	for index, statefulInfo := range statefulSlice {
 		if index >= 1 {
 			UnmarshalK8SYaml(t, statefulInfo, &statefulsetObj)
+			require.Empty(t, statefulsetObj.Labels)
+			require.Equal(t, statefulsetObj.Spec.Template.Labels["key1"], "value1")
 			require.Equal(t, *statefulsetObj.Spec.Replicas, int32(3))
 			require.Equal(t, statefulsetObj.Spec.ServiceName, "pega-hazelcast-service")
 			statefulsetSpec := statefulsetObj.Spec.Template.Spec
