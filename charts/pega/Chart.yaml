@@ -5,9 +5,9 @@ version: "4.9.0"
 type: application
 description: Pega installation on kubernetes
 keywords:
-- pega
-- prpc
-- kubernetes
+  - pega
+  - prpc
+  - kubernetes
 home: http://www.pega.com
 
 # Pega does NOT actively update this Cassandra dependency. To leverage Cassandra, you should:
