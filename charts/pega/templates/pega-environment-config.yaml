@@ -268,8 +268,6 @@ data:
   IS_PEGA_25_OR_LATER: {{ (include "isPega25OrLater" .) }}
 {{- end }}
 {{- if .Values.global.logging }}
-{{- if .Values.global.logging.traceIdEnabled }}
-  PEGA_LOG_TRACE_ID_ENABLED: "true"
-{{- end }}
+  PEGA_LOG_TRACE_ID_ENABLED: "{{ .Values.global.logging.traceIdEnabled }}"
 {{- end }}
 {{ end }}
