@@ -68,6 +68,8 @@ func TestPegaTraceIdLogging(t *testing.T) {
 				UnmarshalK8SYaml(t, configData, &pegaConfigMap)
 				_, exists := pegaConfigMap.Data["prlog4j2.xml.tmpl"]
 				require.True(t, exists, "prlog4j2.xml.tmpl key should exist in tier config")
+				_, existsStatic := pegaConfigMap.Data["prlog4j2.xml"]
+				require.True(t, existsStatic, "prlog4j2.xml key should exist in tier config for backward compatibility")
 			}
 		}
 	})
@@ -87,7 +89,7 @@ func TestPegaTraceIdLogging(t *testing.T) {
 			if index >= 1 && index <= 3 {
 				UnmarshalK8SYaml(t, configData, &pegaConfigMap)
 				tmplContent := pegaConfigMap.Data["prlog4j2.xml.tmpl"]
-				require.Contains(t, tmplContent, `{{ if eq (env "PEGA_LOG_TRACE_ID_ENABLED") "true" }}`)
+				require.Contains(t, tmplContent, `{{ if .Env.PEGA_LOG_TRACE_ID_ENABLED }}`)
 				require.Contains(t, tmplContent, `[%X{traceId}]`)
 				require.Contains(t, tmplContent, `{{ end }}`)
 			}
