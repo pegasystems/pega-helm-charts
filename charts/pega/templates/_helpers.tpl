@@ -610,3 +610,20 @@ servicePort: use-annotation
     "false"
   {{- end }}
 {{- end }}
+
+{{/* Checks if the Pega version supports the new separated health probe endpoints (>= 26.1.1) */}}
+{{- define "useNewHealthProbes" -}}
+  {{- if and .Values.global.newHealthProbes (eq (toString .Values.global.newHealthProbes.enabled) "true") -}}
+    {{- if .Values.global.pegaVersion -}}
+      {{- if (semverCompare ">= 26.1.1-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+        true
+      {{- else -}}
+        false
+      {{- end -}}
+    {{- else -}}
+      false
+    {{- end -}}
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end -}}
