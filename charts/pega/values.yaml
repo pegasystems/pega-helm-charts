@@ -30,8 +30,8 @@ global:
 
   # Logging configuration
   logging:
-    # Set to true to include traceId in log4j2 log patterns for distributed tracing correlation
-    traceIdEnabled: false
+    # Set to true to include correlationId in log4j2 log patterns for distributed tracing correlation
+    correlationIdEnabled: false
 
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
   # Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.

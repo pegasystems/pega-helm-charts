@@ -14,7 +14,7 @@ func TestPegaTraceIdLogging(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
-	t.Run("default values should not emit PEGA_LOG_TRACE_ID_ENABLED", func(t *testing.T) {
+	t.Run("default values should not emit PEGA_LOG_CORRELATION_ID_ENABLED", func(t *testing.T) {
 		var options = &helm.Options{
 			SetValues: map[string]string{
 				"global.provider":        "k8s",
@@ -23,33 +23,33 @@ func TestPegaTraceIdLogging(t *testing.T) {
 		}
 
 		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-		VerifyEnvNotPresent(t, yamlContent, "PEGA_LOG_TRACE_ID_ENABLED")
+		VerifyEnvNotPresent(t, yamlContent, "PEGA_LOG_CORRELATION_ID_ENABLED")
 	})
 
-	t.Run("traceIdEnabled true should emit PEGA_LOG_TRACE_ID_ENABLED", func(t *testing.T) {
+	t.Run("correlationIdEnabled true should emit PEGA_LOG_CORRELATION_ID_ENABLED", func(t *testing.T) {
 		var options = &helm.Options{
 			SetValues: map[string]string{
 				"global.provider":                "k8s",
 				"global.actions.execute":         "deploy",
-				"global.logging.traceIdEnabled":  "true",
+				"global.logging.correlationIdEnabled":  "true",
 			},
 		}
 
 		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-		VerifyEnvValue(t, yamlContent, "PEGA_LOG_TRACE_ID_ENABLED", "true")
+		VerifyEnvValue(t, yamlContent, "PEGA_LOG_CORRELATION_ID_ENABLED", "true")
 	})
 
-	t.Run("traceIdEnabled false should not emit PEGA_LOG_TRACE_ID_ENABLED", func(t *testing.T) {
+	t.Run("correlationIdEnabled false should not emit PEGA_LOG_CORRELATION_ID_ENABLED", func(t *testing.T) {
 		var options = &helm.Options{
 			SetValues: map[string]string{
 				"global.provider":                "k8s",
 				"global.actions.execute":         "deploy",
-				"global.logging.traceIdEnabled":  "false",
+				"global.logging.correlationIdEnabled":  "false",
 			},
 		}
 
 		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})
-		VerifyEnvNotPresent(t, yamlContent, "PEGA_LOG_TRACE_ID_ENABLED")
+		VerifyEnvNotPresent(t, yamlContent, "PEGA_LOG_CORRELATION_ID_ENABLED")
 	})
 
 	t.Run("tier config contains prlog4j2.xml.tmpl key", func(t *testing.T) {
@@ -89,8 +89,9 @@ func TestPegaTraceIdLogging(t *testing.T) {
 			if index >= 1 && index <= 3 {
 				UnmarshalK8SYaml(t, configData, &pegaConfigMap)
 				tmplContent := pegaConfigMap.Data["prlog4j2.xml.tmpl"]
-				require.Contains(t, tmplContent, `{{ if .Env.PEGA_LOG_TRACE_ID_ENABLED }}`)
-				require.Contains(t, tmplContent, `[%X{traceId}]`)
+				require.Contains(t, tmplContent, `{{ if .Env.PEGA_LOG_CORRELATION_ID_ENABLED }}`)
+				require.Contains(t, tmplContent, `[%X{ext-correlation-id}]`)
+				require.Contains(t, tmplContent, `[%X{int-correlation-id}]`)
 				require.Contains(t, tmplContent, `{{ end }}`)
 			}
 		}

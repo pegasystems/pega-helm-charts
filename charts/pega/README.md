@@ -77,13 +77,13 @@ Use the `logging` section under `global` to configure log output behavior.
 
 | Parameter | Type | Default | Description |
 |-----------|------|---------|-------------|
-| `global.logging.traceIdEnabled` | Boolean | `false` | When set to `true`, includes `[%X{traceId}]` in the PegaRULES, PegaBIX, and PegaCLUSTER log4j2 patterns to support distributed tracing correlation. When `false` (default), the log pattern remains unchanged from baseline. |
+| `global.logging.correlationIdEnabled` | Boolean | `false` | When set to `true`, includes `[%X{traceId}]` in the PegaRULES, PegaBIX, and PegaCLUSTER log4j2 patterns to support distributed tracing correlation. When `false` (default), the log pattern remains unchanged from baseline. |
 
 Example:
 ```yaml
 global:
   logging:
-    traceIdEnabled: true
+    correlationIdEnabled: true
 ```
 
 ## JDBC Configuration
