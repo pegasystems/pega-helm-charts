@@ -85,6 +85,25 @@ isInternalDeployment: false
 oauthPublicKeyURL: ""
 
 # -------------------------------------------------------------------
+# Pega Infinity JWT signing key
+# -------------------------------------------------------------------
+# The Autopilot service signs JWTs (sent to Pega Infinity) with an RSA
+# private key. All pod replicas must share the same key so the JWKS
+# endpoint exposes a stable public key.
+#
+# Default behavior: the chart auto-creates a Secret named
+# "<deployment>-pega-auth" containing a freshly-generated RSA-2048 PEM.
+# The key is reused on subsequent `helm upgrade` runs (idempotent via
+# `lookup`) and is deleted on `helm uninstall`.
+#
+# To supply your own pre-existing Secret (e.g., key managed in a vault
+# and synced via External Secrets Operator), set existingSecret to the
+# Secret name. The Secret must contain key AUTOPILOT_PEGA_PRIVATE_KEY_PEM
+# whose value is a PEM-encoded RSA private key.
+pegaAuth:
+  existingSecret: ""
+
+# -------------------------------------------------------------------
 # Custom models file
 # -------------------------------------------------------------------
 # Option 1: Use the default models file bundled with this chart (files/default-models.json).
