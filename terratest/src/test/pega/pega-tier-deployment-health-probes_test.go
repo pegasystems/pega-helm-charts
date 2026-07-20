@@ -13,7 +13,7 @@ import (
 )
 
 // TestPegaDeploymentLegacyHealthProbes verifies that when newHealthProbes is not enabled,
-// probes use the legacy /ping endpoint with legacy default values.
+// probes use the legacy /ping endpoint with legacy default values (enhanced probes not active).
 func TestPegaDeploymentLegacyHealthProbes(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
@@ -37,9 +37,9 @@ func TestPegaDeploymentLegacyHealthProbes(t *testing.T) {
 	verifyLegacyProbes(t, &pod)
 }
 
-// TestPegaDeploymentNewHealthProbesEnabled verifies that when newHealthProbes.enabled=true
-// and pegaVersion >= 26.1.1, probes use the new separated endpoints with new defaults.
-func TestPegaDeploymentNewHealthProbesEnabled(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesEnabled verifies that when newHealthProbes.enabled=true
+// and pegaVersion supports enhanced probes (>= 2026.1.1), probes use the new separated endpoints with new defaults.
+func TestPegaDeploymentEnhancedHealthProbesEnabled(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -51,7 +51,7 @@ func TestPegaDeploymentNewHealthProbesEnabled(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "true",
-			"global.pegaVersion":           "26.2.0",
+			"global.pegaVersion":           "2026.2.0",
 		},
 	}
 
@@ -67,8 +67,8 @@ func TestPegaDeploymentNewHealthProbesEnabled(t *testing.T) {
 	require.Empty(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"])
 }
 
-// TestPegaDeploymentNewHealthProbesWithExactVersion verifies behavior with exact threshold version 26.1.1
-func TestPegaDeploymentNewHealthProbesWithExactVersion(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesWithExactVersion2026 verifies behavior with exact threshold version 2026.1.1
+func TestPegaDeploymentEnhancedHealthProbesWithExactVersion2026(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -80,7 +80,7 @@ func TestPegaDeploymentNewHealthProbesWithExactVersion(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "true",
-			"global.pegaVersion":           "26.1.1",
+			"global.pegaVersion":           "2026.1.1",
 		},
 	}
 
@@ -90,13 +90,12 @@ func TestPegaDeploymentNewHealthProbesWithExactVersion(t *testing.T) {
 	UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
 	pod := depObj.Spec.Template.Spec
 
-	// Exact version 26.1.1 should activate new probes (>= check)
+	// Exact version 2026.1.1 should activate enhanced probes
 	verifyNewProbes(t, &pod)
 }
 
-// TestPegaDeploymentNewHealthProbesFallbackOlderVersion verifies that when newHealthProbes.enabled=true
-// but pegaVersion < 26.1.1, probes fall back to legacy /ping and a warning annotation is added.
-func TestPegaDeploymentNewHealthProbesFallbackOlderVersion(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesWithExactVersion2025 verifies behavior with exact threshold version 2025.1.4
+func TestPegaDeploymentEnhancedHealthProbesWithExactVersion2025(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -108,7 +107,35 @@ func TestPegaDeploymentNewHealthProbesFallbackOlderVersion(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "true",
-			"global.pegaVersion":           "25.1.0",
+			"global.pegaVersion":           "2025.1.4",
+		},
+	}
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+	pod := depObj.Spec.Template.Spec
+
+	// Exact version 2025.1.4 should activate enhanced probes
+	verifyNewProbes(t, &pod)
+}
+
+// TestPegaDeploymentEnhancedHealthProbesFallbackOlderVersion verifies that when newHealthProbes.enabled=true
+// but pegaVersion is not supported, probes fall back to legacy /ping and a warning annotation is added.
+func TestPegaDeploymentEnhancedHealthProbesFallbackOlderVersion(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	options := &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":              "eks",
+			"global.actions.execute":       "deploy",
+			"global.deployment.name":       "pega",
+			"global.newHealthProbes.enabled": "true",
+			"global.pegaVersion":           "2025.1.0",
 		},
 	}
 
@@ -123,11 +150,11 @@ func TestPegaDeploymentNewHealthProbesFallbackOlderVersion(t *testing.T) {
 
 	// Should have fallback warning annotation
 	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "Falling back to legacy /ping probes")
-	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "25.1.0")
+	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "2025.1.0")
 }
 
-// TestPegaDeploymentNewHealthProbesFallbackNoVersion verifies fallback when pegaVersion is not set at all.
-func TestPegaDeploymentNewHealthProbesFallbackNoVersion(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesFallbackNoVersion verifies fallback when pegaVersion is not set at all.
+func TestPegaDeploymentEnhancedHealthProbesFallbackNoVersion(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -155,9 +182,9 @@ func TestPegaDeploymentNewHealthProbesFallbackNoVersion(t *testing.T) {
 	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "Falling back to legacy /ping probes")
 }
 
-// TestPegaDeploymentNewHealthProbesVersion26_1_0 verifies that version 26.1.0 (just below threshold)
+// TestPegaDeploymentEnhancedHealthProbesVersion2026_1_0 verifies that version 2026.1.0 (just below threshold)
 // falls back to legacy probes.
-func TestPegaDeploymentNewHealthProbesVersion26_1_0(t *testing.T) {
+func TestPegaDeploymentEnhancedHealthProbesVersion2026_1_0(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -169,7 +196,7 @@ func TestPegaDeploymentNewHealthProbesVersion26_1_0(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "true",
-			"global.pegaVersion":           "26.1.0",
+			"global.pegaVersion":           "2026.1.0",
 		},
 	}
 
@@ -179,16 +206,47 @@ func TestPegaDeploymentNewHealthProbesVersion26_1_0(t *testing.T) {
 	UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
 	pod := depObj.Spec.Template.Spec
 
-	// 26.1.0 is below 26.1.1, should use legacy
+	// 2026.1.0 is below 2026.1.1, should use legacy
 	verifyLegacyProbes(t, &pod)
 
 	// Should have fallback warning annotation
 	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "Falling back to legacy /ping probes")
 }
 
-// TestPegaDeploymentNewHealthProbesAppliedToAllTiers verifies that new probes apply
+// TestPegaDeploymentEnhancedHealthProbesVersion2025_1_3 verifies that version 2025.1.3 (just below threshold)
+// falls back to legacy probes.
+func TestPegaDeploymentEnhancedHealthProbesVersion2025_1_3(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	options := &helm.Options{
+		SetValues: map[string]string{
+			"global.provider":              "eks",
+			"global.actions.execute":       "deploy",
+			"global.deployment.name":       "pega",
+			"global.newHealthProbes.enabled": "true",
+			"global.pegaVersion":           "2025.1.3",
+		},
+	}
+
+	yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+	yamlSplit := strings.Split(yamlContent, "---")
+
+	UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+	pod := depObj.Spec.Template.Spec
+
+	// 2025.1.3 is below 2025.1.4, should use legacy
+	verifyLegacyProbes(t, &pod)
+
+	// Should have fallback warning annotation
+	require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "Falling back to legacy /ping probes")
+}
+
+// TestPegaDeploymentEnhancedHealthProbesAppliedToAllTiers verifies that enhanced probes apply
 // to all tiers (web and batch) when enabled globally.
-func TestPegaDeploymentNewHealthProbesAppliedToAllTiers(t *testing.T) {
+func TestPegaDeploymentEnhancedHealthProbesAppliedToAllTiers(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -201,7 +259,7 @@ func TestPegaDeploymentNewHealthProbesAppliedToAllTiers(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "true",
-			"global.pegaVersion":           "26.2.0",
+			"global.pegaVersion":           "2026.2.0",
 		},
 	}
 
@@ -217,9 +275,9 @@ func TestPegaDeploymentNewHealthProbesAppliedToAllTiers(t *testing.T) {
 	verifyNewProbes(t, &batchDep.Spec.Template.Spec)
 }
 
-// TestPegaDeploymentNewHealthProbesWithCustomOverrides verifies that user-specified
-// probe values take precedence over new probe defaults.
-func TestPegaDeploymentNewHealthProbesWithCustomOverrides(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesWithCustomOverrides verifies that user-specified
+// probe values take precedence over enhanced probe defaults.
+func TestPegaDeploymentEnhancedHealthProbesWithCustomOverrides(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -231,7 +289,7 @@ func TestPegaDeploymentNewHealthProbesWithCustomOverrides(t *testing.T) {
 			"global.actions.execute":                  "deploy",
 			"global.deployment.name":                  "pega",
 			"global.newHealthProbes.enabled":            "true",
-			"global.pegaVersion":                      "26.2.0",
+			"global.pegaVersion":                      "2026.2.0",
 			"global.tier[0].name":                     "web",
 			"global.tier[0].livenessProbe.timeoutSeconds":    "15",
 			"global.tier[0].livenessProbe.periodSeconds":     "25",
@@ -264,9 +322,9 @@ func TestPegaDeploymentNewHealthProbesWithCustomOverrides(t *testing.T) {
 	require.Equal(t, int32(45), pod.Containers[0].StartupProbe.FailureThreshold)
 }
 
-// TestPegaDeploymentNewHealthProbesDisabledExplicitly verifies that when explicitly set to false,
+// TestPegaDeploymentEnhancedHealthProbesDisabledExplicitly verifies that when explicitly set to false,
 // legacy probes are used even with a compatible version.
-func TestPegaDeploymentNewHealthProbesDisabledExplicitly(t *testing.T) {
+func TestPegaDeploymentEnhancedHealthProbesDisabledExplicitly(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
@@ -278,7 +336,7 @@ func TestPegaDeploymentNewHealthProbesDisabledExplicitly(t *testing.T) {
 			"global.actions.execute":       "deploy",
 			"global.deployment.name":       "pega",
 			"global.newHealthProbes.enabled": "false",
-			"global.pegaVersion":           "26.2.0",
+			"global.pegaVersion":           "2026.2.0",
 		},
 	}
 
@@ -295,14 +353,14 @@ func TestPegaDeploymentNewHealthProbesDisabledExplicitly(t *testing.T) {
 	require.Empty(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"])
 }
 
-// TestPegaDeploymentNewHealthProbesFutureVersion verifies new probes work with future versions.
-func TestPegaDeploymentNewHealthProbesFutureVersion(t *testing.T) {
+// TestPegaDeploymentEnhancedHealthProbesFutureVersion verifies enhanced probes work with future versions.
+func TestPegaDeploymentEnhancedHealthProbesFutureVersion(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	var depObj appsv1.Deployment
 
-	versions := []string{"27.0.0", "26.5.3", "30.1.0"}
+	versions := []string{"2027.0.0", "2026.5.3", "2030.1.0", "2025.2.0", "2025.1.5"}
 
 	for _, version := range versions {
 		options := &helm.Options{
@@ -358,6 +416,40 @@ func verifyLegacyProbes(t *testing.T, pod *k8score.PodSpec) {
 	require.Equal(t, int32(10), pod.Containers[0].StartupProbe.PeriodSeconds)
 	require.Equal(t, int32(1), pod.Containers[0].StartupProbe.SuccessThreshold)
 	require.Equal(t, int32(30), pod.Containers[0].StartupProbe.FailureThreshold)
+}
+
+// TestPegaDeploymentEnhancedHealthProbesRejected8xVersion verifies that 8.x versions are rejected.
+func TestPegaDeploymentEnhancedHealthProbesRejected8xVersion(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	var depObj appsv1.Deployment
+
+	versions := []string{"8.8.0", "8.23.1", "8.7.4"}
+
+	for _, version := range versions {
+		options := &helm.Options{
+			SetValues: map[string]string{
+				"global.provider":              "eks",
+				"global.actions.execute":       "deploy",
+				"global.deployment.name":       "pega",
+				"global.newHealthProbes.enabled": "true",
+				"global.pegaVersion":           version,
+			},
+		}
+
+		yamlContent := RenderTemplate(t, options, helmChartPath, []string{"templates/pega-tier-deployment.yaml"})
+		yamlSplit := strings.Split(yamlContent, "---")
+
+		UnmarshalK8SYaml(t, yamlSplit[1], &depObj)
+		pod := depObj.Spec.Template.Spec
+
+		// All 8.x versions should fall back to legacy probes
+		verifyLegacyProbes(t, &pod)
+
+		// Should have fallback warning annotation
+		require.Contains(t, depObj.ObjectMeta.Annotations["pega.io/health-probes-warning"], "Falling back to legacy /ping probes")
+	}
 }
 
 // verifyNewProbes asserts that all probes use the new separated endpoints with new defaults.

@@ -611,12 +611,32 @@ servicePort: use-annotation
   {{- end }}
 {{- end }}
 
-{{/* Checks if the Pega version supports the new separated health probe endpoints (>= 26.1.1) */}}
-{{- define "useNewHealthProbes" -}}
+{{/* Checks if the Pega version supports the enhancedz health probe endpoints */}}
+{{/* Supported: 2025.1.4+, 2026.1.1+, 2027+. Rejected: all 8.x versions */}}
+{{- define "areEnhancedHealthProbesSupported" -}}
   {{- if and .Values.global.newHealthProbes (eq (toString .Values.global.newHealthProbes.enabled) "true") -}}
     {{- if .Values.global.pegaVersion -}}
-      {{- if (semverCompare ">= 26.1.1-0" (trimPrefix "branch-" .Values.global.pegaVersion)) -}}
+      {{- $version := trimPrefix "branch-" .Values.global.pegaVersion -}}
+      {{- $parts := splitList "." $version -}}
+      {{- $major := int (index $parts 0) -}}
+      {{- $minor := 0 -}}
+      {{- if gt (len $parts) 1 -}}{{- $minor = int (index $parts 1) -}}{{- end -}}
+      {{- $patch := 0 -}}
+      {{- if gt (len $parts) 2 -}}{{- $patch = int (index $parts 2) -}}{{- end -}}
+      {{- if ge $major 2027 -}}
         true
+      {{- else if eq $major 2026 -}}
+        {{- if or (gt $minor 1) (and (eq $minor 1) (ge $patch 1)) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
+      {{- else if eq $major 2025 -}}
+        {{- if or (gt $minor 1) (and (eq $minor 1) (ge $patch 4)) -}}
+          true
+        {{- else -}}
+          false
+        {{- end -}}
       {{- else -}}
         false
       {{- end -}}

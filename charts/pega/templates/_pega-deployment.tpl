@@ -2,7 +2,7 @@
 {{- $useStartupProbe := false }}
 {{- $livenessProbe := .node.livenessProbe }}
 {{- $readinessProbe := .node.readinessProbe }}
-{{- $useNewProbes := (eq (include "useNewHealthProbes" .root) "true") }}
+{{- $useEnhancedProbes := (eq (include "areEnhancedHealthProbesSupported" .root) "true") }}
 {{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
 {{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
 {{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
@@ -12,14 +12,14 @@
   {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
   {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
 {{- end }}
-{{- if $useNewProbes }}
+{{- if $useEnhancedProbes }}
   {{- $livenessProbeInitialDelaySeconds = $livenessProbe.initialDelaySeconds | default 0 }}
   {{- $livenessProbeFailureThreshold = $livenessProbe.failureThreshold | default 3 }}
   {{- $livenessProbePeriodSeconds = $livenessProbe.periodSeconds | default 20 }}
   {{- $readinessProbeInitialDelaySeconds = $readinessProbe.initialDelaySeconds | default 0 }}
 {{- end }}
 {{- $newProbesRequestedButUnavailable := false }}
-{{- if and .root.Values.global.newHealthProbes (eq (toString .root.Values.global.newHealthProbes.enabled) "true") (not $useNewProbes) }}
+{{- if and .root.Values.global.newHealthProbes (eq (toString .root.Values.global.newHealthProbes.enabled) "true") (not $useEnhancedProbes) }}
   {{- $newProbesRequestedButUnavailable = true }}
 {{- end }}
 
@@ -192,7 +192,7 @@ spec:
 {{- end }}
 {{- end }}
         # Specify any of the container environment variables here
-        env:	
+        env:
         # Node type of the Pega nodes for {{ .name }}
 {{- if .root.Values.stream }}
 {{- if .root.Values.stream.url }}
@@ -345,7 +345,7 @@ spec:
         # LivenessProbe: indicates whether the container is live, i.e. running.
         livenessProbe:
           httpGet:
-{{- if $useNewProbes }}
+{{- if $useEnhancedProbes }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/liveness"
 {{- else }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
@@ -353,14 +353,14 @@ spec:
             port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbeInitialDelaySeconds }}
-          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default (ternary 5 20 $useNewProbes) }}
+          timeoutSeconds: {{ $livenessProbe.timeoutSeconds | default (ternary 5 20 $useEnhancedProbes) }}
           periodSeconds: {{ $livenessProbePeriodSeconds }}
           successThreshold: {{ $livenessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $livenessProbeFailureThreshold }}
         # ReadinessProbe: indicates whether the container is ready to service requests.
         readinessProbe:
           httpGet:
-{{- if $useNewProbes }}
+{{- if $useEnhancedProbes }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/readiness"
 {{- else }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
@@ -368,7 +368,7 @@ spec:
             port: {{ $readinessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
-          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default (ternary 5 10 $useNewProbes) }}
+          timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default (ternary 5 10 $useEnhancedProbes) }}
           periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
@@ -377,7 +377,7 @@ spec:
         {{- $startupProbe := .node.startupProbe }}
         startupProbe:
           httpGet:
-{{- if $useNewProbes }}
+{{- if $useEnhancedProbes }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/startup"
 {{- else }}
             path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
@@ -385,10 +385,10 @@ spec:
             port: {{ $startupProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}
-          timeoutSeconds: {{ $startupProbe.timeoutSeconds | default (ternary 5 10 $useNewProbes) }}
+          timeoutSeconds: {{ $startupProbe.timeoutSeconds | default (ternary 5 10 $useEnhancedProbes) }}
           periodSeconds: {{ $startupProbe.periodSeconds | default 10 }}
           successThreshold: {{ $startupProbe.successThreshold | default 1 }}
-          failureThreshold: {{ $startupProbe.failureThreshold | default (ternary 60 30 $useNewProbes) }}
+          failureThreshold: {{ $startupProbe.failureThreshold | default (ternary 60 30 $useEnhancedProbes) }}
 {{- end }}
 
 {{- if .custom }}
