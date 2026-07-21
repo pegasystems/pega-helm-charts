@@ -37,7 +37,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=5> >= 8.6 </td>
-            <td rowspan=5>1.45.3</td>
+            <td rowspan=5>1.46.0</td>
             <td rowspan=3> <b>search-n-reporting-service</b></td>
         </tr>
         <tr>
@@ -47,8 +47,8 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td>Enabled</td>
-            <td>Elasticsearch 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 & 8.19.11</td>
-            <td>As a best practice, use Elasticsearch version 8.19.11.</td>
+            <td>Elasticsearch 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 & 8.19.18</td>
+            <td>As a best practice, use Elasticsearch version 8.19.18.</td>
         </tr>
         <tr>
             <td rowspan=1> <b>search-n-reporting-service-os</b></td>
@@ -66,25 +66,25 @@ As a best practice, use OpenSearch 2.19. </td>
 **Important:** Pega supports only official Elasticsearch and OpenSearch Docker images. Custom images, for example, `bitnami/elasticsearch`, are not supported.
 
 ### If your deployment uses the internally-provisioned Elasticsearch: ###
-To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To update Elasticsearch version to 7.17.9 perform the following actions:
    * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 7.17.3.
 
      Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.
    * Update the elasticsearch.imageTag in the Backing Services Helm chart to 7.17.9.
-3. To update Elasticsearch version to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11, perform the following actions:
+3. To update Elasticsearch version to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18, perform the following actions:
    * Update the Elasticsearch `dependencies.version` parameter in the [requirement.yaml](../../requirements.yaml) to 8.5.1.
 
      Note: This parameter references the Elasticsearch Helm chart version and not the Elasticsearch cluster version.
-   * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11.
+   * Update the elasticsearch.imageTag in the Backing Services Helm chart to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18.
 4. Restart the SRS pods.
 
 ### If your deployment connects to an externally-managed Elasticsearch service: ###
-To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
+To migrate to Elasticsearch version 7.17.9, 7.17.29, 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18 from the Elasticsearch version 7.10.2 or 7.16.3, perform the following steps:
 1. Update the SRS Docker image version to use v1.31.2. This version has backward compatibility with Elasticsearch versions 7.10.x and 7.16.x, so your SRS will continue to work even before you update your Elasticsearch service.
 2. To use Elasticsearch version 7.17.9, upgrade your external Elasticsearch cluster to 7.17.9 according to your organization’s best practices. For more information, see official Elasticsearch version 7.17 documentation.
-3. To use Elasticsearch version 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11, upgrade your external Elasticsearch cluster to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6 or 8.19.11 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
+3. To use Elasticsearch version 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18, upgrade your external Elasticsearch cluster to 8.10.3, 8.15.1, 8.15.5, 8.18.2, 8.18.3, 8.18.6, 8.19.11 or 8.19.18 according to your organization’s best practices. For more information, see official Elasticsearch version 8.x documentation.
 4. Restart the SRS pods.
 
 ### SRS runtime configuration
