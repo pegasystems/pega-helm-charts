@@ -19,6 +19,9 @@ docker:
   autopilot:
     image: YOUR_AUTOPILOT_SERVICE_IMAGE:TAG
     imagePullPolicy: IfNotPresent
+  infinityRulesMcp:
+    image: YOUR_INFINITY_RULES_MCP_IMAGE:TAG
+    imagePullPolicy: IfNotPresent
 
 # -------------------------------------------------------------------
 # Replicas & Resources
@@ -83,6 +86,37 @@ isInternalDeployment: false
 # so the Autopilot Service can validate incoming OAuth Bearer tokens from Pega Platform.
 # Example: "https://your-idp-host/oauth2/v1/keys"
 oauthPublicKeyURL: ""
+
+# -------------------------------------------------------------------
+# Infinity Rules MCP Service (optional)
+# -------------------------------------------------------------------
+# Enable this deployment when Autopilot needs Infinity rules MCP functionality.
+# The Autopilot pod is always configured with VCS_INFINITY_RULES_MCP_URL that
+# points to this in-namespace service name.
+infinityRulesMcp:
+  enabled: false
+  replicas: 2
+  service:
+    port: 80
+    targetPort: 8090
+    serviceType: ClusterIP
+  resources:
+    requests:
+      cpu: 500m
+      memory: "768Mi"
+    limits:
+      cpu: "1"
+      memory: "1Gi"
+  livenessProbe:
+    initialDelaySeconds: 30
+    timeoutSeconds: 5
+    periodSeconds: 15
+    failureThreshold: 3
+  readinessProbe:
+    initialDelaySeconds: 20
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
 
 # -------------------------------------------------------------------
 # Custom models file
