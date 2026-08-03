@@ -1,0 +1,18 @@
+{{- if and .Values.enabled .Values.infinityRulesMcp.enabled }}
+{{- $depName := "infinity-rules-mcp-service" }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $depName }}
+  labels:
+    app: {{ $depName }}
+spec:
+  selector:
+    app: {{ $depName }}
+  ports:
+  - name: http
+    protocol: TCP
+    port: {{ .Values.infinityRulesMcp.service.port }}
+    targetPort: {{ .Values.infinityRulesMcp.service.targetPort }}
+  type: {{ .Values.infinityRulesMcp.service.serviceType }}
+{{ end }}

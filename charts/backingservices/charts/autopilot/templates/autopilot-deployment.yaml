@@ -62,10 +62,17 @@ spec:
           value: {{ .Values.isInternalDeployment | quote }}
         - name: BLOCK_UNAUTH_REQUESTS
           value: {{ .Values.authEnabled | quote }}
+        - name: VCS_INFINITY_RULES_MCP_URL
+          value: "http://infinity-rules-mcp-service/mcp"
         {{- if .Values.authEnabled }}
         - name: SAX_JWKS_URL
           value: {{ include "autopilot.oauthPublicKeyUrl" . }}
         {{- end }}
+        - name: AUTOPILOT_PEGA_PRIVATE_KEY_PEM
+          valueFrom:
+            secretKeyRef:
+              name: autopilot-pega-auth
+              key: AUTOPILOT_PEGA_PRIVATE_KEY_PEM
         {{- if .Values.modelProviders }}
         - name: MODEL_PROVIDERS
           value: {{ .Values.modelProviders | quote }}
