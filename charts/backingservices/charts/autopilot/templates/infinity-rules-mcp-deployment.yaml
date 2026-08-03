@@ -1,0 +1,63 @@
+{{- if and .Values.enabled .Values.infinityRulesMcp.enabled }}
+{{- $depName := "infinity-rules-mcp-service" }}
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: {{ $depName }}
+  labels:
+    app: {{ $depName }}
+spec:
+  replicas: {{ .Values.infinityRulesMcp.replicas }}
+  selector:
+    matchLabels:
+      app: {{ $depName }}
+  template:
+    metadata:
+      labels:
+        app: {{ $depName }}
+    spec:
+      imagePullSecrets:
+      - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "autopilot" ) }}
+      {{- range .Values.docker.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
+      containers:
+      - name: infinity-rules-mcp
+        image: {{ .Values.docker.infinityRulesMcp.image }}
+        imagePullPolicy: {{ .Values.docker.infinityRulesMcp.imagePullPolicy }}
+        ports:
+        - containerPort: {{ .Values.infinityRulesMcp.service.targetPort }}
+        resources:
+          {{- if .Values.infinityRulesMcp.resources }}
+          {{ toYaml .Values.infinityRulesMcp.resources | nindent 10 }}
+          {{- end }}
+        env:
+        - name: SERVER_PORT
+          value: {{ .Values.infinityRulesMcp.service.targetPort | quote }}
+        - name: PEGA_SKILLS_PATH
+          value: "/opt/infinity-skills"
+        - name: PEGA_WRITE_ENABLED
+          value: "true"
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        livenessProbe:
+          initialDelaySeconds: {{ .Values.infinityRulesMcp.livenessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.infinityRulesMcp.livenessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.infinityRulesMcp.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.infinityRulesMcp.livenessProbe.failureThreshold }}
+          tcpSocket:
+            port: {{ .Values.infinityRulesMcp.service.targetPort }}
+        readinessProbe:
+          initialDelaySeconds: {{ .Values.infinityRulesMcp.readinessProbe.initialDelaySeconds }}
+          timeoutSeconds: {{ .Values.infinityRulesMcp.readinessProbe.timeoutSeconds }}
+          periodSeconds: {{ .Values.infinityRulesMcp.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.infinityRulesMcp.readinessProbe.failureThreshold }}
+          tcpSocket:
+            port: {{ .Values.infinityRulesMcp.service.targetPort }}
+{{ end }}
