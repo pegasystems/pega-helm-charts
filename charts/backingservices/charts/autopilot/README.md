@@ -39,7 +39,9 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `docker.registry.password` | Specify the image registry password. |
 | `docker.imagePullSecretNames` | Specify an array of existing image pull Secrets to use when pulling images. |
 | `docker.autopilot.image` | Specify the Autopilot Service image and tag. |
-| `docker.autopilot.imagePullPolicy` | Specify the image pull policy. Default: `IfNotPresent` |
+| `docker.autopilot.imagePullPolicy` | Specify the Autopilot Service image pull policy. Default: `IfNotPresent` |
+| `docker.infinityRulesMcp.image` | Specify the Infinity Rules MCP Service image and tag. Required when `infinityRulesMcp.enabled` is `true`. |
+| `docker.infinityRulesMcp.imagePullPolicy` | Specify the Infinity Rules MCP Service image pull policy. Default: `IfNotPresent` |
 | `replicas` | Specify the number of Autopilot pods. Default: `2` |
 | `resources` | Define CPU and memory requests and limits for the Autopilot container. |
 | `service.port` | Specify the Kubernetes Service port. Default: `80` |
@@ -51,8 +53,33 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `isInternalDeployment` | Leave this parameter as `false` for client-managed cloud or on-premises deployments. |
 | `modelProviders` | Specify a comma-separated list of providers to expose, such as `"Azure,Vertex,Bedrock"`. If this value is empty, the service relies on the configured credentials and model list. For FedRAMP or PCFG environments, set `"Bedrock"` as the provider. |
 | `awsRegion` | Specify the AWS region used by Bedrock. Default: `us-east-1` |
+| `infinityRulesMcp.enabled` | Set this parameter to `true` to deploy the optional Infinity Rules MCP Service in the same namespace as Autopilot. Default: `false` |
+| `infinityRulesMcp.replicas` | Specify the number of Infinity Rules MCP Service pods. Default: `2` |
+| `infinityRulesMcp.service.port` | Specify the Infinity Rules MCP Kubernetes Service port. Default: `80` |
+| `infinityRulesMcp.service.targetPort` | Specify the Infinity Rules MCP container port. Default: `8090` |
+| `infinityRulesMcp.service.serviceType` | Specify the Infinity Rules MCP Kubernetes Service type. Default: `ClusterIP` |
+| `infinityRulesMcp.resources` | Define CPU and memory requests and limits for the Infinity Rules MCP container. |
 | `affinity` | Define pod affinity rules. |
 | `tolerations` | Define pod tolerations. |
+
+## Infinity Rules MCP Service
+
+The chart can optionally deploy the Infinity Rules MCP Service in the same namespace as the Autopilot Service. When the service is enabled, Autopilot communicates with it through the internal Kubernetes service endpoint `http://infinity-rules-mcp-service/mcp`.
+
+The Autopilot pod is always configured with `VCS_INFINITY_RULES_MCP_URL=http://infinity-rules-mcp-service/mcp`. If `infinityRulesMcp.enabled` is `false`, the MCP Deployment, Service, and PodDisruptionBudget are not rendered. If you enable the MCP service later, the existing Autopilot URL configuration already points to the service name.
+
+```yaml
+autopilot:
+  enabled: true
+
+  docker:
+    infinityRulesMcp:
+      image: "YOUR_REGISTRY_URL/infinity-rules-mcp:YOUR_TAG"
+      imagePullPolicy: IfNotPresent
+
+  infinityRulesMcp:
+    enabled: true
+```
 
 ## Provider credentials
 
@@ -700,6 +727,9 @@ autopilot:
     autopilot:
       image: "YOUR_REGISTRY_URL/autopilot-service:YOUR_TAG"
       imagePullPolicy: Always
+    infinityRulesMcp:
+      image: "YOUR_REGISTRY_URL/infinity-rules-mcp:YOUR_TAG"
+      imagePullPolicy: IfNotPresent
 
   replicas: 2
   enableGenaiHub: false
@@ -707,6 +737,9 @@ autopilot:
   isInternalDeployment: false
   modelProviders: "Azure,Vertex,Bedrock"
   deployModelsConfigMap: true
+
+  infinityRulesMcp:
+    enabled: false
 
   azure:
     endpoint: "https://YOUR_AZURE_RESOURCE.openai.azure.com/"

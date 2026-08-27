@@ -1,0 +1,17 @@
+{{- if and .Values.enabled .Values.infinityRulesMcp.enabled }}
+{{- $depName := "infinity-rules-mcp-service" }}
+{{- if (semverCompare ">= 1.21.0-0" (trimPrefix "v" .Capabilities.KubeVersion.GitVersion)) }}
+apiVersion: policy/v1
+{{- else }}
+apiVersion: policy/v1beta1
+{{- end }}
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $depName }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  minAvailable: 50%
+  selector:
+    matchLabels:
+      app: {{ $depName }}
+{{ end }}
