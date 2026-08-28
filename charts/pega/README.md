@@ -141,17 +141,13 @@ To support this option,
 4. For alternate configuration the keys should be TOMCAT_CERTIFICATE_FILE, TOMCAT_CERTIFICATE_KEY_FILE and TOMCAT_CERTIFICATE_CHAIN_FILE, ca.crt(in case of traefik addon enabled) for certificate and key files.
 
 
-### Driver URI
+### Database Driver
 
-Pega requires a database driver JAR to be provided for connecting to the relational database.  This JAR may either be baked into your image by extending the Pega provided Docker image, or it may be pulled in dynamically when the container is deployed.  If you want to pull in the driver during deployment, you will need to specify a URL to the driver using the `jdbc.driverUri` parameter.  This address must be visible and accessible from the process running inside the container.
+Pega requires a database driver JAR to be provided for connecting to the relational database. The driver JAR must be baked into your image by extending the Pega-provided Docker image. For instructions on building a custom image with the driver included, see [building-your-own-Pega-installer-image.md](../../docs/building-your-own-Pega-installer-image.md).
 
-Use the `customArtifactory.authentication.basic` section to provide access credentials or use `customArtifactory.authentication.apiKey` to provide an APIKey value and dedicated APIKey header details if you host the driver in a custom artifactory that requires Basic or APIKey Authentication.
+> **Note:** In previous versions, the driver could be downloaded at container startup by specifying a `jdbc.driverUri` URL. This dynamic download capability has been removed; you must now embed the driver JAR in your image before deployment.
 
-If you configured a secret in an external secrets operator for customArtifactory credentials, enter the secret name in `customArtifactory.authentication.external_secret_name` parameter. For details, see [this section.](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator)
-
-If your artifactory domain server certificate is not issued by Certificate Authority, you must provide the server certificate using the `customArtifactory.certificate` parameter. To disable SSL verification, you can set `customArtifactory.enableSSLVerification` to `false` and leave the `CustomArtifactory.certificate` parameter blank.
-
-The Pega Docker images use Java 11, which requires that the JDBC driver that you specify is compatible with Java 11.
+The Pega Docker images use Java 11, which requires that the JDBC driver you provide is compatible with Java 11.
 
 ### Authentication
 
@@ -229,26 +225,6 @@ utilityImages:
     image: "pegasystems/k8s-wait-for"
     imagePullPolicy: "IfNotPresent"
 ```
-
-## Running Pega without curl utility
-Pega pods use the curl utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
-
-This improves the general security posture related to the curl utility:
-* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
-* The init container runs briefly before there is inbound access to the pod.
-
-To use the curl utility via an init container, set the following:
-
-```yaml
-global:
-   downloadContainer: 
-        image: "curlimages/curl:<version>"
-        imagePullPolicy: "IfNotPresent"
-        sharedVolumeSize: "10Mi"
-```
-The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
-
-The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
 
 ## Deployment Name (Optional)
 

@@ -8,10 +8,6 @@ data:
   JDBC_URL: {{ .Values.global.jdbc.url }}
   # Class name of the DB's JDBC driver
   JDBC_CLASS: {{ .Values.global.jdbc.driverClass }}
-{{- if and .Values.global.jdbc.driverUri (eq (include "usesICDownload" .) "false")}}
-  # URI that the JDBC driver can be downloaded from
-  JDBC_DRIVER_URI: {{ .Values.global.jdbc.driverUri }}
-{{- end }}
   # Rules schema of the Pega installation
   RULES_SCHEMA: {{ .Values.global.jdbc.rulesSchema }}
   # Data schema of the Pega installation
@@ -48,8 +44,6 @@ data:
   # Bypass loading assembly classes into database during installation
   BYPASS_LOAD_ASSEMBLED_CLASSES: {{ .Values.bypassLoadAssembledClasses | quote }}
 {{- end }}
-  # Enable ssl verification for jdbc driver download
-  ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION: {{ .Values.global.customArtifactory.enableSSLVerification | quote }}
   # Custom JVM arguments for the installer
   CUSTOM_JVM_ARGS: {{ .Values.customJVMArgs | quote }}
 {{- if .Values.global.fips140_3Mode }}

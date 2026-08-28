@@ -45,8 +45,6 @@ spec:
       serviceAccountName: {{ .root.Values.serviceAccountName }}
 {{- end }}
       volumes:
-{{- include "jdbcLibVolume" .root | indent 6 }}
-{{- include "downloadScriptVolume" (merge .root (dict "chartType" "installer")) | indent 6 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
       - name: {{ template "pegaInstallerMountVolume" }}
         persistentVolumeClaim:
@@ -66,9 +64,6 @@ spec:
           sources:
           {{- $d := dict "deploySecret" "deployDBSecret" "deployNonExtsecret" "deployNonExtDBSecret" "extSecretName" .root.Values.global.jdbc.external_secret_name "nonExtSecretName" "pega-db-secret-name" "context" .root  -}}
           {{ include "secretResolver" $d | indent 10}}
-
-          {{- $artifactoryDict := dict "deploySecret" "deployArtifactorySecret" "deployNonExtsecret" "deployNonExtArtifactorySecret" "extSecretName" .root.Values.global.customArtifactory.authentication.external_secret_name "nonExtSecretName" "pega-custom-artifactory-secret-name" "context" .root -}}
-          {{ include "secretResolver" $artifactoryDict | indent 10}}
 
           {{- $extRestSecretName := "" }}
           {{- if .root.Values.upgrade }}{{- if .root.Values.upgrade.pega_rest_external_secret_name }}{{- $extRestSecretName = .root.Values.upgrade.pega_rest_external_secret_name }}{{- end }}{{- end }}
@@ -90,15 +85,7 @@ spec:
      {{- end }}
           # Used to specify permissions on files within the volume.
           defaultMode: 420
-{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
-{{- if .root.Values.global.customArtifactory.certificate }}
-{{- include "pegaCustomArtifactoryCertificateTemplate" .root | indent 6 }}
-{{- end }}
-{{- end }}
       initContainers:
-{{- $credVolumeName := include "pegaInstallerCredentialsVolume" .root }}
-{{- $artifactoryCertVolumeName := include "pegaCustomArtifactoryCertificateTemplate" .root }}
-{{- include "jdbc-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
@@ -126,7 +113,6 @@ spec:
           # CPU and Memory that the containers for {{ .name }} request
           {{- include "pegaInstallerResources" . | indent 10 }}
         volumeMounts:
-{{- include "jdbcLibVolumeMount" .root | indent 8 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
         - name: {{ template "pegaInstallerMountVolume" }}
           mountPath: "/opt/pega/mount/installer"
@@ -143,12 +129,6 @@ spec:
 {{- if .root.Values.custom }}
 {{- if .root.Values.custom.volumeMounts }}
 {{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
-{{- end }}
-{{- end }}
-{{ if (eq (include "customArtifactorySSLVerificationEnabled" .root) "true") }}
-{{- if .root.Values.global.customArtifactory.certificate }}
-        - name: {{ template "pegaVolumeCustomArtifactoryCertificate" }}
-          mountPath: "/opt/pega/artifactory/cert"
 {{- end }}
 {{- end }}
         env:

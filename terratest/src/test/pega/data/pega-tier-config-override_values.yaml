@@ -31,8 +31,6 @@ global:
     driverClass: "YOUR_JDBC_DRIVER_CLASS"
     #   pega.database.type	Valid values are: mssql, oracledate, udb, db2zos, postgres
     dbType: "YOUR_DATABASE_TYPE"
-    #   For databases that use multiple JDBC driver files (such as DB2), specify comma separated values for 'driverUri'
-    driverUri: "YOUR_JDBC_DRIVER_URI"
     username: "YOUR_JDBC_USERNAME"
     password: "YOUR_JDBC_PASSWORD"
     # CUSTOM CONNECTION PROPERTIES
