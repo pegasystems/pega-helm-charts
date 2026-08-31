@@ -1,3 +1,11 @@
+{{- define "distributionKitUrl" }}
+{{- if and .Values.distributionKit .Values.distributionKit.url }}
+{{- .Values.distributionKit.url }}
+{{- else if .Values.distributionKitURL }}
+{{- .Values.distributionKitURL }}
+{{- end }}
+{{- end }}
+
 {{- define "usesKitICDownload" }}
 {{- $usesKitICDownload := "false" -}}
 {{- if .Values.distributionKit }}
@@ -14,8 +22,20 @@
 {{- printf "%s" (include "deploymentName" $) -}}-installer-kit-download-script-config
 {{- end }}
 
+{{- define "usesKitPVC" }}
+{{- $usesKitPVC := "false" -}}
+{{- if and .Values.distributionKitVolumeClaimName (eq (include "distributionKitUrl" .) "") }}
+{{- $usesKitPVC = "true" }}
+{{- end }}
+{{- $usesKitPVC -}}
+{{- end }}
+
 {{- define "kitVolume" }}
-{{- if eq (include "usesKitICDownload" .) "true" }}
+{{- if eq (include "usesKitPVC" .) "true" }}
+- name: {{ template "pegaDistributionKitVolume" }}
+  persistentVolumeClaim:
+    claimName: {{ .Values.distributionKitVolumeClaimName }}
+{{- else if eq (include "usesKitICDownload" .) "true" }}
 - name: {{ template "pegaDistributionKitVolume" }}
   emptyDir:
     sizeLimit: {{ default "10Mi" .Values.distributionKit.downloadContainer.sharedVolumeSize }}
@@ -23,7 +43,7 @@
 {{- end }}
 
 {{- define "kitVolumeMount" }}
-{{- if eq (include "usesKitICDownload" .) "true" }}
+{{- if or (eq (include "usesKitPVC" .) "true") (eq (include "usesKitICDownload" .) "true") }}
 - name: {{ template "pegaDistributionKitVolume" }}
   mountPath: "/opt/pega/mount/kit"
 {{- end }}
@@ -153,7 +173,7 @@ data:
   command: ['sh', '-c', '/opt/pega/dlscripts/download-kit.sh']
   env:
   - name: DISTRIBUTION_KIT_URL
-    value: {{ .Values.distributionKit.url | quote }}
+    value: {{ include "distributionKitUrl" . | quote }}
   - name: ENABLE_CUSTOM_ARTIFACTORY_SSL_VERIFICATION
     value: "{{ .Values.global.customArtifactory.enableSSLVerification }}"
   volumeMounts:

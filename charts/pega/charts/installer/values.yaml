@@ -29,6 +29,10 @@ distributionKit:
     imagePullPolicy: "IfNotPresent"
     # Size of the volume shared between the init container and the installer container to hold the downloaded kit.
     sharedVolumeSize: "10Mi"
+# A manually managed Persistent Volume Claim for mounting the distribution kit. You must create this PVC manually before you bind the volume.
+# This is an alternative to distributionKit.url. If both are specified, distributionKit.url takes precedence.
+# Only the distribution kit zip file is expected inside the volume.
+distributionKitVolumeClaimName: ""
 # A manually managed Persistent Volume Claim for mounting upgrade artifacts. You must create this PVC manually before you bind the volume.
 # The installer job persists upgrade artifacts to this Persistent Volume to support automatically resuming rules_upgrade from point of failure when you use custom upgradeType.
 # To use this function, set the automaticResumeEnabled parameter to true.
