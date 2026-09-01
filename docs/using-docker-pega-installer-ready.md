@@ -19,31 +19,33 @@ Use `pega-installer-ready` instead when you need to use a standalone kit rather 
 
 1. Set `installer.image` to `pega-installer-ready` instead of a combined image:
 
-   ```yaml
-   installer:
-     image: "pegasystems/pega-installer-ready:<tag>"
-   ```
+  ```yaml
+  installer:
+    image: "pegasystems/pega-installer-ready:<tag>"
+  ```
 
-2. Provide the distribution kit to the `pega-installer-ready` image:
+2. Provide the distribution kit to the `pega-installer-ready` image using one of the following options:
 
-   The first way to provide the installer-ready image with the distribution kit is through a persistent volume. Create the PVC in the same namespace as the Pega deployment and ensure it contains only the distribution kit `.zip` file. Set `installer.distributionKitVolumeClaimName` to the claim name and leave `installer.distributionKit.url` empty. The installer job mounts the PVC at `/opt/pega/mount/kit`.
+   1. Provide `installer.distributionKit.url` as a URL the installer job can download the kit `.zip` from. If the URL requires authentication, also set the `global.customArtifactory` values. Additionally, set `installer.distributionKit.downloadContainer.image` to an image that has `curl` available to be used as an init container.
 
-   ```yaml
-   installer:
-     distributionKit:
-       url: ""
-     distributionKitVolumeClaimName: "pega-distribution-kit"
-   ```
+      ```yaml
+      installer:
+        distributionKit:
+          url: "https://example.com/kit.zip"
+          downloadContainer:
+            image: "curlimages/curl:<tag>"
+      ```
 
-   Alternatively, provide `installer.distributionKit.url` as a URL the installer job can download the kit `.zip` from. If the URL requires authentication, also set the `global.customArtifactory` values. Additionally, set `installer.distributionKit.downloadContainer.image` to an image that has `curl` available to be used as an init container.
+   2. Provide the distribution kit through a persistent volume. Create the PVC in the same namespace as the Pega deployment and ensure it contains only the distribution kit `.zip` file. Set `installer.distributionKitVolumeClaimName` to the claim name and leave `installer.distributionKit.url` empty.
 
-   ```yaml
-   installer:
-     distributionKit:
-       url: "https://example.com/kit.zip"
-       downloadContainer:
-         image: "curlimages/curl:<tag>"
-   ```
+      ```yaml
+      installer:
+        distributionKit:
+          url: ""
+        distributionKitVolumeClaimName: "pega-distribution-kit"
+      ```
+
+      The installer job mounts the PVC at `/opt/pega/mount/kit`.
 
    If both `installer.distributionKit.url` and `installer.distributionKitVolumeClaimName` are specified, the URL takes precedence.
 
