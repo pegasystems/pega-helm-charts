@@ -55,4 +55,3 @@ You can pin `installer.image` to a specific release or build by adding a tag, fo
 
 Available tags are:
 - `3.9-<jdk>` (`3.9-jdk11`, `3.9-jdk17`, `3.9-jdk21`) returns the 3.9 release built for that JDK version.
-- `latest` (or no tag specified) returns the latest good build.
