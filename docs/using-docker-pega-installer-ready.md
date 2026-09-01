@@ -12,8 +12,8 @@ Use `pega-installer-ready` instead when you need to use a standalone kit rather 
 
 - You have completed the general Kubernetes and Helm setup described in the [Preparing the environment](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/preparing-the-deployment-install.html) guide for your environment.
 - Your database is created and reachable.
-- You can pull `pegasystems/pega-installer-ready` from downloads.pega.com.
-- You have either a URL the installer job can use to download your Pega Platform distribution kit or a manually created PersistentVolumeClaim (PVC) containing the kit `.zip` file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading the Pega Platform distribution package](https://docs.pega.com/bundle/platform/page/platform/deployment/downloading-pega-distribution-package.html). You can stop after downloading, since you won't be building a combined image.
+- The `pegasystems/pega-installer-ready` image has been pulled.
+- You have either a URL the installer job can use to download your Pega Platform distribution kit or a manually created PersistentVolumeClaim (PVC) containing the kit `.zip` file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading the Pega Platform distribution package](https://docs.pega.com/bundle/platform/page/platform/deployment/downloading-pega-distribution-package.html).
 
 ## Configuring the pega chart to use pega-installer-ready
 
@@ -24,15 +24,18 @@ Use `pega-installer-ready` instead when you need to use a standalone kit rather 
      image: "pegasystems/pega-installer-ready:<tag>"
    ```
 
-2. Set `installer.distributionKit.url` to a URL the installer job can download the kit `.zip` from. If the URL requires authentication, also set the `global.customArtifactory` values.
+2. Provide the distribution kit to the `pega-installer-ready` image:
+
+   The first way to provide the installer-ready image with the distribution kit is through a persistent volume. Create the PVC in the same namespace as the Pega deployment and ensure it contains only the distribution kit `.zip` file. Set `installer.distributionKitVolumeClaimName` to the claim name and leave `installer.distributionKit.url` empty. The installer job mounts the PVC at `/opt/pega/mount/kit`.
 
    ```yaml
    installer:
      distributionKit:
-       url: "https://example.com/kit.zip"
+       url: ""
+     distributionKitVolumeClaimName: "pega-distribution-kit"
    ```
 
-   By default, the `pega-installer-ready` container downloads the kit itself at startup. If you'd rather have a separate init container download the kit before the installer container starts, for example to avoid giving the installer container direct network access, set `installer.distributionKit.downloadContainer.image` to an image that has `curl` available:
+   Alternatively, provide `installer.distributionKit.url` as a URL the installer job can download the kit `.zip` from. If the URL requires authentication, also set the `global.customArtifactory` values. Additionally, set `installer.distributionKit.downloadContainer.image` to an image that has `curl` available to be used as an init container.
 
    ```yaml
    installer:
@@ -42,67 +45,12 @@ Use `pega-installer-ready` instead when you need to use a standalone kit rather 
          image: "curlimages/curl:<tag>"
    ```
 
-   Alternatively, provide the distribution kit with a PVC. Create the PVC in the same namespace as the Pega deployment and ensure it contains only the distribution kit `.zip` file. Set `installer.distributionKitVolumeClaimName` to the claim name and leave `installer.distributionKit.url` empty. The installer job mounts the PVC at `/opt/pega/mount/kit`.
-
-   ```yaml
-   installer:
-     distributionKit:
-       url: ""
-     distributionKitVolumeClaimName: "pega-distribution-kit"
-   ```
-
-   When both `installer.distributionKit.url` and `installer.distributionKitVolumeClaimName` are specified, the URL takes precedence.
-
-## Installing Pega Platform
-
-Set `global.actions.execute` to `install` or `install-deploy`, and fill in your database connection details, then deploy as usual with `helm install`.
-
-```yaml
-global:
-  actions:
-    execute: "install-deploy"
-  jdbc:
-    url: "<your-jdbc-url>"
-    dbType: "<your-db-type>"
-    driverClass: "<your-jdbc-driver-class>"
-    username: "<db-username>"
-    password: "<db-password>"
-    rulesSchema: "rules"
-    dataSchema: "data"
-installer:
-  image: "pegasystems/pega-installer-ready:<tag>"
-  adminPassword: "<temporary-admin-password>"
-  distributionKit:
-    url: "https://example.com/kit.zip"
-```
-
-```bash
-$ helm install mypega-demo pega/pega --namespace mypega --values pega.yaml
-```
-
-Follow the progress of the installer job the same way you would for any Pega Platform deployment, by watching the installer pod and job logs from your Kubernetes dashboard or `kubectl`.
-
-## Upgrading Pega Platform
-
-Set `global.actions.execute` to `upgrade` or `upgrade-deploy`, and set `installer.upgrade.upgradeType` to `in-place`, `out-of-place-rules`, `out-of-place-data`, `zero-downtime`, or `custom`.
-
-```yaml
-global:
-  actions:
-    execute: "upgrade-deploy"
-installer:
-  image: "pegasystems/pega-installer-ready:<tag>"
-  upgrade:
-    upgradeType: "in-place"
-```
-
-If you use `upgradeType: "custom"`, also set `installer.upgrade.upgradeSteps` to a comma-separated list of the steps to run, in order: `enable_cluster_upgrade`, `rules_migration`, `rules_upgrade`, `data_upgrade`, `disable_cluster_upgrade`.
-
-For background on choosing an upgrade type, see [Upgrading your Pega Platform deployment](upgrading-pega-deployment-zero-downtime.md); for applying a zero-downtime patch, see [Patching Pega Platform in your deployment](patching-pega-deployment.md). If an upgrade fails partway through, see [Resuming failed upgrades from point of failures](resuming-rules-upgrade-failures.md) before you retry.
+   If both `installer.distributionKit.url` and `installer.distributionKitVolumeClaimName` are specified, the URL takes precedence.
 
 ## Choosing an image version
 
-You can pin `installer.image` to a specific release or build by adding a tag, for example `pegasystems/pega-installer-ready:3.9-jdk17`. Available tags are:
+You can pin `installer.image` to a specific release or build by adding a tag, for example `pegasystems/pega-installer-ready:3.9-jdk17`. Select the proper image to match your distribution's JDK. Reference the "Java Versions" section of the [Platform Support Guide](https://docs.pega.com/bundle/platform/page/platform/deployment/platform-support-guide/platform-support-guide.html) for details.
 
+Available tags are:
 - `3.9-<jdk>` (`3.9-jdk11`, `3.9-jdk17`, `3.9-jdk21`) returns the 3.9 release built for that JDK version.
 - `latest` (or no tag specified) returns the latest good build.
