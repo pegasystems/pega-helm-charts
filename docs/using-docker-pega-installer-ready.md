@@ -1,19 +1,19 @@
 # Using the Pega Platform installer-ready Docker image
 
-Pega provides a Docker image, `pegasystems/pega-installer-ready`, that installs or upgrades Pega Platform against your database when the `pega` Helm chart's installer job runs it. Pull the image from [PEGA-DOWNLOADS LINK].
+Pega provides a Docker image, `pegasystems/pega-installer-ready`, that installs or upgrades Pega Platform against your database when the `pega` Helm chart's installer job runs it. For instructions on how to pull this image, refer to the [Installing with the Pega Installer Docker Image](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/install-process-use-docker-image.html) guide.
 
 ## When to use pega-installer-ready instead of the combined installer image
 
 Pega distributes a combined installer image that already contains a Pega distribution kit, and pointing `installer.image` at that image is the standard way client-managed cloud clients install or upgrade Pega Platform.
 
-Use `pega-installer-ready` instead when you need to supply your own kit rather than use the one bundled into Pega's combined image, for example if that bundled kit has a known vulnerability you need to avoid. In this case, you point `installer.image` at `pega-installer-ready` itself, and supply the distribution kit to the installer job separately, either from a URL or a mounted volume. You still deploy the same way as any other Pega Platform deployment, by editing values.yaml and running `helm install` or `helm upgrade`, as described in the [Deploying Pega Platform](Deploying-Pega-on-AKS.md) guide for your environment. This document only covers the settings that differ when you use `pega-installer-ready`.
+Use `pega-installer-ready` instead when you need to use a standalone kit rather than use the one bundled into Pega's combined image, for example if that bundled kit has a known vulnerability that cannot be a part of a Docker image. In this case, you point `installer.image` at `pega-installer-ready` itself, and supply the distribution kit to the installer job separately, either from a URL or a mounted volume. You still deploy the same way as any other Pega Platform deployment, by editing values.yaml and running `helm install` or `helm upgrade`, as described in the [Installing with the Pega Installer Docker Image](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/install-process-use-docker-image.html) guide for your environment. This document only covers the settings that differ when you use `pega-installer-ready`.
 
 ## Prerequisites
 
-- You have completed the general Kubernetes and Helm setup described in the [Deploying Pega Platform](Deploying-Pega-on-AKS.md) guide for your environment.
+- You have completed the general Kubernetes and Helm setup described in the [Preparing the environment](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/preparing-the-deployment-install.html) guide for your environment.
 - Your database is created and reachable.
-- You can pull `pegasystems/pega-installer-ready` from [PEGA-DOWNLOADS LINK].
-- You have either a URL the installer job can use to download your Pega Platform distribution kit or a manually created PersistentVolumeClaim (PVC) containing the kit `.zip` file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading a Pega Platform distribution to your local system](building-your-own-Pega-installer-image.md#downloading-a-pega-platform-distribution-to-your-local-system); you can stop after downloading, since you won't be building a combined image.
+- You can pull `pegasystems/pega-installer-ready` from downloads.pega.com.
+- You have either a URL the installer job can use to download your Pega Platform distribution kit or a manually created PersistentVolumeClaim (PVC) containing the kit `.zip` file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading the Pega Platform distribution package](https://docs.pega.com/bundle/platform/page/platform/deployment/downloading-pega-distribution-package.html). You can stop after downloading, since you won't be building a combined image.
 
 ## Configuring the pega chart to use pega-installer-ready
 
