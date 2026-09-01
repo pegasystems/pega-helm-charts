@@ -38,7 +38,7 @@
 {{- else if eq (include "usesKitICDownload" .) "true" }}
 - name: {{ template "pegaDistributionKitVolume" }}
   emptyDir:
-    sizeLimit: {{ default "10Mi" .Values.distributionKit.downloadContainer.sharedVolumeSize }}
+    sizeLimit: {{ default "5Gi" .Values.distributionKit.downloadContainer.sharedVolumeSize }}
 {{- end }}
 {{- end }}
 

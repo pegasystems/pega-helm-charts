@@ -588,7 +588,7 @@ installer:
       image: ""
       imagePullPolicy: "IfNotPresent"
       # Size of the volume shared between the init container and the installer container to hold the downloaded kit.
-      sharedVolumeSize: "4Gi"
+      sharedVolumeSize: "5Gi"
   # A manually managed Persistent Volume Claim for mounting the distribution kit. You must create this PVC manually before you bind the volume.
   # This is an alternative to distributionKit.url. If both are specified, distributionKit.url takes precedence.
   # Only the distribution kit zip file is expected inside the volume.
