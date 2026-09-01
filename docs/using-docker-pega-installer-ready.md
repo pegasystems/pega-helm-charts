@@ -13,7 +13,7 @@ Use `pega-installer-ready` instead when you need to supply your own kit rather t
 - You have completed the general Kubernetes and Helm setup described in the [Deploying Pega Platform](Deploying-Pega-on-AKS.md) guide for your environment.
 - Your database is created and reachable.
 - You can pull `pegasystems/pega-installer-ready` from [PEGA-DOWNLOADS LINK].
-- You have a URL the installer job can use to download your Pega Platform distribution kit; the chart only supports providing the kit this way, not by mounting it from a local file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading a Pega Platform distribution to your local system](building-your-own-Pega-installer-image.md#downloading-a-pega-platform-distribution-to-your-local-system); you can stop after downloading, since you won't be building a combined image.
+- You have either a URL the installer job can use to download your Pega Platform distribution kit or a manually created PersistentVolumeClaim (PVC) containing the kit `.zip` file. For instructions on obtaining a kit and hosting it somewhere the installer job can reach, see [Downloading a Pega Platform distribution to your local system](building-your-own-Pega-installer-image.md#downloading-a-pega-platform-distribution-to-your-local-system); you can stop after downloading, since you won't be building a combined image.
 
 ## Configuring the pega chart to use pega-installer-ready
 
@@ -41,6 +41,17 @@ Use `pega-installer-ready` instead when you need to supply your own kit rather t
        downloadContainer:
          image: "curlimages/curl:<tag>"
    ```
+
+   Alternatively, provide the distribution kit with a PVC. Create the PVC in the same namespace as the Pega deployment and ensure it contains only the distribution kit `.zip` file. Set `installer.distributionKitVolumeClaimName` to the claim name and leave `installer.distributionKit.url` empty. The installer job mounts the PVC at `/opt/pega/mount/kit`.
+
+   ```yaml
+   installer:
+     distributionKit:
+       url: ""
+     distributionKitVolumeClaimName: "pega-distribution-kit"
+   ```
+
+   When both `installer.distributionKit.url` and `installer.distributionKitVolumeClaimName` are specified, the URL takes precedence.
 
 ## Installing Pega Platform
 
