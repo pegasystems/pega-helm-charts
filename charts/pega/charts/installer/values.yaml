@@ -18,16 +18,25 @@ adminPassword: ""
 assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
 bypassTruncateUpdatescache: "false"
-# Distribution kit URL
-distributionKitURL: ""
+# Pega distribution kit settings. Only required when installer.image does not already contain a kit (for example, pega-installer-ready).
+distributionKit:
+  # URL to download the distribution kit zip file from.
+  url: ""
+  # Specify an image to use as an init container to download the distribution kit from distributionKit.url.
+  # If not specified, the installer container downloads the kit itself at startup instead.
+  downloadContainer:
+    image: ""
+    imagePullPolicy: "IfNotPresent"
+    # Size of the volume shared between the init container and the installer container to hold the downloaded kit.
+    sharedVolumeSize: "5Gi"
+# A manually managed Persistent Volume Claim for mounting the distribution kit. You must create this PVC manually before you bind the volume.
+# This is an alternative to distributionKit.url. If both are specified, distributionKit.url takes precedence.
+# Only the distribution kit zip file is expected inside the volume.
+distributionKitVolumeClaimName: ""
 # A manually managed Persistent Volume Claim for mounting upgrade artifacts. You must create this PVC manually before you bind the volume.
 # The installer job persists upgrade artifacts to this Persistent Volume to support automatically resuming rules_upgrade from point of failure when you use custom upgradeType.
 # To use this function, set the automaticResumeEnabled parameter to true.
 installerMountVolumeClaimName: ""
-# A manually managed Persistent Volume Claim for mounting distribution kit. Given PVC must be created manually before volume will be bound.
-# This as an alternative to distributionKitURL. If both are specified then distributionKitURL will take precedence.
-# Only distriubtion kit zip file is expected inside the volume.
-distributionKitVolumeClaimName: ""
 # Bypass loading engine classes into database.
 bypassLoadEngineClasses: "false"
 # Bypass loading assembly classes into database
