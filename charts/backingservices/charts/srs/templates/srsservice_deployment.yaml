@@ -40,6 +40,9 @@ spec:
             - name: srs-https-port
               containerPort: 8443
               protocol: TCP
+            - name: srs-health-port
+              containerPort: 8082
+              protocol: TCP
             {{ end }}
           {{- if .Values.srsStorage.tls.enabled }}
           volumeMounts:
@@ -48,19 +51,11 @@ spec:
               {{- if .Values.srsRuntime.ssl.enabled }}
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
-                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
-            - name: srs-readiness-volume
-              mountPath: /usr/share/ssl/srs/readiness/
-                {{ end }}
               {{ end }}
           {{- else if .Values.srsRuntime.ssl.enabled }}
           volumeMounts:
             - name: srs-ssl-volume
               mountPath: /usr/share/ssl/srs/
-              {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
-            - name: srs-readiness-volume
-              mountPath: /usr/share/ssl/srs/readiness/
-              {{ end }}
               {{- if .Values.srsStorage.mtls.enabled }}
             - name: es-ssl-volume
               mountPath: /usr/share/ssl/es/
@@ -79,18 +74,10 @@ spec:
           {{ end }}
           readinessProbe:
               {{- if .Values.srsRuntime.ssl.enabled }}
-            exec:
-              command:
-                - wget
-                {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
-                - --certificate=/usr/share/ssl/srs/readiness/client.crt
-                - --private-key=/usr/share/ssl/srs/readiness/client.key
-                - --ca-certificate=/usr/share/ssl/srs/readiness/ca.crt
-                {{ end }}
-                - --no-check-certificate
-                - --no-verbose
-                - --spider
-                - https://localhost:8443/health
+            httpGet:
+              path: /health
+              port: srs-health-port
+              scheme: HTTP
               {{- else }}
             httpGet:
               path: /health
@@ -205,6 +192,10 @@ spec:
               {{- end }}
             {{ end }}
             {{- if .Values.srsRuntime.ssl.enabled }}
+            - name: SRS_HEALTH_HTTP_ENABLED
+              value: "true"
+            - name: SRS_HEALTH_HTTP_PORT
+              value: "8082"
             - name: SSL_ENABLED
               value: "true"
             - name: SRS_TLS_CLIENT_AUTHENTICATION
@@ -259,22 +250,12 @@ spec:
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
-          {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
-      - name: srs-readiness-volume
-        secret:
-          secretName: "srs-readiness-certs"
-          {{ end }}
         {{ end }}
       {{- else if .Values.srsRuntime.ssl.enabled }}
       volumes:
       - name: srs-ssl-volume
         secret:
           secretName: "{{ .Values.srsRuntime.ssl.certsSecret | default "srs-ssl-certificates"}}"
-        {{ if eq .Values.srsRuntime.ssl.clientAuthentication "need" }}
-      - name: srs-readiness-volume
-        secret:
-          secretName: "srs-readiness-certs"
-        {{ end }}
         {{- if .Values.srsStorage.mtls.enabled }}
       - name: es-ssl-volume
         secret:
