@@ -50,7 +50,7 @@ func VerifyTierConfgOverrides(t *testing.T, yamlContent string, options *helm.Op
 			pegaConfigMapData := pegaConfigMap.Data
 			require.Equal(t, "prconfig override", pegaConfigMapData["prconfig.xml"])
 			require.Equal(t, "context.xml override", pegaConfigMapData["context.xml.tmpl"])
-			require.Equal(t, "prlog4j2 override", pegaConfigMapData["prlog4j2.xml"])
+			require.Equal(t, "prlog4j2 override", pegaConfigMapData["prlog4j2.xml.tmpl"])
 			require.Equal(t, "server.xml override", pegaConfigMapData["server.xml.tmpl"])
 			require.Equal(t, "web.xml override", pegaConfigMapData["web.xml"])
 		}
