@@ -33,13 +33,17 @@ data:
 {{ .root.Files.Get "config/deploy/prconfig.xml" | indent 6 }}
 {{- end }}
 
-  # Pega deployment prlog4j2.xml file
-  prlog4j2.xml: |-
+  # Pega deployment prlog4j2.xml template file (takes precedence over prlog4j2.xml)
+  prlog4j2.xml.tmpl: |-
 {{- if $custom_config.prlog4j2 }}
 {{ $custom_config.prlog4j2 | indent 6 }}
 {{ else }}
-{{ .root.Files.Get "config/deploy/prlog4j2.xml" | indent 6 }}
+{{ .root.Files.Get "config/deploy/prlog4j2.xml.tmpl" | indent 6 }}
 {{- end }}
+
+  # Pega deployment prlog4j2.xml static file (backward compatibility)
+  prlog4j2.xml: |-
+{{ .root.Files.Get "config/deploy/prlog4j2.xml" | indent 6 }}
 
   # Pega deployment contextXML template file
   context.xml.tmpl: |-
