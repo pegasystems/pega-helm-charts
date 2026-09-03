@@ -2,13 +2,13 @@
 kind: ConfigMap
 apiVersion: v1
 metadata:
-  name: {{ template "hazelcastEnvironmentConfig" }}
+  name: {{ template "hazelcastEnvironmentConfig" .}}
   namespace: {{ .Release.Namespace }}
 data:
   # Key Value pairs
   NAMESPACE: {{ .Release.Namespace }}
   JAVA_OPTS: {{ .Values.server.java_opts | quote }}
-  SERVICE_NAME: {{ template "hazelcastName" }}-service
+  SERVICE_NAME: {{ template "hazelcastName" .}}-service
   MIN_CLUSTER_SIZE: {{ .Values.replicas | quote }}
 {{- if .Values.server.jmx_enabled }}
   JMX_ENABLED: {{ .Values.server.jmx_enabled | quote }}
