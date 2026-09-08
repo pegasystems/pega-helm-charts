@@ -37,7 +37,7 @@ The service deployment provisions runtime service pods along with a dependency o
         </tr>
         <tr>
             <td rowspan=5> >= 8.6 </td>
-            <td rowspan=5>1.48.1</td>
+            <td rowspan=5>1.48.2</td>
             <td rowspan=3> <b>search-n-reporting-service</b></td>
         </tr>
         <tr>
