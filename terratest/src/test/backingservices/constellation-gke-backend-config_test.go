@@ -61,7 +61,7 @@ func TestConstellationMessagingGKEBackendConfig(t *testing.T) {
 	require.Equal(t, 5, int(*cllnBackendConfig.Spec.HealthCheck.CheckIntervalSec))
 	require.Equal(t, 1, int(*cllnBackendConfig.Spec.HealthCheck.HealthyThreshold))
 	require.Equal(t, 3000, int(*cllnBackendConfig.Spec.HealthCheck.Port))
-	require.Equal(t, "/c11n-messaging/ping", *cllnBackendConfig.Spec.HealthCheck.RequestPath)
+	require.Equal(t, "/k8s/ping", *cllnBackendConfig.Spec.HealthCheck.RequestPath)
 	require.Equal(t, 5, int(*cllnBackendConfig.Spec.HealthCheck.TimeoutSec))
 	require.Equal(t, "HTTP", *cllnBackendConfig.Spec.HealthCheck.Type)
 	require.Equal(t, 2, int(*cllnBackendConfig.Spec.HealthCheck.UnhealthyThreshold))
