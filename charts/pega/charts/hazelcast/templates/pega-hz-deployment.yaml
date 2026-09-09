@@ -35,7 +35,7 @@ spec:
           mountPath: "/opt/hazelcast/secrets"
         envFrom:
         - configMapRef:
-            name: {{ template "hazelcastEnvironmentConfig" }}
+            name: {{ template "hazelcastEnvironmentConfig" . }}
         resources:
           requests:
             cpu: "{{ .Values.resources.requests.cpu }}"
