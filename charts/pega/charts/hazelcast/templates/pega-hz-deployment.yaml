@@ -21,6 +21,9 @@ spec:
       annotations:
 {{- include "generatedHazelcastServicePodAnnotations" . | indent 8 }}
     spec:
+{{- if (.Values.serviceAccount).name }}
+      serviceAccountName: {{ .Values.serviceAccount.name }}
+{{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.graceful_shutdown_max_wait_seconds }}
       containers:
       - name: hazelcast
