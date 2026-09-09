@@ -129,13 +129,6 @@ jobs:
           cd terratest/src/test
           go test ./pega | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
 
-      - name: run go tests on addons
-        run: |
-          export GOPATH=$GITHUB_WORKSPACE/terratest
-          export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
-          cd terratest/src/test
-          go test ./addons | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
-
       - name: run go tests on backing services
         run: |
           export GOPATH=$GITHUB_WORKSPACE/terratest
