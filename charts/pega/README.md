@@ -2,6 +2,13 @@
 
 The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
+## Transitioning from Pega Helm Charts v5
+
+Pega Helm Charts major version 5 introduced support for using v4 Pega docker images (which includes hardened image variants).
+In conjunction with using the v4 docker images (which do not include the curl utility), you are now required to specify an image to use for downloading the JDBC driver. 
+This image is specified in the `global.downloadContainer.image` parameter -- for more information, see [Running Pega without curl utility](#running-pega-without-curl-utility).
+
+
 ## Supported providers
 
 Enter your Kubernetes provider which will allow the Helm charts to configure to any differences between deployment environments. These values are case-sensitive and must be lowercase.
@@ -151,7 +158,9 @@ If you configured a secret in an external secrets operator for customArtifactory
 
 If your artifactory domain server certificate is not issued by Certificate Authority, you must provide the server certificate using the `customArtifactory.certificate` parameter. To disable SSL verification, you can set `customArtifactory.enableSSLVerification` to `false` and leave the `CustomArtifactory.certificate` parameter blank.
 
-The Pega Docker images use Java 11, which requires that the JDBC driver that you specify is compatible with Java 11.
+The Pega Docker images use Java 11, 17 and 21 depending on the deployed Pega Platform version which requires that the JDBC driver that you specify is compatible with applicable Java version.
+
+Major version 5 of the Pega Helm Charts includes support v4 Pega docker images which do not include the curl utility.  It is necessary to specify a container image for downloading the JDBC driver. For more information, see [Running Pega without curl utility](#running-pega-without-curl-utility).
 
 ### Authentication
 
