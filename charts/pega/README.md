@@ -261,6 +261,11 @@ This improves the general security posture related to the curl utility:
 
 The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
 
+You can set `global.downloadContainer.image` to an empty string to skip the download step in the event that you are:
+* Using a v3 Pega-provided docker image for compatibility reasons.
+* Using a customized image that already contains your JDBC driver.
+
+
 ## Deployment Name (Optional)
 
 Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
