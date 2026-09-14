@@ -62,3 +62,31 @@ func TestConstellationMessagingDeploymentWithTolerations(t *testing.T) {
 	require.Equal(t, "NotSchedule", string(deploymentTolerations[0].Effect))
 	require.Empty(t, cllnMessagingDeploymentObj.Spec.Template.Spec.Affinity)
 }
+
+func TestConstellationMessagingDeploymentProbePath(t *testing.T) {
+
+	helmChartParser := NewHelmConfigParser(
+		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
+			"constellation-messaging.enabled": "true",
+			"constellation-messaging.name":    "constellation-messaging",
+		},
+			[]string{"charts/constellation-messaging/templates/messaging-deployment.yaml"}),
+	)
+
+	var cllnMessagingDeploymentObj appsv1.Deployment
+	helmChartParser.getResourceYAML(SearchResourceOption{
+		Name: "constellation-messaging",
+		Kind: "Deployment",
+	}, &cllnMessagingDeploymentObj)
+
+	require.NotEmpty(t, cllnMessagingDeploymentObj.Spec.Template.Spec.Containers)
+	messagingContainer := cllnMessagingDeploymentObj.Spec.Template.Spec.Containers[0]
+
+	require.NotNil(t, messagingContainer.LivenessProbe)
+	require.NotNil(t, messagingContainer.LivenessProbe.HTTPGet)
+	require.Equal(t, "/k8s/ping", messagingContainer.LivenessProbe.HTTPGet.Path)
+
+	require.NotNil(t, messagingContainer.ReadinessProbe)
+	require.NotNil(t, messagingContainer.ReadinessProbe.HTTPGet)
+	require.Equal(t, "/k8s/ping", messagingContainer.ReadinessProbe.HTTPGet.Path)
+}

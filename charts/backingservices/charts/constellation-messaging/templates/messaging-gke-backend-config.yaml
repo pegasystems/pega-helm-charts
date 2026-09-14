@@ -1,5 +1,5 @@
 {{- $depName := printf "%s" (include "deploymentName" (dict "root" .Values "defaultname" "constellation-messaging" )) }}
-{{- $requestPath := printf "%s/ping" .Values.urlPath }}
+{{- $requestPath := printf "%s" .Values.pingPath }}
 {{- $srvPort := .Values.service.port }}{{ if .Values.pegaMessagingPort }}{{ $srvPort = .Values.pegaMessagingPort }}{{ end }}
 
 {{- if .Values.enabled }}
