@@ -71,6 +71,21 @@ global:
       ----SAMPLE KRB5.CONF----
 ```
 
+## Logging Configuration
+
+Use the `logging` section under `global` to configure log output behavior.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `global.logging.traceIdEnabled` | Boolean | `false` | When set to `true`, includes `[%X{traceId}]` in the PegaRULES, PegaBIX, and PegaCLUSTER log4j2 patterns to support distributed tracing correlation. When `false` (default), the log pattern remains unchanged from baseline. |
+
+Example:
+```yaml
+global:
+  logging:
+    traceIdEnabled: true
+```
+
 ## JDBC Configuration
 
 Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes. For more information about supported databases and jdbc driver versions, see the [Platform Support Guide](https://docs.pega.com/bundle/platform/page/platform/deployment/platform-support-guide/platform-support-guide.html) 
