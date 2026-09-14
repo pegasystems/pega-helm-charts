@@ -578,6 +578,21 @@ installer:
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
+  # Pega distribution kit settings. Only required when installer.image does not already contain a kit (for example, pega-installer-ready).
+  distributionKit:
+    # URL to download the distribution kit zip file from.
+    url: ""
+    # Specify an image to use as an init container to download the distribution kit from distributionKit.url.
+    # If not specified, the installer container downloads the kit itself at startup instead.
+    downloadContainer:
+      image: ""
+      imagePullPolicy: "IfNotPresent"
+      # Size of the volume shared between the init container and the installer container to hold the downloaded kit.
+      sharedVolumeSize: "5Gi"
+  # A manually managed Persistent Volume Claim for mounting the distribution kit. You must create this PVC manually before you bind the volume.
+  # This is an alternative to distributionKit.url. If both are specified, distributionKit.url takes precedence.
+  # Only the distribution kit zip file is expected inside the volume.
+  distributionKitVolumeClaimName: ""
   # Specifies the system name. Default name is "pega".
   systemName: "pega"
   # Sets the system's production level during installation.

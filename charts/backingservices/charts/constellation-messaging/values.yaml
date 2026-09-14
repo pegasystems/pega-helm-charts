@@ -21,6 +21,7 @@ docker:
     imagePullPolicy: Always
 
 urlPath: /c11n-messaging
+pingPath: /k8s/ping
 
 # set memoryRequest &  memoryLimit to Limit memory usage for container https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/#meaning-of-memory
 # resources:

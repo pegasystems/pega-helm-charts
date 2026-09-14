@@ -36,9 +36,9 @@ data:
   # Specify the workload manager to load UDFs into db2zos
   DB2ZOS_UDF_WLM: {{ .Values.zos.db2zosUdfWlm}}
 {{- end }}
-{{- if .Values.distributionKitURL }}
+{{- if and (ne (include "distributionKitUrl" .) "") (eq (include "usesKitICDownload" .) "false") }}
   # Distribution kit URL
-  DISTRIBUTION_KIT_URL: {{ .Values.distributionKitURL }}
+  DISTRIBUTION_KIT_URL: {{ include "distributionKitUrl" . }}
 {{- end }}
 {{- if .Values.bypassLoadEngineClasses }}
   # Bypass loading engine classes into database during installation

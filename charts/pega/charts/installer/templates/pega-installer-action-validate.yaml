@@ -9,3 +9,4 @@
 {{- fail "Upgrade Type value is not correct for upgrade-deploy action. Supported value is 'zero-downtime' and @deprecated 'out-of-place' "  }}
 {{- end }}
 {{- end }}
+

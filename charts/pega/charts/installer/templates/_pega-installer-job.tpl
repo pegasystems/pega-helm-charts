@@ -47,15 +47,12 @@ spec:
       volumes:
 {{- include "jdbcLibVolume" .root | indent 6 }}
 {{- include "downloadScriptVolume" (merge .root (dict "chartType" "installer")) | indent 6 }}
+{{- include "kitVolume" .root | indent 6 }}
+{{- include "kitDownloadScriptVolume" .root | indent 6 }}
 {{- if .root.Values.installerMountVolumeClaimName }}
       - name: {{ template "pegaInstallerMountVolume" }}
         persistentVolumeClaim:
           claimName: {{ .root.Values.installerMountVolumeClaimName }}
-{{- end }}
-{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
-      - name: {{ template "pegaDistributionKitVolume" }}
-        persistentVolumeClaim:
-          claimName: {{ .root.Values.distributionKitVolumeClaimName }}
 {{- end }}
 {{- if .root.Values.custom }}{{- if .root.Values.custom.volumes }}
 {{ toYaml .root.Values.custom.volumes | indent 6 }}
@@ -99,6 +96,7 @@ spec:
 {{- $credVolumeName := include "pegaInstallerCredentialsVolume" .root }}
 {{- $artifactoryCertVolumeName := include "pegaCustomArtifactoryCertificateTemplate" .root }}
 {{- include "jdbc-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
+{{- include "kit-downloader-init-container" (merge .root (dict "credVolumeName" $credVolumeName "artifactoryCertVolumeName" $artifactoryCertVolumeName)) | indent 6 }}
 {{- range $i, $val := .initContainers }}
 {{ include $val $.root | indent 6 }}
 {{- end }}
@@ -136,10 +134,7 @@ spec:
           mountPath: "/opt/pega/config"
         - name: {{ template "pegaInstallerCredentialsVolume" }}
           mountPath: "/opt/pega/secrets"
-{{- if and .root.Values.distributionKitVolumeClaimName (not .root.Values.distributionKitURL) }}
-        - name: {{ template "pegaDistributionKitVolume" }}
-          mountPath: "/opt/pega/mount/kit"
-{{- end }}
+{{- include "kitVolumeMount" .root | indent 8 }}
 {{- if .root.Values.custom }}
 {{- if .root.Values.custom.volumeMounts }}
 {{ toYaml .root.Values.custom.volumeMounts | indent 8 }}
