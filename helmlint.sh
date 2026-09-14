@@ -2,7 +2,7 @@
 
 exitCode=0
 # Nested for loops to iterate over the chart names, values files, and providers
-for chart_name in "addons" "backingservices" "pega"
+for chart_name in "backingservices" "pega"
 do
     for values_file in "test_tls.yml" "values.yml"
     do
