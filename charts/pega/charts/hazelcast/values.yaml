@@ -1,5 +1,8 @@
 ---
 image: "YOUR_HAZELCAST_IMAGE:TAG"
+# Change the name of the hazelcast deployment
+# deployment:
+#     name: "pega-hazelcast"
 clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
 imagePullPolicy: "Always"
 # Enter the number of initial members in Hazelcast cluster.
