@@ -259,7 +259,10 @@ This improves the general security posture related to the curl utility:
 * Restricts the use of curl to a single container that is only used for downloading the JDBC driver while the pod has no inbound access.
 * Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
 
-The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
+The requirements for the image are: 
+* It contains the curl utility on the path. 
+* It must be capable of running a POSIX compliant shell script.
+
 
 You can set `global.downloadContainer.image` to an empty string to skip the download step in the event that you are:
 * Using a v3 Pega-provided docker image for compatibility reasons.
