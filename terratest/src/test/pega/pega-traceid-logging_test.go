@@ -52,7 +52,7 @@ func TestPegaTraceIdLogging(t *testing.T) {
 		VerifyEnvValue(t, yamlContent, "PEGA_LOG_CORRELATION_ID_ENABLED", "false")
 	})
 
-	t.Run("tier config contains prlog4j2.xml.tmpl key", func(t *testing.T) {
+	t.Run("tier config contains only prlog4j2.xml.tmpl key", func(t *testing.T) {
 		var options = &helm.Options{
 			SetValues: map[string]string{
 				"global.provider":        "k8s",
@@ -69,7 +69,7 @@ func TestPegaTraceIdLogging(t *testing.T) {
 				_, exists := pegaConfigMap.Data["prlog4j2.xml.tmpl"]
 				require.True(t, exists, "prlog4j2.xml.tmpl key should exist in tier config")
 				_, existsStatic := pegaConfigMap.Data["prlog4j2.xml"]
-				require.True(t, existsStatic, "prlog4j2.xml key should exist in tier config for backward compatibility")
+				require.False(t, existsStatic, "prlog4j2.xml key should not exist in tier config")
 			}
 		}
 	})
