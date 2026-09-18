@@ -1,4 +1,27 @@
 ---
+networkPolicy:
+  # Generate standard Kubernetes NetworkPolicy resources. Disabled by default.
+  enabled: false
+  # When enabled, deny all ingress and egress first, then add the allow rules below.
+  defaultDeny: true
+  database:
+    enabled: false
+    # Use CIDRs or pod/namespace selectors. NetworkPolicy cannot resolve FQDNs.
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    # These are destination pod ports, not Kubernetes Service ports.
+    ports: []
+  kafka:
+    enabled: false
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    ports: []
+  # Each entry is a Kubernetes NetworkPolicy spec plus a required name.
+  # The name is used only to create a release-safe metadata.name.
+  customPolicies: []
+
 global:
   # This values.yaml file is an example.  For more information about
   # each configuration option, see the project readme.

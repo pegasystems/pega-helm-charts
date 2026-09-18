@@ -1,0 +1,294 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $deploymentName := include "deploymentName" . }}
+{{- $defaultDeny := true }}
+{{- if hasKey .Values.networkPolicy "defaultDeny" }}
+{{- $defaultDeny = .Values.networkPolicy.defaultDeny }}
+{{- end }}
+{{- if $defaultDeny }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-default-deny" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Ingress
+  - Egress
+---
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-dns" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+    - namespaceSelector:
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
+      podSelector:
+        matchLabels:
+          k8s-app: kube-dns
+    ports:
+    - protocol: UDP
+      port: 53
+    - protocol: TCP
+      port: 53
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-tiers" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      component: Pega
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8443
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          component: Pega
+    ports:
+    - protocol: TCP
+      port: 8080
+    - protocol: TCP
+      port: 8443
+{{- if .Values.hazelcast.enabled }}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: pega-hazelcast
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+{{- end }}
+{{- if .Values.hazelcast.clusteringServiceEnabled }}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: clusteringservice
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+{{- end }}
+{{- if and (not .Values.pegasearch.externalSearchService) (empty .Values.pegasearch.externalURL) }}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: {{ include "searchName" . }}
+          component: Search
+    ports:
+    - protocol: TCP
+      port: 9200
+{{- end }}
+{{- if and .Values.cassandra.enabled (empty .Values.dds.externalNodes) }}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: cassandra
+          release: {{ .Release.Name }}
+    ports:
+    - protocol: TCP
+      port: 9042
+{{- end }}
+{{- if .Values.hazelcast.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-hazelcast" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: pega-hazelcast
+      component: Hazelcast
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          component: Pega
+    - podSelector:
+        matchLabels:
+          app: pega-hazelcast
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: pega-hazelcast
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+---
+{{- end }}
+{{- if .Values.hazelcast.clusteringServiceEnabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-clusteringservice" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: clusteringservice
+      component: Hazelcast
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          component: Pega
+    - podSelector:
+        matchLabels:
+          app: clusteringservice
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: clusteringservice
+          component: Hazelcast
+    ports:
+    - protocol: TCP
+      port: 5701
+---
+{{- end }}
+{{- if and (not .Values.pegasearch.externalSearchService) (empty .Values.pegasearch.externalURL) }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-search" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: {{ include "searchName" . }}
+      component: Search
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          component: Pega
+    - podSelector:
+        matchLabels:
+          app: {{ include "searchName" . }}
+          component: Search
+    ports:
+    - protocol: TCP
+      port: 9200
+    - protocol: TCP
+      port: 9300
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: {{ include "searchName" . }}
+          component: Search
+    ports:
+    - protocol: TCP
+      port: 9300
+---
+{{- end }}
+{{- if and .Values.cassandra.enabled (empty .Values.dds.externalNodes) }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-cassandra" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: cassandra
+      release: {{ .Release.Name }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  - from:
+    - podSelector:
+        matchLabels:
+          component: Pega
+    - podSelector:
+        matchLabels:
+          app: cassandra
+          release: {{ .Release.Name }}
+    ports:
+    - protocol: TCP
+      port: 9042
+    - protocol: TCP
+      port: 7000
+    - protocol: TCP
+      port: 7001
+  egress:
+  - to:
+    - podSelector:
+        matchLabels:
+          app: cassandra
+          release: {{ .Release.Name }}
+    ports:
+    - protocol: TCP
+      port: 9042
+    - protocol: TCP
+      port: 7000
+    - protocol: TCP
+      port: 7001
+---
+{{- end }}
+{{- if and .Values.cassandra.enabled (empty .Values.dds.externalNodes) }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-installer" $deploymentName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      app: installer
+  policyTypes:
+  - Egress
+  egress:
+{{- if and .Values.cassandra.enabled (empty .Values.dds.externalNodes) }}
+  - to:
+    - podSelector:
+        matchLabels:
+          app: cassandra
+          release: {{ .Release.Name }}
+    ports:
+    - protocol: TCP
+      port: 9042
+{{- end }}
+---
+{{- end }}
+{{- end }}

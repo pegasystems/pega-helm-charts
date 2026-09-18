@@ -43,6 +43,40 @@ Example:
 action: "deploy"
 ```
 
+## Network policies
+
+NetworkPolicy generation is disabled by default. To use the chart in a zero-trust namespace,
+set `networkPolicy.enabled: true`. The chart then creates a namespace-wide default-deny policy,
+allows DNS lookups, and adds rules for the enabled Pega components (tiers, Hazelcast or
+Clustering Service, internal Search, and internal Cassandra).
+
+External database and Kafka destinations must be configured explicitly because standard
+Kubernetes NetworkPolicy resources cannot match DNS names:
+
+```yaml
+networkPolicy:
+  enabled: true
+  database:
+    enabled: true
+    cidrs:
+      - 10.20.30.40/32
+    ports:
+      - 5432
+  kafka:
+    enabled: true
+    cidrs:
+      - 10.40.0.10/32
+    ports:
+      - 9092
+```
+
+The configured ports are destination pod ports, not Kubernetes Service ports. Pod and namespace
+selectors can be used instead of CIDRs with `podSelector` and `namespaceSelector`. Additional
+typed Kubernetes policies can be supplied through `networkPolicy.customPolicies`; each entry
+requires a unique `name`, and the remaining fields are placed under the policy `spec`.
+NetworkPolicy resources are additive, so policies already present in the namespace can grant
+additional access. Enforcement requires a NetworkPolicy-capable cluster network plugin.
+
 ## NIST SP 800-53 and NIST SP 800-131
 
 **Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**

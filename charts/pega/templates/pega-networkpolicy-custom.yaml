@@ -1,0 +1,14 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $deploymentName := include "deploymentName" . }}
+{{- range .Values.networkPolicy.customPolicies }}
+{{- $policyName := required "networkPolicy.customPolicies entries must define name" .name }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ printf "%s-networkpolicy-%s" $deploymentName $policyName | trunc 63 | trimSuffix "-" }}
+  namespace: {{ $.Release.Namespace }}
+spec:
+{{ toYaml (omit . "name") | nindent 2 }}
+---
+{{- end }}
+{{- end }}
