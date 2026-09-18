@@ -3,7 +3,22 @@ networkPolicy:
   # Generate standard Kubernetes NetworkPolicy resources. Disabled by default.
   enabled: false
   # When enabled, deny all ingress and egress first, then add the allow rules below.
-  defaultDeny: true
+  defaultDeny: false
+  # At least one ingress peer must be configured when networkPolicy.enabled is true.
+  # These peers are allowed to reach the Pega tier ports.
+  ingress:
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+  dns:
+    # Override these selectors when the cluster uses NodeLocal DNSCache or
+    # non-standard CoreDNS labels.
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: kube-system
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
   database:
     enabled: false
     # Use CIDRs or pod/namespace selectors. NetworkPolicy cannot resolve FQDNs.
@@ -18,9 +33,40 @@ networkPolicy:
     namespaceSelector: {}
     podSelector: {}
     ports: []
+  externalSearch:
+    enabled: false
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    ports: []
+  # Additional installer destinations, for example an artifactory or an upgrade endpoint.
+  installer:
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    ports: []
   # Each entry is a Kubernetes NetworkPolicy spec plus a required name.
   # The name is used only to create a release-safe metadata.name.
-  customPolicies: []
+  customPolicies:
+    # Example custom policy. Remove the leading '#' characters to enable it.
+    # The policy spec is passed through as standard Kubernetes NetworkPolicy spec.
+#     - name: allow-monitoring
+#       podSelector:
+#         matchLabels:
+#           component: Pega
+#       policyTypes:
+#         - Ingress
+#       ingress:
+#         - from:
+#             - namespaceSelector:
+#                 matchLabels:
+#                   kubernetes.io/metadata.name: monitoring
+#               podSelector:
+#                 matchLabels:
+#                   app.kubernetes.io/name: prometheus
+#           ports:
+#             - protocol: TCP
+#               port: 8080
 
 global:
   # This values.yaml file is an example.  For more information about

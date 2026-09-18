@@ -1,5 +1,6 @@
 {{- /*
 deploymentName
+networkPolicyName
 pegaRegistrySecret
 imagePullSecrets
 pegaVolumeCredentials
@@ -19,6 +20,27 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 
 
 {{- define "deploymentName" }}{{ $deploymentNamePrefix := "pega" }}{{ if (.Values.global.deployment) }}{{ if (.Values.global.deployment.name) }}{{ $deploymentNamePrefix = .Values.global.deployment.name }}{{ end }}{{ end }}{{ $deploymentNamePrefix }}{{- end }}
+
+{{- define "networkPolicyName" -}}
+{{- $fullName := printf "%s-networkpolicy-%s" .deploymentName .suffix -}}
+{{- if le (len $fullName) 63 -}}
+{{- $fullName -}}
+{{- else -}}
+{{- printf "%s-%s" (printf "%s-networkpolicy" .deploymentName | trunc 54 | trimSuffix "-") (sha256sum $fullName | trunc 8) -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "validateNetworkPolicyPorts" -}}
+{{- range .ports }}
+{{- $port := toString . }}
+{{- if not (regexMatch "^[0-9]+$" $port) }}
+{{- fail (printf "%s ports must be integers between 1 and 65535" $.name) }}
+{{- end }}
+{{- if or (lt (atoi $port) 1) (gt (atoi $port) 65535) }}
+{{- fail (printf "%s ports must be integers between 1 and 65535" $.name) }}
+{{- end }}
+{{- end }}
+{{- end }}
 
 {{- define "pegaVolumeCredentials" }}pega-volume-credentials{{- end }}
 

@@ -4,11 +4,17 @@
 {{- if hasKey .Values.networkPolicy "defaultDeny" }}
 {{- $defaultDeny = .Values.networkPolicy.defaultDeny }}
 {{- end }}
+{{- if not (or (gt (len .Values.networkPolicy.ingress.cidrs) 0) .Values.networkPolicy.ingress.namespaceSelector .Values.networkPolicy.ingress.podSelector) }}
+{{- fail "networkPolicy.ingress requires at least one of cidrs, namespaceSelector, or podSelector" }}
+{{- end }}
+{{- if not (and .Values.networkPolicy.dns.namespaceSelector .Values.networkPolicy.dns.podSelector) }}
+{{- fail "networkPolicy.dns requires both namespaceSelector and podSelector" }}
+{{- end }}
 {{- if $defaultDeny }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-default-deny" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "default-deny") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector: {}
@@ -17,10 +23,53 @@ spec:
   - Egress
 ---
 {{- end }}
+{{- if .Values.networkPolicy.externalSearch.enabled }}
+{{- include "validateNetworkPolicyPorts" (dict "name" "networkPolicy.externalSearch" "ports" .Values.networkPolicy.externalSearch.ports) }}
+{{- if not (or (gt (len .Values.networkPolicy.externalSearch.cidrs) 0) .Values.networkPolicy.externalSearch.namespaceSelector .Values.networkPolicy.externalSearch.podSelector) }}
+{{- fail "networkPolicy.externalSearch requires at least one of cidrs, namespaceSelector, or podSelector" }}
+{{- end }}
+{{- if not (gt (len .Values.networkPolicy.externalSearch.ports) 0) }}
+{{- fail "networkPolicy.externalSearch.ports must contain at least one destination port" }}
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-dns" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "external-search") }}
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector:
+    matchLabels:
+      component: Pega
+  policyTypes:
+  - Egress
+  egress:
+  - to:
+{{- range .Values.networkPolicy.externalSearch.cidrs }}
+    - ipBlock:
+        cidr: {{ . | quote }}
+{{- end }}
+{{- if .Values.networkPolicy.externalSearch.namespaceSelector }}
+    - namespaceSelector:
+{{ toYaml .Values.networkPolicy.externalSearch.namespaceSelector | nindent 8 }}
+{{- if .Values.networkPolicy.externalSearch.podSelector }}
+      podSelector:
+{{ toYaml .Values.networkPolicy.externalSearch.podSelector | nindent 8 }}
+{{- end }}
+{{- else if .Values.networkPolicy.externalSearch.podSelector }}
+    - podSelector:
+{{ toYaml .Values.networkPolicy.externalSearch.podSelector | nindent 8 }}
+{{- end }}
+    ports:
+{{- range .Values.networkPolicy.externalSearch.ports }}
+    - protocol: TCP
+      port: {{ . | int }}
+{{- end }}
+---
+{{- end }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "dns") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector: {}
@@ -29,11 +78,9 @@ spec:
   egress:
   - to:
     - namespaceSelector:
-        matchLabels:
-          kubernetes.io/metadata.name: kube-system
+{{ toYaml .Values.networkPolicy.dns.namespaceSelector | nindent 8 }}
       podSelector:
-        matchLabels:
-          k8s-app: kube-dns
+{{ toYaml .Values.networkPolicy.dns.podSelector | nindent 8 }}
     ports:
     - protocol: UDP
       port: 53
@@ -43,7 +90,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-tiers" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "tiers") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -53,7 +100,26 @@ spec:
   - Ingress
   - Egress
   ingress:
-  - ports:
+  - from:
+    - podSelector:
+        matchLabels:
+          component: Pega
+{{- range .Values.networkPolicy.ingress.cidrs }}
+    - ipBlock:
+        cidr: {{ . | quote }}
+{{- end }}
+{{- if .Values.networkPolicy.ingress.namespaceSelector }}
+    - namespaceSelector:
+{{ toYaml .Values.networkPolicy.ingress.namespaceSelector | nindent 8 }}
+{{- if .Values.networkPolicy.ingress.podSelector }}
+      podSelector:
+{{ toYaml .Values.networkPolicy.ingress.podSelector | nindent 8 }}
+{{- end }}
+{{- else if .Values.networkPolicy.ingress.podSelector }}
+    - podSelector:
+{{ toYaml .Values.networkPolicy.ingress.podSelector | nindent 8 }}
+{{- end }}
+    ports:
     - protocol: TCP
       port: 8080
     - protocol: TCP
@@ -108,11 +174,12 @@ spec:
     - protocol: TCP
       port: 9042
 {{- end }}
+---
 {{- if .Values.hazelcast.enabled }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-hazelcast" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "hazelcast") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -149,7 +216,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-clusteringservice" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "clusteringservice") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -186,7 +253,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-search" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "search") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -225,7 +292,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-cassandra" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "cassandra") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:
@@ -240,6 +307,9 @@ spec:
     - podSelector:
         matchLabels:
           component: Pega
+    - podSelector:
+        matchLabels:
+          app: installer
     - podSelector:
         matchLabels:
           app: cassandra
@@ -270,7 +340,7 @@ spec:
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-installer" $deploymentName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "installer-cassandra") }}
   namespace: {{ .Release.Namespace }}
 spec:
   podSelector:

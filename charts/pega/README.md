@@ -46,9 +46,13 @@ action: "deploy"
 ## Network policies
 
 NetworkPolicy generation is disabled by default. To use the chart in a zero-trust namespace,
-set `networkPolicy.enabled: true`. The chart then creates a namespace-wide default-deny policy,
-allows DNS lookups, and adds rules for the enabled Pega components (tiers, Hazelcast or
-Clustering Service, internal Search, and internal Cassandra).
+set `networkPolicy.enabled: true` and configure at least one ingress peer. `defaultDeny` is
+enabled by default and can be explicitly disabled only when namespace-wide isolation is not
+required. The chart then
+creates a namespace-wide default-deny policy, allows DNS lookups, and adds rules for the
+enabled Pega components (tiers, Hazelcast or Clustering Service, internal Search, and
+internal Cassandra). The namespace-wide default deny also affects unrelated workloads in
+the release namespace.
 
 External database and Kafka destinations must be configured explicitly because standard
 Kubernetes NetworkPolicy resources cannot match DNS names:
@@ -56,6 +60,19 @@ Kubernetes NetworkPolicy resources cannot match DNS names:
 ```yaml
 networkPolicy:
   enabled: true
+  defaultDeny: true
+  ingress:
+    cidrs:
+      - 10.10.0.0/16
+  # Defaults target CoreDNS in kube-system. Override both selectors for NodeLocal DNSCache
+  # or clusters with non-standard DNS labels.
+  dns:
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: kube-system
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
   database:
     enabled: true
     cidrs:
@@ -71,11 +88,32 @@ networkPolicy:
 ```
 
 The configured ports are destination pod ports, not Kubernetes Service ports. Pod and namespace
-selectors can be used instead of CIDRs with `podSelector` and `namespaceSelector`. Additional
-typed Kubernetes policies can be supplied through `networkPolicy.customPolicies`; each entry
-requires a unique `name`, and the remaining fields are placed under the policy `spec`.
+selectors can be used instead of CIDRs with `podSelector` and `namespaceSelector`. The
+`namespaceSelector` and `podSelector` values are combined when both are supplied. External
+Search and additional installer destinations use the same CIDR/selector model through
+`networkPolicy.externalSearch` and `networkPolicy.installer`. Every configured destination
+requires at least one peer and one port; ports must be integers from 1 through 65535.
+The built-in tier and Cassandra policies also allow the required same-namespace Pega and
+installer traffic. Additional typed Kubernetes policies can be supplied
+through `networkPolicy.customPolicies`; each entry requires a unique DNS-1123 `name`, and the
+remaining fields are placed under the policy `spec`.
 NetworkPolicy resources are additive, so policies already present in the namespace can grant
 additional access. Enforcement requires a NetworkPolicy-capable cluster network plugin.
+
+### NetworkPolicy validation script
+
+The repository includes a local, cluster-independent validation script covering positive,
+negative, and edge-case configurations:
+
+```bash
+./scripts/test-pega-networkpolicy.sh
+```
+
+The script requires Helm and validates disabled and enabled modes, default-deny behavior,
+DNS and ingress rules, database/Kafka/Search/installer destinations, selector combinations,
+custom policy rendering, namespace scoping, duplicate names, long deployment names, and
+fail-fast handling of incomplete or invalid configuration. It does not create or modify
+resources in a Kubernetes cluster.
 
 ## NIST SP 800-53 and NIST SP 800-131
 

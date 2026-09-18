@@ -1,11 +1,23 @@
 {{- if .Values.networkPolicy.enabled }}
 {{- $deploymentName := include "deploymentName" . }}
+{{- $policyNames := dict }}
+{{- $reservedPolicyNames := list "default-deny" "external-search" "dns" "tiers" "hazelcast" "clusteringservice" "search" "cassandra" "installer-cassandra" "database" "kafka" "installer-database" "installer-additional" }}
 {{- range .Values.networkPolicy.customPolicies }}
 {{- $policyName := required "networkPolicy.customPolicies entries must define name" .name }}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $policyName) }}
+{{- fail (printf "networkPolicy.customPolicies name %q must be a DNS-1123 label" $policyName) }}
+{{- end }}
+{{- if hasKey $policyNames $policyName }}
+{{- fail (printf "networkPolicy.customPolicies contains duplicate name %q" $policyName) }}
+{{- end }}
+{{- if has $policyName $reservedPolicyNames }}
+{{- fail (printf "networkPolicy.customPolicies name %q is reserved by a built-in policy" $policyName) }}
+{{- end }}
+{{- $_ := set $policyNames $policyName true }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: {{ printf "%s-networkpolicy-%s" $deploymentName $policyName | trunc 63 | trimSuffix "-" }}
+  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" $policyName) }}
   namespace: {{ $.Release.Namespace }}
 spec:
 {{ toYaml (omit . "name") | nindent 2 }}
