@@ -8,6 +8,7 @@ Pega Helm Charts major version 5 introduced support for using v4 Pega docker ima
 In conjunction with using the v4 docker images (which do not include the curl utility), you are now required to specify an image to use for downloading the JDBC driver. 
 This image is specified in the `global.downloadContainer.image` parameter -- for more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
 
+Alternatively, it is still possible to build custom images that include the JDBC driver (in which case `global.downloadContainer.image` can be set to blank.)
 
 ## Supported providers
 
@@ -160,7 +161,7 @@ If your artifactory domain server certificate is not issued by Certificate Autho
 
 The Pega Docker images use Java 11, 17 and 21 depending on the deployed Pega Platform version which requires that the JDBC driver that you specify is compatible with applicable Java version.
 
-Major version 5 of the Pega Helm Charts includes support v4 Pega docker images which do not include the curl utility.  It is necessary to specify a container image for downloading the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
+Major version 5 of the Pega Helm Charts includes support v4 Pega docker images which do not include the curl utility.  It is necessary to specify a container image for downloading the JDBC driver or to use a custom image that includes the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
 
 ### Authentication
 
