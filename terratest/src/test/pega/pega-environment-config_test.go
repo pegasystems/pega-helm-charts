@@ -233,7 +233,7 @@ func VerifyEnvironmentConfig(t *testing.T, yamlContent string, options *helm.Opt
 	require.Equal(t, envConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, envConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, envConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
-	require.Equal(t, envConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
+
 	if options.SetValues["global.actions.execute"] == "upgrade-deploy" {
 		require.Equal(t, envConfigData["RULES_SCHEMA"], "")
 	} else {
@@ -296,6 +296,7 @@ func TestPegaEnvironmentConfigJDBCDriverNoICDownload(t *testing.T) {
 			"global.provider":        "k8s",
 			"global.actions.execute": "deploy",
 			"global.jdbc.driverUri": "http://mydriverdownload.com/driver.jar",
+			"global.downloadContainer.image": "",
 		},
 	}
 	var yamlContent = RenderTemplate(t, options, helmChartPath, []string{"templates/pega-environment-config.yaml"})

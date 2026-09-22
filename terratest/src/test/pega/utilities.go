@@ -5,7 +5,7 @@ import (
 	"io/ioutil"
 	"strings"
 	"testing"
-
+    "regexp"
 	"github.com/gruntwork-io/terratest/modules/helm"
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
@@ -84,6 +84,20 @@ func VerifyInitContainerData(t *testing.T, containers []k8score.Container, optio
 			VerifyK8sWaitForArgs(t, container)
 			require.Equal(t, []string{"sh", "-c", " kubectl rollout status deployment/" + depName + "-web --namespace default && kubectl rollout status deployment/" + depName + "-batch --namespace default && kubectl rollout status statefulset/" + depName + "-stream --namespace default"}, container.Command)
 			VerifyInitContainerResources(t, container)
+		} else if name == "jdbc-lib-downloader" {
+            require.Equal(t, []string{"sh", "-c", "/opt/pega/dlscripts/download-jdbc-lib.sh"}, container.Command)
+            require.Equal(t, "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG", container.Image)
+
+            require.Equal(t, container.VolumeMounts[0].Name, "jdbc-lib-volume")
+            require.Equal(t, container.VolumeMounts[0].MountPath, "/opt/pega/lib")
+
+            require.Equal(t, container.VolumeMounts[1].Name, "download-script-volume")
+            require.Equal(t, container.VolumeMounts[1].MountPath, "/opt/pega/dlscripts")
+
+            matched, _ := regexp.MatchString(`^(pega-installer-credentials-volume|pega-volume-credentials){1}$`, container.VolumeMounts[2].Name)
+
+            require.True(t, matched)
+            require.Equal(t, container.VolumeMounts[2].MountPath, "/opt/pega/secrets")
 		} else {
 			fmt.Println("invalid init containers found.. please check the list", name)
 			t.Fail()
