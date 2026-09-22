@@ -53,6 +53,8 @@ Name                                           | Description                    
 #### Example
 
 ```yaml
+deployment:
+  name: pega-hazelcast
 image: "YOUR_HAZELCAST_IMAGE:TAG"
 clusteringServiceImage: "YOUR_CLUSTERING_SERVICE_IMAGE:TAG"
 imagePullPolicy: "Always"
