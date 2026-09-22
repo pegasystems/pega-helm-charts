@@ -10,6 +10,10 @@ roleRef:
   name: {{ template "installerJobReaderRole" }}
 subjects:
 - kind: ServiceAccount
-  name: default
+{{- $config := .Values.serviceAccount }}
+{{- if and (not $config.enabled) .Values.global.serviceAccount.enabled }}
+{{- $config = .Values.global.serviceAccount }}
+{{- end }}
+  name: {{ if .Values.serviceAccountName }}{{ .Values.serviceAccountName }}{{ else if $config.name }}{{ $config.name }}{{ else }}{{ include "pegaInstallerServiceAccountName" (dict "root" . "config" $config) }}{{ end }}
   namespace: {{ .Release.Namespace }}
 {{ end }}

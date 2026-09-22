@@ -115,6 +115,66 @@ custom policy rendering, namespace scoping, duplicate names, long deployment nam
 fail-fast handling of incomplete or invalid configuration. It does not create or modify
 resources in a Kubernetes cluster.
 
+## Service accounts
+
+ServiceAccount management is disabled by default and does not change existing deployments.
+To run all workloads created by this chart with a non-default ServiceAccount, configure the
+shared global account:
+
+```yaml
+global:
+  serviceAccount:
+    enabled: true
+    create: true
+    name: pega-workload
+    automountServiceAccountToken: false
+    annotations: {}
+    labels: {}
+```
+
+The shared account is assigned to Pega runtime tiers, Hazelcast, Clustering Service,
+Search, and Constellation. Installer jobs use it unless an installer-specific account is
+configured. The clustering migration job intentionally retains its dedicated ServiceAccount
+because it requires separate Kubernetes API permissions. The separately deployed
+`backingservices` chart and external dependency workloads are outside this chart's scope.
+
+The legacy per-component configuration remains supported:
+
+```yaml
+serviceAccount:
+  enabled: true
+  create: true
+  name: pega-runtime
+  automountServiceAccountToken: false
+  annotations: {}
+  labels: {}
+
+installer:
+  serviceAccount:
+    enabled: true
+    create: true
+    name: pega-installer
+    automountServiceAccountToken: false
+    annotations: {}
+    labels: {}
+```
+
+Set `create: false` and provide `name` to use a pre-existing shared ServiceAccount. It must
+already exist in the release namespace. The chart does not create Roles, RoleBindings,
+ClusterRoles, or ClusterRoleBindings, and does not grant permissions automatically.
+Cloud workload-identity annotations and the corresponding cloud roles must be configured
+separately.
+
+Existing `tier[].custom.serviceAccountName` and `installer.serviceAccountName` values remain
+supported and take precedence over the managed runtime and installer configuration,
+respectively. The clustering-service migration job continues to use its dedicated
+ServiceAccount and namespace-scoped RBAC.
+
+Runtime and installer ServiceAccounts default to `automountServiceAccountToken: false`.
+Enable token mounting only when the workload explicitly requires Kubernetes API access.
+ServiceAccount names must be valid Kubernetes DNS subdomains and are resolved in the
+release namespace.
+
 ## NIST SP 800-53 and NIST SP 800-131
 
 **Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**

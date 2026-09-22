@@ -17,6 +17,18 @@ spec:
       labels:
         app: constellation
     spec:
+{{- if .Values.serviceAccountName }}
+      serviceAccountName: {{ .Values.serviceAccountName }}
+{{- else if .Values.global.serviceAccount.enabled }}
+{{- if .Values.global.serviceAccount.name }}
+      serviceAccountName: {{ .Values.global.serviceAccount.name }}
+{{- else }}
+      serviceAccountName: constellation-serviceaccount
+{{- end }}
+{{- end }}
+{{- if .Values.global.serviceAccount.enabled }}
+      automountServiceAccountToken: {{ .Values.global.serviceAccount.automountServiceAccountToken }}
+{{- end }}
       imagePullSecrets:
 {{- include "imagePullSecrets" . | indent 6 }}
       containers:

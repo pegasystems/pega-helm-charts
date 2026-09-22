@@ -58,6 +58,7 @@ spec:
     metadata:
       labels:
         app: {{ .name }}
+        component: Pega
 {{- if .node.podLabels }}
 {{ toYaml .node.podLabels | indent 8 }}
 {{- include "generatedPodLabels" .root | indent 8 }}
@@ -73,9 +74,30 @@ spec:
 
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
+{{- $serviceAccount := .root.Values.serviceAccount }}
+{{- if .root.Values.global.serviceAccount.enabled }}
+{{- $serviceAccount = .root.Values.global.serviceAccount }}
+{{- end }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
+{{- include "validateServiceAccountName" (dict "name" .custom.serviceAccountName "message" "tier.custom.serviceAccountName") }}
       serviceAccountName: {{ .custom.serviceAccountName }}
+{{- else if $serviceAccount.enabled }}
+{{- if $serviceAccount.name }}
+      serviceAccountName: {{ $serviceAccount.name }}
+{{- else if $serviceAccount.create }}
+      serviceAccountName: {{ include "pegaServiceAccountName" .root }}
+{{- else }}
+{{- fail "serviceAccount.enabled requires serviceAccount.name or serviceAccount.create=true" }}
+{{- end }}
+{{- end }}
+{{- else if $serviceAccount.enabled }}
+{{- if $serviceAccount.name }}
+      serviceAccountName: {{ $serviceAccount.name }}
+{{- else if $serviceAccount.create }}
+      serviceAccountName: {{ include "pegaServiceAccountName" .root }}
+{{- else }}
+{{- fail "serviceAccount.enabled requires serviceAccount.name or serviceAccount.create=true" }}
 {{- end }}
 {{- end }}
       volumes:

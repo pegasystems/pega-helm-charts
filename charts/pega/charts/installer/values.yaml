@@ -49,6 +49,13 @@ customJVMArgs: ""
 waitForJobCompletion: "false"
 # Optionally specify specific service account
 # serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
+serviceAccount:
+  enabled: false
+  create: false
+  name: ""
+  annotations: {}
+  labels: {}
+  automountServiceAccountToken: false
 threads:
   # Maximum Idle Thread.Default is 5
   maxIdle: 5

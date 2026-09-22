@@ -30,6 +30,43 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- end -}}
 {{- end -}}
 
+{{- define "pegaServiceAccountName" -}}
+{{- if .Values.global.serviceAccount.enabled -}}
+{{- if .Values.global.serviceAccount.name -}}
+{{- .Values.global.serviceAccount.name -}}
+{{- else -}}
+{{- printf "%s-serviceaccount" (include "deploymentName" .) | trunc 253 | trimSuffix "-" -}}
+{{- end -}}
+{{- else if .Values.serviceAccount.name -}}
+{{- .Values.serviceAccount.name -}}
+{{- else -}}
+{{- printf "%s-serviceaccount" (include "deploymentName" .) | trunc 253 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "pegaInstallerServiceAccountName" -}}
+{{- if .config.name -}}
+{{- .config.name -}}
+{{- else -}}
+{{- printf "%s-installer-serviceaccount" (include "deploymentName" .root) | trunc 253 | trimSuffix "-" -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "validateServiceAccountName" -}}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$" .name) -}}
+{{- fail (printf "%s must be a valid DNS subdomain" .message) -}}
+{{- end -}}
+{{- if gt (len .name) 253 -}}
+{{- fail (printf "%s must be no longer than 253 characters" .message) -}}
+{{- end -}}
+{{- end -}}
+
+{{- define "validateServiceAccountBoolean" -}}
+{{- if not (kindIs "bool" .value) -}}
+{{- fail (printf "%s must be a boolean" .message) -}}
+{{- end -}}
+{{- end -}}
+
 {{- define "validateNetworkPolicyPorts" -}}
 {{- range .ports }}
 {{- $port := toString . }}

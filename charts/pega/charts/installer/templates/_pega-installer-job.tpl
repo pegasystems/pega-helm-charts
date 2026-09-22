@@ -41,8 +41,24 @@ spec:
 {{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
+{{- $serviceAccount := .root.Values.serviceAccount }}
+{{- if and (not $serviceAccount.enabled) .root.Values.global.serviceAccount.enabled }}
+{{- $serviceAccount = .root.Values.global.serviceAccount }}
+{{- end }}
 {{- if .root.Values.serviceAccountName }}
+{{- include "validateServiceAccountName" (dict "name" .root.Values.serviceAccountName "message" "installer.serviceAccountName") }}
       serviceAccountName: {{ .root.Values.serviceAccountName }}
+{{- else if $serviceAccount.enabled }}
+{{- if $serviceAccount.name }}
+      serviceAccountName: {{ $serviceAccount.name }}
+{{- else if $serviceAccount.create }}
+      serviceAccountName: {{ include "pegaInstallerServiceAccountName" (dict "root" .root "config" $serviceAccount) }}
+{{- else }}
+{{- fail "installer.serviceAccount.enabled requires installer.serviceAccount.name or installer.serviceAccount.create=true" }}
+{{- end }}
+{{- end }}
+{{- if $serviceAccount.enabled }}
+      automountServiceAccountToken: {{ $serviceAccount.automountServiceAccountToken }}
 {{- end }}
       volumes:
 {{- include "jdbcLibVolume" .root | indent 6 }}

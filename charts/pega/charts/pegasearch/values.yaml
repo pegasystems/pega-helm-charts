@@ -9,6 +9,8 @@ minimumMasterNodes: 1
 # If externalURL is set to a value different from the name of the k8s service defined in pega-search-service.yaml,
 # no search nodes are deployed automatically, and Pega uses this search node url.
 externalURL: "http://pega-search"
+# Optional per-component override. When empty, global.serviceAccount is used.
+serviceAccountName: ""
 # Enter the docker image used to deploy Elasticsearch. This value will be ignored if using an external url.
 # Push the Elasticsearch image to the same internal Docker registry that you specified in the Docker section above.
 image: "pegasystems/search"

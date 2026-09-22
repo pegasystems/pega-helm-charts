@@ -6,6 +6,7 @@ image: IMAGE_REPO_URL_HERE
 logLevel: info
 enabled: false
 replicas: 2
+serviceAccountName: ""
 livenessProbe:
   initialDelaySeconds: 5
   timeoutSeconds: 5
