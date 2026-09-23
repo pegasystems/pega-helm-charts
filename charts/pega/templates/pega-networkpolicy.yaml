@@ -4,12 +4,6 @@
 {{- if hasKey .Values.networkPolicy "defaultDeny" }}
 {{- $defaultDeny = .Values.networkPolicy.defaultDeny }}
 {{- end }}
-{{- if not (or (gt (len .Values.networkPolicy.ingress.cidrs) 0) .Values.networkPolicy.ingress.namespaceSelector .Values.networkPolicy.ingress.podSelector) }}
-{{- fail "networkPolicy.ingress requires at least one of cidrs, namespaceSelector, or podSelector" }}
-{{- end }}
-{{- if not (and .Values.networkPolicy.dns.namespaceSelector .Values.networkPolicy.dns.podSelector) }}
-{{- fail "networkPolicy.dns requires both namespaceSelector and podSelector" }}
-{{- end }}
 {{- if $defaultDeny }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -22,50 +16,6 @@ spec:
   - Ingress
   - Egress
 ---
-{{- end }}
-{{- if .Values.networkPolicy.externalSearch.enabled }}
-{{- include "validateNetworkPolicyPorts" (dict "name" "networkPolicy.externalSearch" "ports" .Values.networkPolicy.externalSearch.ports) }}
-{{- if not (or (gt (len .Values.networkPolicy.externalSearch.cidrs) 0) .Values.networkPolicy.externalSearch.namespaceSelector .Values.networkPolicy.externalSearch.podSelector) }}
-{{- fail "networkPolicy.externalSearch requires at least one of cidrs, namespaceSelector, or podSelector" }}
-{{- end }}
-{{- if not (gt (len .Values.networkPolicy.externalSearch.ports) 0) }}
-{{- fail "networkPolicy.externalSearch.ports must contain at least one destination port" }}
-{{- end }}
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" "external-search") }}
-  namespace: {{ .Release.Namespace }}
-spec:
-  podSelector:
-    matchLabels:
-      component: Pega
-  policyTypes:
-  - Egress
-  egress:
-  - to:
-{{- range .Values.networkPolicy.externalSearch.cidrs }}
-    - ipBlock:
-        cidr: {{ . | quote }}
-{{- end }}
-{{- if .Values.networkPolicy.externalSearch.namespaceSelector }}
-    - namespaceSelector:
-{{ toYaml .Values.networkPolicy.externalSearch.namespaceSelector | nindent 8 }}
-{{- if .Values.networkPolicy.externalSearch.podSelector }}
-      podSelector:
-{{ toYaml .Values.networkPolicy.externalSearch.podSelector | nindent 8 }}
-{{- end }}
-{{- else if .Values.networkPolicy.externalSearch.podSelector }}
-    - podSelector:
-{{ toYaml .Values.networkPolicy.externalSearch.podSelector | nindent 8 }}
-{{- end }}
-    ports:
-{{- range .Values.networkPolicy.externalSearch.ports }}
-    - protocol: TCP
-      port: {{ . | int }}
-{{- end }}
----
-{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -78,15 +28,18 @@ spec:
   egress:
   - to:
     - namespaceSelector:
-{{ toYaml .Values.networkPolicy.dns.namespaceSelector | nindent 8 }}
+        matchLabels:
+          kubernetes.io/metadata.name: kube-system
       podSelector:
-{{ toYaml .Values.networkPolicy.dns.podSelector | nindent 8 }}
+        matchLabels:
+          k8s-app: kube-dns
     ports:
     - protocol: UDP
       port: 53
     - protocol: TCP
       port: 53
 ---
+{{- end }}
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
@@ -104,21 +57,6 @@ spec:
     - podSelector:
         matchLabels:
           component: Pega
-{{- range .Values.networkPolicy.ingress.cidrs }}
-    - ipBlock:
-        cidr: {{ . | quote }}
-{{- end }}
-{{- if .Values.networkPolicy.ingress.namespaceSelector }}
-    - namespaceSelector:
-{{ toYaml .Values.networkPolicy.ingress.namespaceSelector | nindent 8 }}
-{{- if .Values.networkPolicy.ingress.podSelector }}
-      podSelector:
-{{ toYaml .Values.networkPolicy.ingress.podSelector | nindent 8 }}
-{{- end }}
-{{- else if .Values.networkPolicy.ingress.podSelector }}
-    - podSelector:
-{{ toYaml .Values.networkPolicy.ingress.podSelector | nindent 8 }}
-{{- end }}
     ports:
     - protocol: TCP
       port: 8080

@@ -46,10 +46,9 @@ action: "deploy"
 ## Network policies
 
 NetworkPolicy generation is disabled by default. To use the chart in a zero-trust namespace,
-set `networkPolicy.enabled: true` and configure at least one ingress peer. `defaultDeny` is
-enabled by default and can be explicitly disabled only when namespace-wide isolation is not
-required. The chart then
-creates a namespace-wide default-deny policy, allows DNS lookups, and adds rules for the
+set `networkPolicy.enabled: true` and `defaultDeny: true`. The chart then creates a
+namespace-wide default-deny policy, a separate DNS policy allowing UDP/TCP port 53 to CoreDNS,
+and adds rules for the
 enabled Pega components (tiers, Hazelcast or Clustering Service, internal Search, and
 internal Cassandra). The namespace-wide default deny also affects unrelated workloads in
 the release namespace.
@@ -61,18 +60,6 @@ Kubernetes NetworkPolicy resources cannot match DNS names:
 networkPolicy:
   enabled: true
   defaultDeny: true
-  ingress:
-    cidrs:
-      - 10.10.0.0/16
-  # Defaults target CoreDNS in kube-system. Override both selectors for NodeLocal DNSCache
-  # or clusters with non-standard DNS labels.
-  dns:
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: kube-system
-    podSelector:
-      matchLabels:
-        k8s-app: kube-dns
   database:
     enabled: true
     cidrs:
@@ -89,10 +76,11 @@ networkPolicy:
 
 The configured ports are destination pod ports, not Kubernetes Service ports. Pod and namespace
 selectors can be used instead of CIDRs with `podSelector` and `namespaceSelector`. The
-`namespaceSelector` and `podSelector` values are combined when both are supplied. External
-Search and additional installer destinations use the same CIDR/selector model through
-`networkPolicy.externalSearch` and `networkPolicy.installer`. Every configured destination
-requires at least one peer and one port; ports must be integers from 1 through 65535.
+`namespaceSelector` and `podSelector` values are combined when both are supplied. The built-in
+tier policy allows only same-namespace Pega-to-Pega ingress. Define external ingress or
+additional installer destinations explicitly through `networkPolicy.customPolicies`. Every
+configured database or Kafka destination requires at least one peer and one port; ports must be
+integers from 1 through 65535.
 The built-in tier and Cassandra policies also allow the required same-namespace Pega and
 installer traffic. Additional typed Kubernetes policies can be supplied
 through `networkPolicy.customPolicies`; each entry requires a unique DNS-1123 `name`, and the
@@ -138,17 +126,9 @@ configured. The clustering migration job intentionally retains its dedicated Ser
 because it requires separate Kubernetes API permissions. The separately deployed
 `backingservices` chart and external dependency workloads are outside this chart's scope.
 
-The legacy per-component configuration remains supported:
+The installer can use a separate account when it requires different permissions:
 
 ```yaml
-serviceAccount:
-  enabled: true
-  create: true
-  name: pega-runtime
-  automountServiceAccountToken: false
-  annotations: {}
-  labels: {}
-
 installer:
   serviceAccount:
     enabled: true

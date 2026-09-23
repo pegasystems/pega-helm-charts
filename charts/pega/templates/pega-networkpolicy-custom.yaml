@@ -1,7 +1,7 @@
 {{- if .Values.networkPolicy.enabled }}
 {{- $deploymentName := include "deploymentName" . }}
 {{- $policyNames := dict }}
-{{- $reservedPolicyNames := list "default-deny" "external-search" "dns" "tiers" "hazelcast" "clusteringservice" "search" "cassandra" "installer-cassandra" "database" "kafka" "installer-database" "installer-additional" }}
+{{- $reservedPolicyNames := list "default-deny" "dns" "tiers" "hazelcast" "clusteringservice" "search" "cassandra" "installer-cassandra" "database" "kafka" "installer-database" }}
 {{- range .Values.networkPolicy.customPolicies }}
 {{- $policyName := required "networkPolicy.customPolicies entries must define name" .name }}
 {{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $policyName) }}

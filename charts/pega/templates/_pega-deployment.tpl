@@ -74,10 +74,7 @@ spec:
 
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
-{{- $serviceAccount := .root.Values.serviceAccount }}
-{{- if .root.Values.global.serviceAccount.enabled }}
-{{- $serviceAccount = .root.Values.global.serviceAccount }}
-{{- end }}
+{{- $serviceAccount := .root.Values.global.serviceAccount }}
 {{- if .custom }}
 {{- if .custom.serviceAccountName }}
 {{- include "validateServiceAccountName" (dict "name" .custom.serviceAccountName "message" "tier.custom.serviceAccountName") }}

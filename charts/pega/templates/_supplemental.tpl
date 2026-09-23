@@ -37,8 +37,6 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- else -}}
 {{- printf "%s-serviceaccount" (include "deploymentName" .) | trunc 253 | trimSuffix "-" -}}
 {{- end -}}
-{{- else if .Values.serviceAccount.name -}}
-{{- .Values.serviceAccount.name -}}
 {{- else -}}
 {{- printf "%s-serviceaccount" (include "deploymentName" .) | trunc 253 | trimSuffix "-" -}}
 {{- end -}}

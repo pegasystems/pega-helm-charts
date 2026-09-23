@@ -4,45 +4,16 @@ networkPolicy:
   enabled: false
   # When enabled, deny all ingress and egress first, then add the allow rules below.
   defaultDeny: false
-  # At least one ingress peer must be configured when networkPolicy.enabled is true.
-  # These peers are allowed to reach the Pega tier ports.
-  ingress:
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-  dns:
-    # Override these selectors when the cluster uses NodeLocal DNSCache or
-    # non-standard CoreDNS labels.
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: kube-system
-    podSelector:
-      matchLabels:
-        k8s-app: kube-dns
   database:
     enabled: false
     # Use CIDRs or pod/namespace selectors. NetworkPolicy cannot resolve FQDNs.
     cidrs: []
-    namespaceSelector: {}
     podSelector: {}
     # These are destination pod ports, not Kubernetes Service ports.
     ports: []
   kafka:
     enabled: false
     cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
-  externalSearch:
-    enabled: false
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
-  # Additional installer destinations, for example an artifactory or an upgrade endpoint.
-  installer:
-    cidrs: []
-    namespaceSelector: {}
     podSelector: {}
     ports: []
   # Each entry is a Kubernetes NetworkPolicy spec plus a required name.
@@ -68,21 +39,10 @@ networkPolicy:
 #             - protocol: TCP
 #               port: 8080
 
-# Optional ServiceAccount management for Pega runtime pods.
-# Existing tier[].custom.serviceAccountName values take precedence.
-serviceAccount:
-  enabled: false
-  create: false
-  name: ""
-  annotations: {}
-  labels: {}
-  automountServiceAccountToken: false
-
 global:
   # Shared ServiceAccount configuration for all Pega subcharts.
-  # This is the canonical setting when every workload must avoid the default
-  # ServiceAccount. Existing serviceAccount and per-component overrides remain
-  # supported for compatibility.
+  # Existing tier[].custom.serviceAccountName and component-specific overrides
+  # remain supported.
   serviceAccount:
     enabled: false
     create: false
