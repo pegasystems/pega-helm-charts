@@ -2,6 +2,7 @@ package pega
 
 import (
 	"path/filepath"
+	"reflect"
 	"strings"
 	"testing"
 
@@ -140,8 +141,9 @@ func TestPegaNetworkPoliciesAllComponents(t *testing.T) {
 	require.True(t, hasIngressFromPod(cassandra, "app", "cassandra", 7000))
 	require.Empty(t, policies["pega-networkpolicy-installer"].Spec.Ingress)
 	require.Equal(t, []networkingv1.PolicyType{networkingv1.PolicyTypeEgress}, policies["pega-networkpolicy-installer"].Spec.PolicyTypes)
-	for _, name := range []string{"pega-networkpolicy-hazelcast", "pega-networkpolicy-search", "pega-networkpolicy-constellation"} {
-		require.True(t, hasIngressFromTierSelector(policies[name]), name)
+	require.True(t, hasIngressFromTierSelectorPort(tiers, 5701))
+	for name, port := range map[string]int{"pega-networkpolicy-hazelcast": 5701, "pega-networkpolicy-search": 9200, "pega-networkpolicy-constellation": 3000} {
+		require.True(t, hasIngressFromTierSelectorPort(policies[name], port), name)
 	}
 }
 
@@ -200,6 +202,27 @@ func TestPegaNetworkPoliciesCassandraOverrides(t *testing.T) {
 	require.True(t, hasIngressFromTierSelectorPort(cassandra, 9142))
 	require.True(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "dds", 9142))
 	require.False(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "dds", 9042))
+}
+
+func TestPegaNetworkPoliciesTierCustomPorts(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+		"global.tier[0].name":                          "web",
+		"global.tier[0].custom.ports[0].containerPort": "9100",
+		"global.tier[0].custom.ports[1].containerPort": "9101",
+		"global.tier[0].custom.ports[1].protocol":      "UDP",
+		"global.tier[1].name":                          "batch",
+		"global.tier[1].custom.ports[0].containerPort": "8080",
+	})}, helmChartPath)
+
+	tiers := policies["pega-networkpolicy-tiers"]
+	require.True(t, hasIngressFromTierSelectorPort(tiers, 9100))
+	require.True(t, hasEgressToPod(tiers, "app", "pega-hazelcast", 5701))
+	require.False(t, hasIngressFromTierSelectorPort(tiers, 9101), "non-TCP custom ports must come from customPolicies")
+	require.Len(t, tiers.Spec.Ingress[0].Ports, 4, "tier ports must be de-duplicated")
+	require.Len(t, tiers.Spec.Egress[0].Ports, 4)
 }
 
 func TestPegaNetworkPoliciesDeploymentName(t *testing.T) {
@@ -435,25 +458,19 @@ func hasIngressFromPod(policy networkingv1.NetworkPolicy, key string, value stri
 	return false
 }
 
+// isTierSelector matches the selector of the default tiers (pega-web, pega-batch).
 func isTierSelector(selector *metav1.LabelSelector) bool {
-	return selector != nil && len(selector.MatchExpressions) == 1 && selector.MatchExpressions[0].Key == "app"
+	return selector != nil && len(selector.MatchLabels) == 0 && reflect.DeepEqual(selector.MatchExpressions, []metav1.LabelSelectorRequirement{{
+		Key:      "app",
+		Operator: metav1.LabelSelectorOpIn,
+		Values:   []string{"pega-web", "pega-batch"},
+	}})
 }
 
 func hasIngressFromTierSelectorPort(policy networkingv1.NetworkPolicy, port int) bool {
 	for _, rule := range policy.Spec.Ingress {
 		for _, peer := range rule.From {
 			if isTierSelector(peer.PodSelector) && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
-				return true
-			}
-		}
-	}
-	return false
-}
-
-func hasIngressFromTierSelector(policy networkingv1.NetworkPolicy) bool {
-	for _, rule := range policy.Spec.Ingress {
-		for _, peer := range rule.From {
-			if isTierSelector(peer.PodSelector) {
 				return true
 			}
 		}

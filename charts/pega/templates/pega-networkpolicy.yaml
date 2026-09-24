@@ -15,6 +15,7 @@
 {{- $constellation := include "networkPolicyConstellationSelector" . }}
 {{- $cassandra := include "networkPolicyCassandraSelector" . }}
 {{- $cql := include "networkPolicyCassandraPort" . | int }}
+{{- $tierPorts := include "networkPolicyTierPorts" . | splitList "," }}
 
 {{- if $deployTiers }}
 ---
@@ -28,7 +29,7 @@ spec:
   - Ingress
   - Egress
   ingress:
-  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 8080 8443 5701)) | nindent 2 }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" $tierPorts) | nindent 2 }}
   {{- if $runInstaller }}
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $installer) "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
@@ -36,7 +37,7 @@ spec:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $constellation) "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
   egress:
-  {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443 5701)) | nindent 2 }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" $tierPorts) | nindent 2 }}
   {{- if $hazelcastEnabled }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $hazelcast "ports" (list 5701)) | nindent 2 }}
   {{- end }}

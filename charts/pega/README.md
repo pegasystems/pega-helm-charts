@@ -60,8 +60,8 @@ policy per workload that this release deploys:
 
 The chart allows automatically:
 
-- traffic between these workloads on their container ports (tiers 8080/8443 and embedded Hazelcast
-  5701, Hazelcast 5701, Search 9200/9300, Cassandra CQL (`cassandra.config.ports.cql`, default 9042)/7000/7001, Constellation 3000);
+- traffic between these workloads on fixed ports (tiers 8080/8443, embedded Hazelcast 5701 and TCP
+  `tier[].custom.ports`, Hazelcast 5701, Search 9200/9300, Cassandra CQL (`cassandra.config.ports.cql`, default 9042)/7000/7001, Constellation 3000);
 - egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
   `networkPolicy.kafka` (required when `stream.enabled` is true).
 
@@ -109,6 +109,7 @@ Other typical cases:
   `upgrade-deploy`, installer jobs during zero-downtime upgrades); use the API server endpoint addresses
   (`kubectl get endpoints kubernetes -n default`), not the `kubernetes` Service IP;
 - metrics scraping of Hazelcast and Clustering Service (8089);
+- non-TCP `tier[].custom.ports` and legacy embedded `Stream` nodes (broker traffic between tiers);
 - external Search (Elasticsearch or the Search and Reporting Service) or external Cassandra;
 - other destinations such as `global.jdbc.driverUri` downloads, `installer.distributionKit.url`, SMTP,
   identity providers or integrations.
@@ -123,7 +124,11 @@ the same pods extends the built-in rules:
 networkPolicy:
   customPolicies:
     - name: allow-dns
-      podSelector: {}
+      podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values: [pega-web, pega-batch, installer, pega-hazelcast, clusteringservice, pega-search, constellation, cassandra]
       policyTypes:
         - Egress
       egress:
@@ -170,7 +175,11 @@ networkPolicy:
               port: 443
 ```
 
-Pods that no policy selects, such as the Clustering Service migration job, are not affected.
+The `allow-dns` example selects the Pega pods by their `app` label (default deployment name `pega`;
+adjust the list to your tiers and components). Pods that no policy selects, such as the Clustering
+Service migration job, are not affected. If you use `podSelector: {}` instead, that job becomes
+isolated too and needs Kubernetes API egress (it runs `kubectl`); select it with the
+`job-name: <clusteringServiceName>-migration-job` label.
 Enforcement requires a NetworkPolicy-capable cluster network plugin.
 
 ## Service accounts
@@ -212,8 +221,8 @@ namespace; the chart then leaves `automountServiceAccountToken` to that account.
 skipped when `installer.serviceAccountName` is set.
 
 Explicit per-workload names take precedence over the managed accounts: `tier[].custom.serviceAccountName`,
-`installer.serviceAccountName`, `hazelcast.serviceAccountName`, `pegasearch.serviceAccountName` and
-`constellation.serviceAccountName`. The chart does not set `automountServiceAccountToken` for these
+`installer.serviceAccountName`, `hazelcast.serviceAccountName` (Hazelcast and Clustering Service),
+`pegasearch.serviceAccountName` and `constellation.serviceAccountName`. The chart does not set `automountServiceAccountToken` for these
 accounts. The Clustering Service migration job keeps its dedicated ServiceAccount and RBAC.
 
 For the `install-deploy`, `upgrade` and `upgrade-deploy` actions, the `check-installer-status` RoleBinding

@@ -67,16 +67,16 @@ func TestPegaServiceAccountsCreated(t *testing.T) {
 	require.False(t, *installer.AutomountServiceAccountToken)
 
 	specs := renderPodSpecs(t, options, helmChartPath)
-	require.Equal(t, "web-account", specs["pega-web"].ServiceAccountName)
-	require.Nil(t, specs["pega-web"].AutomountServiceAccountToken, "explicit overrides keep their own automount setting")
-	require.Equal(t, "pega-serviceaccount", specs["pega-batch"].ServiceAccountName)
-	require.True(t, *specs["pega-batch"].AutomountServiceAccountToken)
+	require.Equal(t, "web-account", podSpec(t, specs, "pega-web").ServiceAccountName)
+	require.Nil(t, podSpec(t, specs, "pega-web").AutomountServiceAccountToken, "explicit overrides keep their own automount setting")
+	require.Equal(t, "pega-serviceaccount", podSpec(t, specs, "pega-batch").ServiceAccountName)
+	require.True(t, automount(t, specs, "pega-batch"))
 	for _, name := range []string{"pega-search", "pega-hazelcast", "clusteringservice", "constellation"} {
-		require.Equal(t, "pega-serviceaccount", specs[name].ServiceAccountName, name)
-		require.True(t, *specs[name].AutomountServiceAccountToken, name)
+		require.Equal(t, "pega-serviceaccount", podSpec(t, specs, name).ServiceAccountName, name)
+		require.True(t, automount(t, specs, name), name)
 	}
-	require.Equal(t, "pega-installer-serviceaccount", specs["pega-db-install"].ServiceAccountName)
-	require.False(t, *specs["pega-db-install"].AutomountServiceAccountToken)
+	require.Equal(t, "pega-installer-serviceaccount", podSpec(t, specs, "pega-db-install").ServiceAccountName)
+	require.False(t, automount(t, specs, "pega-db-install"))
 }
 
 func TestPegaServiceAccountsExisting(t *testing.T) {
@@ -102,13 +102,13 @@ func TestPegaServiceAccountsExisting(t *testing.T) {
 	}
 
 	specs := renderPodSpecs(t, options, helmChartPath)
-	require.Equal(t, "existing-runtime", specs["pega-web"].ServiceAccountName)
-	require.Nil(t, specs["pega-web"].AutomountServiceAccountToken, "existing accounts keep their own automount setting")
+	require.Equal(t, "existing-runtime", podSpec(t, specs, "pega-web").ServiceAccountName)
+	require.Nil(t, podSpec(t, specs, "pega-web").AutomountServiceAccountToken, "existing accounts keep their own automount setting")
 	for name, account := range map[string]string{"pega-hazelcast": "existing-hazelcast", "pega-search": "existing-search", "constellation": "existing-constellation"} {
-		require.Equal(t, account, specs[name].ServiceAccountName, name)
-		require.Nil(t, specs[name].AutomountServiceAccountToken, name)
+		require.Equal(t, account, podSpec(t, specs, name).ServiceAccountName, name)
+		require.Nil(t, podSpec(t, specs, name).AutomountServiceAccountToken, name)
 	}
-	require.Equal(t, "existing-installer", specs["pega-db-install"].ServiceAccountName)
+	require.Equal(t, "existing-installer", podSpec(t, specs, "pega-db-install").ServiceAccountName)
 }
 
 func TestPegaServiceAccountsValidation(t *testing.T) {
@@ -123,6 +123,7 @@ func TestPegaServiceAccountsValidation(t *testing.T) {
 		{"create without enabled", map[string]string{"global.serviceAccount.create": "true"}, "global.serviceAccount.create requires global.serviceAccount.enabled=true"},
 		{"enabled without name or create", map[string]string{"global.serviceAccount.enabled": "true"}, "global.serviceAccount.enabled requires global.serviceAccount.name or global.serviceAccount.create=true"},
 		{"installer create without enabled", map[string]string{"installer.serviceAccount.create": "true"}, "installer.serviceAccount.create requires installer.serviceAccount.enabled=true"},
+		{"installer enabled without name or create on deploy", map[string]string{"global.actions.execute": "deploy", "installer.serviceAccount.enabled": "true"}, "installer.serviceAccount.enabled requires installer.serviceAccount.name or installer.serviceAccount.create=true"},
 		{"installer create without enabled on deploy", map[string]string{"global.actions.execute": "deploy", "installer.serviceAccount.create": "true"}, "installer.serviceAccount.create requires installer.serviceAccount.enabled=true"},
 	}
 
@@ -164,4 +165,15 @@ func renderPodSpecs(t *testing.T, options *helm.Options, chartPath string) map[s
 		}
 	}
 	return specs
+}
+
+func podSpec(t *testing.T, specs map[string]corev1.PodSpec, name string) corev1.PodSpec {
+	require.Contains(t, specs, name, "workload not rendered")
+	return specs[name]
+}
+
+func automount(t *testing.T, specs map[string]corev1.PodSpec, name string) bool {
+	value := podSpec(t, specs, name).AutomountServiceAccountToken
+	require.NotNil(t, value, name+": automountServiceAccountToken not set")
+	return *value
 }

@@ -75,6 +75,19 @@ matchLabels:
 {{- default 9042 (((.Values.cassandra).config).ports).cql -}}
 {{- end -}}
 
+{{- /* TCP ports of the tier pods: HTTP(S), embedded Hazelcast and TCP tier[].custom.ports. Returns a comma-separated list. */ -}}
+{{- define "networkPolicyTierPorts" -}}
+{{- $ports := list 8080 8443 5701 -}}
+{{- range .Values.global.tier -}}
+{{- range ((.custom).ports | default list) -}}
+{{- if and .containerPort (eq (.protocol | default "TCP") "TCP") -}}
+{{- $ports = append $ports (.containerPort | int) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- $ports | uniq | join "," -}}
+{{- end -}}
+
 {{- define "networkPolicyDeployTiers" -}}
 {{- include "performDeployment" . | trim -}}
 {{- end -}}
