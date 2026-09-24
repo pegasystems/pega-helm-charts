@@ -17,7 +17,7 @@ spec:
       labels:
         app: constellation
     spec:
-{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName "overridePath" "constellation.serviceAccountName") }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName) }}
 {{- . | nindent 6 }}
 {{- end }}
       imagePullSecrets:

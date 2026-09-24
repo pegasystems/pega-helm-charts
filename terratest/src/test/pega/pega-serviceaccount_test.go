@@ -110,9 +110,6 @@ func TestPegaServiceAccountsValidation(t *testing.T) {
 	}{
 		{"create without enabled", map[string]string{"global.serviceAccount.create": "true"}, "global.serviceAccount.create requires global.serviceAccount.enabled=true"},
 		{"enabled without name or create", map[string]string{"global.serviceAccount.enabled": "true"}, "global.serviceAccount.enabled requires global.serviceAccount.name or global.serviceAccount.create=true"},
-		{"invalid name", map[string]string{"global.serviceAccount.enabled": "true", "global.serviceAccount.name": "Bad_Name"}, "global.serviceAccount.name must be a valid DNS subdomain"},
-		{"invalid override", map[string]string{"hazelcast.serviceAccountName": "Bad_Name"}, "hazelcast.serviceAccountName must be a valid DNS subdomain"},
-		{"automount not boolean", map[string]string{"installer.serviceAccount.enabled": "true", "installer.serviceAccount.create": "true", "installer.serviceAccount.automountServiceAccountToken": "yes"}, "installer.serviceAccount.automountServiceAccountToken must be a boolean"},
 		{"installer create without enabled", map[string]string{"installer.serviceAccount.create": "true"}, "installer.serviceAccount.create requires installer.serviceAccount.enabled=true"},
 	}
 

@@ -1,74 +1,20 @@
 ---
 networkPolicy:
-  # Generate Kubernetes NetworkPolicy resources for the workloads rendered by this release.
-  # NetworkPolicy cannot resolve FQDNs: use CIDRs or namespace/pod selectors, and destination
-  # pod ports (not Service ports). Ports are integers (TCP) or {protocol, port} maps.
+  # Render NetworkPolicy resources for the Pega workloads of this release. Traffic between
+  # workloads of this release and DNS egress are allowed automatically. Everything else, for
+  # example the ingress controller, the Kubernetes API or monitoring, must be allowed with
+  # customPolicies. See the README for examples.
   enabled: false
-  # Also render a namespace-wide deny-all policy and a namespace-wide DNS allow policy.
-  # Without it, only the pods selected by the built-in policies are isolated.
-  defaultDeny: false
-  # DNS egress, added to every built-in policy. Defaults target CoreDNS in kube-system;
-  # override for OpenShift (openshift-dns, port 5353), NodeLocal DNSCache, etc.
-  dns:
-    cidrs: []
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: kube-system
-    podSelector:
-      matchLabels:
-        k8s-app: kube-dns
-    ports:
-      - protocol: UDP
-        port: 53
-      - protocol: TCP
-        port: 53
-  # Kubernetes API egress for k8s-wait-for and kubectl. cidrs is required for install-deploy,
-  # zero-downtime upgrade-deploy and Clustering Service migration; use the API server endpoint
-  # addresses (kubectl get endpoints kubernetes -n default).
-  kubeApiServer:
-    cidrs: []
-    ports:
-      - 443
-      - 6443
-  # Sources allowed to reach tier (8080/8443) and Constellation (3000) pods, as NetworkPolicyPeer entries.
-  ingress:
-    from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: ingress-nginx
-      - namespaceSelector:
-          matchLabels:
-            policy-group.network.openshift.io/ingress: ""
-  # Sources allowed to scrape Hazelcast and Clustering Service metrics (8089).
-  metrics:
-    from:
-      - namespaceSelector:
-          matchLabels:
-            kubernetes.io/metadata.name: monitoring
-        podSelector:
-          matchLabels:
-            app.kubernetes.io/name: prometheus
-  # External destinations for tiers (database also for the installer). Each is required while the
-  # matching feature is used: database always, kafka with stream.enabled, externalSearch without
-  # internal Search, externalCassandra with dds.externalNodes. Selectors must be non-empty.
+  # Egress to the Pega database, required when enabled. NetworkPolicy cannot resolve FQDNs:
+  # use CIDRs or namespace/pod selectors, and destination pod ports (not Service ports).
+  # Ports are integers (TCP) or {protocol, port} maps.
   database:
     cidrs: []
     namespaceSelector: {}
     podSelector: {}
     ports: []
+  # Egress to Kafka, required when stream.enabled is true.
   kafka:
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
-  # External Elasticsearch or Search and Reporting Service.
-  externalSearch:
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
-  # External Cassandra (dds.externalNodes).
-  externalCassandra:
     cidrs: []
     namespaceSelector: {}
     podSelector: {}
@@ -76,19 +22,20 @@ networkPolicy:
   # Additional policies. Each entry is a NetworkPolicy spec plus a name; podSelector is required.
   # The name becomes <deploymentName>-networkpolicy-<name> and must not reuse a built-in name.
   customPolicies: []
-  # - name: allow-app-agent
+  # - name: allow-ingress-controller
   #   podSelector:
   #     matchLabels:
   #       app: pega-web
   #   policyTypes:
-  #     - Egress
-  #   egress:
-  #     - to:
-  #         - ipBlock:
-  #             cidr: 10.20.0.0/16
+  #     - Ingress
+  #   ingress:
+  #     - from:
+  #         - namespaceSelector:
+  #             matchLabels:
+  #               kubernetes.io/metadata.name: ingress-nginx
   #       ports:
   #         - protocol: TCP
-  #           port: 8443
+  #           port: 8080
 
 global:
   # Shared ServiceAccount for tiers, Hazelcast, Clustering Service, Search, Constellation and,

@@ -46,8 +46,7 @@ action: "deploy"
 ## Network policies
 
 NetworkPolicy generation is disabled by default. Set `networkPolicy.enabled: true` to render one
-policy per workload that this release deploys. Each policy selects only the pods of that workload
-and allows the traffic it needs, plus DNS egress (`networkPolicy.dns`):
+policy per workload that this release deploys:
 
 | Policy | Selected pods | Rendered when |
 |--------|---------------|---------------|
@@ -55,41 +54,26 @@ and allows the traffic it needs, plus DNS egress (`networkPolicy.dns`):
 | `<deploymentName>-networkpolicy-installer` (egress only) | `app: installer` | install or upgrade actions |
 | `<deploymentName>-networkpolicy-hazelcast` | Hazelcast | `hazelcast.enabled` and a deploy action |
 | `<deploymentName>-networkpolicy-clusteringservice` | Clustering Service | `hazelcast.clusteringServiceEnabled` and a deploy action |
-| `<deploymentName>-networkpolicy-clusteringservice-migration` (egress only) | migration job | `hazelcast.migration.initiateMigration` with Clustering Service and a deploy action |
 | `<deploymentName>-networkpolicy-search` | internal Search | internal Search is deployed (deploy action) |
 | `<deploymentName>-networkpolicy-cassandra` | internal Cassandra | `cassandra.enabled` without `dds.externalNodes` |
 | `<deploymentName>-networkpolicy-constellation` | Constellation | `constellation.enabled` |
 
-The built-in rules allow traffic between these workloads on their container ports (tiers 8080/8443
-and embedded Hazelcast 5701, Hazelcast 5701, Search 9200/9300, Cassandra 9042/7000/7001,
-Constellation 3000). `networkPolicy.ingress.from` lists the sources allowed to reach tiers and
-Constellation (by default the `ingress-nginx` namespace and the OpenShift ingress namespaces);
-`networkPolicy.metrics.from` lists the sources allowed to scrape Hazelcast and Clustering Service
-metrics on 8089. Cloud load balancers that target pods directly (for example AWS ALB IP targets, GKE NEG
-or Azure AGIC) send traffic from VPC or health-check ranges; add those CIDRs to `ingress.from` as
-`ipBlock` peers.
+The chart allows automatically:
 
-Without `defaultDeny`, pods that no built-in policy selects are not affected. Set
-`defaultDeny: true` to also render a namespace-wide deny-all policy and a namespace-wide DNS policy;
-this affects every workload in the release namespace, including workloads not managed by this chart.
+- traffic between these workloads on their container ports (tiers 8080/8443 and embedded Hazelcast
+  5701, Hazelcast 5701, Search 9200/9300, Cassandra 9042/7000/7001, Constellation 3000);
+- DNS egress on ports 53 and 5353 (UDP and TCP) for every selected pod;
+- egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
+  `networkPolicy.kafka` (required when `stream.enabled` is true).
 
-Standard NetworkPolicy resources cannot match DNS names, so external destinations are configured with
-CIDRs (`cidrs`) or selectors (`namespaceSelector`, `podSelector`; both are combined into one peer when
-set together; selectors must be non-empty). Ports are destination pod ports, not Service ports, and are either integers (TCP) or
-`{protocol, port}` maps with protocol `TCP`, `UDP` or `SCTP`.
-
-- `database` is required whenever the tier or installer policy is rendered.
-- `kafka` is required when `stream.enabled` is true, `externalSearch` when Search is external
-  (external Elasticsearch or the Search and Reporting Service), and `externalCassandra` when
-  `dds.externalNodes` is set. When the feature is not used they are added only if a peer is configured.
-- `kubeApiServer.cidrs` is required for `install-deploy`, zero-downtime `upgrade-deploy` and Clustering
-  Service migration, because `k8s-wait-for` and `kubectl` call the Kubernetes API. Use the API server
-  endpoint addresses (`kubectl get endpoints kubernetes -n default`), not the `kubernetes` Service IP.
+NetworkPolicy cannot match DNS names, so `database` and `kafka` are configured with CIDRs (`cidrs`) or
+non-empty selectors (`namespaceSelector`, `podSelector`; combined into one peer when set together).
+Ports are destination pod ports, not Service ports, and are either integers (TCP) or `{protocol, port}`
+maps with protocol `TCP`, `UDP` or `SCTP`.
 
 ```yaml
 networkPolicy:
   enabled: true
-  defaultDeny: true
   database:
     cidrs:
       - 10.20.30.40/32
@@ -101,22 +85,62 @@ networkPolicy:
         kubernetes.io/metadata.name: kafka
     ports:
       - 9092
-  kubeApiServer:
-    cidrs:
-      - 10.0.0.1/32
 ```
 
-Tier and installer egress is an allow-list. Other destinations the deployment uses, such as
-`global.jdbc.driverUri` downloads, `installer.distributionKit.url`, a custom artifactory, SMTP, identity
-providers or other integrations, must be allowed through `networkPolicy.customPolicies`.
+Any other traffic to or from the selected pods is denied and must be allowed with
+`networkPolicy.customPolicies`. Typical cases:
 
-Additional policies can be supplied through `networkPolicy.customPolicies`. Each entry is a standard
-NetworkPolicy `spec` plus a `name`; the name must be a unique DNS-1123 label that is not used by a
-built-in policy, and `podSelector` is required (use `{}` to select all pods explicitly). The resource
-is named `<deploymentName>-networkpolicy-<name>`.
+- the ingress controller or cloud load balancer reaching tiers (8080/8443) and Constellation (3000);
+- the Kubernetes API for `k8s-wait-for` and `kubectl` (tiers during `install-deploy` and zero-downtime
+  `upgrade-deploy`, installer jobs during zero-downtime upgrades); use the API server endpoint addresses
+  (`kubectl get endpoints kubernetes -n default`), not the `kubernetes` Service IP;
+- metrics scraping of Hazelcast and Clustering Service (8089);
+- external Search (Elasticsearch or the Search and Reporting Service) or external Cassandra;
+- other destinations such as `global.jdbc.driverUri` downloads, `installer.distributionKit.url`, SMTP,
+  identity providers or integrations.
 
-NetworkPolicy resources are additive, so policies already present in the namespace can grant
-additional access. Enforcement requires a NetworkPolicy-capable cluster network plugin.
+Each `customPolicies` entry is a standard NetworkPolicy `spec` plus a `name`; the name must be a unique
+DNS-1123 label that is not used by a built-in policy, and `podSelector` is required (use `{}` to select
+all pods in the namespace, for example for a namespace-wide deny-all policy). The resource is named
+`<deploymentName>-networkpolicy-<name>`. Because policies are additive, a custom policy that selects
+the same pods extends the built-in rules:
+
+```yaml
+networkPolicy:
+  customPolicies:
+    - name: allow-ingress-controller
+      podSelector:
+        matchLabels:
+          app: pega-web
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ingress-nginx
+          ports:
+            - protocol: TCP
+              port: 8080
+    - name: allow-kube-api
+      podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values: [pega-web, pega-batch, installer]
+      policyTypes:
+        - Egress
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 10.0.0.1/32
+          ports:
+            - protocol: TCP
+              port: 443
+```
+
+Pods that no policy selects, such as the Clustering Service migration job, are not affected.
+Enforcement requires a NetworkPolicy-capable cluster network plugin.
 
 ## Service accounts
 
@@ -165,7 +189,6 @@ the tiers and the installer jobs, falling back to `default`, because their `k8s-
 read job status. When `global.serviceAccount` is shared, Hazelcast, Search and Constellation pods use the
 same bound account; set their `serviceAccountName` to separate accounts if they must not have this access. Keep `automountServiceAccountToken: true` for accounts used by those pods. The chart does
 not create any other Roles or bindings; cloud workload-identity roles must be configured separately.
-ServiceAccount names must be valid Kubernetes DNS subdomains.
 
 ## NIST SP 800-53 and NIST SP 800-131
 

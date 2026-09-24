@@ -21,7 +21,7 @@ spec:
       annotations:
 {{- include "generatedClusteringServicePodAnnotations" . | indent 8 }}
     spec:
-{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName "overridePath" "hazelcast.serviceAccountName") }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName) }}
 {{- . | nindent 6 }}
 {{- end }}
       terminationGracePeriodSeconds: {{ .Values.server.graceful_shutdown_max_wait_seconds }}

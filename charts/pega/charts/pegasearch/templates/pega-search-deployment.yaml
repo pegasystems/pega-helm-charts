@@ -32,7 +32,7 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
-{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName "overridePath" "pegasearch.serviceAccountName") }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName) }}
 {{- . | nindent 6 }}
 {{- end }}
       {{ if ne .Values.global.provider "openshift" }}

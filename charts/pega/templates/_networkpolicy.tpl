@@ -15,7 +15,7 @@ Helpers that render YAML lists return unindented content; callers trim and inden
 
 {{- /* Suffixes used by built-in policies. customPolicies must not reuse them. */ -}}
 {{- define "networkPolicyBuiltInSuffixes" -}}
-default-deny,dns,tiers,installer,constellation,hazelcast,clusteringservice,clusteringservice-migration,search,cassandra
+tiers,installer,constellation,hazelcast,clusteringservice,search,cassandra
 {{- end -}}
 
 {{- define "networkPolicyMetadata" -}}
@@ -69,12 +69,6 @@ matchLabels:
   release: {{ .Release.Name }}
 {{- end -}}
 
-{{- /* Pods created by Jobs carry the job-name label automatically. */ -}}
-{{- define "networkPolicyMigrationJobSelector" -}}
-matchLabels:
-  job-name: {{ include "clusteringServiceName" . }}-migration-job
-{{- end -}}
-
 {{- define "networkPolicyDeployTiers" -}}
 {{- include "performDeployment" . | trim -}}
 {{- end -}}
@@ -93,28 +87,6 @@ false
 {{- if .Values.pegasearch.externalSearchService -}}
 false
 {{- else if or (empty $externalURL) (eq $externalURL "http://pega-search") (eq $externalURL (include "defaultSearchURL" .)) -}}
-true
-{{- else -}}
-false
-{{- end -}}
-{{- end -}}
-
-{{- define "networkPolicyMigrationJob" -}}
-{{- if and (eq (include "networkPolicyDeployTiers" .) "true") .Values.hazelcast.clusteringServiceEnabled (.Values.hazelcast.migration).initiateMigration -}}
-true
-{{- else -}}
-false
-{{- end -}}
-{{- end -}}
-
-{{- /*
-True when a workload runs k8s-wait-for or kubectl: tier pods during install-deploy and
-zero-downtime upgrade-deploy, installer jobs during zero-downtime upgrades, and the
-Clustering Service migration job.
-*/ -}}
-{{- define "networkPolicyRequiresKubeApi" -}}
-{{- $zdt := and (eq (include "performUpgradeAndDeployment" .) "true") (eq .Values.installer.upgrade.upgradeType "zero-downtime") -}}
-{{- if or (eq (include "performInstallAndDeployment" .) "true") $zdt (eq (include "networkPolicyMigrationJob" .) "true") -}}
 true
 {{- else -}}
 false
@@ -191,18 +163,20 @@ Renders nothing for an unconfigured optional destination. Arguments: name, confi
 {{- end -}}
 {{- end -}}
 
+{{- /*
+DNS egress to any destination, added to every built-in policy. Port 5353 covers DNS pods that
+listen on it behind the port-53 Service (for example openshift-dns).
+*/ -}}
 {{- define "networkPolicyDnsRule" -}}
-{{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.dns" "config" .Values.networkPolicy.dns "required" true) -}}
-{{- end -}}
-
-{{- /* Kubernetes API egress. Fails when an API-dependent workload is rendered without kubeApiServer.cidrs. */ -}}
-{{- define "networkPolicyKubeApiRule" -}}
-{{- $config := .Values.networkPolicy.kubeApiServer -}}
-{{- if $config.cidrs -}}
-{{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.kubeApiServer" "config" (pick $config "cidrs" "ports")) -}}
-{{- else if eq (include "networkPolicyRequiresKubeApi" .) "true" -}}
-{{- fail "networkPolicy.kubeApiServer.cidrs is required for install-deploy, zero-downtime upgrade-deploy and Clustering Service migration, because k8s-wait-for and kubectl call the Kubernetes API. Set it to the API server endpoint addresses (kubectl get endpoints kubernetes -n default)." -}}
-{{- end -}}
+- ports:
+  - protocol: UDP
+    port: 53
+  - protocol: TCP
+    port: 53
+  - protocol: UDP
+    port: 5353
+  - protocol: TCP
+    port: 5353
 {{- end -}}
 
 {{- /* Egress rule to pods of this release. Arguments: selector (YAML string), ports. */ -}}
@@ -223,14 +197,4 @@ Renders nothing for an unconfigured optional destination. Arguments: name, confi
   {{- end }}
   ports:
   {{- include "networkPolicyPorts" (dict "name" "networkPolicy" "ports" .ports) | trim | nindent 2 }}
-{{- end -}}
-
-{{- /* Ingress rule from user-configured peers. Renders nothing when peers is empty. Arguments: peers, ports. */ -}}
-{{- define "networkPolicyPeerIngressRule" -}}
-{{- with .peers -}}
-- from:
-  {{- toYaml . | nindent 2 }}
-  ports:
-  {{- include "networkPolicyPorts" (dict "name" "networkPolicy" "ports" $.ports) | trim | nindent 2 }}
-{{- end -}}
 {{- end -}}

@@ -73,7 +73,7 @@ spec:
 
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
-{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" .root "override" (.custom).serviceAccountName "overridePath" "tier.custom.serviceAccountName") }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" .root "override" (.custom).serviceAccountName) }}
 {{- . | nindent 6 }}
 {{- end }}
       volumes:

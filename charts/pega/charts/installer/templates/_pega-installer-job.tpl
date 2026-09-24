@@ -41,7 +41,7 @@ spec:
 {{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
-{{- with include "pegaServiceAccountSpec" (include "pegaInstallerServiceAccountArgs" .root | fromJson) }}
+{{- with include "pegaInstallerServiceAccountSpec" .root }}
 {{- . | nindent 6 }}
 {{- end }}
       volumes:

@@ -4,7 +4,6 @@
 {{- $runInstaller := eq (include "networkPolicyRunInstaller" .) "true" }}
 {{- $hazelcastEnabled := and $deployTiers .Values.hazelcast.enabled }}
 {{- $clusteringServiceEnabled := and $deployTiers .Values.hazelcast.clusteringServiceEnabled }}
-{{- $migrationJob := eq (include "networkPolicyMigrationJob" .) "true" }}
 {{- $searchEnabled := and $deployTiers (eq (include "networkPolicyInternalSearch" .) "true") }}
 {{- $constellationEnabled := eq ((.Values.constellation).enabled | toString) "true" }}
 {{- $cassandraEnabled := eq (include "internalCassandraEnabled" . | trim) "true" }}
@@ -16,30 +15,6 @@
 {{- $constellation := include "networkPolicyConstellationSelector" . }}
 {{- $cassandra := include "networkPolicyCassandraSelector" . }}
 {{- $dnsRule := include "networkPolicyDnsRule" . }}
-{{- $kubeApiRule := include "networkPolicyKubeApiRule" . }}
-
-{{- if $np.defaultDeny }}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-{{ include "networkPolicyMetadata" (dict "root" . "suffix" "default-deny") }}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Ingress
-  - Egress
----
-# Keeps name resolution working for every workload in the namespace once default deny is active.
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-{{ include "networkPolicyMetadata" (dict "root" . "suffix" "dns") }}
-spec:
-  podSelector: {}
-  policyTypes:
-  - Egress
-  egress:
-  {{- $dnsRule | nindent 2 }}
-{{- end }}
 
 {{- if $deployTiers }}
 ---
@@ -60,14 +35,8 @@ spec:
   {{- if $constellationEnabled }}
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $constellation) "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
-  {{- with include "networkPolicyPeerIngressRule" (dict "peers" $np.ingress.from "ports" (list 8080 8443)) }}
-  {{- . | nindent 2 }}
-  {{- end }}
   egress:
   {{- $dnsRule | nindent 2 }}
-  {{- with $kubeApiRule }}
-  {{- . | nindent 2 }}
-  {{- end }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443 5701)) | nindent 2 }}
   {{- if $hazelcastEnabled }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $hazelcast "ports" (list 5701)) | nindent 2 }}
@@ -85,11 +54,8 @@ spec:
   {{- include "networkPolicyPodEgressRule" (dict "selector" $constellation "ports" (list 3000)) | nindent 2 }}
   {{- end }}
   {{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.database" "config" $np.database "required" true) | nindent 2 }}
-  {{- $required := dict "kafka" (.Values.stream).enabled "externalSearch" (not $searchEnabled) "externalCassandra" (and (.Values.dds).externalNodes true) }}
-  {{- range $name := list "kafka" "externalSearch" "externalCassandra" }}
-  {{- with include "networkPolicyDestinationRule" (dict "name" (printf "networkPolicy.%s" $name) "config" (get $np $name) "required" (get $required $name)) }}
+  {{- with include "networkPolicyDestinationRule" (dict "name" "networkPolicy.kafka" "config" $np.kafka "required" (.Values.stream).enabled) }}
   {{- . | nindent 2 }}
-  {{- end }}
   {{- end }}
 {{- end }}
 
@@ -105,9 +71,6 @@ spec:
   - Egress
   egress:
   {{- $dnsRule | nindent 2 }}
-  {{- with $kubeApiRule }}
-  {{- . | nindent 2 }}
-  {{- end }}
   {{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.database" "config" $np.database "required" true) | nindent 2 }}
   {{- if $deployTiers }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
@@ -130,9 +93,6 @@ spec:
   - Egress
   ingress:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 3000)) | nindent 2 }}
-  {{- with include "networkPolicyPeerIngressRule" (dict "peers" $np.ingress.from "ports" (list 3000)) }}
-  {{- . | nindent 2 }}
-  {{- end }}
   egress:
   {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
@@ -152,28 +112,10 @@ spec:
   - Egress
   ingress:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers $component.selector) "ports" (list 5701)) | nindent 2 }}
-  {{- with include "networkPolicyPeerIngressRule" (dict "peers" $np.metrics.from "ports" (list 8089)) }}
-  {{- . | nindent 2 }}
-  {{- end }}
   egress:
   {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $component.selector "ports" (list 5701)) | nindent 2 }}
 {{- end }}
-{{- end }}
-
-{{- if $migrationJob }}
----
-apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-{{ include "networkPolicyMetadata" (dict "root" . "suffix" "clusteringservice-migration") }}
-spec:
-  podSelector:
-    {{- include "networkPolicyMigrationJobSelector" . | nindent 4 }}
-  policyTypes:
-  - Egress
-  egress:
-  {{- $dnsRule | nindent 2 }}
-  {{- $kubeApiRule | nindent 2 }}
 {{- end }}
 
 {{- if $searchEnabled }}
