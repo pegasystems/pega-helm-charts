@@ -1,55 +1,108 @@
 ---
 networkPolicy:
-  # Generate standard Kubernetes NetworkPolicy resources. Disabled by default.
+  # Generate Kubernetes NetworkPolicy resources for the workloads rendered by this release.
+  # NetworkPolicy cannot resolve FQDNs: use CIDRs or namespace/pod selectors, and destination
+  # pod ports (not Service ports). Ports are integers (TCP) or {protocol, port} maps.
   enabled: false
-  # When enabled, deny all ingress and egress first, then add the allow rules below.
+  # Also render a namespace-wide deny-all policy and a namespace-wide DNS allow policy.
+  # Without it, only the pods selected by the built-in policies are isolated.
   defaultDeny: false
-  database:
-    enabled: false
-    # Use CIDRs or pod/namespace selectors. NetworkPolicy cannot resolve FQDNs.
+  # DNS egress, added to every built-in policy. Defaults target CoreDNS in kube-system;
+  # override for OpenShift (openshift-dns, port 5353), NodeLocal DNSCache, etc.
+  dns:
     cidrs: []
+    namespaceSelector:
+      matchLabels:
+        kubernetes.io/metadata.name: kube-system
+    podSelector:
+      matchLabels:
+        k8s-app: kube-dns
+    ports:
+      - protocol: UDP
+        port: 53
+      - protocol: TCP
+        port: 53
+  # Kubernetes API egress for k8s-wait-for and kubectl. cidrs is required for install-deploy,
+  # zero-downtime upgrade-deploy and Clustering Service migration; use the API server endpoint
+  # addresses (kubectl get endpoints kubernetes -n default).
+  kubeApiServer:
+    cidrs: []
+    ports:
+      - 443
+      - 6443
+  # Sources allowed to reach tier (8080/8443) and Constellation (3000) pods, as NetworkPolicyPeer entries.
+  ingress:
+    from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: ingress-nginx
+      - namespaceSelector:
+          matchLabels:
+            policy-group.network.openshift.io/ingress: ""
+  # Sources allowed to scrape Hazelcast and Clustering Service metrics (8089).
+  metrics:
+    from:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: monitoring
+        podSelector:
+          matchLabels:
+            app.kubernetes.io/name: prometheus
+  # External destinations for tiers (database also for the installer). Each is required while the
+  # matching feature is used: database always, kafka with stream.enabled, externalSearch without
+  # internal Search, externalCassandra with dds.externalNodes. Selectors must be non-empty.
+  database:
+    cidrs: []
+    namespaceSelector: {}
     podSelector: {}
-    # These are destination pod ports, not Kubernetes Service ports.
     ports: []
   kafka:
-    enabled: false
     cidrs: []
+    namespaceSelector: {}
     podSelector: {}
     ports: []
-  # Each entry is a Kubernetes NetworkPolicy spec plus a required name.
-  # The name is used only to create a release-safe metadata.name.
-  customPolicies:
-    # Example custom policy. Remove the leading '#' characters to enable it.
-    # The policy spec is passed through as standard Kubernetes NetworkPolicy spec.
-#     - name: allow-monitoring
-#       podSelector:
-#         matchLabels:
-#           component: Pega
-#       policyTypes:
-#         - Ingress
-#       ingress:
-#         - from:
-#             - namespaceSelector:
-#                 matchLabels:
-#                   kubernetes.io/metadata.name: monitoring
-#               podSelector:
-#                 matchLabels:
-#                   app.kubernetes.io/name: prometheus
-#           ports:
-#             - protocol: TCP
-#               port: 8080
+  # External Elasticsearch or Search and Reporting Service.
+  externalSearch:
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    ports: []
+  # External Cassandra (dds.externalNodes).
+  externalCassandra:
+    cidrs: []
+    namespaceSelector: {}
+    podSelector: {}
+    ports: []
+  # Additional policies. Each entry is a NetworkPolicy spec plus a name; podSelector is required.
+  # The name becomes <deploymentName>-networkpolicy-<name> and must not reuse a built-in name.
+  customPolicies: []
+  # - name: allow-app-agent
+  #   podSelector:
+  #     matchLabels:
+  #       app: pega-web
+  #   policyTypes:
+  #     - Egress
+  #   egress:
+  #     - to:
+  #         - ipBlock:
+  #             cidr: 10.20.0.0/16
+  #       ports:
+  #         - protocol: TCP
+  #           port: 8443
 
 global:
-  # Shared ServiceAccount configuration for all Pega subcharts.
-  # Existing tier[].custom.serviceAccountName and component-specific overrides
-  # remain supported.
+  # Shared ServiceAccount for tiers, Hazelcast, Clustering Service, Search, Constellation and,
+  # unless installer.serviceAccount is enabled, installer jobs. tier[].custom.serviceAccountName
+  # and <component>.serviceAccountName take precedence.
   serviceAccount:
     enabled: false
+    # Create the account; otherwise name must refer to an existing account.
     create: false
+    # Defaults to <deploymentName>-serviceaccount.
     name: ""
     annotations: {}
     labels: {}
-    automountServiceAccountToken: false
+    automountServiceAccountToken: true
 
   # This values.yaml file is an example.  For more information about
   # each configuration option, see the project readme.
@@ -629,15 +682,17 @@ installer:
   # Set the initial administrator@pega.com password for your installation.  This will need to be changed at first login.
   # The adminPassword value cannot start with "@".
   adminPassword: "ADMIN_PASSWORD"
-  # Existing serviceAccountName remains supported for externally managed accounts.
+  # Existing ServiceAccount for installer jobs; takes precedence over installer.serviceAccount.
   serviceAccountName: ""
+  # Installer-specific ServiceAccount; when disabled, installer jobs use global.serviceAccount.
   serviceAccount:
     enabled: false
     create: false
+    # Defaults to <deploymentName>-installer-serviceaccount.
     name: ""
     annotations: {}
     labels: {}
-    automountServiceAccountToken: false
+    automountServiceAccountToken: true
   # Pega distribution kit settings. Only required when installer.image does not already contain a kit (for example, pega-installer-ready).
   distributionKit:
     # URL to download the distribution kit zip file from.

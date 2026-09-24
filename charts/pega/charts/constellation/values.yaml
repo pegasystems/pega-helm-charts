@@ -6,6 +6,7 @@ image: IMAGE_REPO_URL_HERE
 logLevel: info
 enabled: false
 replicas: 2
+# Optional per-component override. When empty, global.serviceAccount is used.
 serviceAccountName: ""
 livenessProbe:
   initialDelaySeconds: 5

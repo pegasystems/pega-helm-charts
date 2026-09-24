@@ -32,17 +32,8 @@ spec:
 {{ toYaml .Values.podAnnotations | indent 8 }}
 {{- end }}
     spec:
-{{- if .Values.serviceAccountName }}
-      serviceAccountName: {{ .Values.serviceAccountName }}
-{{- else if .Values.global.serviceAccount.enabled }}
-{{- if .Values.global.serviceAccount.name }}
-      serviceAccountName: {{ .Values.global.serviceAccount.name }}
-{{- else }}
-      serviceAccountName: {{ include "pegaServiceAccountName" . }}
-{{- end }}
-{{- end }}
-{{- if .Values.global.serviceAccount.enabled }}
-      automountServiceAccountToken: {{ .Values.global.serviceAccount.automountServiceAccountToken }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName "overridePath" "pegasearch.serviceAccountName") }}
+{{- . | nindent 6 }}
 {{- end }}
       {{ if ne .Values.global.provider "openshift" }}
       securityContext:

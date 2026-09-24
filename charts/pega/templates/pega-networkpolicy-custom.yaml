@@ -1,26 +1,26 @@
 {{- if .Values.networkPolicy.enabled }}
-{{- $deploymentName := include "deploymentName" . }}
-{{- $policyNames := dict }}
-{{- $reservedPolicyNames := list "default-deny" "dns" "tiers" "hazelcast" "clusteringservice" "search" "cassandra" "installer-cassandra" "database" "kafka" "installer-database" }}
+{{- $reserved := splitList "," (include "networkPolicyBuiltInSuffixes" .) }}
+{{- $seen := dict }}
 {{- range .Values.networkPolicy.customPolicies }}
-{{- $policyName := required "networkPolicy.customPolicies entries must define name" .name }}
-{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $policyName) }}
-{{- fail (printf "networkPolicy.customPolicies name %q must be a DNS-1123 label" $policyName) }}
+{{- $name := required "networkPolicy.customPolicies entries must define name" .name }}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $name) }}
+{{- fail (printf "networkPolicy.customPolicies name %q must be a DNS-1123 label" $name) }}
 {{- end }}
-{{- if hasKey $policyNames $policyName }}
-{{- fail (printf "networkPolicy.customPolicies contains duplicate name %q" $policyName) }}
+{{- if has $name $reserved }}
+{{- fail (printf "networkPolicy.customPolicies name %q is reserved by a built-in policy" $name) }}
 {{- end }}
-{{- if has $policyName $reservedPolicyNames }}
-{{- fail (printf "networkPolicy.customPolicies name %q is reserved by a built-in policy" $policyName) }}
+{{- if hasKey $seen $name }}
+{{- fail (printf "networkPolicy.customPolicies contains duplicate name %q" $name) }}
 {{- end }}
-{{- $_ := set $policyNames $policyName true }}
+{{- $_ := set $seen $name true }}
+{{- if not (hasKey . "podSelector") }}
+{{- fail (printf "networkPolicy.customPolicies %q must define podSelector; use {} to select all pods in the namespace" $name) }}
+{{- end }}
+---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
-metadata:
-  name: {{ include "networkPolicyName" (dict "deploymentName" $deploymentName "suffix" $policyName) }}
-  namespace: {{ $.Release.Namespace }}
+{{ include "networkPolicyMetadata" (dict "root" $ "suffix" $name) }}
 spec:
-{{ toYaml (omit . "name") | nindent 2 }}
----
+  {{- toYaml (omit . "name") | nindent 2 }}
 {{- end }}
 {{- end }}
