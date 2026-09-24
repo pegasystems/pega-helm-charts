@@ -5,20 +5,25 @@ networkPolicy:
   # the ingress controller, the Kubernetes API or monitoring, must be allowed with customPolicies.
   # See the README for examples.
   enabled: false
-  # Egress to the Pega database, required when enabled. NetworkPolicy cannot resolve FQDNs:
-  # use CIDRs or namespace/pod selectors, and destination pod ports (not Service ports).
-  # Ports are integers (TCP) or {protocol, port} maps.
-  database:
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
-  # Egress to Kafka, required when stream.enabled is true.
-  kafka:
-    cidrs: []
-    namespaceSelector: {}
-    podSelector: {}
-    ports: []
+  # Egress rules (standard NetworkPolicyEgressRule entries) added to the tier and installer
+  # policies for the Pega database; required when enabled. NetworkPolicy cannot resolve FQDNs:
+  # use ipBlock or namespace/pod selectors, and destination pod ports (not Service ports).
+  database: []
+  # - to:
+  #     - ipBlock:
+  #         cidr: 10.20.30.40/32
+  #   ports:
+  #     - protocol: TCP
+  #       port: 5432
+  # Egress rules added to the tier policy for Kafka; required when stream.enabled is true.
+  kafka: []
+  # - to:
+  #     - namespaceSelector:
+  #         matchLabels:
+  #           kubernetes.io/metadata.name: kafka
+  #   ports:
+  #     - protocol: TCP
+  #       port: 9092
   # Additional policies. Each entry is a NetworkPolicy spec plus a name; podSelector is required.
   # The name becomes <deploymentName>-networkpolicy-<name> and must not reuse a built-in name.
   customPolicies: []

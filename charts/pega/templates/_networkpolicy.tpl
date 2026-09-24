@@ -93,73 +93,26 @@ false
 {{- end -}}
 {{- end -}}
 
-{{- /*
-Renders NetworkPolicyPort entries. Each port is either an integer (TCP) or a map with
-protocol (TCP, UDP or SCTP) and port. Arguments: name, ports.
-*/ -}}
+{{- /* Renders TCP NetworkPolicyPort entries for the built-in rules. Argument: list of ports. */ -}}
 {{- define "networkPolicyPorts" -}}
-{{- if empty .ports -}}
-{{- fail (printf "%s.ports must contain at least one port" .name) -}}
-{{- end -}}
-{{- range .ports }}
-{{- $protocol := "TCP" }}
-{{- $port := . }}
-{{- if kindIs "map" . }}
-{{- $protocol = .protocol | default "TCP" | toString | upper }}
-{{- $port = .port }}
-{{- end }}
-{{- if not (has $protocol (list "TCP" "UDP" "SCTP")) }}
-{{- fail (printf "%s.ports protocol must be TCP, UDP or SCTP" $.name) }}
-{{- end }}
-{{- $portString := toString $port }}
-{{- if or (not (regexMatch "^[0-9]+$" $portString)) (lt (atoi $portString) 1) (gt (atoi $portString) 65535) }}
-{{- fail (printf "%s.ports must be integers between 1 and 65535" $.name) }}
-{{- end }}
-- protocol: {{ $protocol }}
-  port: {{ atoi $portString }}
-{{- end }}
-{{- end -}}
-
-{{- /* Renders NetworkPolicyPeer entries from cidrs, namespaceSelector and podSelector. Empty selectors are ignored. */ -}}
-{{- define "networkPolicyPeers" -}}
-{{- range .cidrs }}
-- ipBlock:
-    cidr: {{ . | quote }}
-{{- end }}
-{{- if .namespaceSelector }}
-- namespaceSelector:
-    {{- toYaml .namespaceSelector | nindent 4 }}
-  {{- with .podSelector }}
-  podSelector:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-{{- else if .podSelector }}
-- podSelector:
-    {{- toYaml .podSelector | nindent 4 }}
+{{- range . }}
+- protocol: TCP
+  port: {{ . }}
 {{- end }}
 {{- end -}}
 
 {{- /*
-Renders one egress rule for a configured destination (cidrs/namespaceSelector/podSelector + ports).
-Renders nothing for an unconfigured optional destination. Arguments: name, config, required.
+Renders user-supplied NetworkPolicyEgressRule entries (networkPolicy.database, networkPolicy.kafka).
+Arguments: name, rules, required.
 */ -}}
-{{- define "networkPolicyDestinationRule" -}}
-{{- $config := .config | default dict -}}
-{{- range $config.cidrs -}}
-{{- if not (regexMatch "^[0-9a-fA-F:.]+/[0-9]{1,3}$" (toString .)) -}}
-{{- fail (printf "%s.cidrs entries must be CIDR blocks, for example 10.0.0.0/16" $.name) -}}
+{{- define "networkPolicyEgressRules" -}}
+{{- if not (kindIs "slice" (.rules | default list)) -}}
+{{- fail (printf "%s must be a list of NetworkPolicy egress rules" .name) -}}
 {{- end -}}
-{{- end -}}
-{{- $peers := include "networkPolicyPeers" $config | trim -}}
-{{- if $peers -}}
-- to:
-  {{- $peers | nindent 2 }}
-  ports:
-  {{- include "networkPolicyPorts" (dict "name" .name "ports" $config.ports) | trim | nindent 2 }}
+{{- if .rules -}}
+{{- toYaml .rules -}}
 {{- else if .required -}}
-{{- fail (printf "%s requires at least one of cidrs, namespaceSelector or podSelector" .name) -}}
-{{- else if $config.ports -}}
-{{- fail (printf "%s.ports is set but no cidrs, namespaceSelector or podSelector is configured" .name) -}}
+{{- fail (printf "%s must contain at least one NetworkPolicy egress rule" .name) -}}
 {{- end -}}
 {{- end -}}
 
@@ -169,7 +122,7 @@ Renders nothing for an unconfigured optional destination. Arguments: name, confi
   - podSelector:
       {{- .selector | nindent 6 }}
   ports:
-  {{- include "networkPolicyPorts" (dict "name" "networkPolicy" "ports" .ports) | trim | nindent 2 }}
+  {{- include "networkPolicyPorts" .ports | trim | nindent 2 }}
 {{- end -}}
 
 {{- /* Ingress rule from pods of this release. Arguments: selectors (list of YAML strings), ports. */ -}}
@@ -180,5 +133,5 @@ Renders nothing for an unconfigured optional destination. Arguments: name, confi
       {{- . | nindent 6 }}
   {{- end }}
   ports:
-  {{- include "networkPolicyPorts" (dict "name" "networkPolicy" "ports" .ports) | trim | nindent 2 }}
+  {{- include "networkPolicyPorts" .ports | trim | nindent 2 }}
 {{- end -}}

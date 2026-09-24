@@ -65,25 +65,29 @@ The chart allows automatically:
 - egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
   `networkPolicy.kafka` (required when `stream.enabled` is true).
 
-NetworkPolicy cannot match DNS names, so `database` and `kafka` are configured with CIDRs (`cidrs`) or
-non-empty selectors (`namespaceSelector`, `podSelector`; combined into one peer when set together).
-Ports are destination pod ports, not Service ports, and are either integers (TCP) or `{protocol, port}`
-maps with protocol `TCP`, `UDP` or `SCTP`.
+`database` and `kafka` are lists of standard Kubernetes `NetworkPolicyEgressRule` entries (`to` and
+`ports`). The chart adds `database` to the tier and installer policies and `kafka` to the tier policy,
+so the rules do not need pod selectors for the Pega pods. NetworkPolicy cannot match DNS names, so use
+`ipBlock` or namespace/pod selectors, and destination pod ports, not Service ports.
 
 ```yaml
 networkPolicy:
   enabled: true
   database:
-    cidrs:
-      - 10.20.30.40/32
-    ports:
-      - 5432
+    - to:
+        - ipBlock:
+            cidr: 10.20.30.40/32
+      ports:
+        - protocol: TCP
+          port: 5432
   kafka:
-    namespaceSelector:
-      matchLabels:
-        kubernetes.io/metadata.name: kafka
-    ports:
-      - 9092
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
 ```
 
 Any other traffic to or from the selected pods is denied and must be allowed with

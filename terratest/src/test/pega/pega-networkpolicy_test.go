@@ -20,18 +20,25 @@ var networkPolicyTemplates = []string{
 
 func networkPolicyValues(overrides map[string]string) map[string]string {
 	values := map[string]string{
-		"global.provider":                 "k8s",
-		"global.actions.execute":          "deploy",
-		"cassandra.enabled":               "false",
-		"networkPolicy.enabled":           "true",
-		"networkPolicy.database.cidrs[0]": "10.0.0.0/24",
-		"networkPolicy.database.ports[0]": "5432",
-		"networkPolicy.kafka.cidrs[0]":    "10.2.0.0/24",
-		"networkPolicy.kafka.ports[0]":    "9092",
+		"global.provider":                              "k8s",
+		"global.actions.execute":                       "deploy",
+		"cassandra.enabled":                            "false",
+		"networkPolicy.enabled":                        "true",
+		"networkPolicy.database[0].to[0].ipBlock.cidr": "10.0.0.0/24",
+		"networkPolicy.database[0].ports[0].protocol":  "TCP",
+		"networkPolicy.database[0].ports[0].port":      "5432",
+		"networkPolicy.kafka[0].to[0].ipBlock.cidr":    "10.2.0.0/24",
+		"networkPolicy.kafka[0].ports[0].protocol":     "TCP",
+		"networkPolicy.kafka[0].ports[0].port":         "9092",
 	}
 	for key, value := range overrides {
 		if value == "null" {
-			delete(values, key+"[0]")
+			for existing := range values {
+				if strings.HasPrefix(existing, key) {
+					delete(values, existing)
+				}
+			}
+			continue
 		}
 		values[key] = value
 	}
@@ -153,16 +160,28 @@ func TestPegaNetworkPoliciesExternalSearch(t *testing.T) {
 	}
 }
 
-func TestPegaNetworkPoliciesPortFormats(t *testing.T) {
+func TestPegaNetworkPoliciesExternalRulesPassThrough(t *testing.T) {
 	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
 	require.NoError(t, err)
 
 	policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
-		"networkPolicy.kafka.ports[0].protocol": "tcp",
-		"networkPolicy.kafka.ports[0].port":     "9142",
+		"global.actions.execute":                                          "install-deploy",
+		"networkPolicy.database[0].to[0].ipBlock.except[0]":               "10.0.0.128/25",
+		"networkPolicy.database[0].ports[1].protocol":                     "UDP",
+		"networkPolicy.database[0].ports[1].port":                         "5433",
+		"networkPolicy.kafka[0].to[0].ipBlock.cidr":                       "null",
+		"networkPolicy.kafka[0].to[0].namespaceSelector.matchLabels.team": "streaming",
 	})}, helmChartPath)
 
-	require.True(t, hasEgressPort(policies["pega-networkpolicy-tiers"], corev1.ProtocolTCP, 9142))
+	for _, name := range []string{"pega-networkpolicy-tiers", "pega-networkpolicy-installer"} {
+		rule := egressRuleToCIDR(policies[name], "10.0.0.0/24")
+		require.NotNil(t, rule, name)
+		require.Equal(t, []string{"10.0.0.128/25"}, rule.To[0].IPBlock.Except, name)
+		require.True(t, hasPort(rule.Ports, corev1.ProtocolTCP, 5432), name)
+		require.True(t, hasPort(rule.Ports, corev1.ProtocolUDP, 5433), name)
+	}
+	require.True(t, hasEgressToNamespace(policies["pega-networkpolicy-tiers"], "team", "streaming", 9092))
+	require.False(t, hasEgressToNamespace(policies["pega-networkpolicy-installer"], "team", "streaming", 9092), "kafka rules apply to tiers only")
 }
 
 func TestPegaNetworkPoliciesCustomPolicies(t *testing.T) {
@@ -189,13 +208,9 @@ func TestPegaNetworkPoliciesValidation(t *testing.T) {
 		values   map[string]string
 		expected string
 	}{
-		{"missing database", map[string]string{"networkPolicy.database.cidrs": "null"}, "networkPolicy.database requires at least one of"},
-		{"database without ports", map[string]string{"networkPolicy.database.ports": "null"}, "networkPolicy.database.ports must contain at least one port"},
-		{"invalid CIDR", map[string]string{"networkPolicy.database.cidrs[0]": "db.example.com"}, "networkPolicy.database.cidrs entries must be CIDR blocks"},
-		{"invalid port", map[string]string{"networkPolicy.database.ports[0]": "70000"}, "networkPolicy.database.ports must be integers between 1 and 65535"},
-		{"invalid protocol", map[string]string{"networkPolicy.kafka.ports[0].protocol": "ICMP", "networkPolicy.kafka.ports[0].port": "9092"}, "networkPolicy.kafka.ports protocol must be TCP, UDP or SCTP"},
-		{"ports without peers", map[string]string{"stream.enabled": "false", "networkPolicy.kafka.cidrs": "null"}, "networkPolicy.kafka.ports is set but no cidrs"},
-		{"kafka required with stream", map[string]string{"networkPolicy.kafka.cidrs": "null"}, "networkPolicy.kafka requires at least one of"},
+		{"missing database", map[string]string{"networkPolicy.database": "null"}, "networkPolicy.database must contain at least one NetworkPolicy egress rule"},
+		{"database not a list", map[string]string{"networkPolicy.database": "null", "networkPolicy.database.cidrs[0]": "10.0.0.0/24"}, "networkPolicy.database must be a list of NetworkPolicy egress rules"},
+		{"kafka required with stream", map[string]string{"networkPolicy.kafka": "null"}, "networkPolicy.kafka must contain at least one NetworkPolicy egress rule"},
 		{"reserved custom name", map[string]string{"networkPolicy.customPolicies[0].name": "installer", "networkPolicy.customPolicies[0].podSelector.matchLabels.app": "x"}, "is reserved by a built-in policy"},
 		{"duplicate custom name", map[string]string{
 			"networkPolicy.customPolicies[0].name": "extra", "networkPolicy.customPolicies[0].podSelector.matchLabels.app": "x",
@@ -280,6 +295,28 @@ func hasEgressToPod(policy networkingv1.NetworkPolicy, key string, value string,
 	for _, rule := range policy.Spec.Egress {
 		for _, peer := range rule.To {
 			if peer.PodSelector != nil && peer.NamespaceSelector == nil && peer.PodSelector.MatchLabels[key] == value && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func egressRuleToCIDR(policy networkingv1.NetworkPolicy, cidr string) *networkingv1.NetworkPolicyEgressRule {
+	for i, rule := range policy.Spec.Egress {
+		for _, peer := range rule.To {
+			if peer.IPBlock != nil && peer.IPBlock.CIDR == cidr {
+				return &policy.Spec.Egress[i]
+			}
+		}
+	}
+	return nil
+}
+
+func hasEgressToNamespace(policy networkingv1.NetworkPolicy, key string, value string, port int) bool {
+	for _, rule := range policy.Spec.Egress {
+		for _, peer := range rule.To {
+			if peer.NamespaceSelector != nil && peer.NamespaceSelector.MatchLabels[key] == value && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
 				return true
 			}
 		}

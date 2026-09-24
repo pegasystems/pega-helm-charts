@@ -51,8 +51,8 @@ spec:
   {{- if $constellationEnabled }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $constellation "ports" (list 3000)) | nindent 2 }}
   {{- end }}
-  {{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.database" "config" $np.database "required" true) | nindent 2 }}
-  {{- with include "networkPolicyDestinationRule" (dict "name" "networkPolicy.kafka" "config" $np.kafka "required" (.Values.stream).enabled) }}
+  {{- include "networkPolicyEgressRules" (dict "name" "networkPolicy.database" "rules" $np.database "required" true) | nindent 2 }}
+  {{- with include "networkPolicyEgressRules" (dict "name" "networkPolicy.kafka" "rules" $np.kafka "required" (.Values.stream).enabled) }}
   {{- . | nindent 2 }}
   {{- end }}
 {{- end }}
@@ -68,7 +68,7 @@ spec:
   policyTypes:
   - Egress
   egress:
-  {{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.database" "config" $np.database "required" true) | nindent 2 }}
+  {{- include "networkPolicyEgressRules" (dict "name" "networkPolicy.database" "rules" $np.database "required" true) | nindent 2 }}
   {{- if $deployTiers }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
