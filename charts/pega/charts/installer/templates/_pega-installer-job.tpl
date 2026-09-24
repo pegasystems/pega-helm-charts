@@ -41,24 +41,26 @@ spec:
 {{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
-{{- $serviceAccount := .root.Values.serviceAccount }}
-{{- if and (not $serviceAccount.enabled) .root.Values.global.serviceAccount.enabled }}
-{{- $serviceAccount = .root.Values.global.serviceAccount }}
+{{- $installerServiceAccount := .root.Values.serviceAccount }}
+{{- $usesGlobalServiceAccount := false }}
+{{- if and (not $installerServiceAccount.enabled) .root.Values.global.serviceAccount.enabled }}
+{{- $installerServiceAccount = .root.Values.global.serviceAccount }}
+{{- $usesGlobalServiceAccount = true }}
 {{- end }}
 {{- if .root.Values.serviceAccountName }}
 {{- include "validateServiceAccountName" (dict "name" .root.Values.serviceAccountName "message" "installer.serviceAccountName") }}
       serviceAccountName: {{ .root.Values.serviceAccountName }}
-{{- else if $serviceAccount.enabled }}
-{{- if $serviceAccount.name }}
-      serviceAccountName: {{ $serviceAccount.name }}
-{{- else if $serviceAccount.create }}
-      serviceAccountName: {{ include "pegaInstallerServiceAccountName" (dict "root" .root "config" $serviceAccount) }}
+{{- else if $installerServiceAccount.enabled }}
+{{- if $installerServiceAccount.name }}
+      serviceAccountName: {{ $installerServiceAccount.name }}
+{{- else if $installerServiceAccount.create }}
+      serviceAccountName: {{ include "pegaInstallerServiceAccountName" (dict "root" .root "config" $installerServiceAccount "useGlobal" $usesGlobalServiceAccount) }}
 {{- else }}
 {{- fail "installer.serviceAccount.enabled requires installer.serviceAccount.name or installer.serviceAccount.create=true" }}
 {{- end }}
 {{- end }}
-{{- if $serviceAccount.enabled }}
-      automountServiceAccountToken: {{ $serviceAccount.automountServiceAccountToken }}
+{{- if $installerServiceAccount.enabled }}
+      automountServiceAccountToken: {{ $installerServiceAccount.automountServiceAccountToken }}
 {{- end }}
       volumes:
 {{- include "jdbcLibVolume" .root | indent 6 }}

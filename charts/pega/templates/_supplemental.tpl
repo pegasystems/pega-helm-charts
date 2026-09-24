@@ -43,7 +43,9 @@ charts to render standalone. See: https://github.com/helm/helm/issues/11260 for 
 {{- end -}}
 
 {{- define "pegaInstallerServiceAccountName" -}}
-{{- if .config.name -}}
+{{- if .useGlobal -}}
+{{- include "pegaServiceAccountName" .root -}}
+{{- else if .config.name -}}
 {{- .config.name -}}
 {{- else -}}
 {{- printf "%s-installer-serviceaccount" (include "deploymentName" .root) | trunc 253 | trimSuffix "-" -}}

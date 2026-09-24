@@ -88,21 +88,6 @@ remaining fields are placed under the policy `spec`.
 NetworkPolicy resources are additive, so policies already present in the namespace can grant
 additional access. Enforcement requires a NetworkPolicy-capable cluster network plugin.
 
-### NetworkPolicy validation script
-
-The repository includes a local, cluster-independent validation script covering positive,
-negative, and edge-case configurations:
-
-```bash
-./scripts/test-pega-networkpolicy.sh
-```
-
-The script requires Helm and validates disabled and enabled modes, default-deny behavior,
-DNS and ingress rules, database/Kafka/Search/installer destinations, selector combinations,
-custom policy rendering, namespace scoping, duplicate names, long deployment names, and
-fail-fast handling of incomplete or invalid configuration. It does not create or modify
-resources in a Kubernetes cluster.
-
 ## Service accounts
 
 ServiceAccount management is disabled by default and does not change existing deployments.

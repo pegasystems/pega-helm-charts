@@ -38,7 +38,7 @@ spec:
 {{- if .Values.global.serviceAccount.name }}
       serviceAccountName: {{ .Values.global.serviceAccount.name }}
 {{- else }}
-      serviceAccountName: {{ printf "%s-search-serviceaccount" (include "searchName" .) | trunc 253 | trimSuffix "-" }}
+      serviceAccountName: {{ include "pegaServiceAccountName" . }}
 {{- end }}
 {{- end }}
 {{- if .Values.global.serviceAccount.enabled }}

@@ -10,10 +10,12 @@ roleRef:
   name: {{ template "installerJobReaderRole" }}
 subjects:
 - kind: ServiceAccount
-{{- $config := .Values.serviceAccount }}
-{{- if and (not $config.enabled) .Values.global.serviceAccount.enabled }}
-{{- $config = .Values.global.serviceAccount }}
+{{- $installerServiceAccount := .Values.serviceAccount }}
+{{- $usesGlobalServiceAccount := false }}
+{{- if and (not $installerServiceAccount.enabled) .Values.global.serviceAccount.enabled }}
+{{- $installerServiceAccount = .Values.global.serviceAccount }}
+{{- $usesGlobalServiceAccount = true }}
 {{- end }}
-  name: {{ if .Values.serviceAccountName }}{{ .Values.serviceAccountName }}{{ else if $config.name }}{{ $config.name }}{{ else }}{{ include "pegaInstallerServiceAccountName" (dict "root" . "config" $config) }}{{ end }}
+  name: {{ if .Values.serviceAccountName }}{{ .Values.serviceAccountName }}{{ else if $installerServiceAccount.name }}{{ $installerServiceAccount.name }}{{ else }}{{ include "pegaInstallerServiceAccountName" (dict "root" . "config" $installerServiceAccount "useGlobal" $usesGlobalServiceAccount) }}{{ end }}
   namespace: {{ .Release.Namespace }}
 {{ end }}

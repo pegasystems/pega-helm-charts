@@ -1,6 +1,6 @@
 {{- if .Values.networkPolicy.enabled }}
 {{- $deploymentName := include "deploymentName" . }}
-{{- $defaultDeny := true }}
+{{- $defaultDeny := false }}
 {{- if hasKey .Values.networkPolicy "defaultDeny" }}
 {{- $defaultDeny = .Values.networkPolicy.defaultDeny }}
 {{- end }}

@@ -47,7 +47,8 @@ customJVMArgs: ""
 # installerMaxHeap: 8g
 # If 'true', Helm will wait for the install or upgrade to finish, and only succeed if the job completes without error.
 waitForJobCompletion: "false"
-# Optionally specify specific service account
+# Optional installer-specific ServiceAccount. When disabled, the shared
+# global.serviceAccount is used when it is enabled.
 # serviceAccountName: MY_INSTALLER_SERVICE_ACCOUNT_NAME
 serviceAccount:
   enabled: false
