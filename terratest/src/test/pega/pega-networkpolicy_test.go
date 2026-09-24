@@ -31,6 +31,7 @@ func networkPolicyValues(overrides map[string]string) map[string]string {
 		"networkPolicy.kafka[0].ports[0].protocol":     "TCP",
 		"networkPolicy.kafka[0].ports[0].port":         "9092",
 	}
+	// Deletions run first so that a "null" override never removes a key set by another override.
 	for key, value := range overrides {
 		if value == "null" {
 			for existing := range values {
@@ -38,9 +39,12 @@ func networkPolicyValues(overrides map[string]string) map[string]string {
 					delete(values, existing)
 				}
 			}
-			continue
 		}
-		values[key] = value
+	}
+	for key, value := range overrides {
+		if value != "null" {
+			values[key] = value
+		}
 	}
 	return values
 }
@@ -123,6 +127,100 @@ func TestPegaNetworkPoliciesAllComponents(t *testing.T) {
 	require.True(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "constellation", 3000))
 	require.True(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "clusteringservice", 5701))
 	require.Equal(t, map[string]string{"app": "installer"}, policies["pega-networkpolicy-installer"].Spec.PodSelector.MatchLabels)
+
+	tiers := policies["pega-networkpolicy-tiers"]
+	require.True(t, hasIngressFromPod(tiers, "app", "installer", 8080))
+	require.True(t, hasIngressFromPod(tiers, "app", "constellation", 8080))
+	require.False(t, hasIngressFromPod(tiers, "app", "pega-search", 8080))
+	require.True(t, hasIngressFromPod(policies["pega-networkpolicy-hazelcast"], "app", "pega-hazelcast", 5701))
+	require.True(t, hasIngressFromPod(policies["pega-networkpolicy-clusteringservice"], "app", "clusteringservice", 5701))
+	require.True(t, hasIngressFromPod(policies["pega-networkpolicy-search"], "app", "pega-search", 9300))
+	cassandra := policies["pega-networkpolicy-cassandra"]
+	require.True(t, hasIngressFromPod(cassandra, "app", "installer", 9042))
+	require.True(t, hasIngressFromPod(cassandra, "app", "cassandra", 7000))
+	require.Empty(t, policies["pega-networkpolicy-installer"].Spec.Ingress)
+	require.Equal(t, []networkingv1.PolicyType{networkingv1.PolicyTypeEgress}, policies["pega-networkpolicy-installer"].Spec.PolicyTypes)
+	for _, name := range []string{"pega-networkpolicy-hazelcast", "pega-networkpolicy-search", "pega-networkpolicy-constellation"} {
+		require.True(t, hasIngressFromTierSelector(policies[name]), name)
+	}
+}
+
+func TestPegaNetworkPoliciesActions(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	testCases := map[string][]string{
+		"install":        {"pega-networkpolicy-installer"},
+		"upgrade":        {"pega-networkpolicy-installer"},
+		"upgrade-deploy": {"pega-networkpolicy-tiers", "pega-networkpolicy-installer", "pega-networkpolicy-hazelcast", "pega-networkpolicy-search"},
+	}
+	for action, expected := range testCases {
+		t.Run(action, func(t *testing.T) {
+			policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+				"global.actions.execute":        action,
+				"installer.upgrade.upgradeType": getUpgradeTypeForUpgradeAction(action),
+			})}, helmChartPath)
+
+			require.ElementsMatch(t, expected, policyNames(policies))
+			installer := policies["pega-networkpolicy-installer"]
+			require.True(t, hasEgressToCIDR(installer, "10.0.0.0/24", 5432))
+			require.Equal(t, action == "upgrade-deploy", hasEgressToTierSelector(installer), "installer reaches tiers only when they are deployed")
+		})
+	}
+}
+
+func TestPegaNetworkPoliciesOptionalComponents(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+		"stream.enabled":      "false",
+		"networkPolicy.kafka": "null",
+		"hazelcast.enabled":   "false",
+	})}, helmChartPath)
+
+	require.ElementsMatch(t, []string{"pega-networkpolicy-tiers", "pega-networkpolicy-search"}, policyNames(policies))
+	tiers := policies["pega-networkpolicy-tiers"]
+	require.False(t, hasEgressToPod(tiers, "app", "pega-hazelcast", 5701))
+	require.False(t, hasEgressToCIDR(tiers, "10.2.0.0/24", 9092))
+}
+
+func TestPegaNetworkPoliciesCassandraOverrides(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+		"cassandra.enabled":          "true",
+		"cassandra.nameOverride":     "dds",
+		"cassandra.config.ports.cql": "9142",
+	})}, helmChartPath)
+
+	cassandra := policies["pega-networkpolicy-cassandra"]
+	require.Equal(t, "dds", cassandra.Spec.PodSelector.MatchLabels["app"])
+	require.True(t, hasIngressFromTierSelectorPort(cassandra, 9142))
+	require.True(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "dds", 9142))
+	require.False(t, hasEgressToPod(policies["pega-networkpolicy-tiers"], "app", "dds", 9042))
+}
+
+func TestPegaNetworkPoliciesDeploymentName(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	policies := renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+		"global.deployment.name": "prod",
+	})}, helmChartPath)
+	require.ElementsMatch(t, []string{"prod-networkpolicy-tiers", "prod-networkpolicy-hazelcast", "prod-networkpolicy-search"}, policyNames(policies))
+	require.Equal(t, []string{"prod-web", "prod-batch"}, policies["prod-networkpolicy-tiers"].Spec.PodSelector.MatchExpressions[0].Values)
+
+	longName := strings.Repeat("a", 60)
+	policies = renderNetworkPolicies(t, &helm.Options{SetValues: networkPolicyValues(map[string]string{
+		"global.deployment.name": longName,
+	})}, helmChartPath)
+	require.Len(t, policies, 3)
+	for name := range policies {
+		require.LessOrEqual(t, len(name), 63, name)
+		require.True(t, strings.HasPrefix(name, longName[:40]), name)
+	}
 }
 
 func TestPegaNetworkPoliciesMigrationJob(t *testing.T) {
@@ -210,6 +308,8 @@ func TestPegaNetworkPoliciesValidation(t *testing.T) {
 	}{
 		{"missing database", map[string]string{"networkPolicy.database": "null"}, "networkPolicy.database must contain at least one NetworkPolicy egress rule"},
 		{"database not a list", map[string]string{"networkPolicy.database": "null", "networkPolicy.database.cidrs[0]": "10.0.0.0/24"}, "networkPolicy.database must be a list of NetworkPolicy egress rules"},
+		{"database rule without to or ports", map[string]string{"networkPolicy.database": "null", "networkPolicy.database[0].description": "any"}, "networkPolicy.database entries must be NetworkPolicy egress rules"},
+		{"scalar kafka rule", map[string]string{"networkPolicy.kafka": "null", "networkPolicy.kafka[0]": "10.2.0.0/24"}, "networkPolicy.kafka entries must be NetworkPolicy egress rules"},
 		{"kafka required with stream", map[string]string{"networkPolicy.kafka": "null"}, "networkPolicy.kafka must contain at least one NetworkPolicy egress rule"},
 		{"reserved custom name", map[string]string{"networkPolicy.customPolicies[0].name": "installer", "networkPolicy.customPolicies[0].podSelector.matchLabels.app": "x"}, "is reserved by a built-in policy"},
 		{"duplicate custom name", map[string]string{
@@ -317,6 +417,54 @@ func hasEgressToNamespace(policy networkingv1.NetworkPolicy, key string, value s
 	for _, rule := range policy.Spec.Egress {
 		for _, peer := range rule.To {
 			if peer.NamespaceSelector != nil && peer.NamespaceSelector.MatchLabels[key] == value && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasIngressFromPod(policy networkingv1.NetworkPolicy, key string, value string, port int) bool {
+	for _, rule := range policy.Spec.Ingress {
+		for _, peer := range rule.From {
+			if peer.PodSelector != nil && peer.NamespaceSelector == nil && peer.PodSelector.MatchLabels[key] == value && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func isTierSelector(selector *metav1.LabelSelector) bool {
+	return selector != nil && len(selector.MatchExpressions) == 1 && selector.MatchExpressions[0].Key == "app"
+}
+
+func hasIngressFromTierSelectorPort(policy networkingv1.NetworkPolicy, port int) bool {
+	for _, rule := range policy.Spec.Ingress {
+		for _, peer := range rule.From {
+			if isTierSelector(peer.PodSelector) && hasPort(rule.Ports, corev1.ProtocolTCP, port) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasIngressFromTierSelector(policy networkingv1.NetworkPolicy) bool {
+	for _, rule := range policy.Spec.Ingress {
+		for _, peer := range rule.From {
+			if isTierSelector(peer.PodSelector) {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func hasEgressToTierSelector(policy networkingv1.NetworkPolicy) bool {
+	for _, rule := range policy.Spec.Egress {
+		for _, peer := range rule.To {
+			if isTierSelector(peer.PodSelector) {
 				return true
 			}
 		}

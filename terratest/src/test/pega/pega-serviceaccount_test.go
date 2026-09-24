@@ -45,34 +45,38 @@ func TestPegaServiceAccountsCreated(t *testing.T) {
 		"global.serviceAccount.enabled": "true",
 		"global.serviceAccount.create":  "true",
 		"global.serviceAccount.annotations.eks\\.amazonaws\\.com/role-arn": "arn:aws:iam::1:role/pega",
-		"global.serviceAccount.automountServiceAccountToken":               "false",
-		"installer.serviceAccount.enabled":                                 "true",
-		"installer.serviceAccount.create":                                  "true",
-		"global.tier[0].name":                                              "web",
-		"global.tier[0].custom.serviceAccountName":                         "web-account",
-		"global.tier[1].name":                                              "batch",
+		"installer.serviceAccount.automountServiceAccountToken":            "false",
+		"constellation.enabled":                    "true",
+		"hazelcast.clusteringServiceEnabled":       "true",
+		"installer.serviceAccount.enabled":         "true",
+		"installer.serviceAccount.create":          "true",
+		"global.tier[0].name":                      "web",
+		"global.tier[0].custom.serviceAccountName": "web-account",
+		"global.tier[1].name":                      "batch",
 	}}
 
 	var runtime corev1.ServiceAccount
 	UnmarshalK8SYaml(t, RenderTemplate(t, options, helmChartPath, []string{"templates/pega-serviceaccount.yaml"}), &runtime)
 	require.Equal(t, "pega-serviceaccount", runtime.Name)
 	require.Equal(t, "arn:aws:iam::1:role/pega", runtime.Annotations["eks.amazonaws.com/role-arn"])
-	require.False(t, *runtime.AutomountServiceAccountToken)
+	require.True(t, *runtime.AutomountServiceAccountToken)
 
 	var installer corev1.ServiceAccount
 	UnmarshalK8SYaml(t, RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-serviceaccount.yaml"}), &installer)
 	require.Equal(t, "pega-installer-serviceaccount", installer.Name)
-	require.True(t, *installer.AutomountServiceAccountToken)
+	require.False(t, *installer.AutomountServiceAccountToken)
 
 	specs := renderPodSpecs(t, options, helmChartPath)
 	require.Equal(t, "web-account", specs["pega-web"].ServiceAccountName)
 	require.Nil(t, specs["pega-web"].AutomountServiceAccountToken, "explicit overrides keep their own automount setting")
 	require.Equal(t, "pega-serviceaccount", specs["pega-batch"].ServiceAccountName)
-	require.False(t, *specs["pega-batch"].AutomountServiceAccountToken)
-	require.Equal(t, "pega-serviceaccount", specs["pega-search"].ServiceAccountName)
-	require.Equal(t, "pega-serviceaccount", specs["pega-hazelcast"].ServiceAccountName)
+	require.True(t, *specs["pega-batch"].AutomountServiceAccountToken)
+	for _, name := range []string{"pega-search", "pega-hazelcast", "clusteringservice", "constellation"} {
+		require.Equal(t, "pega-serviceaccount", specs[name].ServiceAccountName, name)
+		require.True(t, *specs[name].AutomountServiceAccountToken, name)
+	}
 	require.Equal(t, "pega-installer-serviceaccount", specs["pega-db-install"].ServiceAccountName)
-	require.True(t, *specs["pega-db-install"].AutomountServiceAccountToken)
+	require.False(t, *specs["pega-db-install"].AutomountServiceAccountToken)
 }
 
 func TestPegaServiceAccountsExisting(t *testing.T) {
@@ -80,22 +84,30 @@ func TestPegaServiceAccountsExisting(t *testing.T) {
 	require.NoError(t, err)
 
 	options := &helm.Options{SetValues: map[string]string{
-		"global.provider":               "k8s",
-		"global.actions.execute":        "install-deploy",
-		"global.serviceAccount.enabled": "true",
-		"global.serviceAccount.name":    "existing-runtime",
-		"installer.serviceAccountName":  "existing-installer",
-		"hazelcast.serviceAccountName":  "existing-hazelcast",
+		"global.provider":                  "k8s",
+		"global.actions.execute":           "install-deploy",
+		"global.serviceAccount.enabled":    "true",
+		"global.serviceAccount.name":       "existing-runtime",
+		"installer.serviceAccountName":     "existing-installer",
+		"hazelcast.serviceAccountName":     "existing-hazelcast",
+		"pegasearch.serviceAccountName":    "existing-search",
+		"constellation.enabled":            "true",
+		"constellation.serviceAccountName": "existing-constellation",
 	}}
 
-	_, err = RenderTemplateE(t, options, helmChartPath, []string{"templates/pega-serviceaccount.yaml"})
-	require.Error(t, err)
+	for _, template := range []string{"templates/pega-serviceaccount.yaml", "charts/installer/templates/pega-installer-serviceaccount.yaml"} {
+		_, err = RenderTemplateE(t, options, helmChartPath, []string{template})
+		require.Error(t, err, template)
+		require.Contains(t, err.Error(), "could not find template", template)
+	}
 
 	specs := renderPodSpecs(t, options, helmChartPath)
 	require.Equal(t, "existing-runtime", specs["pega-web"].ServiceAccountName)
-	require.True(t, *specs["pega-web"].AutomountServiceAccountToken)
-	require.Equal(t, "existing-hazelcast", specs["pega-hazelcast"].ServiceAccountName)
-	require.Nil(t, specs["pega-hazelcast"].AutomountServiceAccountToken)
+	require.Nil(t, specs["pega-web"].AutomountServiceAccountToken, "existing accounts keep their own automount setting")
+	for name, account := range map[string]string{"pega-hazelcast": "existing-hazelcast", "pega-search": "existing-search", "constellation": "existing-constellation"} {
+		require.Equal(t, account, specs[name].ServiceAccountName, name)
+		require.Nil(t, specs[name].AutomountServiceAccountToken, name)
+	}
 	require.Equal(t, "existing-installer", specs["pega-db-install"].ServiceAccountName)
 }
 
@@ -111,6 +123,7 @@ func TestPegaServiceAccountsValidation(t *testing.T) {
 		{"create without enabled", map[string]string{"global.serviceAccount.create": "true"}, "global.serviceAccount.create requires global.serviceAccount.enabled=true"},
 		{"enabled without name or create", map[string]string{"global.serviceAccount.enabled": "true"}, "global.serviceAccount.enabled requires global.serviceAccount.name or global.serviceAccount.create=true"},
 		{"installer create without enabled", map[string]string{"installer.serviceAccount.create": "true"}, "installer.serviceAccount.create requires installer.serviceAccount.enabled=true"},
+		{"installer create without enabled on deploy", map[string]string{"global.actions.execute": "deploy", "installer.serviceAccount.create": "true"}, "installer.serviceAccount.create requires installer.serviceAccount.enabled=true"},
 	}
 
 	for _, testCase := range testCases {
@@ -119,14 +132,7 @@ func TestPegaServiceAccountsValidation(t *testing.T) {
 			for key, value := range testCase.values {
 				values[key] = value
 			}
-			args := []string{}
-			for key, value := range values {
-				if value == "yes" {
-					args = append(args, "--set-string", key+"="+value)
-					delete(values, key)
-				}
-			}
-			_, err := helm.RenderTemplateE(t, &helm.Options{SetValues: values}, helmChartPath, PegaHelmRelease, []string{}, args...)
+			_, err := helm.RenderTemplateE(t, &helm.Options{SetValues: values}, helmChartPath, PegaHelmRelease, []string{})
 			require.Error(t, err)
 			require.Contains(t, err.Error(), testCase.expected)
 		})

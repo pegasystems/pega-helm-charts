@@ -31,7 +31,8 @@ editing it.
 
 {{- /*
 pegaServiceAccountSpec renders the pod spec ServiceAccount fields, or nothing when the pod keeps the
-namespace default. An explicit override wins and never sets automountServiceAccountToken.
+namespace default. An explicit override wins. automountServiceAccountToken is only set for accounts
+created by the chart; existing accounts keep their own setting.
 Arguments: override, config, configPath, generatedName.
 */ -}}
 {{- define "pegaServiceAccountSpec" -}}
@@ -42,7 +43,9 @@ serviceAccountName: {{ .override }}
 {{- fail (printf "%s.enabled requires %s.name or %s.create=true" .configPath .configPath .configPath) -}}
 {{- end -}}
 serviceAccountName: {{ .config.name | default .generatedName }}
+{{- if .config.create }}
 automountServiceAccountToken: {{ .config.automountServiceAccountToken }}
+{{- end }}
 {{- end -}}
 {{- end -}}
 

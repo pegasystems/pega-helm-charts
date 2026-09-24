@@ -63,10 +63,16 @@ matchLabels:
   app: constellation
 {{- end -}}
 
+{{- /* Matches the labels of the cassandra subchart (cassandra.name). */ -}}
 {{- define "networkPolicyCassandraSelector" -}}
 matchLabels:
-  app: cassandra
+  app: {{ default "cassandra" (.Values.cassandra).nameOverride | trunc 63 | trimSuffix "-" }}
   release: {{ .Release.Name }}
+{{- end -}}
+
+{{- /* CQL container port of the cassandra subchart. */ -}}
+{{- define "networkPolicyCassandraPort" -}}
+{{- default 9042 (((.Values.cassandra).config).ports).cql -}}
 {{- end -}}
 
 {{- define "networkPolicyDeployTiers" -}}
@@ -108,6 +114,11 @@ Arguments: name, rules, required.
 {{- define "networkPolicyEgressRules" -}}
 {{- if not (kindIs "slice" (.rules | default list)) -}}
 {{- fail (printf "%s must be a list of NetworkPolicy egress rules" .name) -}}
+{{- end -}}
+{{- range .rules -}}
+{{- if not (and (kindIs "map" .) (or .to .ports)) -}}
+{{- fail (printf "%s entries must be NetworkPolicy egress rules with to and/or ports; an empty rule would allow all egress" $.name) -}}
+{{- end -}}
 {{- end -}}
 {{- if .rules -}}
 {{- toYaml .rules -}}

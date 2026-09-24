@@ -61,14 +61,15 @@ policy per workload that this release deploys:
 The chart allows automatically:
 
 - traffic between these workloads on their container ports (tiers 8080/8443 and embedded Hazelcast
-  5701, Hazelcast 5701, Search 9200/9300, Cassandra 9042/7000/7001, Constellation 3000);
+  5701, Hazelcast 5701, Search 9200/9300, Cassandra CQL (`cassandra.config.ports.cql`, default 9042)/7000/7001, Constellation 3000);
 - egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
   `networkPolicy.kafka` (required when `stream.enabled` is true).
 
 `database` and `kafka` are lists of standard Kubernetes `NetworkPolicyEgressRule` entries (`to` and
 `ports`). The chart adds `database` to the tier and installer policies and `kafka` to the tier policy,
 so the rules do not need pod selectors for the Pega pods. NetworkPolicy cannot match DNS names, so use
-`ipBlock` or namespace/pod selectors, and destination pod ports, not Service ports.
+`ipBlock` or namespace/pod selectors, and destination pod ports, not Service ports. Each entry must set
+`to` and/or `ports`, because an empty rule would allow all egress.
 
 ```yaml
 networkPolicy:
@@ -206,19 +207,23 @@ installer:
 ```
 
 With `create: false`, `name` is required and must refer to an existing ServiceAccount in the release
-namespace. `create: true` requires `enabled: true`. The installer ServiceAccount is only created for
-install and upgrade actions.
+namespace; the chart then leaves `automountServiceAccountToken` to that account. `create: true` requires
+`enabled: true`. The installer ServiceAccount is only created for install and upgrade actions and is
+skipped when `installer.serviceAccountName` is set.
 
 Explicit per-workload names take precedence over the managed accounts: `tier[].custom.serviceAccountName`,
 `installer.serviceAccountName`, `hazelcast.serviceAccountName`, `pegasearch.serviceAccountName` and
 `constellation.serviceAccountName`. The chart does not set `automountServiceAccountToken` for these
 accounts. The Clustering Service migration job keeps its dedicated ServiceAccount and RBAC.
 
-The `check-installer-status` RoleBinding (install and upgrade actions) binds the ServiceAccounts used by
-the tiers and the installer jobs, falling back to `default`, because their `k8s-wait-for` init containers
-read job status. When `global.serviceAccount` is shared, Hazelcast, Search and Constellation pods use the
-same bound account; set their `serviceAccountName` to separate accounts if they must not have this access. Keep `automountServiceAccountToken: true` for accounts used by those pods. The chart does
-not create any other Roles or bindings; cloud workload-identity roles must be configured separately.
+For the `install-deploy`, `upgrade` and `upgrade-deploy` actions, the `check-installer-status` RoleBinding
+binds the ServiceAccounts used by the tiers and the installer jobs, falling back to `default`, because their
+`k8s-wait-for` init containers read job status through the Kubernetes API. Keep
+`automountServiceAccountToken: true` for the tier and installer accounts with these actions; otherwise the
+init containers cannot authenticate and the pods never start. When `global.serviceAccount` is shared,
+Hazelcast, Search and Constellation pods use the same bound account; set their `serviceAccountName` to
+separate accounts if they must not have this access. The chart does not create any other Roles or bindings;
+cloud workload-identity roles must be configured separately.
 
 ## NIST SP 800-53 and NIST SP 800-131
 
@@ -868,7 +873,7 @@ tier:
 
 ### Service Account
 
-If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier. To let the chart manage a shared account instead, see [Service accounts](#service-accounts).
 
 Example:
 
@@ -1579,7 +1584,7 @@ installer:
 ```
 
 ### Installer Service Account
-If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/). To let the chart manage the installer account, see [Service accounts](#service-accounts).
 
 Example:
 

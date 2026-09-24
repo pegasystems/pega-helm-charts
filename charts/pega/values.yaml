@@ -71,6 +71,7 @@ global:
     name: ""
     annotations: {}
     labels: {}
+    # Only applied when create is true. Keep true for install-deploy, upgrade and upgrade-deploy (k8s-wait-for).
     automountServiceAccountToken: true
 
   # This values.yaml file is an example.  For more information about
@@ -661,6 +662,7 @@ installer:
     name: ""
     annotations: {}
     labels: {}
+    # Only applied when create is true. Keep true for install-deploy, upgrade and upgrade-deploy (k8s-wait-for).
     automountServiceAccountToken: true
   # Pega distribution kit settings. Only required when installer.image does not already contain a kit (for example, pega-installer-ready).
   distributionKit:

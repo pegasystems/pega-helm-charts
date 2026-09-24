@@ -14,6 +14,7 @@
 {{- $search := include "networkPolicySearchSelector" . }}
 {{- $constellation := include "networkPolicyConstellationSelector" . }}
 {{- $cassandra := include "networkPolicyCassandraSelector" . }}
+{{- $cql := include "networkPolicyCassandraPort" . | int }}
 
 {{- if $deployTiers }}
 ---
@@ -46,7 +47,7 @@ spec:
   {{- include "networkPolicyPodEgressRule" (dict "selector" $search "ports" (list 9200)) | nindent 2 }}
   {{- end }}
   {{- if $cassandraEnabled }}
-  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 9042)) | nindent 2 }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list $cql)) | nindent 2 }}
   {{- end }}
   {{- if $constellationEnabled }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $constellation "ports" (list 3000)) | nindent 2 }}
@@ -73,7 +74,7 @@ spec:
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
   {{- if $cassandraEnabled }}
-  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 9042)) | nindent 2 }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list $cql)) | nindent 2 }}
   {{- end }}
 {{- end }}
 
@@ -147,10 +148,10 @@ spec:
   {{- if $deployTiers }}{{ $clients = append $clients $tiers }}{{ end }}
   {{- if $runInstaller }}{{ $clients = append $clients $installer }}{{ end }}
   {{- with $clients }}
-  {{- include "networkPolicyPodIngressRule" (dict "selectors" . "ports" (list 9042)) | nindent 2 }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" . "ports" (list $cql)) | nindent 2 }}
   {{- end }}
-  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $cassandra) "ports" (list 7000 7001 9042)) | nindent 2 }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $cassandra) "ports" (list 7000 7001 $cql)) | nindent 2 }}
   egress:
-  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 7000 7001 9042)) | nindent 2 }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 7000 7001 $cql)) | nindent 2 }}
 {{- end }}
 {{- end }}
