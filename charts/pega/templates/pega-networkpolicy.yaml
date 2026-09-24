@@ -14,7 +14,6 @@
 {{- $search := include "networkPolicySearchSelector" . }}
 {{- $constellation := include "networkPolicyConstellationSelector" . }}
 {{- $cassandra := include "networkPolicyCassandraSelector" . }}
-{{- $dnsRule := include "networkPolicyDnsRule" . }}
 
 {{- if $deployTiers }}
 ---
@@ -36,7 +35,6 @@ spec:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $constellation) "ports" (list 8080 8443)) | nindent 2 }}
   {{- end }}
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443 5701)) | nindent 2 }}
   {{- if $hazelcastEnabled }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $hazelcast "ports" (list 5701)) | nindent 2 }}
@@ -70,7 +68,6 @@ spec:
   policyTypes:
   - Egress
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyDestinationRule" (dict "name" "networkPolicy.database" "config" $np.database "required" true) | nindent 2 }}
   {{- if $deployTiers }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
@@ -94,7 +91,6 @@ spec:
   ingress:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 3000)) | nindent 2 }}
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
 {{- end }}
 
@@ -113,7 +109,6 @@ spec:
   ingress:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers $component.selector) "ports" (list 5701)) | nindent 2 }}
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $component.selector "ports" (list 5701)) | nindent 2 }}
 {{- end }}
 {{- end }}
@@ -133,7 +128,6 @@ spec:
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 9200)) | nindent 2 }}
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $search) "ports" (list 9200 9300)) | nindent 2 }}
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $search "ports" (list 9200 9300)) | nindent 2 }}
 {{- end }}
 
@@ -157,7 +151,6 @@ spec:
   {{- end }}
   {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $cassandra) "ports" (list 7000 7001 9042)) | nindent 2 }}
   egress:
-  {{- $dnsRule | nindent 2 }}
   {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 7000 7001 9042)) | nindent 2 }}
 {{- end }}
 {{- end }}

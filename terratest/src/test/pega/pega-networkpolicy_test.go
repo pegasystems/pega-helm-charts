@@ -70,10 +70,8 @@ func TestPegaNetworkPoliciesDeploy(t *testing.T) {
 	}}, tiers.Spec.PodSelector.MatchExpressions)
 	require.ElementsMatch(t, []networkingv1.PolicyType{networkingv1.PolicyTypeIngress, networkingv1.PolicyTypeEgress}, tiers.Spec.PolicyTypes)
 	require.True(t, hasEgressToCIDR(tiers, "10.0.0.0/24", 5432))
-	require.True(t, hasEgressPort(tiers, corev1.ProtocolUDP, 53), "every component policy must allow DNS")
 	require.True(t, hasEgressToPod(tiers, "app", "pega-search", 9200))
 	require.True(t, hasEgressToPod(tiers, "app", "pega-hazelcast", 5701))
-	require.True(t, hasEgressPort(tiers, corev1.ProtocolUDP, 5353))
 	require.True(t, hasEgressToCIDR(tiers, "10.2.0.0/24", 9092))
 	for _, rule := range tiers.Spec.Ingress {
 		for _, peer := range rule.From {
@@ -84,7 +82,6 @@ func TestPegaNetworkPoliciesDeploy(t *testing.T) {
 
 	hazelcast := policies["pega-networkpolicy-hazelcast"]
 	require.Equal(t, map[string]string{"app": "pega-hazelcast", "component": "Hazelcast"}, hazelcast.Spec.PodSelector.MatchLabels)
-	require.True(t, hasEgressPort(hazelcast, corev1.ProtocolUDP, 53))
 }
 
 func TestPegaNetworkPoliciesAllComponents(t *testing.T) {
@@ -109,7 +106,7 @@ func TestPegaNetworkPoliciesAllComponents(t *testing.T) {
 	}, policyNames(policies))
 	for name, policy := range policies {
 		require.NotEqual(t, metav1.LabelSelector{}, policy.Spec.PodSelector, name)
-		require.True(t, hasEgressPort(policy, corev1.ProtocolUDP, 53), name)
+		require.False(t, hasEgressPort(policy, corev1.ProtocolUDP, 53), "DNS must come from customPolicies: "+name)
 	}
 
 	for _, name := range []string{"pega-networkpolicy-tiers", "pega-networkpolicy-installer"} {

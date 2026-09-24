@@ -62,7 +62,6 @@ The chart allows automatically:
 
 - traffic between these workloads on their container ports (tiers 8080/8443 and embedded Hazelcast
   5701, Hazelcast 5701, Search 9200/9300, Cassandra 9042/7000/7001, Constellation 3000);
-- DNS egress on ports 53 and 5353 (UDP and TCP) for every selected pod;
 - egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
   `networkPolicy.kafka` (required when `stream.enabled` is true).
 
@@ -88,7 +87,17 @@ networkPolicy:
 ```
 
 Any other traffic to or from the selected pods is denied and must be allowed with
-`networkPolicy.customPolicies`. Typical cases:
+`networkPolicy.customPolicies`.
+
+**DNS egress is not generated and must always be configured.** Pega, the installer, Hazelcast,
+Search and Cassandra connect to the database, Kafka and each other by name. Without a DNS policy the
+chart renders successfully, but the pods fail at runtime with connection timeouts,
+`UnknownHostException` or failed cluster discovery. Point the policy at the DNS service of your cluster,
+for example CoreDNS in `kube-system`, `openshift-dns` (pod port 5353) or NodeLocal DNSCache
+(`169.254.20.10`). A policy with `podSelector: {}` also isolates egress of every other pod in the
+namespace, so it must allow everything those pods need; select the Pega pods explicitly otherwise.
+
+Other typical cases:
 
 - the ingress controller or cloud load balancer reaching tiers (8080/8443) and Constellation (3000);
 - the Kubernetes API for `k8s-wait-for` and `kubectl` (tiers during `install-deploy` and zero-downtime
@@ -108,6 +117,23 @@ the same pods extends the built-in rules:
 ```yaml
 networkPolicy:
   customPolicies:
+    - name: allow-dns
+      podSelector: {}
+      policyTypes:
+        - Egress
+      egress:
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: kube-system
+              podSelector:
+                matchLabels:
+                  k8s-app: kube-dns
+          ports:
+            - protocol: UDP
+              port: 53
+            - protocol: TCP
+              port: 53
     - name: allow-ingress-controller
       podSelector:
         matchLabels:

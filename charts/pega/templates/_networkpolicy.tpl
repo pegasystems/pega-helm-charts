@@ -163,22 +163,6 @@ Renders nothing for an unconfigured optional destination. Arguments: name, confi
 {{- end -}}
 {{- end -}}
 
-{{- /*
-DNS egress to any destination, added to every built-in policy. Port 5353 covers DNS pods that
-listen on it behind the port-53 Service (for example openshift-dns).
-*/ -}}
-{{- define "networkPolicyDnsRule" -}}
-- ports:
-  - protocol: UDP
-    port: 53
-  - protocol: TCP
-    port: 53
-  - protocol: UDP
-    port: 5353
-  - protocol: TCP
-    port: 5353
-{{- end -}}
-
 {{- /* Egress rule to pods of this release. Arguments: selector (YAML string), ports. */ -}}
 {{- define "networkPolicyPodEgressRule" -}}
 - to:

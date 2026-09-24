@@ -1,9 +1,9 @@
 ---
 networkPolicy:
-  # Render NetworkPolicy resources for the Pega workloads of this release. Traffic between
-  # workloads of this release and DNS egress are allowed automatically. Everything else, for
-  # example the ingress controller, the Kubernetes API or monitoring, must be allowed with
-  # customPolicies. See the README for examples.
+  # Render NetworkPolicy resources for the Pega workloads of this release. Only traffic between
+  # workloads of this release is allowed automatically. Everything else, including DNS (required),
+  # the ingress controller, the Kubernetes API or monitoring, must be allowed with customPolicies.
+  # See the README for examples.
   enabled: false
   # Egress to the Pega database, required when enabled. NetworkPolicy cannot resolve FQDNs:
   # use CIDRs or namespace/pod selectors, and destination pod ports (not Service ports).
@@ -22,6 +22,23 @@ networkPolicy:
   # Additional policies. Each entry is a NetworkPolicy spec plus a name; podSelector is required.
   # The name becomes <deploymentName>-networkpolicy-<name> and must not reuse a built-in name.
   customPolicies: []
+  # - name: allow-dns
+  #   podSelector: {}
+  #   policyTypes:
+  #     - Egress
+  #   egress:
+  #     - to:
+  #         - namespaceSelector:
+  #             matchLabels:
+  #               kubernetes.io/metadata.name: kube-system
+  #           podSelector:
+  #             matchLabels:
+  #               k8s-app: kube-dns
+  #       ports:
+  #         - protocol: UDP
+  #           port: 53
+  #         - protocol: TCP
+  #           port: 53
   # - name: allow-ingress-controller
   #   podSelector:
   #     matchLabels:
