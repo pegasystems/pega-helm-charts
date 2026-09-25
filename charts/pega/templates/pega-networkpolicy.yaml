@@ -1,0 +1,158 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $np := .Values.networkPolicy }}
+{{- $deployTiers := eq (include "networkPolicyDeployTiers" .) "true" }}
+{{- $runInstaller := eq (include "networkPolicyRunInstaller" .) "true" }}
+{{- $hazelcastEnabled := and $deployTiers .Values.hazelcast.enabled }}
+{{- $clusteringServiceEnabled := and $deployTiers .Values.hazelcast.clusteringServiceEnabled }}
+{{- $searchEnabled := and $deployTiers (eq (include "networkPolicyInternalSearch" .) "true") }}
+{{- $constellationEnabled := eq ((.Values.constellation).enabled | toString) "true" }}
+{{- $cassandraEnabled := eq (include "internalCassandraEnabled" . | trim) "true" }}
+{{- $tiers := include "networkPolicyTierSelector" . }}
+{{- $installer := include "networkPolicyInstallerSelector" . }}
+{{- $hazelcast := include "networkPolicyHazelcastSelector" . }}
+{{- $clusteringService := include "networkPolicyClusteringServiceSelector" . }}
+{{- $search := include "networkPolicySearchSelector" . }}
+{{- $constellation := include "networkPolicyConstellationSelector" . }}
+{{- $cassandra := include "networkPolicyCassandraSelector" . }}
+{{- $cql := include "networkPolicyCassandraPort" . | int }}
+{{- $tierPorts := include "networkPolicyTierPorts" . | splitList "," }}
+
+{{- if $deployTiers }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" . "suffix" "tiers") }}
+spec:
+  podSelector:
+    {{- $tiers | nindent 4 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" $tierPorts) | nindent 2 }}
+  {{- if $runInstaller }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $installer) "ports" (list 8080 8443)) | nindent 2 }}
+  {{- end }}
+  {{- if $constellationEnabled }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $constellation) "ports" (list 8080 8443)) | nindent 2 }}
+  {{- end }}
+  egress:
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" $tierPorts) | nindent 2 }}
+  {{- if $hazelcastEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $hazelcast "ports" (list 5701)) | nindent 2 }}
+  {{- end }}
+  {{- if $clusteringServiceEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $clusteringService "ports" (list 5701)) | nindent 2 }}
+  {{- end }}
+  {{- if $searchEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $search "ports" (list 9200)) | nindent 2 }}
+  {{- end }}
+  {{- if $cassandraEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list $cql)) | nindent 2 }}
+  {{- end }}
+  {{- if $constellationEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $constellation "ports" (list 3000)) | nindent 2 }}
+  {{- end }}
+  {{- include "networkPolicyEgressRules" (dict "name" "networkPolicy.database" "rules" $np.database "required" true) | nindent 2 }}
+  {{- with include "networkPolicyEgressRules" (dict "name" "networkPolicy.kafka" "rules" $np.kafka "required" (.Values.stream).enabled) }}
+  {{- . | nindent 2 }}
+  {{- end }}
+{{- end }}
+
+{{- if $runInstaller }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" . "suffix" "installer") }}
+spec:
+  podSelector:
+    {{- $installer | nindent 4 }}
+  policyTypes:
+  - Egress
+  egress:
+  {{- include "networkPolicyEgressRules" (dict "name" "networkPolicy.database" "rules" $np.database "required" true) | nindent 2 }}
+  {{- if $deployTiers }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
+  {{- end }}
+  {{- if $cassandraEnabled }}
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list $cql)) | nindent 2 }}
+  {{- end }}
+{{- end }}
+
+{{- if $constellationEnabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" . "suffix" "constellation") }}
+spec:
+  podSelector:
+    {{- $constellation | nindent 4 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 3000)) | nindent 2 }}
+  egress:
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $tiers "ports" (list 8080 8443)) | nindent 2 }}
+{{- end }}
+
+{{- range $component := list (dict "enabled" $hazelcastEnabled "suffix" "hazelcast" "selector" $hazelcast) (dict "enabled" $clusteringServiceEnabled "suffix" "clusteringservice" "selector" $clusteringService) }}
+{{- if $component.enabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" $ "suffix" $component.suffix) }}
+spec:
+  podSelector:
+    {{- $component.selector | nindent 4 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers $component.selector) "ports" (list 5701)) | nindent 2 }}
+  egress:
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $component.selector "ports" (list 5701)) | nindent 2 }}
+{{- end }}
+{{- end }}
+
+{{- if $searchEnabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" . "suffix" "search") }}
+spec:
+  podSelector:
+    {{- $search | nindent 4 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $tiers) "ports" (list 9200)) | nindent 2 }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $search) "ports" (list 9200 9300)) | nindent 2 }}
+  egress:
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $search "ports" (list 9200 9300)) | nindent 2 }}
+{{- end }}
+
+{{- if $cassandraEnabled }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" . "suffix" "cassandra") }}
+spec:
+  podSelector:
+    {{- $cassandra | nindent 4 }}
+  policyTypes:
+  - Ingress
+  - Egress
+  ingress:
+  {{- $clients := list }}
+  {{- if $deployTiers }}{{ $clients = append $clients $tiers }}{{ end }}
+  {{- if $runInstaller }}{{ $clients = append $clients $installer }}{{ end }}
+  {{- with $clients }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" . "ports" (list $cql)) | nindent 2 }}
+  {{- end }}
+  {{- include "networkPolicyPodIngressRule" (dict "selectors" (list $cassandra) "ports" (list 7000 7001 $cql)) | nindent 2 }}
+  egress:
+  {{- include "networkPolicyPodEgressRule" (dict "selector" $cassandra "ports" (list 7000 7001 $cql)) | nindent 2 }}
+{{- end }}
+{{- end }}
