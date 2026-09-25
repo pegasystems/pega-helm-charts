@@ -1,69 +1,15 @@
 ---
 networkPolicy:
-  # Render NetworkPolicy resources for the Pega workloads of this release. Only traffic between
-  # workloads of this release is allowed automatically. Everything else, including DNS (required),
-  # the ingress controller, the Kubernetes API or monitoring, must be allowed with customPolicies.
-  # See the README for examples.
+  # Enable NetworkPolicy resources for this release.
   enabled: false
-  # Egress rules (standard NetworkPolicyEgressRule entries) added to the tier and installer
-  # policies for the Pega database; required when enabled. NetworkPolicy cannot resolve FQDNs:
-  # use ipBlock or namespace/pod selectors, and destination pod ports (not Service ports).
+  # Egress rules for the database; required when enabled.
   database: []
-  # - to:
-  #     - ipBlock:
-  #         cidr: 10.20.30.40/32
-  #   ports:
-  #     - protocol: TCP
-  #       port: 5432
-  # Egress rules added to the tier policy for Kafka; required when stream.enabled is true.
+
+  # Egress rules for Kafka; required when stream.enabled is true.
   kafka: []
-  # - to:
-  #     - namespaceSelector:
-  #         matchLabels:
-  #           kubernetes.io/metadata.name: kafka
-  #   ports:
-  #     - protocol: TCP
-  #       port: 9092
-  # Additional policies. Each entry is a NetworkPolicy spec plus a name; podSelector is required.
-  # The name becomes <deploymentName>-networkpolicy-<name> and must not reuse a built-in name.
+
+  # Additional NetworkPolicy specs. Each entry requires a unique name and podSelector.
   customPolicies: []
-  # - name: allow-dns
-  #   # Pega pods for the default deployment name; podSelector: {} would also isolate the
-  #   # Clustering Service migration job (see README).
-  #   podSelector:
-  #     matchExpressions:
-  #       - key: app
-  #         operator: In
-  #         values: [pega-web, pega-batch, installer, pega-hazelcast, clusteringservice, pega-search, constellation, cassandra]
-  #   policyTypes:
-  #     - Egress
-  #   egress:
-  #     - to:
-  #         - namespaceSelector:
-  #             matchLabels:
-  #               kubernetes.io/metadata.name: kube-system
-  #           podSelector:
-  #             matchLabels:
-  #               k8s-app: kube-dns
-  #       ports:
-  #         - protocol: UDP
-  #           port: 53
-  #         - protocol: TCP
-  #           port: 53
-  # - name: allow-ingress-controller
-  #   podSelector:
-  #     matchLabels:
-  #       app: pega-web
-  #   policyTypes:
-  #     - Ingress
-  #   ingress:
-  #     - from:
-  #         - namespaceSelector:
-  #             matchLabels:
-  #               kubernetes.io/metadata.name: ingress-nginx
-  #       ports:
-  #         - protocol: TCP
-  #           port: 8080
 
 global:
   # This values.yaml file is an example.  For more information about
