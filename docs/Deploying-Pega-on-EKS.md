@@ -492,7 +492,7 @@ Pega added for this purpose in the [pega-helm-charts](https://github.com/pegasys
 
 - context.xml: add additional required data sources
 
-- prlog4j2.xml: modify your logging configuration, if required
+- prlog4j2.xml.tmpl: modify your logging configuration, if required
 
 - prconfig.xml: adjust the standard Pega Platform configuration with known,
     required settings
