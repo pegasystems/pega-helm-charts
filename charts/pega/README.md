@@ -2,6 +2,14 @@
 
 The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
 
+## Transitioning from Pega Helm Charts v5
+
+Pega Helm Charts major version 5 introduced support for using v4 Pega docker images (which includes hardened image variants).
+In conjunction with using the v4 docker images (which do not include the curl utility), you are now required to specify an image to use for downloading the JDBC driver. 
+This image is specified in the `global.downloadContainer.image` parameter -- for more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
+
+Alternatively, it is still possible to build custom images that include the JDBC driver (in which case `global.downloadContainer.image` can be set to blank.)
+
 ## Supported providers
 
 Enter your Kubernetes provider which will allow the Helm charts to configure to any differences between deployment environments. These values are case-sensitive and must be lowercase.
@@ -166,7 +174,9 @@ If you configured a secret in an external secrets operator for customArtifactory
 
 If your artifactory domain server certificate is not issued by Certificate Authority, you must provide the server certificate using the `customArtifactory.certificate` parameter. To disable SSL verification, you can set `customArtifactory.enableSSLVerification` to `false` and leave the `CustomArtifactory.certificate` parameter blank.
 
-The Pega Docker images use Java 11, which requires that the JDBC driver that you specify is compatible with Java 11.
+The Pega Docker images use Java 11, 17 and 21 depending on the deployed Pega Platform version which requires that the JDBC driver that you specify is compatible with applicable Java version.
+
+Major version 5 of the Pega Helm Charts includes support v4 Pega docker images which do not include the curl utility.  It is necessary to specify a container image for downloading the JDBC driver or to use a custom image that includes the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
 
 ### Authentication
 
@@ -206,13 +216,15 @@ The JDBC Connection configurations are defined in [charts/pega/config/deploy/con
 
 ## Docker
 
-Specify the location for the Pega Docker image.  This image is available on DockerHub, but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
+Specify the location for the Pega Docker image.  This image is available from `pega-docker.downloads.pega.com` (see [Downloading the Pega-provided Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/downloading-docker-images.html)), but can also be mirrored and/or extended with the use of a private registry.  Specify the url of the image with `docker.pega.image`. You may optionally specify an imagePullPolicy with `docker.pega.imagePullPolicy`.
+
+A subset of Pega Docker images were previously published to DockerHub, but the publishing of these images will be discontinued.
 
 When using a private registry that requires a username and password, specify them using the `docker.registry.username` and `docker.registry.password` parameters.
 
 To avoid specifying Docker registry credentials in values.yaml, create secrets for Docker registry credentials to avoid exposing these credentials. Refer to [Kubernetes secrets](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/) to create Docker registry secrets. Specify secret names as a list of comma-separated strings using the `docker.imagePullSecretNames` parameter. Kubernetes checks each registry secret of image pull secrets to pull an image from the repository. If the specified image is available in one of the provided secrets, kubernetes will pull it from that repository. To create Docker registry secrets from external secrets, refer to [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).
 
-When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `pegasystems/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
+When you download Docker images, it is recommended that you specify the absolute image version and the image name instead of using the `latest` tag; for example: `platform/pega:8.4.4` or `platform-services/search-n-reporting-service:1.12.0`. When you download these images with these details from the Pega repository, you pull the latest available image. If you pull images only specifying `latest`, you may not get the image you wanted.
 
 For this reason, it is also recommended that you specify the `docker.pega.imagePullPolicy: "IfNotPresent"` option in production, since it will ensure that a new generic tagged image will not overwrite the locally cached version.
 
@@ -226,7 +238,7 @@ docker:
     password: "YOUR_DOCKER_REGISTRY_PASSWORD"
   imagePullSecretNames: []
   pega:
-    image: "pegasystems/pega:8.4.4"
+    image: "platform/pega:8.4.4"
     imagePullPolicy: "Always"
 ```
 
@@ -245,15 +257,13 @@ utilityImages:
     imagePullPolicy: "IfNotPresent"
 ```
 
-## Running Pega without curl utility
-Pega pods use the curl utility to download JDBC drivers at pod startup time.  The curl utility is subject to frequently discovered vulnerabilities.  For this reason it will be possible to leverage the curl utility via an init container.
+## Downloading the JDBC driver
 
-This improves the general security posture related to the curl utility:
-* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
-* The init container runs briefly before there is inbound access to the pod.
+The Pega-provided docker images do not include JDBC drivers -- they need to be provided at deployment time (they can be preloaded if using a customized image).
 
-To use the curl utility via an init container, set the following:
+In order to provide JDBC drivers at deployment time, you need to specify the a URL to the download location of the driver via the `global.jdbc.driverUri` configuration value.
 
+While previous versions of the Pega-provided docker images included the curl utility, the v4 images do not. When using the v4 images, it is necessary to specify the `global.downloadContainer.image` configuration value:
 ```yaml
 global:
    downloadContainer: 
@@ -261,9 +271,21 @@ global:
         imagePullPolicy: "IfNotPresent"
         sharedVolumeSize: "10Mi"
 ```
-The requirements for the image is that it contains curl on the path and is capable of running a POSIX compliant shell script.
+The Pega Helm Charts use the provided image to download the JDBC driver via an init container and write it to a volume shared with the Pega container.
 
-The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
+This improves the general security posture related to the curl utility:
+* Restricts the use of curl to a single container that is only used for downloading the JDBC driver while the pod has no inbound access.
+* Allows the use of a more up-to-date version of curl (rather than waiting for downstream repositories to provide patches).
+
+The requirements for the image are: 
+* It contains the curl utility on the path. 
+* It must be capable of running a POSIX compliant shell script.
+
+
+You can set `global.downloadContainer.image` to an empty string to skip the download step in the event that you are:
+* Using a v3 Pega-provided docker image for compatibility reasons.
+* Using a customized image that already contains your JDBC driver.
+
 
 ## Deployment Name (Optional)
 
