@@ -17,6 +17,14 @@ global:
   actions:
     execute: "deploy"
 
+  # Health probe endpoint profile applied to the liveness, readiness and startup probes of all tiers.
+  # standard: uses the existing probe API.
+  # enhanced: uses more specific health check APIs: /<context>/PRRestService/monitor/pingService/liveness, /readiness and /startup
+  # IMPORTANT: 'enhanced' is supported only on Pega Platform 27.1.0 and later. Using it with an earlier
+  # version will cause the deployment to fail (the probes will fail and the pods will not become ready).
+  probes:
+    profile: "standard"
+
   # Pega Platform versions 25.0 and above require that certain libraries are included in the bootstrap classpath
   # for Tomcat.  As this chart supports multiple versions of the Pega Platform, the version is determined
   # dynamically at startup.  If there is a problem performing the version check, it can be bypassed by setting
