@@ -343,7 +343,7 @@ spec:
         readinessProbe:
           httpGet:
             path: {{ include "pega.probePath" (dict "root" .root "node" .node "probeType" "readiness") | quote }}
-            port: {{ $readinessProbe.port | default (ternary 8081 8080 (eq ((.root.Values.global.probes).profile | default "standard") "enhanced")) }}
+            port: {{ $readinessProbe.port | default (ternary 8081 8080 (eq ((.root.Values.global.probes).profile | default "standard") "dedicated")) }}
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}

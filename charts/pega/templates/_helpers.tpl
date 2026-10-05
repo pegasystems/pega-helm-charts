@@ -293,7 +293,7 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 
 # Determine the health probe path for a probe type (liveness, readiness, startup) based on global.probes.profile.
 # standard (default): /<context>/PRRestService/monitor/pingService/ping
-# enhanced:           /<context>/PRRestService/monitor/pingService/<probeType>
+# dedicated:           /<context>/PRRestService/monitor/pingService/<probeType>
 {{- define "pega.probePath" -}}
 {{- $profile := "standard" -}}
 {{- if .root.Values.global.probes -}}
@@ -302,10 +302,10 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
 {{- $context := include "pega.applicationContextPath" . -}}
 {{- if eq $profile "standard" -}}
 /{{ $context }}/PRRestService/monitor/pingService/ping
-{{- else if eq $profile "enhanced" -}}
+{{- else if eq $profile "dedicated" -}}
 /{{ $context }}/PRRestService/monitor/pingService/{{ .probeType }}
 {{- else -}}
-{{- fail (printf "global.probes.profile must be either 'standard' or 'enhanced', got '%s'" $profile) -}}
+{{- fail (printf "global.probes.profile must be either 'standard' or 'dedicated', got '%s'" $profile) -}}
 {{- end -}}
 {{- end }}
 
