@@ -17,8 +17,8 @@ secretResolver are copied from pega/templates/_helpers.tpl because helm lint req
 charts to render standalone. See: https://github.com/helm/helm/issues/11260 for more details.
 
 The ServiceAccount helpers (pegaServiceAccountName ... pegaServiceAccountResource) are shared
-by the pega chart and all subcharts. This file is the master copy; run sync_supplementals.sh after
-editing it.
+by the pega chart and all subcharts. The master copy of this file is charts/pega/templates/_supplemental.tpl;
+edit only that file and run sync_supplementals.sh to update the subchart copies.
 */}}
 
 
