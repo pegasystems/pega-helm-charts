@@ -5,10 +5,9 @@ The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubern
 ## Transitioning from Pega Helm Charts v5
 
 Pega Helm Charts major version 5 introduced support for using v4 Pega docker images (which includes hardened image variants).
-In conjunction with using the v4 docker images (which do not include the curl utility), you are now required to specify an image to use for downloading the JDBC driver. 
-This image is specified in the `global.downloadContainer.image` parameter -- for more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
+The hardened images do not include the curl utility, which was previously used to download the JDBC driver.  It is recommended that customers build on top of the existing images to include the appropriate JDBC driver libraries need for their deployment. If there are organizational concerns around building customized docker images, the download mechanism can still be used, but there is additional required configuration needed for the hardened image variants. See the [Downloading the JDBC driver](#downloading-the-jdbc-driver) section for more information.
 
-Alternatively, it is still possible to build custom images that include the JDBC driver (in which case `global.downloadContainer.image` can be set to blank.)
+(If you are including the JDBC driver in your custom image, you can skip the download step by setting `global.downloadContainer.image` to an empty string.)
 
 ## Supported providers
 
@@ -161,7 +160,7 @@ If your artifactory domain server certificate is not issued by Certificate Autho
 
 The Pega Docker images use Java 11, 17 and 21 depending on the deployed Pega Platform version which requires that the JDBC driver that you specify is compatible with applicable Java version.
 
-Major version 5 of the Pega Helm Charts includes support v4 Pega docker images which do not include the curl utility.  It is necessary to specify a container image for downloading the JDBC driver or to use a custom image that includes the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
+Major version 5 of the Pega Helm Charts includes support for v4 Pega docker images which provide hardened image variants that do not include the curl utility.  It is necessary to use a custom image that includes the JDBC driver or to specify a container image for downloading the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
 
 ### Authentication
 
@@ -244,11 +243,13 @@ utilityImages:
 
 ## Downloading the JDBC driver
 
-The Pega-provided docker images do not include JDBC drivers -- they need to be provided at deployment time (they can be preloaded if using a customized image).
+The Pega-provided docker images do not include JDBC drivers.
+
+The recommended approach is to build a custom image that includes the JDBC driver, but they can also be provided at deployment time.
 
 In order to provide JDBC drivers at deployment time, you need to specify the a URL to the download location of the driver via the `global.jdbc.driverUri` configuration value.
 
-While previous versions of the Pega-provided docker images included the curl utility, the v4 images do not. When using the v4 images, it is necessary to specify the `global.downloadContainer.image` configuration value:
+If you have opted to use the hardened Pega image varients, you will have to provide some additional configuration in order to download the JDBC driver. The hardened images do not contain the curl utility so you will have to provide a docker image that does:
 ```yaml
 global:
    downloadContainer: 
@@ -267,9 +268,7 @@ The requirements for the image are:
 * It must be capable of running a POSIX compliant shell script.
 
 
-You can set `global.downloadContainer.image` to an empty string to skip the download step in the event that you are:
-* Using a v3 Pega-provided docker image for compatibility reasons.
-* Using a customized image that already contains your JDBC driver.
+You can set `global.downloadContainer.image` to an empty string to skip the download step in the event that you are using a customized image that already contains your JDBC driver.
 
 
 ## Deployment Name (Optional)
