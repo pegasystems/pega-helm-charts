@@ -57,8 +57,8 @@ func TestPegaTierDeploymentProbesStandardProfile(t *testing.T) {
 	require.Equal(t, intstr.FromInt(8080), container.ReadinessProbe.HTTPGet.Port)
 }
 
-func TestPegaTierDeploymentProbesEnhancedProfile(t *testing.T) {
-	depObj := renderWebTierProbes(t, map[string]string{"global.probes.profile": "enhanced"})
+func TestPegaTierDeploymentProbesDedicatedProfile(t *testing.T) {
+	depObj := renderWebTierProbes(t, map[string]string{"global.probes.profile": "dedicated"})
 	container := depObj.Spec.Template.Spec.Containers[0]
 
 	require.Equal(t, "/prweb/PRRestService/monitor/pingService/liveness", container.LivenessProbe.HTTPGet.Path)
@@ -66,13 +66,13 @@ func TestPegaTierDeploymentProbesEnhancedProfile(t *testing.T) {
 	require.NotNil(t, container.StartupProbe)
 	require.Equal(t, "/prweb/PRRestService/monitor/pingService/startup", container.StartupProbe.HTTPGet.Path)
 
-	// readiness defaults to 8081 with the enhanced profile
+	// readiness defaults to 8081 with the dedicated profile
 	require.Equal(t, intstr.FromInt(8081), container.ReadinessProbe.HTTPGet.Port)
 }
 
-func TestPegaTierDeploymentProbesEnhancedProfileReadinessPortOverride(t *testing.T) {
+func TestPegaTierDeploymentProbesDedicatedProfileReadinessPortOverride(t *testing.T) {
 	depObj := renderWebTierProbes(t, map[string]string{
-		"global.probes.profile":              "enhanced",
+		"global.probes.profile":              "dedicated",
 		"global.tier[0].readinessProbe.port": "9090",
 	})
 	container := depObj.Spec.Template.Spec.Containers[0]
@@ -96,6 +96,6 @@ func TestPegaTierDeploymentProbesInvalidProfile(t *testing.T) {
 
 	_, err = helm.RenderTemplateE(t, options, helmChartPath, "pega", []string{"templates/pega-tier-deployment.yaml"})
 	require.Error(t, err)
-	require.Contains(t, err.Error(), "global.probes.profile must be either 'standard' or 'enhanced'")
+	require.Contains(t, err.Error(), "global.probes.profile must be either 'standard' or 'dedicated'")
 }
 
