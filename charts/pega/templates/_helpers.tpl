@@ -291,6 +291,24 @@ until cqlsh -u {{ $cassandraUser | quote }} -p {{ $cassandraPassword | quote }} 
    {{- end -}}
 {{- end }}
 
+# Determine the health probe path for a probe type (liveness, readiness, startup) based on global.probes.profile.
+# standard (default): /<context>/PRRestService/monitor/pingService/ping
+# dedicated:           /<context>/PRRestService/monitor/pingService/<probeType>
+{{- define "pega.probePath" -}}
+{{- $profile := "standard" -}}
+{{- if .root.Values.global.probes -}}
+  {{- $profile = .root.Values.global.probes.profile | default "standard" -}}
+{{- end -}}
+{{- $context := include "pega.applicationContextPath" . -}}
+{{- if eq $profile "standard" -}}
+/{{ $context }}/PRRestService/monitor/pingService/ping
+{{- else if eq $profile "dedicated" -}}
+/{{ $context }}/PRRestService/monitor/pingService/{{ .probeType }}
+{{- else -}}
+{{- fail (printf "global.probes.profile must be either 'standard' or 'dedicated', got '%s'" $profile) -}}
+{{- end -}}
+{{- end }}
+
 {{- define "gkemanagedcertificate" }}
 {{- if (semverCompare ">= 1.19.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
 apiVersion: networking.gke.io/v1
