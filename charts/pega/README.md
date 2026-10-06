@@ -811,6 +811,7 @@ Pega uses liveness, readiness, and startup probes to determine application healt
 
 Notes:
 * Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
+* `global.probes.profile` selects the health endpoints used by the probes of all tiers. `standard` (default) uses the existing probe API. `dedicated` uses more specific health check APIs for each probe: `/<context>/PRRestService/monitor/pingService/liveness`, `/readiness` and `/startup`. Any other value fails the deployment. **The `dedicated` profile is supported only on Pega Platform 27.1.0 and later, using it on an earlier version causes the deployment to fail.** With `dedicated`, the readiness probe uses port `8081` by default (override with `readinessProbe.port`).
 * `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
 
 #### Kubernetes pre-1.18
