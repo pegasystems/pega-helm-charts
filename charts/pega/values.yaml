@@ -76,11 +76,11 @@ global:
     dataSchema: "YOUR_DATA_SCHEMA"
     customerDataSchema: ""
 
-  # Specify a container containing curl utility which can be used to download JDBC Driver.  If specified, this container will be used as
-  # an init container to download the JDBC driver and copy to shared volume. This is required for use with the v4.0 hardened installer and
-  # runtime docker images provided by Pega. If you are using custom images that include jdbc drivers, you can comment out this section.
-  # The sharedVolumeSize parameter specifies the size of the shared volume to be used between the init container and the main Pega pod.
-  # The default value is 10Mi. This value can be increased if required to accommodate larger JDBC driver files.
+  # Specify a container that contains a curl utility that can be used to download JDBC Driver. If specified, the installer job uses this container as
+  # an init container to download the JDBC driver and copy it to the shared volume. This process is required if you use the hardened v4.0 installer and
+  # runtime docker images provided by Pega. If you use custom images that include jdbc drivers, you can comment out this section.
+  # The sharedVolumeSize parameter specifies the size of the shared volume to use between the init container and the main Pega pod.
+  # The default value is 10Mi. If necessary, you can increase this value to accommodate larger JDBC driver files.
   downloadContainer:
     image: "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG"
     imagePullPolicy: "IfNotPresent"
