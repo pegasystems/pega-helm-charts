@@ -159,7 +159,7 @@ If your artifactory domain server certificate is not issued by Certificate Autho
 
 The Pega Docker images use Java 11, 17 and 21 depending on the deployed Pega Platform version. You must specify is compatible with applicable Java version.
 
-Pega Helm Charts v5 supports Pega Docker images v4. The hardened variant of the v4 docker images do not include the curl utility.  You must specify a container image for downloading the JDBC driver. For more information, see [Running Pega without curl utility](#running-pega-without-curl-utility).
+Pega Helm Charts v5 supports Pega Docker images v4. The hardened variant of the v4 docker images do not include the curl utility.  You must specify a container image for downloading the JDBC driver. For more information, see [Downloading the JDBC driver](#downloading-the-jdbc-driver).
 
 ### Authentication
 
