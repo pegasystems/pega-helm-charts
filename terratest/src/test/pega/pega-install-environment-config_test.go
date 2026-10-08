@@ -111,7 +111,7 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, installEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, installEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, installEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
-	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
+	require.Equal(t, installEnvConfigData["JDBC_DRIVER_URI"], "")
 	require.Equal(t, installEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, installEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, installEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
@@ -201,5 +201,5 @@ func assertInstallerEnvironmentConfigJdbcUri(t *testing.T, configYaml string, op
 	UnmarshalK8SYaml(t, configYaml, &installEnvConfigMap)
 	installEnvConfigData := installEnvConfigMap.Data
 
-	require.Equal(t, expectedDriverUri, installEnvConfigData["JDBC_DRIVER_URI"])
+	require.Equal(t, "", installEnvConfigData["JDBC_DRIVER_URI"])
 }

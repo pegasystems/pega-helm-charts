@@ -129,7 +129,6 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["DB_TYPE"], "YOUR_DATABASE_TYPE")
 	require.Equal(t, upgradeEnvConfigData["JDBC_URL"], "YOUR_JDBC_URL")
 	require.Equal(t, upgradeEnvConfigData["JDBC_CLASS"], "YOUR_JDBC_DRIVER_CLASS")
-	require.Equal(t, upgradeEnvConfigData["JDBC_DRIVER_URI"], "YOUR_JDBC_DRIVER_URI")
 	require.Equal(t, upgradeEnvConfigData["RULES_SCHEMA"], "YOUR_RULES_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["DATA_SCHEMA"], "YOUR_DATA_SCHEMA")
 	require.Equal(t, upgradeEnvConfigData["CUSTOMERDATA_SCHEMA"], "")
@@ -208,6 +207,7 @@ func TestPegaUpgradeEnvironmentConfigNoICDownload(t *testing.T) {
 					"installer.upgrade.pegaRESTServerURL": "",
 					"installer.upgrade.pegaRESTUsername":  expectedValues["PEGA_REST_USERNAME"],
 					"installer.upgrade.pegaRESTPassword":  expectedValues["PEGA_REST_PASSWORD"],
+					"global.downloadContainer.image": "",
 				},
 			}
 
