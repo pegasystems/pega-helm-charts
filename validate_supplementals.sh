@@ -5,7 +5,7 @@ validation_failed=0
 failed_files=""
 
 # Loop through each TPL file
-for tpl_file in "charts/pega/charts/installer/templates/_supplemental.tpl" "charts/pega/charts/hazelcast/templates/_supplemental.tpl" "charts/pega/charts/pegasearch/templates/_supplemental.tpl"; do
+for tpl_file in "charts/pega/charts/installer/templates/_supplemental.tpl" "charts/pega/charts/hazelcast/templates/_supplemental.tpl" "charts/pega/charts/pegasearch/templates/_supplemental.tpl" "charts/pega/charts/constellation/templates/_supplemental.tpl"; do
   # Compare the TPL file with the master file
   if ! cmp -s "$master_file" "$tpl_file"; then
     validation_failed=1
