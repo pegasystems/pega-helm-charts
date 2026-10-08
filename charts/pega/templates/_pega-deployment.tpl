@@ -73,10 +73,8 @@ spec:
 
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
-{{- if .custom }}
-{{- if .custom.serviceAccountName }}
-      serviceAccountName: {{ .custom.serviceAccountName }}
-{{- end }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" .root "override" (.custom).serviceAccountName) }}
+{{- . | nindent 6 }}
 {{- end }}
       volumes:
       # Volume used to mount config files.
