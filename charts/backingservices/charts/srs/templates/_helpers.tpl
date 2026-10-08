@@ -9,10 +9,13 @@ App name
 Create a default fully qualified deployment name. This is used to define the deployment resource name.
 We truncate at 63 chars because some Kubernetes name fields are limited to this (by the DNS naming spec).
 If release name contains chart name it will be used as a full name.
+The key deploymentName is DEPRECATED use deployment.name instead.
 */}}
 {{- define "srs.fullname" -}}
 {{- if .Values.deploymentName }}
 {{- .Values.deploymentName | trunc 63 | trimSuffix "-" }}
+{{- else if and (.Values.deployment) (.Values.deployment.name)}}
+{{- .Values.deployment.name | trunc 63 | trimSuffix "-" }}
 {{- else }}
 {{- $name := default .Chart.Name .Values.deploymentName }}
 {{- if contains $name .Release.Name }}
