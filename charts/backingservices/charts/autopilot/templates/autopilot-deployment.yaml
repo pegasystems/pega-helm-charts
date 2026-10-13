@@ -64,6 +64,20 @@ spec:
           value: {{ .Values.authEnabled | quote }}
         - name: VCS_INFINITY_RULES_MCP_URL
           value: "http://infinity-rules-mcp-service/mcp"
+        {{- with .Values.autopilot.proxy }}
+        {{- if .httpProxy }}
+        - name: HTTP_PROXY
+          value: {{ .httpProxy | quote }}
+        {{- end }}
+        {{- if .httpsProxy }}
+        - name: HTTPS_PROXY
+          value: {{ .httpsProxy | quote }}
+        {{- end }}
+        {{- if .noProxy }}
+        - name: NO_PROXY
+          value: {{ .noProxy | quote }}
+        {{- end }}
+        {{- end }}
         {{- if .Values.authEnabled }}
         - name: SAX_JWKS_URL
           value: {{ include "autopilot.oauthPublicKeyUrl" . }}

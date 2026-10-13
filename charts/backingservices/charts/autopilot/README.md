@@ -59,8 +59,51 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `infinityRulesMcp.service.targetPort` | Specify the Infinity Rules MCP container port. Default: `8090` |
 | `infinityRulesMcp.service.serviceType` | Specify the Infinity Rules MCP Kubernetes Service type. Default: `ClusterIP` |
 | `infinityRulesMcp.resources` | Define CPU and memory requests and limits for the Infinity Rules MCP container. |
+| `autopilot.proxy.httpProxy` | Optional `HTTP_PROXY` value for the Autopilot container. |
+| `autopilot.proxy.httpsProxy` | Optional `HTTPS_PROXY` value for the Autopilot container. |
+| `autopilot.proxy.noProxy` | Optional comma-separated `NO_PROXY` value for the Autopilot container. |
+| `infinityRulesMcp.proxy.httpProxyHost` | Optional `HTTP_PROXY_HOST` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyPort` | Optional `HTTP_PROXY_PORT` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyUsername` | Optional `HTTP_PROXY_USERNAME` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyPassword` | Optional `HTTP_PROXY_PASSWORD` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.noProxy` | Optional pipe-separated `NO_PROXY` value for the Infinity Rules MCP container. |
 | `affinity` | Define pod affinity rules. |
 | `tolerations` | Define pod tolerations. |
+
+### Proxy configuration
+
+Proxy environment variables are optional and are configured independently for
+the Autopilot and Infinity Rules MCP containers. Supply proxy credentials through
+your deployment-specific values file rather than the chart defaults.
+
+```yaml
+autopilot:
+  proxy:
+    httpProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    httpsProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    noProxy: "localhost,127.0.0.1,::1,.svc,.cluster.local"
+
+infinityRulesMcp:
+  proxy:
+    httpProxyHost: "<proxy-host>"
+    httpProxyPort: "<proxy-port>"
+    httpProxyUsername: "<username>"
+    httpProxyPassword: "<password>"
+    noProxy: "localhost|127.0.0.1|::1|.svc|.cluster.local"
+```
+
+The Autopilot service requires comma-separated `NO_PROXY` entries, while the
+Infinity Rules MCP service requires pipe-separated entries.
+
+For Autopilot, proxy credentials are embedded in the `httpProxy` and
+`httpsProxy` URLs when authentication is required. For example:
+
+```yaml
+autopilot:
+  proxy:
+    httpProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    httpsProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+```
 
 ## Infinity Rules MCP Service
 

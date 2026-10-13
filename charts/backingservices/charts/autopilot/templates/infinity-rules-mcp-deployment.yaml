@@ -38,6 +38,28 @@ spec:
           value: "/opt/infinity-skills"
         - name: PEGA_WRITE_ENABLED
           value: "true"
+        {{- with .Values.infinityRulesMcp.proxy }}
+        {{- if .httpProxyHost }}
+        - name: HTTP_PROXY_HOST
+          value: {{ .httpProxyHost | quote }}
+        {{- end }}
+        {{- if .httpProxyPort }}
+        - name: HTTP_PROXY_PORT
+          value: {{ .httpProxyPort | quote }}
+        {{- end }}
+        {{- if .httpProxyUsername }}
+        - name: HTTP_PROXY_USERNAME
+          value: {{ .httpProxyUsername | quote }}
+        {{- end }}
+        {{- if .httpProxyPassword }}
+        - name: HTTP_PROXY_PASSWORD
+          value: {{ .httpProxyPassword | quote }}
+        {{- end }}
+        {{- if .noProxy }}
+        - name: NO_PROXY
+          value: {{ .noProxy | quote }}
+        {{- end }}
+        {{- end }}
         - name: POD_NAMESPACE
           valueFrom:
             fieldRef:
