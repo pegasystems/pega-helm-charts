@@ -18,8 +18,6 @@ adminPassword: ""
 assembler: ""
 # Bypass automatically truncating PR_SYS_UPDATESCACHE . Default is false.
 bypassTruncateUpdatescache: "false"
-# Number of threads for the expose columns operation
-exposeNumOfThreads: 4
 # Pega distribution kit settings. Only required when installer.image does not already contain a kit (for example, pega-installer-ready).
 distributionKit:
   # URL to download the distribution kit zip file from.

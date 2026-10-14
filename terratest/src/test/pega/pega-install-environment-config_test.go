@@ -121,7 +121,7 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, "ADMIN_PASSWORD", installEnvConfigData["ADMIN_PASSWORD"])
 	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "true")
-	require.Equal(t, "4", installEnvConfigData["EXPOSE_NUM_OF_THREADS"])
+	require.NotContains(t, installEnvConfigData, "EXPOSE_NUM_OF_THREADS")
 	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
 	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
 	require.Equal(t, installEnvConfigData["MAX_IDLE"], "5")
@@ -154,7 +154,6 @@ func TestPegaInstallerEnvironmentConfigWithCustomExposeNumOfThreads(t *testing.T
 					"global.provider":               "k8s",
 					"global.actions.execute":        operation,
 					"installer.upgrade.upgradeType": "zero-downtime",
-					"installer.exposeNumOfThreads":  "8",
 				},
 			}
 			if operation == "upgrade" {
@@ -165,10 +164,21 @@ func TestPegaInstallerEnvironmentConfigWithCustomExposeNumOfThreads(t *testing.T
 				template = "charts/installer/templates/pega-upgrade-environment-config.yaml"
 			}
 
-			yamlContent := RenderTemplate(t, options, helmChartPath, []string{template})
-			var envConfigMap k8score.ConfigMap
-			UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
-			require.Equal(t, "8", envConfigMap.Data["EXPOSE_NUM_OF_THREADS"])
+			for _, threads := range []string{"unset", "", "4", "8"} {
+				t.Run("threads="+threads, func(t *testing.T) {
+					if threads != "unset" {
+						options.SetValues["installer.exposeNumOfThreads"] = threads
+					}
+					yamlContent := RenderTemplate(t, options, helmChartPath, []string{template})
+					var envConfigMap k8score.ConfigMap
+					UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+					if threads == "unset" || threads == "" {
+						require.NotContains(t, envConfigMap.Data, "EXPOSE_NUM_OF_THREADS")
+					} else {
+						require.Equal(t, threads, envConfigMap.Data["EXPOSE_NUM_OF_THREADS"])
+					}
+				})
+			}
 		})
 	}
 }
