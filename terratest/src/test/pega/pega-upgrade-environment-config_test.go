@@ -136,6 +136,7 @@ func assertUpgradeEnvironmentConfig(t *testing.T, configYaml string, options *he
 	require.Equal(t, upgradeEnvConfigData["UPGRADE_TYPE"], "zero-downtime")
 	require.Equal(t, upgradeEnvConfigData["MT_SYSTEM"], "")
 	require.Equal(t, upgradeEnvConfigData["BYPASS_UDF_GENERATION"], "true")
+	require.Equal(t, "4", upgradeEnvConfigData["EXPOSE_NUM_OF_THREADS"])
 	require.Equal(t, upgradeEnvConfigData["ZOS_PROPERTIES"], "/opt/pega/config/DB2SiteDependent.properties")
 	require.Equal(t, upgradeEnvConfigData["DB2ZOS_UDF_WLM"], "")
 	require.Equal(t, upgradeEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
