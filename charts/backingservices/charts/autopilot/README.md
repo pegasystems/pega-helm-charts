@@ -95,6 +95,38 @@ infinityRulesMcp:
 The Autopilot service requires comma-separated `NO_PROXY` entries, while the
 Infinity Rules MCP service requires pipe-separated entries.
 
+Both service containers are configured to run without root privileges by
+default. The Autopilot container uses the non-root user defined by its image,
+while the Infinity Rules MCP container uses UID/GID `1001`, matching its
+Dockerfile. Both containers also drop Linux capabilities and disable privilege
+escalation. The root filesystem remains writable by default because Autopilot
+uses `/tmp/autopilot/models-cache` and `/lean/prometheus/metrics` at runtime.
+
+The security settings can be overridden independently when required:
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+infinityRulesMcp:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+```
+
 For Autopilot, proxy credentials are embedded in the `httpProxy` and
 `httpsProxy` URLs when authentication is required. For example:
 

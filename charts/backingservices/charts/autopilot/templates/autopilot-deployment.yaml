@@ -64,6 +64,8 @@ spec:
           value: {{ .Values.authEnabled | quote }}
         - name: VCS_INFINITY_RULES_MCP_URL
           value: "http://infinity-rules-mcp-service/mcp"
+        - name: DEEPEVAL_CACHE_FOLDER
+          value: {{ .Values.deepeval.cacheFolder | quote }}
         {{- with .Values.autopilot.proxy }}
         {{- if .httpProxy }}
         - name: HTTP_PROXY

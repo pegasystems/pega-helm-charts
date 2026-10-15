@@ -18,8 +18,12 @@ spec:
     spec:
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "autopilot" ) }}
-      {{- range .Values.docker.imagePullSecretNames }}
-      - name: {{ . }}
+       {{- range .Values.docker.imagePullSecretNames }}
+       - name: {{ . }}
+       {{- end }}
+      {{- if .Values.infinityRulesMcp.podSecurityContext }}
+      securityContext:
+        {{ toYaml .Values.infinityRulesMcp.podSecurityContext | nindent 8 }}
       {{- end }}
       containers:
       - name: infinity-rules-mcp
@@ -31,6 +35,13 @@ spec:
           {{- if .Values.infinityRulesMcp.resources }}
           {{ toYaml .Values.infinityRulesMcp.resources | nindent 10 }}
           {{- end }}
+        securityContext:
+          {{- if .Values.infinityRulesMcp.securityContext }}
+          {{ toYaml .Values.infinityRulesMcp.securityContext | nindent 10 }}
+          {{- end }}
+        volumeMounts:
+        - name: mcp-logs
+          mountPath: /opt/mcp/logs
         env:
         - name: SERVER_PORT
           value: {{ .Values.infinityRulesMcp.service.targetPort | quote }}
@@ -82,4 +93,7 @@ spec:
           failureThreshold: {{ .Values.infinityRulesMcp.readinessProbe.failureThreshold }}
           tcpSocket:
             port: {{ .Values.infinityRulesMcp.service.targetPort }}
+      volumes:
+      - name: mcp-logs
+        emptyDir: {}
 {{ end }}

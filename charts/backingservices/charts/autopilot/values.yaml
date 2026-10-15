@@ -61,10 +61,22 @@ service:
 # Pod security context
 # -------------------------------------------------------------------
 securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
   seccompProfile:
     type: RuntimeDefault
   readOnlyRootFilesystem: false
   allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# -------------------------------------------------------------------
+# DeepEval
+# -------------------------------------------------------------------
+deepeval:
+  cacheFolder: "/tmp/deepeval"
 
 # -------------------------------------------------------------------
 # Health probes
@@ -108,6 +120,20 @@ oauthPublicKeyURL: ""
 # points to this in-namespace service name.
 infinityRulesMcp:
   enabled: false
+  podSecurityContext:
+    fsGroup: 1001
+    fsGroupChangePolicy: OnRootMismatch
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    seccompProfile:
+      type: RuntimeDefault
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
   proxy:
     httpProxyHost: ""
     httpProxyPort: ""
