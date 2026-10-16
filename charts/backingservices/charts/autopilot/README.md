@@ -53,14 +53,113 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `isInternalDeployment` | Leave this parameter as `false` for client-managed cloud or on-premises deployments. |
 | `modelProviders` | Specify a comma-separated list of providers to expose, such as `"Azure,Vertex,Bedrock"`. If this value is empty, the service relies on the configured credentials and model list. For FedRAMP or PCFG environments, set `"Bedrock"` as the provider. |
 | `awsRegion` | Specify the AWS region used by Bedrock. Default: `us-east-1` |
+| `vcs.gatewayDefaultModel` | Default model used by the AI Assistant. |
+| `vcs.githubCopilotBaseUrl` | GitHub Copilot models base URL used by the AI Assistant. |
+| `vcs.openaiBaseUrl` | OpenAI base URL used by the AI Assistant. |
+| `vcs.anthropicBaseUrl` | Anthropic base URL used by the AI Assistant. |
+| `vcs.infinityRulesMcpUrl` | Infinity Rules MCP URL used by the AI Assistant. |
 | `infinityRulesMcp.enabled` | Set this parameter to `true` to deploy the optional Infinity Rules MCP Service in the same namespace as Autopilot. Default: `false` |
 | `infinityRulesMcp.replicas` | Specify the number of Infinity Rules MCP Service pods. Default: `2` |
 | `infinityRulesMcp.service.port` | Specify the Infinity Rules MCP Kubernetes Service port. Default: `80` |
 | `infinityRulesMcp.service.targetPort` | Specify the Infinity Rules MCP container port. Default: `8090` |
 | `infinityRulesMcp.service.serviceType` | Specify the Infinity Rules MCP Kubernetes Service type. Default: `ClusterIP` |
 | `infinityRulesMcp.resources` | Define CPU and memory requests and limits for the Infinity Rules MCP container. |
+| `autopilot.proxy.httpProxy` | Optional `HTTP_PROXY` value for the Autopilot container. |
+| `autopilot.proxy.httpsProxy` | Optional `HTTPS_PROXY` value for the Autopilot container. |
+| `autopilot.proxy.noProxy` | Optional comma-separated `NO_PROXY` value for the Autopilot container. |
+| `infinityRulesMcp.proxy.httpProxyHost` | Optional `HTTP_PROXY_HOST` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyPort` | Optional `HTTP_PROXY_PORT` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyUsername` | Optional `HTTP_PROXY_USERNAME` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.httpProxyPassword` | Optional `HTTP_PROXY_PASSWORD` value for the Infinity Rules MCP container. |
+| `infinityRulesMcp.proxy.noProxy` | Optional pipe-separated `NO_PROXY` value for the Infinity Rules MCP container. |
 | `affinity` | Define pod affinity rules. |
 | `tolerations` | Define pod tolerations. |
+
+### AI Assistant settings
+
+The `vcs` settings configure the AI Assistant environment variables in the
+Autopilot container. The values keys use Helm-friendly names, while the
+rendered environment variable names remain unchanged.
+
+```yaml
+vcs:
+  gatewayDefaultModel: "bedrock/anthropic/claude-sonnet-4-6/v1"
+  githubCopilotBaseUrl: "https://api.githubcopilot.com"
+  openaiBaseUrl: "https://api.openai.com/v1"
+  anthropicBaseUrl: "https://api.anthropic.com/v1"
+  infinityRulesMcpUrl: "http://infinity-rules-mcp-service/mcp"
+```
+
+These values render as `VCS_GATEWAY_DEFAULT_MODEL`,
+`VCS_GITHUB_MODELS_BASE_URL`, `VCS_OPENAI_BASE_URL`,
+`VCS_ANTHROPIC_BASE_URL`, and `VCS_INFINITY_RULES_MCP_URL`.
+
+### Proxy configuration
+
+Proxy environment variables are optional and are configured independently for
+the Autopilot and Infinity Rules MCP containers. Supply proxy credentials through
+your deployment-specific values file rather than the chart defaults.
+
+```yaml
+autopilot:
+  proxy:
+    httpProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    httpsProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    noProxy: "localhost,127.0.0.1,::1,.svc,.cluster.local"
+
+infinityRulesMcp:
+  proxy:
+    httpProxyHost: "<proxy-host>"
+    httpProxyPort: "<proxy-port>"
+    httpProxyUsername: "<username>"
+    httpProxyPassword: "<password>"
+    noProxy: "localhost|127.0.0.1|::1|.svc|.cluster.local"
+```
+
+The Autopilot service requires comma-separated `NO_PROXY` entries, while the
+Infinity Rules MCP service requires pipe-separated entries.
+
+Both service containers are configured to run without root privileges by
+default. The Autopilot container uses the non-root user defined by its image,
+while the Infinity Rules MCP container uses UID/GID `1001`, matching its
+Dockerfile. Both containers also drop Linux capabilities and disable privilege
+escalation. The root filesystem remains writable by default because Autopilot
+uses `/tmp/autopilot/models-cache` and `/lean/prometheus/metrics` at runtime.
+
+The security settings can be overridden independently when required:
+
+```yaml
+securityContext:
+  runAsNonRoot: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+  seccompProfile:
+    type: RuntimeDefault
+
+infinityRulesMcp:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+    seccompProfile:
+      type: RuntimeDefault
+```
+
+For Autopilot, proxy credentials are embedded in the `httpProxy` and
+`httpsProxy` URLs when authentication is required. For example:
+
+```yaml
+autopilot:
+  proxy:
+    httpProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+    httpsProxy: "http://<username>:<password>@<proxy-host>:<proxy-port>"
+```
 
 ## Infinity Rules MCP Service
 
