@@ -6,8 +6,8 @@
 *       @pegasystems/deployment
 
 # Documentation
-*.md        @kingakowalska1
-docs/*      @kingakowalska1
+*.md        @pegasystems/technical-documentation
+docs/*      @pegasystems/technical-documentation
 
 # Chart Defaults
 charts/*  @pegasystems/deployment
@@ -22,3 +22,6 @@ charts/backingservices/charts/constellation-messaging/*  @pegasystems/UIServices
 
 # SRS Chart
 charts/backingservices/charts/srs/*  @pegasystems/searchservice
+
+# Autopilot Chart
+charts/backingservices/charts/autopilot/*  @pegasystems/autopilot
