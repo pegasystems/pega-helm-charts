@@ -113,6 +113,16 @@ isInternalDeployment: false
 oauthPublicKeyURL: ""
 
 # -------------------------------------------------------------------
+# AI Assistant settings
+# -------------------------------------------------------------------
+vcs:
+  gatewayDefaultModel: "bedrock/anthropic/claude-sonnet-4-6/v1"
+  githubCopilotBaseUrl: "https://api.githubcopilot.com"
+  openaiBaseUrl: "https://api.openai.com/v1"
+  anthropicBaseUrl: "https://api.anthropic.com/v1"
+  infinityRulesMcpUrl: "http://infinity-rules-mcp-service/mcp"
+
+# -------------------------------------------------------------------
 # Infinity Rules MCP Service (optional)
 # -------------------------------------------------------------------
 # Enable this deployment when Autopilot needs Infinity rules MCP functionality.

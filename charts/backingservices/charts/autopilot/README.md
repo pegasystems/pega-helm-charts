@@ -53,6 +53,11 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `isInternalDeployment` | Leave this parameter as `false` for client-managed cloud or on-premises deployments. |
 | `modelProviders` | Specify a comma-separated list of providers to expose, such as `"Azure,Vertex,Bedrock"`. If this value is empty, the service relies on the configured credentials and model list. For FedRAMP or PCFG environments, set `"Bedrock"` as the provider. |
 | `awsRegion` | Specify the AWS region used by Bedrock. Default: `us-east-1` |
+| `vcs.gatewayDefaultModel` | Default model used by the AI Assistant. |
+| `vcs.githubCopilotBaseUrl` | GitHub Copilot models base URL used by the AI Assistant. |
+| `vcs.openaiBaseUrl` | OpenAI base URL used by the AI Assistant. |
+| `vcs.anthropicBaseUrl` | Anthropic base URL used by the AI Assistant. |
+| `vcs.infinityRulesMcpUrl` | Infinity Rules MCP URL used by the AI Assistant. |
 | `infinityRulesMcp.enabled` | Set this parameter to `true` to deploy the optional Infinity Rules MCP Service in the same namespace as Autopilot. Default: `false` |
 | `infinityRulesMcp.replicas` | Specify the number of Infinity Rules MCP Service pods. Default: `2` |
 | `infinityRulesMcp.service.port` | Specify the Infinity Rules MCP Kubernetes Service port. Default: `80` |
@@ -69,6 +74,25 @@ The `values.yaml` file defines the deployment, networking, authentication, provi
 | `infinityRulesMcp.proxy.noProxy` | Optional pipe-separated `NO_PROXY` value for the Infinity Rules MCP container. |
 | `affinity` | Define pod affinity rules. |
 | `tolerations` | Define pod tolerations. |
+
+### AI Assistant settings
+
+The `vcs` settings configure the AI Assistant environment variables in the
+Autopilot container. The values keys use Helm-friendly names, while the
+rendered environment variable names remain unchanged.
+
+```yaml
+vcs:
+  gatewayDefaultModel: "bedrock/anthropic/claude-sonnet-4-6/v1"
+  githubCopilotBaseUrl: "https://api.githubcopilot.com"
+  openaiBaseUrl: "https://api.openai.com/v1"
+  anthropicBaseUrl: "https://api.anthropic.com/v1"
+  infinityRulesMcpUrl: "http://infinity-rules-mcp-service/mcp"
+```
+
+These values render as `VCS_GATEWAY_DEFAULT_MODEL`,
+`VCS_GITHUB_MODELS_BASE_URL`, `VCS_OPENAI_BASE_URL`,
+`VCS_ANTHROPIC_BASE_URL`, and `VCS_INFINITY_RULES_MCP_URL`.
 
 ### Proxy configuration
 
