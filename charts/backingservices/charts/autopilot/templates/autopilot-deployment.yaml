@@ -62,8 +62,33 @@ spec:
           value: {{ .Values.isInternalDeployment | quote }}
         - name: BLOCK_UNAUTH_REQUESTS
           value: {{ .Values.authEnabled | quote }}
+        # AI Assistant configuration
+        - name: VCS_GATEWAY_DEFAULT_MODEL
+          value: {{ .Values.vcs.gatewayDefaultModel | quote }}
+        - name: VCS_GITHUB_MODELS_BASE_URL
+          value: {{ .Values.vcs.githubCopilotBaseUrl | quote }}
+        - name: VCS_OPENAI_BASE_URL
+          value: {{ .Values.vcs.openaiBaseUrl | quote }}
+        - name: VCS_ANTHROPIC_BASE_URL
+          value: {{ .Values.vcs.anthropicBaseUrl | quote }}
         - name: VCS_INFINITY_RULES_MCP_URL
-          value: "http://infinity-rules-mcp-service/mcp"
+          value: {{ .Values.vcs.infinityRulesMcpUrl | quote }}
+        - name: DEEPEVAL_CACHE_FOLDER
+          value: {{ .Values.deepeval.cacheFolder | quote }}
+        {{- with .Values.autopilot.proxy }}
+        {{- if .httpProxy }}
+        - name: HTTP_PROXY
+          value: {{ .httpProxy | quote }}
+        {{- end }}
+        {{- if .httpsProxy }}
+        - name: HTTPS_PROXY
+          value: {{ .httpsProxy | quote }}
+        {{- end }}
+        {{- if .noProxy }}
+        - name: NO_PROXY
+          value: {{ .noProxy | quote }}
+        {{- end }}
+        {{- end }}
         {{- if .Values.authEnabled }}
         - name: SAX_JWKS_URL
           value: {{ include "autopilot.oauthPublicKeyUrl" . }}
