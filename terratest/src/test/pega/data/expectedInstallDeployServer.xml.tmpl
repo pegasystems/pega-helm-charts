@@ -76,10 +76,10 @@
                maxHeaderCount="100"
                maxThreads="{{ default .Env.CONFIG_CATALINA_CONNECTOR_8080_MAXTHREADS 200 }}" />
 
-    <!-- facilitates liveness check via separate port -->
+    <!-- Separate connector for health probes configured to use port 8081 -->
     <Connector port="8081" protocol="org.apache.coyote.http11.Http11Nio2Protocol"
                connectionTimeout="20000"
-	       maxThreads="1"/>
+	       maxThreads="3"/>
 
     <!-- Define a SSL/TLS HTTPS Connector on port 8443 -->
 

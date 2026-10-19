@@ -43,6 +43,197 @@ Example:
 action: "deploy"
 ```
 
+## Network policies
+
+NetworkPolicy generation is disabled by default. Set `networkPolicy.enabled: true` to render one
+policy per workload that this release deploys:
+
+| Policy | Selected pods | Rendered when |
+|--------|---------------|---------------|
+| `<deploymentName>-networkpolicy-tiers` | `app: <deploymentName>-<tier>` | `deploy`, `install-deploy`, `upgrade-deploy` |
+| `<deploymentName>-networkpolicy-installer` (egress only) | `app: installer` | install or upgrade actions |
+| `<deploymentName>-networkpolicy-hazelcast` | Hazelcast | `hazelcast.enabled` and a deploy action |
+| `<deploymentName>-networkpolicy-clusteringservice` | Clustering Service | `hazelcast.clusteringServiceEnabled` and a deploy action |
+| `<deploymentName>-networkpolicy-search` | internal Search | internal Search is deployed (deploy action) |
+| `<deploymentName>-networkpolicy-cassandra` | internal Cassandra | `cassandra.enabled` without `dds.externalNodes` |
+| `<deploymentName>-networkpolicy-constellation` | Constellation | `constellation.enabled` |
+
+The chart allows automatically:
+
+- traffic between these workloads on fixed ports (tiers 8080/8443, embedded Hazelcast 5701 and TCP
+  `tier[].custom.ports`, Hazelcast 5701, Search 9200/9300, Cassandra CQL (`cassandra.config.ports.cql`, default 9042)/7000/7001, Constellation 3000);
+- egress from tiers and the installer to `networkPolicy.database` (always required) and from tiers to
+  `networkPolicy.kafka` (required when `stream.enabled` is true).
+
+`database` and `kafka` are lists of standard Kubernetes `NetworkPolicyEgressRule` entries (`to` and
+`ports`). The chart adds `database` to the tier and installer policies and `kafka` to the tier policy,
+so the rules do not need pod selectors for the Pega pods. NetworkPolicy cannot match DNS names, so use
+`ipBlock` or namespace/pod selectors, and destination pod ports, not Service ports. Each entry must set
+`to` and/or `ports`, because an empty rule would allow all egress.
+
+```yaml
+networkPolicy:
+  enabled: true
+  database:
+    - to:
+        - ipBlock:
+            cidr: 10.20.30.40/32
+      ports:
+        - protocol: TCP
+          port: 5432
+  kafka:
+    - to:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: kafka
+      ports:
+        - protocol: TCP
+          port: 9092
+```
+
+Any other traffic to or from the selected pods is denied and must be allowed with
+`networkPolicy.customPolicies`.
+
+**DNS egress is not generated and must always be configured.** Pega, the installer, Hazelcast,
+Search and Cassandra connect to the database, Kafka and each other by name. Without a DNS policy the
+chart renders successfully, but the pods fail at runtime with connection timeouts,
+`UnknownHostException` or failed cluster discovery. Point the policy at the DNS service of your cluster,
+for example CoreDNS in `kube-system`, `openshift-dns` (pod port 5353) or NodeLocal DNSCache
+(`169.254.20.10`). A policy with `podSelector: {}` also isolates egress of every other pod in the
+namespace, so it must allow everything those pods need; select the Pega pods explicitly otherwise.
+
+Other typical cases:
+
+- the ingress controller or cloud load balancer reaching tiers (8080/8443) and Constellation (3000);
+- the Kubernetes API for `k8s-wait-for` and `kubectl` (tiers during `install-deploy` and zero-downtime
+  `upgrade-deploy`, installer jobs during zero-downtime upgrades); use the API server endpoint addresses
+  (`kubectl get endpoints kubernetes -n default`), not the `kubernetes` Service IP;
+- metrics scraping of Hazelcast and Clustering Service (8089);
+- non-TCP `tier[].custom.ports` and legacy embedded `Stream` nodes (broker traffic between tiers);
+- external Search (Elasticsearch or the Search and Reporting Service) or external Cassandra;
+- other destinations such as `global.jdbc.driverUri` downloads, `installer.distributionKit.url`, SMTP,
+  identity providers or integrations.
+
+Each `customPolicies` entry is a standard NetworkPolicy `spec` plus a `name`; the name must be a unique
+DNS-1123 label that is not used by a built-in policy, and `podSelector` is required (use `{}` to select
+all pods in the namespace, for example for a namespace-wide deny-all policy). The resource is named
+`<deploymentName>-networkpolicy-<name>`. Because policies are additive, a custom policy that selects
+the same pods extends the built-in rules:
+
+```yaml
+networkPolicy:
+  customPolicies:
+    - name: allow-dns
+      podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values: [pega-web, pega-batch, installer, pega-hazelcast, clusteringservice, pega-search, constellation, cassandra]
+      policyTypes:
+        - Egress
+      egress:
+        - to:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: kube-system
+              podSelector:
+                matchLabels:
+                  k8s-app: kube-dns
+          ports:
+            - protocol: UDP
+              port: 53
+            - protocol: TCP
+              port: 53
+    - name: allow-ingress-controller
+      podSelector:
+        matchLabels:
+          app: pega-web
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: ingress-nginx
+          ports:
+            - protocol: TCP
+              port: 8080
+    - name: allow-kube-api
+      podSelector:
+        matchExpressions:
+          - key: app
+            operator: In
+            values: [pega-web, pega-batch, installer]
+      policyTypes:
+        - Egress
+      egress:
+        - to:
+            - ipBlock:
+                cidr: 10.0.0.1/32
+          ports:
+            - protocol: TCP
+              port: 443
+```
+
+The `allow-dns` example selects the Pega pods by their `app` label (default deployment name `pega`;
+adjust the list to your tiers and components). Pods that no policy selects, such as the Clustering
+Service migration job, are not affected. If you use `podSelector: {}` instead, that job becomes
+isolated too and needs Kubernetes API egress (it runs `kubectl`); select it with the
+`job-name: <clusteringServiceName>-migration-job` label.
+Enforcement requires a NetworkPolicy-capable cluster network plugin.
+
+## Service accounts
+
+ServiceAccount management is disabled by default and does not change existing deployments.
+To run the workloads created by this chart with a non-default ServiceAccount, configure the
+shared global account:
+
+```yaml
+global:
+  serviceAccount:
+    enabled: true
+    create: true
+    # Defaults to <deploymentName>-serviceaccount when empty.
+    name: ""
+    automountServiceAccountToken: true
+    annotations: {}
+    labels: {}
+```
+
+The shared account is assigned to Pega tiers, Hazelcast, Clustering Service, Search and
+Constellation. Installer jobs use it unless `installer.serviceAccount` is enabled:
+
+```yaml
+installer:
+  serviceAccount:
+    enabled: true
+    create: true
+    # Defaults to <deploymentName>-installer-serviceaccount when empty.
+    name: ""
+    automountServiceAccountToken: true
+    annotations: {}
+    labels: {}
+```
+
+With `create: false`, `name` is required and must refer to an existing ServiceAccount in the release
+namespace; the chart then leaves `automountServiceAccountToken` to that account. `create: true` requires
+`enabled: true`. The installer ServiceAccount is only created for install and upgrade actions and is
+skipped when `installer.serviceAccountName` is set.
+
+Explicit per-workload names take precedence over the managed accounts: `tier[].custom.serviceAccountName`,
+`installer.serviceAccountName`, `hazelcast.serviceAccountName` (Hazelcast and Clustering Service),
+`pegasearch.serviceAccountName` and `constellation.serviceAccountName`. The chart does not set `automountServiceAccountToken` for these
+accounts. The Clustering Service migration job keeps its dedicated ServiceAccount and RBAC.
+
+For the `install-deploy`, `upgrade` and `upgrade-deploy` actions, the `check-installer-status` RoleBinding
+binds the ServiceAccounts used by the tiers and the installer jobs, falling back to `default`, because their
+`k8s-wait-for` init containers read job status through the Kubernetes API. Keep
+`automountServiceAccountToken: true` for the tier and installer accounts with these actions; otherwise the
+init containers cannot authenticate and the pods never start. When `global.serviceAccount` is shared,
+Hazelcast, Search and Constellation pods use the same bound account; set their `serviceAccountName` to
+separate accounts if they must not have this access. The chart does not create any other Roles or bindings;
+cloud workload-identity roles must be configured separately.
+
 ## NIST SP 800-53 and NIST SP 800-131
 
 **Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.**
@@ -69,6 +260,21 @@ global:
   kerberos:
     krb5.conf: |
       ----SAMPLE KRB5.CONF----
+```
+
+## Logging Configuration
+
+Use the `logging` section under `global` to configure log output behavior.
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| `global.logging.correlationIdEnabled` | Boolean | `false` | When set to `true`, includes `[%X{traceId}]` in the PegaRULES, PegaBIX, and PegaCLUSTER log4j2 patterns to support distributed tracing correlation. When `false` (default), the log pattern remains unchanged from baseline. |
+
+Example:
+```yaml
+global:
+  logging:
+    correlationIdEnabled: true
 ```
 
 ## JDBC Configuration
@@ -605,6 +811,7 @@ Pega uses liveness, readiness, and startup probes to determine application healt
 
 Notes:
 * Kubernetes 1.18 and later supports `startupProbe`. If your deployment uses a Kubernetes version older than 1.18, the helm charts exclude `startupProbe` and use different default values for `livenessProbe` and `readinessProbe`.
+* `global.probes.profile` selects the health endpoints used by the probes of all tiers. `standard` (default) uses the existing probe API. `dedicated` uses more specific health check APIs for each probe: `/<context>/PRRestService/monitor/pingService/liveness`, `/readiness` and `/startup`. Any other value fails the deployment. **The `dedicated` profile is supported only on Pega Platform 27.1.0 and later, using it on an earlier version causes the deployment to fail.** With `dedicated`, the readiness probe uses port `8081` by default (override with `readinessProbe.port`).
 * `timeoutSeconds` cannot be greater than `periodSeconds` in some GCP environments. For details, see [this API library from Google](https://developers.google.com/resources/api-libraries/documentation/compute/v1/csharp/latest/classGoogle_1_1Apis_1_1Compute_1_1v1_1_1Data_1_1HttpHealthCheck.html#a027a3932f0681df5f198613701a83145).
 
 #### Kubernetes pre-1.18
@@ -691,7 +898,7 @@ tier:
 
 ### Service Account
 
-If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier.
+If the pod needs to be run with a specific [service account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/), you can specify a custom `serviceAccountName` for your deployment tier. To let the chart manage a shared account instead, see [Service accounts](#service-accounts).
 
 Example:
 
@@ -795,7 +1002,7 @@ While Pega includes default configuration files in the Helm charts, the charts p
 Parameter     | Description    | Default value
 ---           | ---       | ---
 `prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
-`prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
+`prlog4j2`    | A complete prlog4j2.xml template file to inject.  | See [prlog4j2.xml.tmpl](config/deploy/prlog4j2.xml.tmpl).
 `contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
 `serverXML`   | A complete server.xml file to inject  | See [server.xml.tmpl](config/deploy/server.xml.tmpl).
 `webXML`      | A complete web.xml file to inject  | No default provided, but if `config/deploy/web.xml` exists, it will be used as the default.
@@ -1402,7 +1609,7 @@ installer:
 ```
 
 ### Installer Service Account
-If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/).
+If you require that the Pega installer job runs with a specific service account, you can specify a custom `serviceAccountName` for your job. For more information on service accounts, see [Configure Service Account](https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/). To let the chart manage the installer account, see [Service accounts](#service-accounts).
 
 Example:
 

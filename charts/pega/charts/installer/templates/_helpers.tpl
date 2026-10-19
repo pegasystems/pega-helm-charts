@@ -309,3 +309,23 @@ limits:
 {{- end }}
 
 {{- define "installerDefaultMaxHeapSize" }}-Xmx{{ .Values.installerMaxHeap | default "8g" }}{{- end }}
+
+{{- define "pegaInstallerServiceAccountDefaultName" -}}
+{{- printf "%s-installer-serviceaccount" (include "deploymentName" .) -}}
+{{- end -}}
+
+{{- /*
+Pod spec ServiceAccount fields for installer jobs. installer.serviceAccountName wins, then
+installer.serviceAccount when enabled, then global.serviceAccount.
+*/ -}}
+{{- define "pegaInstallerServiceAccountSpec" -}}
+{{- if (.Values.serviceAccount).enabled -}}
+{{- include "pegaServiceAccountSpec" (dict
+      "override" (.Values.serviceAccountName | default "")
+      "config" .Values.serviceAccount
+      "configPath" "installer.serviceAccount"
+      "generatedName" (include "pegaInstallerServiceAccountDefaultName" .)) -}}
+{{- else -}}
+{{- include "pegaWorkloadServiceAccountSpec" (dict "root" . "override" .Values.serviceAccountName) -}}
+{{- end -}}
+{{- end -}}

@@ -73,10 +73,8 @@ spec:
 
     spec:
 {{- include "generatedDNSConfigAnnotations" .root | indent 6 }}
-{{- if .custom }}
-{{- if .custom.serviceAccountName }}
-      serviceAccountName: {{ .custom.serviceAccountName }}
-{{- end }}
+{{- with include "pegaWorkloadServiceAccountSpec" (dict "root" .root "override" (.custom).serviceAccountName) }}
+{{- . | nindent 6 }}
 {{- end }}
       volumes:
       # Volume used to mount config files.
@@ -331,7 +329,7 @@ spec:
         # LivenessProbe: indicates whether the container is live, i.e. running.
         livenessProbe:
           httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            path: {{ include "pega.probePath" (dict "root" .root "node" .node "probeType" "liveness") | quote }}
             port: {{ $livenessProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $livenessProbeInitialDelaySeconds }}
@@ -342,8 +340,8 @@ spec:
         # ReadinessProbe: indicates whether the container is ready to service requests.
         readinessProbe:
           httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
-            port: {{ $readinessProbe.port | default 8080 }}
+            path: {{ include "pega.probePath" (dict "root" .root "node" .node "probeType" "readiness") | quote }}
+            port: {{ $readinessProbe.port | default (ternary 8081 8080 (eq ((.root.Values.global.probes).profile | default "standard") "dedicated")) }}
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
@@ -355,7 +353,7 @@ spec:
         {{- $startupProbe := .node.startupProbe }}
         startupProbe:
           httpGet:
-            path: "/{{ template "pega.applicationContextPath" . }}/PRRestService/monitor/pingService/ping"
+            path: {{ include "pega.probePath" (dict "root" .root "node" .node "probeType" "startup") | quote }}
             port: {{ $startupProbe.port | default 8080 }}
             scheme: HTTP
           initialDelaySeconds: {{ $startupProbe.initialDelaySeconds | default 10 }}

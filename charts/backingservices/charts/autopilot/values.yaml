@@ -24,6 +24,19 @@ docker:
     imagePullPolicy: IfNotPresent
 
 # -------------------------------------------------------------------
+# Proxy configuration
+# -------------------------------------------------------------------
+# Proxy values are optional. The two services use different proxy variables.
+autopilot:
+  proxy:
+    # Include credentials in the proxy URL when authentication is required.
+    # Example: http://proxyuser:proxypassword@proxy.example:3128
+    httpProxy: ""
+    httpsProxy: ""
+    # Use a comma-separated list for the Autopilot service.
+    noProxy: ""
+
+# -------------------------------------------------------------------
 # Replicas & Resources
 # -------------------------------------------------------------------
 replicas: 2
@@ -48,22 +61,34 @@ service:
 # Pod security context
 # -------------------------------------------------------------------
 securityContext:
+  runAsNonRoot: true
+  runAsUser: 1000
+  runAsGroup: 1000
   seccompProfile:
     type: RuntimeDefault
   readOnlyRootFilesystem: false
   allowPrivilegeEscalation: false
+  capabilities:
+    drop:
+      - ALL
+
+# -------------------------------------------------------------------
+# DeepEval
+# -------------------------------------------------------------------
+deepeval:
+  cacheFolder: "/tmp/deepeval"
 
 # -------------------------------------------------------------------
 # Health probes
 # -------------------------------------------------------------------
 livenessProbe:
-  initialDelaySeconds: 10
+  initialDelaySeconds: 30
   timeoutSeconds: 10
   periodSeconds: 10
   successThreshold: 1
   failureThreshold: 3
 readinessProbe:
-  initialDelaySeconds: 10
+  initialDelaySeconds: 30
   timeoutSeconds: 10
   periodSeconds: 10
   successThreshold: 1
@@ -88,6 +113,16 @@ isInternalDeployment: false
 oauthPublicKeyURL: ""
 
 # -------------------------------------------------------------------
+# AI Assistant settings
+# -------------------------------------------------------------------
+vcs:
+  gatewayDefaultModel: "bedrock/anthropic/claude-sonnet-4-6/v1"
+  githubCopilotBaseUrl: "https://api.githubcopilot.com"
+  openaiBaseUrl: "https://api.openai.com/v1"
+  anthropicBaseUrl: "https://api.anthropic.com/v1"
+  infinityRulesMcpUrl: "http://infinity-rules-mcp-service/mcp"
+
+# -------------------------------------------------------------------
 # Infinity Rules MCP Service (optional)
 # -------------------------------------------------------------------
 # Enable this deployment when Autopilot needs Infinity rules MCP functionality.
@@ -95,6 +130,27 @@ oauthPublicKeyURL: ""
 # points to this in-namespace service name.
 infinityRulesMcp:
   enabled: false
+  podSecurityContext:
+    fsGroup: 1001
+    fsGroupChangePolicy: OnRootMismatch
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    seccompProfile:
+      type: RuntimeDefault
+    readOnlyRootFilesystem: false
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+  proxy:
+    httpProxyHost: ""
+    httpProxyPort: ""
+    httpProxyUsername: ""
+    httpProxyPassword: ""
+    # Use a pipe-separated list for the Infinity Rules MCP service.
+    noProxy: ""
   replicas: 2
   service:
     port: 80

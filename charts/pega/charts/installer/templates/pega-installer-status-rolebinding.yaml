@@ -1,4 +1,12 @@
-{{ if (eq (include "createJobsReaderRole" .) "true") }}
+{{- if (eq (include "createJobsReaderRole" .) "true") }}
+{{- /* Pods that run k8s-wait-for: Pega tiers and installer jobs. Pods without a configured ServiceAccount use "default". */ -}}
+{{- $subjects := list }}
+{{- range .Values.global.tier }}
+{{- $spec := include "pegaWorkloadServiceAccountSpec" (dict "root" $ "override" (.custom).serviceAccountName) | fromYaml }}
+{{- $subjects = append $subjects ($spec.serviceAccountName | default "default") }}
+{{- end }}
+{{- $installerSpec := include "pegaInstallerServiceAccountSpec" . | fromYaml }}
+{{- $subjects = append $subjects ($installerSpec.serviceAccountName | default "default") }}
 apiVersion: rbac.authorization.k8s.io/v1
 kind: RoleBinding
 metadata:
@@ -9,7 +17,9 @@ roleRef:
   kind: Role
   name: {{ template "installerJobReaderRole" }}
 subjects:
+{{- range $subjects | uniq }}
 - kind: ServiceAccount
-  name: default
-  namespace: {{ .Release.Namespace }}
-{{ end }}
+  name: {{ . }}
+  namespace: {{ $.Release.Namespace }}
+{{- end }}
+{{- end }}
