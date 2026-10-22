@@ -5,6 +5,7 @@
 {{- $livenessProbeInitialDelaySeconds := $livenessProbe.initialDelaySeconds | default 200 }}
 {{- $livenessProbeFailureThreshold := $livenessProbe.failureThreshold | default 3 }}
 {{- $livenessProbePeriodSeconds := $livenessProbe.periodSeconds | default 30 }}
+{{- $readinessProbePeriodSeconds := $readinessProbe.periodSeconds | default 10 }}
 {{- $readinessProbeInitialDelaySeconds := $readinessProbe.initialDelaySeconds | default 30 }}
 {{- if (semverCompare ">= 1.18.0-0" (trimPrefix "v" .root.Capabilities.KubeVersion.GitVersion)) }}
   {{- $useStartupProbe = true }}
@@ -187,6 +188,10 @@ spec:
 {{- end }}
         - name: NODE_TYPE
           value: {{ .nodeType }}
+        - name: PEGA_READINESS_PROBE_PERIOD_SECONDS
+          value: {{ $readinessProbePeriodSeconds | quote }}
+        - name: PEGA_LIVENESS_PROBE_PERIOD_SECONDS
+          value: {{ $livenessProbePeriodSeconds | quote }}
         - name: PEGA_APP_CONTEXT_PATH
           value: {{ template "pega.applicationContextPath" . }}
         - name: POD_NAME
@@ -345,7 +350,7 @@ spec:
             scheme: HTTP
           initialDelaySeconds: {{ $readinessProbeInitialDelaySeconds }}
           timeoutSeconds: {{ $readinessProbe.timeoutSeconds | default 10 }}
-          periodSeconds: {{ $readinessProbe.periodSeconds | default 10 }}
+          periodSeconds: {{ $readinessProbePeriodSeconds }}
           successThreshold: {{ $readinessProbe.successThreshold | default 1 }}
           failureThreshold: {{ $readinessProbe.failureThreshold | default 3 }}
         # StartupProbe: indicates whether the container has completed its startup process, and delays the LivenessProbe
