@@ -345,6 +345,12 @@ func VerifyDeployment(t *testing.T, pod *k8score.PodSpec, expectedSpec pegaDeplo
 	require.Equal(t, "NODE_TYPE", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, expectedSpec.nodeType, pod.Containers[0].Env[envIndex].Value)
 	envIndex++
+	require.Equal(t, "PEGA_READINESS_PROBE_PERIOD_SECONDS", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "10", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
+	require.Equal(t, "PEGA_LIVENESS_PROBE_PERIOD_SECONDS", pod.Containers[0].Env[envIndex].Name)
+	require.Equal(t, "30", pod.Containers[0].Env[envIndex].Value)
+	envIndex++
 	require.Equal(t, "PEGA_APP_CONTEXT_PATH", pod.Containers[0].Env[envIndex].Name)
 	require.Equal(t, "prweb", pod.Containers[0].Env[envIndex].Value)
 	envIndex++
