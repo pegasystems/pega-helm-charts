@@ -1,8 +1,8 @@
 # Addons Helm chart
 
-The addons chart installs a collection of supporting services and tools for a Pega deployment.  The services you need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed. This readme provides a detailed description of possible configurations and their default values as applicable.
+The addons chart installs a collection of supporting services and tools for a Pega deployment.  The services you need to deploy will depend on your cloud environment - for example you may need a load balancer on Minikube, but not for EKS. These supporting services are deployed once per Kubernetes environment, regardless of how many Pega Infinity instances are deployed. This readme provides a detailed description of possible configurations and sample values as applicable.
 
-Pega does **not** actively update the dependencies in `requirements.yaml`. Whether a dependency is enabled or disabled will depend on the service you choose for your environment. For any enabled dependencies listed in the `requirements.yaml` file, you should update its corresponding `version` value. Disabled dependencies do not require version updates.
+Pega does **not** maintain the dependencies in `requirements.yaml` or the default values for any of these third-party dependent charts. Whether a dependency is enabled or disabled will depend on the service you choose for your environment. For any enabled dependencies listed in the `requirements.yaml` file, you must supply a corresponding `version` value. Disabled dependencies do not require version updates.
 
 ## Load balancer
 
