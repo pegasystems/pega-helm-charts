@@ -77,9 +77,9 @@ func runPegaInstallerJobTest(t *testing.T, externalSecretName string) {
 						}
 					} else {
 						if operation == "install" || operation == "install-deploy" {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, externalSecretName)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-db-install", []string{"jdbc-lib-downloader"}, "pega-install-environment-config", "pega-installer", "install"}, options, pullPolicy, externalSecretName)
 						} else {
-							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, externalSecretName)
+							assertJob(t, yamlSplit[1], pegaDbJob{"pega-pre-upgrade", []string{"jdbc-lib-downloader"}, "pega-upgrade-environment-config", "pega-installer", "pre-upgrade"}, options, pullPolicy, externalSecretName)
 						}
 					}
 
@@ -163,35 +163,44 @@ func assertJob(t *testing.T, jobYaml string, expectedJob pegaDbJob, options *hel
 
 	require.Empty(t, jobSpec.Affinity)
 	require.Empty(t, jobSpec.Tolerations)
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[1].Secret.Name, customArtifactorySecret)
+
+    require.Equal(t, "jdbc-lib-volume", jobSpec.Volumes[0].Name)
+    require.Equal(t, "10Mi", jobSpec.Volumes[0].VolumeSource.EmptyDir.SizeLimit.String())
+
+    require.Equal(t, "download-script-volume", jobSpec.Volumes[1].Name)
+    require.Equal(t, getObjName(options, "-installer-lib-download-script-config"), jobSpec.Volumes[1].ConfigMap.LocalObjectReference.Name)
+
+	require.Equal(t, jobSpec.Volumes[2].Name, "pega-installer-credentials-volume")
+	require.Equal(t, jobSpec.Volumes[2].VolumeSource.Projected.Sources[0].Secret.Name, getObjName(options, "-db-secret"))
+	require.Equal(t, jobSpec.Volumes[2].VolumeSource.Projected.Sources[1].Secret.Name, customArtifactorySecret)
 
 	if externalSecretName == "" {
-	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, getObjName(options, "-upgrade-rest-secret"))
+	    require.Equal(t, jobSpec.Volumes[2].VolumeSource.Projected.Sources[2].Secret.Name, getObjName(options, "-upgrade-rest-secret"))
 	} else {
-	    require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.Sources[2].Secret.Name, externalSecretName)
+	    require.Equal(t, jobSpec.Volumes[2].VolumeSource.Projected.Sources[2].Secret.Name, externalSecretName)
 	}
 
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
-	require.Equal(t, jobSpec.Volumes[1].Name, "pega-volume-installer")
+	require.Equal(t, jobSpec.Volumes[2].VolumeSource.Projected.DefaultMode, volDefaultModePointer)
+	require.Equal(t, jobSpec.Volumes[3].Name, "pega-volume-installer")
 	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-install-config" {
-		require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-install-config")
+		require.Equal(t, jobSpec.Volumes[3].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-install-config")
 	}
-	if jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-upgrade-config" {
-		require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
+	if jobSpec.Volumes[3].VolumeSource.ConfigMap.LocalObjectReference.Name == "pega-upgrade-config" {
+		require.Equal(t, jobSpec.Volumes[3].VolumeSource.ConfigMap.LocalObjectReference.Name, "pega-upgrade-config")
 	}
-	require.Equal(t, jobSpec.Volumes[1].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
+	require.Equal(t, jobSpec.Volumes[3].VolumeSource.ConfigMap.DefaultMode, volDefaultModePointer)
 
 	require.Equal(t, string(jobContainers[0].ImagePullPolicy), pullPolicy)
 
 	require.Equal(t, jobContainers[0].Name, expectedJob.containerName)
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-volume-installer")
-	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/config")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-credentials-volume")
-	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/secrets")
+    require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "jdbc-lib-volume")
+    require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/lib")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-volume-installer")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/config")
+	require.Equal(t, jobContainers[0].VolumeMounts[2].Name, "pega-installer-credentials-volume")
+	require.Equal(t, jobContainers[0].VolumeMounts[2].MountPath, "/opt/pega/secrets")
 	require.Equal(t, jobContainers[0].Env[0].Name, "ACTION")
 	require.Equal(t, jobContainers[0].Env[0].Value, expectedJob.action)
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
@@ -502,7 +511,7 @@ func TestPegaInstallerJobWithICDownload(t *testing.T) {
                     "global.actions.execute":    operation,
                     "installer.imagePullPolicy": "Always",
                     "installer.upgrade.upgradeType":  "zero-downtime",
-                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                    "global.downloadContainer.image": "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG",
                 },
             }
 
@@ -538,7 +547,7 @@ func TestPegaInstallerJobWithICDownloadWithCert(t *testing.T) {
                     "global.actions.execute":    operation,
                     "installer.imagePullPolicy": "Always",
                     "installer.upgrade.upgradeType":  "zero-downtime",
-                    "global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+                    "global.downloadContainer.image": "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG",
                     "global.downloadContainer.sharedVolumeSize": "50Mi",
                 },
             }
