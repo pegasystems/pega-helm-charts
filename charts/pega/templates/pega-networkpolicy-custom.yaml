@@ -1,0 +1,26 @@
+{{- if .Values.networkPolicy.enabled }}
+{{- $reserved := splitList "," (include "networkPolicyBuiltInSuffixes" .) }}
+{{- $seen := dict }}
+{{- range .Values.networkPolicy.customPolicies }}
+{{- $name := required "networkPolicy.customPolicies entries must define name" .name }}
+{{- if not (regexMatch "^[a-z0-9]([-a-z0-9]*[a-z0-9])?$" $name) }}
+{{- fail (printf "networkPolicy.customPolicies name %q must be a DNS-1123 label" $name) }}
+{{- end }}
+{{- if has $name $reserved }}
+{{- fail (printf "networkPolicy.customPolicies name %q is reserved by a built-in policy" $name) }}
+{{- end }}
+{{- if hasKey $seen $name }}
+{{- fail (printf "networkPolicy.customPolicies contains duplicate name %q" $name) }}
+{{- end }}
+{{- $_ := set $seen $name true }}
+{{- if not (hasKey . "podSelector") }}
+{{- fail (printf "networkPolicy.customPolicies %q must define podSelector; use {} to select all pods in the namespace" $name) }}
+{{- end }}
+---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+{{ include "networkPolicyMetadata" (dict "root" $ "suffix" $name) }}
+spec:
+  {{- toYaml (omit . "name") | nindent 2 }}
+{{- end }}
+{{- end }}

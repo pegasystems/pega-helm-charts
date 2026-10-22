@@ -41,8 +41,8 @@ spec:
 {{- end }}
     spec:
       shareProcessNamespace: {{ .root.Values.shareProcessNamespace }}
-{{- if .root.Values.serviceAccountName }}
-      serviceAccountName: {{ .root.Values.serviceAccountName }}
+{{- with include "pegaInstallerServiceAccountSpec" .root }}
+{{- . | nindent 6 }}
 {{- end }}
       volumes:
 {{- include "jdbcLibVolume" .root | indent 6 }}
