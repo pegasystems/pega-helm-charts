@@ -49,6 +49,26 @@ Name                                           | Description                    
 `server.diagnostic_log_file_size_mb` | The maximum size of each diagnostic file, default value used is 50 MB. | `50`
 `server.diagnostics_file_count` | The maximum number of diagnostic files that the system keeps. Default value is 3.  | `3` 
 
+#### StatefulSet Annotations
+
+Use `statefulsetAnnotations` to add annotations to the Clustering Service StatefulSet metadata, for example StormForge Optimize Live settings.
+
+- Values are always rendered as quoted strings, so numbers and booleans are safe.
+- Values are evaluated with `tpl`, so they can reference other values and use conditions.
+- Set a key to `null` in an override values file to remove it.
+- A templated value that renders to an empty string is omitted; a literal `""` is kept.
+- `cpuRequestPercent` returns a percentage of a CPU quantity in millicores.
+- Wrapper charts can override the `generatedClusteringServiceStatefulSetAnnotations` template.
+
+```yaml
+statefulsetAnnotations:
+  live.stormforge.io/auto-deploy: "true"
+  live.stormforge.io/containers.cpu.requests.min: "hazelcast=50m"
+  live.stormforge.io/containers.cpu.requests.max: 'hazelcast={{ include "cpuRequestPercent" (dict "cpu" .Values.resources.requests.cpu "percent" 150) }}'
+  live.stormforge.io/containers.memory.requests.patch-path: "-"
+  live.stormforge.io/containers.memory.limits.patch-path: "-"
+```
+
 
 #### Example
 

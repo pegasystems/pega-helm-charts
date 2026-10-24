@@ -4,6 +4,10 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "clusteringServiceName" . }}
   namespace: {{ .Release.Namespace }}
+{{- with include "clusteringServiceStatefulSetAnnotations" . }}
+  annotations:
+{{- . | trim | nindent 4 }}
+{{- end }}
 spec:
   selector:
     matchLabels:
