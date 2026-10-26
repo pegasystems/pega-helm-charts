@@ -92,55 +92,13 @@ false
 {{- define "generatedClusteringServicePodLabels" }}
 {{- end }}
 
-# Override this template to generate additional Clustering Service StatefulSet annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedClusteringServiceStatefulSetAnnotations" }}
-{{- end }}
-
-{{- /*
-Renders a map of annotations as quoted strings. Values are evaluated with `tpl`, so they can reference other values.
-- null value: key is omitted (use in a stage override file to remove a key)
-- template value that renders to an empty string: key is omitted (use for conditional keys)
-- literal "" value: key is kept with an empty value
-*/}}
-{{- define "renderAnnotations" }}
-{{- $root := .root }}
-{{- range $key, $value := .annotations }}
-{{- if not (kindIs "invalid" $value) }}
-{{- $rendered := tpl (toString $value) $root }}
-{{- if or $rendered (eq (toString $value) "") }}
-{{ $key }}: {{ $rendered | quote }}
-{{- end }}
-{{- end }}
-{{- end }}
-{{- end }}
-
-{{- define "clusteringServiceStatefulSetAnnotations" }}
-{{- include "renderAnnotations" (dict "root" . "annotations" .Values.statefulsetAnnotations) }}
-{{- include "generatedClusteringServiceStatefulSetAnnotations" . }}
-{{- end }}
-
-# Override this template to generate additional Hazelcast StatefulSet annotations that are dynamically composed during helm deployment (do not indent annotations)
-{{- define "generatedHazelcastStatefulSetAnnotations" }}
-{{- end }}
-
+# Renders statefulsetAnnotations for the Clustering Service and Hazelcast StatefulSets as quoted strings; keys set to null are omitted
 {{- define "hazelcastStatefulSetAnnotations" }}
-{{- include "renderAnnotations" (dict "root" . "annotations" .Values.statefulsetAnnotations) }}
-{{- include "generatedHazelcastStatefulSetAnnotations" . }}
+{{- range $key, $value := .Values.statefulsetAnnotations }}
+{{- if not (kindIs "invalid" $value) }}
+{{ $key }}: {{ $value | quote }}
 {{- end }}
-
-{{- /*
-Returns a CPU quantity (e.g. 1, "1.5", "500m") scaled by a percentage, in millicores.
-Usage: {{ include "cpuRequestPercent" (dict "cpu" .Values.resources.requests.cpu "percent" 150) }} -> 1500m
-*/}}
-{{- define "cpuRequestPercent" }}
-{{- $cpu := toString .cpu }}
-{{- $millis := 0.0 }}
-{{- if hasSuffix "m" $cpu }}
-{{- $millis = float64 (trimSuffix "m" $cpu) }}
-{{- else }}
-{{- $millis = mulf (float64 $cpu) 1000 }}
 {{- end }}
-{{- printf "%dm" (int (floor (divf (mulf $millis (float64 .percent)) 100))) }}
 {{- end }}
 
 

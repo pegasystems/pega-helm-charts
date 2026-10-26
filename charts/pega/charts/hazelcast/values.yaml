@@ -30,8 +30,7 @@ username: ""
 password: ""
 
 # Annotations added to the Clustering Service and Hazelcast StatefulSet metadata.
-# Values are always rendered as quoted strings and evaluated with `tpl`, so they can reference other values.
-# Set a key to null in an override values file to remove it; a templated value that renders empty is omitted.
+# Values are always rendered as quoted strings. Set a key to null in an override values file to remove it.
 statefulsetAnnotations: {}
 
 # Memory and CPU settings for HZ service
