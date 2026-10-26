@@ -119,6 +119,15 @@ Renders a map of annotations as quoted strings. Values are evaluated with `tpl`,
 {{- include "generatedClusteringServiceStatefulSetAnnotations" . }}
 {{- end }}
 
+# Override this template to generate additional Hazelcast StatefulSet annotations that are dynamically composed during helm deployment (do not indent annotations)
+{{- define "generatedHazelcastStatefulSetAnnotations" }}
+{{- end }}
+
+{{- define "hazelcastStatefulSetAnnotations" }}
+{{- include "renderAnnotations" (dict "root" . "annotations" .Values.statefulsetAnnotations) }}
+{{- include "generatedHazelcastStatefulSetAnnotations" . }}
+{{- end }}
+
 {{- /*
 Returns a CPU quantity (e.g. 1, "1.5", "500m") scaled by a percentage, in millicores.
 Usage: {{ include "cpuRequestPercent" (dict "cpu" .Values.resources.requests.cpu "percent" 150) }} -> 1500m

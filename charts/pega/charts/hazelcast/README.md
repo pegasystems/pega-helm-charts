@@ -51,14 +51,14 @@ Name                                           | Description                    
 
 #### StatefulSet Annotations
 
-Use `statefulsetAnnotations` to add annotations to the Clustering Service StatefulSet metadata, for example StormForge Optimize Live settings.
+Use `statefulsetAnnotations` to add annotations to the Clustering Service and Hazelcast StatefulSet metadata, for example StormForge Optimize Live settings. Whichever of the two StatefulSets is deployed receives the same annotations.
 
 - Values are always rendered as quoted strings, so numbers and booleans are safe.
 - Values are evaluated with `tpl`, so they can reference other values and use conditions.
 - Set a key to `null` in an override values file to remove it.
 - A templated value that renders to an empty string is omitted; a literal `""` is kept.
 - `cpuRequestPercent` returns a percentage of a CPU quantity in millicores.
-- Wrapper charts can override the `generatedClusteringServiceStatefulSetAnnotations` template.
+- Wrapper charts can override the `generatedClusteringServiceStatefulSetAnnotations` and `generatedHazelcastStatefulSetAnnotations` templates.
 
 ```yaml
 statefulsetAnnotations:

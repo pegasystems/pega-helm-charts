@@ -715,7 +715,7 @@ hazelcast:
   # Enter the external secret for these credentials below.
   external_secret_name: ""
 
-  # Annotations added to the Clustering Service StatefulSet metadata (for example, StormForge Optimize Live settings).
+  # Annotations added to the Clustering Service and Hazelcast StatefulSet metadata (for example, StormForge Optimize Live settings).
   # Values are rendered as quoted strings and support templating. Example:
   # statefulsetAnnotations:
   #   live.stormforge.io/auto-deploy: "true"
