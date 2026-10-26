@@ -54,11 +54,13 @@ Name                                           | Description                    
 Use `statefulsetAnnotations` to add annotations to the Clustering Service and Hazelcast StatefulSet metadata. Whichever of the two StatefulSets is deployed receives the same annotations.
 
 - Values are always rendered as quoted strings, so numbers and booleans are safe.
+- Values are evaluated with `tpl`, so they can reference other values, for example to let a wrapper chart supply them.
 - Set a key to `null` in an override values file to remove it.
 
 ```yaml
 statefulsetAnnotations:
   <AnnotationKey>: "true"
+  <OtherAnnotationKey>: '{{ .Values.someValue | default `fallback` }}'
 ```
 
 

@@ -92,11 +92,11 @@ false
 {{- define "generatedClusteringServicePodLabels" }}
 {{- end }}
 
-# Renders statefulsetAnnotations for the Clustering Service and Hazelcast StatefulSets as quoted strings; keys set to null are omitted
+# Renders statefulsetAnnotations for the Clustering Service and Hazelcast StatefulSets as quoted strings; values are evaluated with tpl and keys set to null are omitted
 {{- define "hazelcastStatefulSetAnnotations" }}
 {{- range $key, $value := .Values.statefulsetAnnotations }}
 {{- if not (kindIs "invalid" $value) }}
-{{ $key }}: {{ $value | quote }}
+{{ $key }}: {{ tpl (toString $value) $ | quote }}
 {{- end }}
 {{- end }}
 {{- end }}

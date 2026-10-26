@@ -716,7 +716,7 @@ hazelcast:
   external_secret_name: ""
 
   # Annotations added to the Clustering Service and Hazelcast StatefulSet metadata.
-  # Values are rendered as quoted strings.
+  # Values are rendered as quoted strings and evaluated with `tpl`, so they can reference other values.
   statefulsetAnnotations: {}
 
   # Apply securityContext to clustering service pods. Example:
