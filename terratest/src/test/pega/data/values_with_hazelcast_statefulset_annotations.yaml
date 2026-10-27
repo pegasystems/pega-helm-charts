@@ -1,0 +1,10 @@
+---
+hazelcast:
+  annotationValue: from-values
+  statefulsetAnnotations:
+    example.com/boolean: true
+    example.com/number: 90
+    example.com/plain: plain-value
+    example.com/templated: '{{ .Values.annotationValue }}'
+    example.com/templated-default: '{{ .Values.missingValue | default `fallback` }}'
+    example.com/removed: null

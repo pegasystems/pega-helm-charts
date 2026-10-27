@@ -262,21 +262,6 @@ global:
       ----SAMPLE KRB5.CONF----
 ```
 
-## Logging Configuration
-
-Use the `logging` section under `global` to configure log output behavior.
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| `global.logging.correlationIdEnabled` | Boolean | `false` | When set to `true`, includes `[%X{traceId}]` in the PegaRULES, PegaBIX, and PegaCLUSTER log4j2 patterns to support distributed tracing correlation. When `false` (default), the log pattern remains unchanged from baseline. |
-
-Example:
-```yaml
-global:
-  logging:
-    correlationIdEnabled: true
-```
-
 ## JDBC Configuration
 
 Use the `jdbc` section  of the values file to specify how to connect to the Pega database. Pega must be installed to this database before deploying on Kubernetes. For more information about supported databases and jdbc driver versions, see the [Platform Support Guide](https://docs.pega.com/bundle/platform/page/platform/deployment/platform-support-guide/platform-support-guide.html) 
@@ -1002,7 +987,7 @@ While Pega includes default configuration files in the Helm charts, the charts p
 Parameter     | Description    | Default value
 ---           | ---       | ---
 `prconfig`    | A complete prconfig.xml file to inject.  | See [prconfig.xml](config/deploy/prconfig.xml).
-`prlog4j2`    | A complete prlog4j2.xml template file to inject.  | See [prlog4j2.xml.tmpl](config/deploy/prlog4j2.xml.tmpl).
+`prlog4j2`    | A complete prlog4j2.xml file to inject.  | See [prlog4j2.xml](config/deploy/prlog4j2.xml).
 `contextXML`  | A complete context.xml template file to inject.  | See [context.xml.tmpl](config/deploy/context.xml.tmpl).
 `serverXML`   | A complete server.xml file to inject  | See [server.xml.tmpl](config/deploy/server.xml.tmpl).
 `webXML`      | A complete web.xml file to inject  | No default provided, but if `config/deploy/web.xml` exists, it will be used as the default.
@@ -1714,6 +1699,7 @@ Parameter   | Description                                                       
 `hazelcast.username` | Configures the username to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the username in Hazelcast cluster and your Pega nodes so authentication occurs automatically.            | `""`
 `hazelcast.password` | Configures the password to be used in a client-server Hazelcast model for authentication between the nodes in the Pega deployment and the nodes in the Hazelcast cluster. This parameter configures the password credential in Hazelcast cluster and your Pega nodes so authentication occurs automatically. | `""`
 `hazelcast.external_secret_name` | If you configured a secret in an external secrets operator, enter the secret name. For details, see [this section](#optional-support-for-providing-credentialscertificates-using-external-secrets-operator).                                                                                                 | `""`
+`hazelcast.statefulsetAnnotations` | Annotations added to the Clustering Service and Hazelcast StatefulSet metadata. Values are rendered as quoted strings and evaluated with `tpl`. Set a key to `null` to remove it. See [Clustering Service README](charts/hazelcast/README.md#statefulset-annotations). | `{}`
 `hazelcast.affinity` | Configures policy to assign the pods to the nodes. See the official [Kubernetes Documentation](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/).                                                                                                                                    | `""`
 
 #### Example
@@ -1733,6 +1719,7 @@ hazelcast:
   username: ""
   password: ""
   external_secret_name: ""
+  statefulsetAnnotations: {}
 ```
 
 ### (Optional) Enabling highly secure encryption of traffic between Pega Platform and the Clustering Service
