@@ -62,11 +62,6 @@ global:
   # Feature is used for Decisioning data flows to fetch data from Kafka or HBase streams
   kerberos: {}
 
-  # Logging configuration
-  logging:
-    # Set to true to include correlationId in log4j2 log patterns for distributed tracing correlation
-    correlationIdEnabled: false
-
   # Set to true to comply with NIST SP 800-53 and NIST SP 800-131.
   # Starting in Pega Platform version '25, highlySecureCryptoModeEnabled has been deprecated in favor of global.fips140_3Mode.
   # Please reference this article for more information:
@@ -714,6 +709,10 @@ hazelcast:
   # HZ_CS_AUTH_USERNAME for username and HZ_CS_AUTH_PASSWORD for password.
   # Enter the external secret for these credentials below.
   external_secret_name: ""
+
+  # Annotations added to the Clustering Service and Hazelcast StatefulSet metadata.
+  # Values are rendered as quoted strings and evaluated with `tpl`, so they can reference other values.
+  statefulsetAnnotations: {}
 
   # Apply securityContext to clustering service pods. Example:
   # securityContext:

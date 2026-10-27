@@ -93,6 +93,15 @@ false
 {{- define "generatedClusteringServicePodLabels" }}
 {{- end }}
 
+# Renders statefulsetAnnotations for the Clustering Service and Hazelcast StatefulSets as quoted strings; values are evaluated with tpl and keys set to null are omitted
+{{- define "hazelcastStatefulSetAnnotations" }}
+{{- range $key, $value := .Values.statefulsetAnnotations }}
+{{- if not (kindIs "invalid" $value) }}
+{{ $key }}: {{ tpl (toString $value) $ | quote }}
+{{- end }}
+{{- end }}
+{{- end }}
+
 
 {{- define "performDeployment" }}
   {{- if or (eq .Values.global.actions.execute "deploy") (eq .Values.global.actions.execute "install-deploy") (eq .Values.global.actions.execute "upgrade-deploy") -}}

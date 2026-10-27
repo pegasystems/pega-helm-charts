@@ -49,6 +49,20 @@ Name                                           | Description                    
 `server.diagnostic_log_file_size_mb` | The maximum size of each diagnostic file, default value used is 50 MB. | `50`
 `server.diagnostics_file_count` | The maximum number of diagnostic files that the system keeps. Default value is 3.  | `3` 
 
+#### StatefulSet Annotations
+
+Use `statefulsetAnnotations` to add annotations to the Clustering Service and Hazelcast StatefulSet metadata. Whichever of the two StatefulSets is deployed receives the same annotations.
+
+- Values are always rendered as quoted strings, so numbers and booleans are safe.
+- Values are evaluated with `tpl`, so they can reference other values, for example to let a wrapper chart supply them.
+- Set a key to `null` in an override values file to remove it.
+
+```yaml
+statefulsetAnnotations:
+  <AnnotationKey>: "true"
+  <OtherAnnotationKey>: '{{ .Values.someValue | default `fallback` }}'
+```
+
 
 #### Example
 
