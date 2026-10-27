@@ -4,6 +4,10 @@ apiVersion: apps/v1
 metadata:
   name: {{ template "hazelcastName" . }}
   namespace: {{ .Release.Namespace }}
+{{- with include "hazelcastStatefulSetAnnotations" . }}
+  annotations:
+{{- . | trim | nindent 4 }}
+{{- end }}
 spec:
   selector:
     matchLabels:
