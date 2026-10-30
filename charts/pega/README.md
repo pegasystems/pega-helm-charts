@@ -1,3 +1,5 @@
+> If using Pega-provided hardened docker images with the Pega Helm charts, please refer to the [Running Pega without curl utility](#running-pega-without-curl-utility) section below.
+
 # Pega Helm chart
 
 The Pega Helm chart is used to deploy an instance of Pega Infinity into a Kubernetes environment.  This readme provides a detailed description of possible configurations and their default values as applicable. You reference the Pega Helm chart to deploy using the parameter settings in the Helm chart using the `helm --set` command to specify a one-time override specific parameter settings that you configured in the Pega Helm chart.
@@ -441,6 +443,7 @@ The requirements for the image is that it contains curl on the path and is capab
 
 The Pega Platform images still contain the curl utility, but with this configuration, the init container will handle downloading the JDBC driver instead of the main Pega container.  The curl utility will eventually be removed from the main Pega images.
 
+Pega-provided hardened images do not contain the curl utility.  If you are using Pega-provided hardened images, you must use the init container to download JDBC drivers or build a custom docker image that includes the JDBC driver library in the `/opt/pega/lib` directory within the image.  If using a custom image with an included JDBC driver library, set `global.downloadContainer.image` to an empty string to disable the init container.
 ## Deployment Name (Optional)
 
 Specify a deployment name that is used to differentiate this deployment in your environment. This name will be prepended to the various Pega tiers and the associated k8s objects in your deployment. Your deployment name should be constrained to lowercase alphanumeric and '-' characters.
