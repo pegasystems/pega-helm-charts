@@ -38,7 +38,7 @@ func TestPegaCustomUpgradeJobResumeEnabled(t *testing.T) {
 						}
 						yamlContent := RenderTemplate(t, options, helmChartPath, []string{"charts/installer/templates/pega-installer-job.yaml"})
 						yamlSplit := strings.Split(yamlContent, "---")
-						assertUpgradeJobJobResumeEnabled(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{}, "pega-upgrade-environment-config", "pega-installer", "upgrade"}, options)
+						assertUpgradeJobJobResumeEnabled(t, yamlSplit[1], pegaDbJob{"pega-db-custom-upgrade", []string{"jdbc-lib-downloader"}, "pega-upgrade-environment-config", "pega-installer", "upgrade"}, options)
 
 					}
 				}
@@ -56,8 +56,14 @@ func assertUpgradeJobJobResumeEnabled(t *testing.T, jobYaml string, expectedJob 
 
 	var containerPort int32 = 8080
 
-	require.Equal(t, jobSpec.Volumes[0].Name, "pega-installer-mount-volume")
-	require.Equal(t, jobSpec.Volumes[0].VolumeSource.PersistentVolumeClaim.ClaimName, "test-claim")
+    require.Equal(t, "jdbc-lib-volume", jobSpec.Volumes[0].Name)
+    require.Equal(t, "10Mi", jobSpec.Volumes[0].VolumeSource.EmptyDir.SizeLimit.String())
+
+    require.Equal(t, "download-script-volume", jobSpec.Volumes[1].Name)
+    require.Equal(t, "pega-installer-lib-download-script-config", jobSpec.Volumes[1].ConfigMap.LocalObjectReference.Name)
+
+	require.Equal(t, jobSpec.Volumes[2].Name, "pega-installer-mount-volume")
+	require.Equal(t, jobSpec.Volumes[2].VolumeSource.PersistentVolumeClaim.ClaimName, "test-claim")
 
 	if jobContainers[0].Name == "pega-db-upgrade-rules-migration" || jobContainers[0].Name == "pega-db-upgrade-rules-upgrade" || jobContainers[0].Name == "pega-db-upgrade-data-upgrade" {
 		require.Equal(t, jobContainers[0].Name, "pega-installer")
@@ -65,8 +71,10 @@ func assertUpgradeJobJobResumeEnabled(t *testing.T, jobYaml string, expectedJob 
 
 	require.Equal(t, "YOUR_INSTALLER_IMAGE:TAG", jobContainers[0].Image)
 	require.Equal(t, jobContainers[0].Ports[0].ContainerPort, containerPort)
-	require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "pega-installer-mount-volume")
-	require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/mount/installer")
+    require.Equal(t, jobContainers[0].VolumeMounts[0].Name, "jdbc-lib-volume")
+    require.Equal(t, jobContainers[0].VolumeMounts[0].MountPath, "/opt/pega/lib")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].Name, "pega-installer-mount-volume")
+	require.Equal(t, jobContainers[0].VolumeMounts[1].MountPath, "/opt/pega/mount/installer")
 	require.Equal(t, jobContainers[0].Env[0].Name, "ACTION")
 	require.Equal(t, jobContainers[0].Env[0].Value, expectedJob.action)
 	require.Equal(t, jobContainers[0].EnvFrom[0].ConfigMapRef.LocalObjectReference.Name, expectedJob.configMapName)
