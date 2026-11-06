@@ -19,10 +19,10 @@ else
   exit 1
 fi
 
-if xmllint --noout charts/pega/config/deploy/prlog4j2.xml >/dev/null 2>&1; then
-  echo "deploy prlog4j2.xml  validation passed"
+if xmllint --noout charts/pega/config/deploy/prlog4j2.xml.tmpl >/dev/null 2>&1; then
+  echo "deploy prlog4j2.xml.tmpl validation passed"
 else
-  echo "deploy prlog4j2.xml formatting is incorrect"
+  echo "deploy prlog4j2.xml.tmpl formatting is incorrect"
   exit 1
 fi
 
