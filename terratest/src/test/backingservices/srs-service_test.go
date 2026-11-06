@@ -1,18 +1,19 @@
 package backingservices
 
 import (
+	"testing"
+
 	"github.com/stretchr/testify/require"
 	k8score "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
-	"testing"
 )
 
-func TestSRSService(t *testing.T){
+func TestSRSService(t *testing.T) {
 
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "true",
-			"srs.deploymentName": "test-srs",
+			"srs.enabled":                "true",
+			"srs.deployment.name":        "test-srs",
 			"srs.srsStorage.tls.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_service.yaml"}),
@@ -26,18 +27,18 @@ func TestSRSService(t *testing.T){
 	VerifySRSService(t, &srsServiceObj)
 }
 
-func TestSRSServiceWithInternetEgress(t *testing.T){
+func TestSRSServiceWithInternetEgress(t *testing.T) {
 
 	helmChartParser := NewHelmConfigParser(
 		NewHelmTestFromTemplate(t, helmChartRelativePath, map[string]string{
-			"srs.enabled": "true",
-			"srs.deploymentName": "test-srs",
-			"srs.srsStorage.requireInternetAccess": "true",
-			"srs.srsStorage.provisionInternalESCluster": "false",
-			"srs.srsStorage.domain": "es.acme.io",
-			"srs.srsStorage.port": "8008",
-			"srs.srsStorage.tls.enabled": "false",
-			"srs.srsStorage.protocol": "https",
+			"srs.enabled":                                "true",
+			"srs.deployment.name":                        "test-srs",
+			"srs.srsStorage.requireInternetAccess":       "true",
+			"srs.srsStorage.provisionInternalESCluster":  "false",
+			"srs.srsStorage.domain":                      "es.acme.io",
+			"srs.srsStorage.port":                        "8008",
+			"srs.srsStorage.tls.enabled":                 "false",
+			"srs.srsStorage.protocol":                    "https",
 			"srs.srsStorage.basicAuthentication.enabled": "false",
 		},
 			[]string{"charts/srs/templates/srsservice_service.yaml"}),
