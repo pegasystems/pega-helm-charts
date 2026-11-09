@@ -16,6 +16,8 @@
 {{- define "pegaDBZDTUpgrade" -}}pega-zdt-upgrade{{- end -}}
 {{- define "pegaDBOOPUpgrade" -}}pega-db-oop-upgrade{{- end -}}
 {{- define "pegaDBInPlaceUpgrade" -}}pega-in-place-upgrade{{- end -}}
+{{- define "pegaCesImport" -}}pega-ces-import-{{ .Values.ces.image | sha256sum | trunc 10 }}{{- end -}}
+{{- define "pegaCesVolume" -}}pega-ces-files{{- end -}}
 {{- define "installerConfig" -}}installer-config{{- end -}}
 {{- define "installerJobReaderRole" -}}jobs-reader{{- end -}}
 {{- define "pegaPreDBUpgrade" -}}pega-pre-upgrade{{- end -}}
@@ -80,6 +82,15 @@
 
 {{- define "performUpgradeAndDeployment" }}
   {{- if (eq .Values.global.actions.execute "upgrade-deploy") -}}
+    true
+  {{- else -}}
+    false
+  {{- end -}}
+{{- end }}
+
+# CES is imported over REST into a running web tier, so only actions that deploy Pega can run it.
+{{- define "performCesImport" }}
+  {{- if and (.Values.ces).image (has .Values.global.actions.execute (list "deploy" "install-deploy" "upgrade-deploy")) -}}
     true
   {{- else -}}
     false
@@ -193,7 +204,7 @@ currentFunctionPath=SYSIBM,SYSFUN,{{ include "resolvedDataSchema" . | upper }}
 {{- end -}}
 
 {{- define "createJobsReaderRole" -}}
-  {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") -}}
+  {{- if or (eq (include "performInstallAndDeployment" .) "true") (eq (include "performUpgrade" .) "true") (eq (include "performCesImport" .) "true") -}}
     true
   {{- else -}}
     false

@@ -1,0 +1,90 @@
+{{- if (eq (include "performCesImport" .) "true") }}
+# Imports Customer Engagement Studio (CES) into the running Pega web tier. The Job name carries a hash of
+# installer.ces.image, so changing the CES image re-runs the import and an unchanged image does not.
+kind: Job
+apiVersion: batch/v1
+metadata:
+  name: {{ include "pegaCesImport" . }}
+  namespace: {{ .Release.Namespace }}
+{{- if .Values.global.pegaJob }}{{- if .Values.global.pegaJob.annotations }}
+  annotations:
+{{ toYaml .Values.global.pegaJob.annotations | indent 4 }}
+{{- end }}{{- end }}
+  labels:
+    app: {{ include "pegaCesImport" . }}
+    {{ include "generatedInstallerJobLabels" . | indent 4 }}
+spec:
+  backoffLimit: 0
+  template:
+    metadata:
+      labels:
+        app: "installer"
+        installer-job: {{ include "pegaCesImport" . }}
+        {{- if .Values.podLabels }}
+{{ toYaml .Values.podLabels | indent 8 }}
+        {{- end -}}
+{{ include "generatedInstallerPodLabels" . | indent 8 }}
+      annotations:
+        ces-image: {{ .Values.ces.image | quote }}
+{{- if .Values.podAnnotations }}
+{{ toYaml .Values.podAnnotations | indent 8 }}
+{{- end }}
+    spec:
+{{- with include "pegaInstallerServiceAccountSpec" . }}
+{{- . | nindent 6 }}
+{{- end }}
+      volumes:
+      - name: {{ template "pegaCesVolume" }}
+        emptyDir: {}
+      - name: {{ template "pegaInstallerCredentialsVolume" }}
+        projected:
+          defaultMode: 420
+          sources:
+          {{- $extRestSecretName := "" }}
+          {{- if .Values.upgrade }}{{- if .Values.upgrade.pega_rest_external_secret_name }}{{- $extRestSecretName = .Values.upgrade.pega_rest_external_secret_name }}{{- end }}{{- end }}
+          {{- $pegaRestDict := dict "deploySecret" "deployPegaRESTSecret" "deployNonExtsecret" "deployNonExtPegaRESTSecret" "extSecretName" $extRestSecretName "nonExtSecretName" "pega-upgrade-rest-secret-name" "context" $ -}}
+          {{ include "secretResolver" $pegaRestDict | indent 10 }}
+      initContainers:
+{{ include "waitForRollingUpdates" . | indent 6 }}
+      # The CES image's default command copies its bundles and import-ces.sh into /work.
+      - name: ces-files
+        image: {{ .Values.ces.image }}
+        imagePullPolicy: {{ default "IfNotPresent" .Values.ces.imagePullPolicy }}
+        volumeMounts:
+        - name: {{ template "pegaCesVolume" }}
+          mountPath: /work
+{{- if .Values.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.nodeSelector | indent 8 }}
+{{- end }}
+      containers:
+      - name: ces-import
+        image: {{ include "pegaInstallerImage" (dict "root" . "name" (include "pegaCesImport" .)) }}
+{{- if .Values.imagePullPolicy }}
+        imagePullPolicy: {{ .Values.imagePullPolicy }}
+{{- end }}
+        command: ["sh", "/opt/pega/ces/import-ces.sh"]
+{{- if .Values.securityContext }}
+        securityContext:
+{{ toYaml .Values.securityContext | indent 10 }}
+{{- end }}
+        resources:
+{{ toYaml (.Values.ces.resources | default .Values.resources) | indent 10 }}
+        volumeMounts:
+        - name: {{ template "pegaCesVolume" }}
+          mountPath: /opt/pega/ces
+        - name: {{ template "pegaInstallerCredentialsVolume" }}
+          mountPath: /opt/pega/secrets
+        env:
+        - name: CES_DIR
+          value: /opt/pega/ces
+        - name: PEGA_REST_SERVER_URL
+          value: {{ include "pegaRestURLOverride" . | quote }}
+        - name: IMPORT_EXISTING_INSTANCES
+          value: {{ default "skip" .Values.ces.importExistingInstances | quote }}
+      restartPolicy: Never
+      imagePullSecrets:
+{{- include "imagePullSecrets" . | indent 6 }}
+{{- include "podAffinity" .Values | indent 6 }}
+{{- include "tolerations" .Values | indent 6 }}
+{{- end }}

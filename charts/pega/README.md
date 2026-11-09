@@ -1558,6 +1558,39 @@ installer:
     targetDataSchema: "temporary_data_schema_name"
 ```
 
+### Customer Engagement Studio (CES)
+
+The installer can also import Customer Engagement Studio (CES) into a running Pega Customer Decision Hub deployment. Set `installer.ces.image` to the CES image you downloaded (for example `pega-docker.downloads.pega.com/platform-services/ces:<ces-version>`) and run the chart with a `deploy`, `install-deploy`, or `upgrade-deploy` action.
+
+The chart creates a `pega-ces-import-<hash>` Job that:
+
+1. Waits for every Pega tier to finish rolling out.
+2. Copies the CES bundles and import script from `installer.ces.image` into a shared volume.
+3. Runs the import with `prpcServiceUtils` from `installer.image`, which must contain the Pega distribution kit (for example `platform/installer`). The import uses the Pega REST service at `installer.upgrade.pegaRESTServerURL`, or the web tier service when that is empty, and the `installer.upgrade` REST credentials (`pegaRESTUsername` and `pegaRESTPassword`, or `pega_rest_external_secret_name` with the keys `PEGA_REST_USERNAME` and `PEGA_REST_PASSWORD`).
+
+The Job name includes a hash of `installer.ces.image`. To update CES, change the image tag and run `helm upgrade`; the import runs again. A `helm upgrade` with the same image does not re-import. The import runs only for actions that deploy Pega, because it needs a running web tier.
+
+Parameter | Description | Default value
+--- | --- | ---
+`ces.image` | CES image. Leave empty to skip the CES import. | `""`
+`ces.imagePullPolicy` | Pull policy for the CES image. | `IfNotPresent`
+`ces.importExistingInstances` | How to handle rule instances that already exist: `skip` or `override`. | `skip`
+`ces.resources` | CPU and memory for the import container. | 1 CPU, 2Gi
+
+Example:
+
+```yaml
+global:
+  actions:
+    execute: "deploy"
+installer:
+  image: "YOUR_INSTALLER_IMAGE:TAG"
+  ces:
+    image: "pega-docker.downloads.pega.com/platform-services/ces:CES_VERSION"
+  upgrade:
+    pega_rest_external_secret_name: "pega-rest-credentials"
+```
+
 ### Installer Pod Annotations
 
 You can add annotations to the installer pod.
