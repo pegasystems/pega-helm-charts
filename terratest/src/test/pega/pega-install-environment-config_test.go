@@ -121,6 +121,7 @@ func assertInstallerEnvironmentConfig(t *testing.T, configYaml string, options *
 	require.Equal(t, "ADMIN_PASSWORD", installEnvConfigData["ADMIN_PASSWORD"])
 	require.Equal(t, "", installEnvConfigData["STATIC_ASSEMBLER"])
 	require.Equal(t, installEnvConfigData["BYPASS_UDF_GENERATION"], "true")
+	require.NotContains(t, installEnvConfigData, "EXPOSE_NUM_OF_THREADS")
 	require.Equal(t, installEnvConfigData["BYPASS_TRUNCATE_UPDATESCACHE"], "false")
 	require.Equal(t, installEnvConfigData["JDBC_CUSTOM_CONNECTION"], "")
 	require.Equal(t, installEnvConfigData["MAX_IDLE"], "5")
@@ -140,6 +141,46 @@ func assertNoDupesInConfigMap(t *testing.T, configYaml string, cm *k8score.Confi
     for key := range cm.Data {
        require.Equal(t, 1, strings.Count(configYaml, " " + key + ": "))
     }
+}
+
+func TestPegaInstallerEnvironmentConfigWithCustomExposeNumOfThreads(t *testing.T) {
+	helmChartPath, err := filepath.Abs(PegaHelmChartPath)
+	require.NoError(t, err)
+
+	for _, operation := range []string{"install", "install-deploy", "upgrade", "upgrade-deploy"} {
+		t.Run(operation, func(t *testing.T) {
+			options := &helm.Options{
+				SetValues: map[string]string{
+					"global.provider":               "k8s",
+					"global.actions.execute":        operation,
+					"installer.upgrade.upgradeType": "zero-downtime",
+				},
+			}
+			if operation == "upgrade" {
+				options.SetValues["installer.upgrade.upgradeType"] = "in-place"
+			}
+			template := "charts/installer/templates/pega-install-environment-config.yaml"
+			if strings.HasPrefix(operation, "upgrade") {
+				template = "charts/installer/templates/pega-upgrade-environment-config.yaml"
+			}
+
+			for _, threads := range []string{"unset", "", "4", "8"} {
+				t.Run("threads="+threads, func(t *testing.T) {
+					if threads != "unset" {
+						options.SetValues["installer.exposeNumOfThreads"] = threads
+					}
+					yamlContent := RenderTemplate(t, options, helmChartPath, []string{template})
+					var envConfigMap k8score.ConfigMap
+					UnmarshalK8SYaml(t, yamlContent, &envConfigMap)
+					if threads == "unset" || threads == "" {
+						require.NotContains(t, envConfigMap.Data, "EXPOSE_NUM_OF_THREADS")
+					} else {
+						require.Equal(t, threads, envConfigMap.Data["EXPOSE_NUM_OF_THREADS"])
+					}
+				})
+			}
+		})
+	}
 }
 
 
