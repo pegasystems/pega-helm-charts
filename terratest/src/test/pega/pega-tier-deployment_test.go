@@ -468,6 +468,7 @@ func TestPegaTierDeploymentNoICDownload(t *testing.T) {
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.storageClassName":       "storage-class",
+						"global.downloadContainer.image": "",
 					},
 				}
 
@@ -507,7 +508,7 @@ func TestPegaTierDeploymentWithICDownload(t *testing.T) {
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.storageClassName":       "storage-class",
-						"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+						"global.downloadContainer.image": "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG",
 					},
 				}
 
@@ -554,7 +555,7 @@ func assertICDownloadComponents(t *testing.T, yaml string, options *helm.Options
 
 func assertDownloaderIC(t *testing.T, ic *k8score.Container, expectedURL string, shouldHaveCert bool) {
     require.NotNil(t, ic)
-    require.Equal(t, "IC_DOWNLOAD_CONTAINER:1.0", ic.Image)
+    require.Equal(t, "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG", ic.Image)
     require.Equal(t, "jdbc-lib-volume", ic.VolumeMounts[0].Name)
     require.Equal(t, "/opt/pega/lib", ic.VolumeMounts[0].MountPath)
     require.Equal(t, "download-script-volume", ic.VolumeMounts[1].Name)
@@ -615,7 +616,7 @@ func TestPegaTierDeploymentWithICDownloadWithCert(t *testing.T) {
 						"global.deployment.name":        depName,
 						"installer.upgrade.upgradeType": "zero-downtime",
 						"global.storageClassName":       "storage-class",
-						"global.downloadContainer.image": "IC_DOWNLOAD_CONTAINER:1.0",
+						"global.downloadContainer.image": "YOUR_DOWNLOAD_CONTAINER_IMAGE:TAG",
 						"global.downloadContainer.sharedVolumeSize": "50Mi",
 					},
 				}
