@@ -110,6 +110,24 @@ upgrade:
   # Specify automaticResumeEnabled to support resuming rules_upgrade from point of failure. You can use this functionality only when you use "custom" upgradeType.
   automaticResumeEnabled: "false"
 
+# Customer Engagement Studio (CES) import. When ces.image is set and global.actions.execute is deploy,
+# install-deploy or upgrade-deploy, a Job waits for the Pega tiers to roll out, then imports the CES
+# bundles from ces.image with prpcServiceUtils from the installer image, using the upgrade REST credentials.
+ces:
+  # CES image, for example pega-docker.downloads.pega.com/platform-services/ces:<ces-version>
+  image: ""
+  imagePullPolicy: "IfNotPresent"
+  # Existing rule instances: skip or override.
+  importExistingInstances: "skip"
+  # Resources for the import container (prpcServiceUtils sends the bundles to the web tier over REST).
+  resources:
+    requests:
+      memory: "2Gi"
+      cpu: 1
+    limits:
+      memory: "2Gi"
+      cpu: 1
+
 # Memory, CPU, and ephemeral storage settings for installer
 # Ephemeral storage recommended size is 10G
 resources:
