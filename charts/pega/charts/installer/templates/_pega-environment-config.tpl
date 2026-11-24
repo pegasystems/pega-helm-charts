@@ -30,6 +30,10 @@ data:
 {{- end }}
   # UDF generation will be skipped if this property is set to true
   BYPASS_UDF_GENERATION: {{ .Values.bypassUdfGeneration | quote}}
+{{- if .Values.exposeNumOfThreads }}
+  # Number of threads for the expose columns operation
+  EXPOSE_NUM_OF_THREADS: {{ .Values.exposeNumOfThreads | quote }}
+{{- end }}
   # Z/OS SITE-SPECIFIC PROPERTIES FILE
   ZOS_PROPERTIES: {{ .Values.zos.zosProperties }}
 {{- if .Values.zos.db2zosUdfWlm }}
