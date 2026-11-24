@@ -556,7 +556,7 @@ pegasearch:
   # Set externalSearchService to true to use the Search and Reporting Service.
   # Refer to the README document to configure SRS as a search functionality provider under this section.
   externalSearchService: false
-  externalURL:
+  externalURL: ""
   srsAuth:
     enabled: false
     url: ""
