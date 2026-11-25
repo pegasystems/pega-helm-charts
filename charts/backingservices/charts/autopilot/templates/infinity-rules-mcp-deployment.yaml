@@ -18,9 +18,9 @@ spec:
     spec:
       imagePullSecrets:
       - name: {{ include "backingservicesRegistrySecret" ( dict "root" .Values "defaultname" "autopilot" ) }}
-       {{- range .Values.docker.imagePullSecretNames }}
-       - name: {{ . }}
-       {{- end }}
+      {{- range .Values.docker.imagePullSecretNames }}
+      - name: {{ . }}
+      {{- end }}
       {{- if .Values.infinityRulesMcp.podSecurityContext }}
       securityContext:
         {{ toYaml .Values.infinityRulesMcp.podSecurityContext | nindent 8 }}
