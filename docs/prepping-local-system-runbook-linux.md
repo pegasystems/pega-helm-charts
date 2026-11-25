@@ -62,7 +62,7 @@ Install the Unzip utility with a packaging tool such as apt.
 
 ### Installing Helm
 
-Pega supports using Helm version 2.1 and later. The latest runbooks use version 3.0 and it’s recommended to use this version. If you use Helm 2.x, some of the commands differ slightly for Helm 2.x.
+Pega supports Helm 3.x and Helm 4.x. For help moving from Helm 3 to Helm 4, see [Migrating from Helm 3 to Helm 4](migrating-from-helm3-to-helm4.md).
 
 Helm supports a variety of installation methods. To learn more, see https://helm.sh/docs/intro/install/.
 
@@ -71,7 +71,7 @@ Helm provides a script that you can download and then run to install the latest 
 1. To download the Helm installation script from the Helm Git repository, from your home directory, enter:
 
     `$ curl
-https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3 >
+https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-4 >
 get_helm.sh`
 
 2. To update the permissions of the file to you can use it for installations, enter:
@@ -82,8 +82,8 @@ get_helm.sh`
 
     ```bash
     $ ./get_helm.sh
-    Helm v3.0.1 is available.
-    Downloading https://get.helm.sh/helm-v3.0.1-linux-amd64.tar.gz
+    Helm v4.3.2 is available.
+    Downloading https://get.helm.sh/helm-v4.3.2-linux-amd64.tar.gz
     Preparing to install helm into /usr/local/bin
     helm installed into /usr/local/bin/helm
     ```
@@ -92,12 +92,10 @@ get_helm.sh`
 
     ```bash
     $ helm version
-    version.BuildInfo{Version:"v3.0.1",
-    GitCommit:"7c22ef9ce89e0ebeb7125ba2ebf7d421f3e82ffa", GitTreeState:"clean",
-    GoVersion:"go1.13.4"}
+    version.BuildInfo{Version:"v4.3.2", ...}
     ```
 
-For additional information, see [Helm documentation](https://helm.sh/docs/); for details about installation methods for previous Helm versions, see <https://v2.helm.sh/docs/using_helm/#installing-helm>.
+For additional information, see [Helm documentation](https://helm.sh/docs/).
 
 ### Installing kubectl
 

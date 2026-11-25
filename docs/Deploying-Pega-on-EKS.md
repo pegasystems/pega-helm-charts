@@ -59,7 +59,7 @@ The following account, resources, and application versions are required for use 
 
 - Select an appropriate location in which to deploy your database resource; the document assumes your location is US East.Pega Platform deployments support commercial and GovCloud regions.
 
-- Helm 3.x or Helm 4.x. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/).
+- Helm 3.x or Helm 4.x. Helm is only required to use the Helm charts and not to use the Kubernetes YAML examples directly. For more information, see the [Helm documentation portal](https://helm.sh/docs/). To move from Helm 3 to Helm 4, see [Migrating from Helm 3 to Helm 4](migrating-from-helm3-to-helm4.md).
 
 - kubectl – the Kubernetes command-line tool that you use to connect to and manage your Kubernetes resources.
 
