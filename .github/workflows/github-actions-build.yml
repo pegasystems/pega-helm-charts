@@ -2,6 +2,7 @@ name:  Pega Chart Build
 
 env:
   HELM_URL: https://get.helm.sh
+  # Helm version used by the release (deploy) job; lint and go-tests run a Helm 3 + Helm 4 matrix
   HELM_TGZ: helm-v3.16.3-linux-amd64.tar.gz
   YAMLLINT_VERSION: 1.35.1
   GO_VERSION: 1.23.4
@@ -32,6 +33,10 @@ jobs:
           sh validate_supplementals.sh
   run-lint-job:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        helm-version: [v3.16.3, v4.3.2]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -44,8 +49,8 @@ jobs:
       - name: Install Helm
         run: |
           sudo rm /usr/local/bin/helm
-          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
-          tar xzf ${{ env.HELM_TGZ }}
+          wget -q ${{ env.HELM_URL }}/helm-${{ matrix.helm-version }}-linux-amd64.tar.gz
+          tar xzf helm-${{ matrix.helm-version }}-linux-amd64.tar.gz
           mv linux-amd64/helm /usr/local/bin/helm
 
       - name: run yamllint
@@ -92,6 +97,10 @@ jobs:
 
   run-go-tests-job:
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        helm-version: [v3.16.3, v4.3.2]
     steps:
       - name: Check out repository code
         uses: actions/checkout@v3
@@ -105,8 +114,8 @@ jobs:
       - name: Install Helm
         run: |
           sudo rm /usr/local/bin/helm
-          wget -q ${{ env.HELM_URL }}/${{ env.HELM_TGZ }}
-          tar xzf ${{ env.HELM_TGZ }}
+          wget -q ${{ env.HELM_URL }}/helm-${{ matrix.helm-version }}-linux-amd64.tar.gz
+          tar xzf helm-${{ matrix.helm-version }}-linux-amd64.tar.gz
           mv linux-amd64/helm /usr/local/bin/helm
 
       - run: helm version
