@@ -8,12 +8,17 @@ You can deploy the Autopilot Service in the `pega` namespace or in a separate na
 
 ## Pega GenAI feature support matrix
 
-| Pega Platform version | GenAI Connect | GenAI Coach | GenAI Agent |
-|---|:---:|:---:|:---:|
-| 24.2 | Yes | No | No |
-| 24.2.4 | Yes | Yes | No |
-| 25.1.1 (`HFIX-C4307` required) | Yes | Yes | Yes |
-| 25.1.2 | Yes | Yes | Yes |
+| Pega Platform version | GenAI Connect | GenAI Coach | GenAI Agent | AI Assistant
+|---|:---:|:---:|:---:|:---:|
+| 24.2 | Yes | No | No | No |
+| 24.2.4 | Yes | Yes | No | No |
+| 25.1.1 (`HFIX-C4307` required) | Yes | Yes | Yes | No |
+| 25.1.2 + | Yes | Yes | Yes | No |
+| 26+ | Yes | Yes | Yes | Yes |
+
+## Autopilot Service Docker image
+
+Use Docker image version `2.49.0` for both the Autopilot Service and the Infinity Rules MCP Service, which supports the AI Assistant feature. For instructions on downloading Pega Docker images, see [Downloading Docker images](https://docs.pega.com/bundle/platform/page/platform/deployment/client-managed-cloud/downloading-docker-images.html#con-downloading-docker-images).
 
 ## Supported LLM providers
 
