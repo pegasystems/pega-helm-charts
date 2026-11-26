@@ -31,7 +31,8 @@ jobs:
       - name: Run validate supplementals script
         run : |
           sh validate_supplementals.sh
-  run-lint-job:
+  lint-matrix-job:
+    name: lint-matrix-job (Helm ${{ matrix.helm-version }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -95,7 +96,8 @@ jobs:
         run: |
           remark -i .remark_ignore -f -u validate-links .
 
-  run-go-tests-job:
+  go-tests-matrix-job:
+    name: go-tests-matrix-job (Helm ${{ matrix.helm-version }})
     runs-on: ubuntu-24.04
     strategy:
       fail-fast: false
@@ -151,6 +153,23 @@ jobs:
           export PATH=$PATH:$GITHUB_WORKSPACE/terratest/bin
           cd terratest/src/test
           go test ./backingservices | grep "FAIL" -A 8 || true ; test ${PIPESTATUS[0]} -eq 0
+
+  # Aggregate jobs keep the check names (run-lint-job, run-go-tests-job) that branch protection requires
+  run-lint-job:
+    runs-on: ubuntu-24.04
+    needs: [lint-matrix-job]
+    if: always()
+    steps:
+      - name: Fail if any Helm version failed
+        run: test "${{ needs.lint-matrix-job.result }}" = "success"
+
+  run-go-tests-job:
+    runs-on: ubuntu-24.04
+    needs: [go-tests-matrix-job]
+    if: always()
+    steps:
+      - name: Fail if any Helm version failed
+        run: test "${{ needs.go-tests-matrix-job.result }}" = "success"
 
   run-deploy-job:
     runs-on: ubuntu-24.04
