@@ -13,8 +13,9 @@ node {
             echo "PR labels -> $labels"
             // Comment on PR about the text execution
             pullRequest.comment("Starting ${env.BRANCH_NAME} validation on -> $labels")
-            sh "curl -fsSL -o helm-v3.2.4-linux-amd64.tar.gz https://get.helm.sh/helm-v3.2.4-linux-amd64.tar.gz"
-            sh "tar -zxvf helm-v3.2.4-linux-amd64.tar.gz"
+            def helmVersion = "v4.3.2"
+            sh "curl -fsSL -o helm-${helmVersion}-linux-amd64.tar.gz https://get.helm.sh/helm-${helmVersion}-linux-amd64.tar.gz"
+            sh "tar -zxvf helm-${helmVersion}-linux-amd64.tar.gz"
             sh "mv linux-amd64/helm /usr/local/bin/helm"
           } else {
             currentBuild.result = 'ABORTED'

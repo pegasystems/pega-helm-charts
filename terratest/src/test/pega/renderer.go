@@ -15,7 +15,12 @@ func RenderTemplateWithErr(t *testing.T, options *helm.Options, helmChartPath st
 }
 
 func RenderTemplateE(t *testing.T, options *helm.Options, helmChartPath string, templates []string) (string, error) {
-	return helm.RenderTemplateE(t, options, helmChartPath, PegaHelmRelease, templates)
+	output, err := helm.RenderTemplateE(t, options, helmChartPath, PegaHelmRelease, templates)
+	if err != nil && output == "" {
+		// Newer terratest returns an empty output on failure, but the tests check the helm error text in it.
+		output = err.Error()
+	}
+	return output, err
 }
 
 func UnmarshalK8SYaml(t *testing.T, yamlData string, destinationObj interface{}) {

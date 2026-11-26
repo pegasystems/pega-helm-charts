@@ -29,10 +29,10 @@ This project assumes you have an installation of Kubernetes available and have H
 
 ```bash
 $ helm version
-version.BuildInfo{Version:"v3.0.0", GitCommit:"e29ce2a54e96cd02ccfce88bee4f58bb6e2a28b6", GitTreeState:"clean", GoVersion:"go1.13.4"}
+version.BuildInfo{Version:"v4.3.2", ...}
 ```
 
-If this command does not successfully return, install Helm 3 for your operating system.  See [Helm Installation](https://helm.sh/docs/intro/install/) for more information.  If you are running Helm 2.x, you will see both a client and server (tiller) portion returned by the version command.  Some of the commands below will also differ slightly for Helm 2.x.
+If this command does not successfully return, install Helm 3 or Helm 4 for your operating system. To move an existing Helm 3 deployment to Helm 4, see [Migrating from Helm 3 to Helm 4](docs/migrating-from-helm3-to-helm4.md).  See [Helm Installation](https://helm.sh/docs/intro/install/) for more information.
 
 1. Add the Pega repository to your Helm installation.
 

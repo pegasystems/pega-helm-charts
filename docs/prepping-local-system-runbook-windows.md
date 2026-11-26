@@ -72,10 +72,9 @@ To install Chocolatey for the first time on your local system, follow these step
 
 ### Installing Helm and the kubernetes CLI commands:
 
-Pega supports using Helm version 2.1 and later and the Kubernetes Command Line Interface (CLI) 1.15 and later. The latest runbooks use Helm version 3.0 and
-kubernetes-cli 1.17.0. It is recommended to use these versions. If you use Helm 2.x, some of the commands differ slightly for Helm 2.x.
+Pega supports Helm 3.x and Helm 4.x and the Kubernetes Command Line Interface (CLI) 1.15 and later. For help moving from Helm 3 to Helm 4, see [Migrating from Helm 3 to Helm 4](migrating-from-helm3-to-helm4.md).
 
-The default Helm version available in Chocolatey is 3.0.x; the version of kubernetes-cli used in the runbooks is version 1.17.x.
+The default Helm version available in Chocolatey is the latest stable release; the runbooks use kubernetes-cli 1.17.x.
 
 Enter the choco install command listed for each application into your PowerShell command prompt as shown:
 

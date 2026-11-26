@@ -234,7 +234,7 @@ constellation-messaging:
 elasticsearch:
   # For internally provisioned Elasticsearch server, the imageTag parameter is set by default to 7.17.9, which is the
   # recommended Elasticsearch server version for k8s version >= 1.25.
-  # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch helm chart version in requirements.yaml.
+  # Use this parameter to change it to 7.10.2 or 7.16.3 for k8s version < 1.25 and make sure to update the Elasticsearch chart version in the dependencies of Chart.yaml.
   imageTag: 7.17.9
   # Permit co-located instances for solitary minikube virtual machines.
   antiAffinity: "soft"

@@ -15,7 +15,7 @@ home: http://www.pega.com
 # * Disable deploying cassandra by setting 'cassandra.enabled' to false.
 dependencies:
 - name: cassandra
-  version: "0.13.3"
+  version: "0.15.3"
   repository: https://charts.helm.sh/incubator
   condition: cassandra.enabled
 - name: constellation
